@@ -14,3 +14,9 @@
 !/tmp/.keep
 
 .byebug_history
+
+/vendor/bundle
+
+.env
+
+.vscode

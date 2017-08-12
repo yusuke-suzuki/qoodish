@@ -30,4 +30,10 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  messages:
+    api:
+      error_400: Invalid parameter specified.
+      error_401: Authentication has failed.
+      error_403: Operation not allowed.
+      error_404: Resource not found.
+      error_500: The request has failed due to some unknown error.
