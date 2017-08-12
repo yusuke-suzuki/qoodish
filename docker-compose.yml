@@ -1,15 +1,15 @@
 version: '3'
 services:
-  db:
-    image: mysql:5.7
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+  redis:
+    image: redis
   api:
     build: .
-    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    command: bundle exec rails s -p 4000 -b '0.0.0.0'
     volumes:
       - .:/qoodish
+    environment:
+      - REDIS_HOST=redis
     ports:
-      - '3000:3000'
+      - '4000:4000'
     depends_on:
-      - db
+      - redis

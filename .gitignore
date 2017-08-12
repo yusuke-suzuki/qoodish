@@ -13,4 +13,12 @@
 !/log/.keep
 !/tmp/.keep
 
+/db/*.sqlite3
+
 .byebug_history
+
+/vendor/bundle
+
+.env
+
+.vscode
