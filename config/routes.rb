@@ -1,3 +1,12 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  resources :users, only: [:create, :destroy]
+  resources :maps do
+    scope module: :maps do
+      resources :reviews, only: [:index, :show, :create]
+      resources :spots, only: [:index, :show]
+      resources :collaborators, only: [:index]
+      resource :follow, only: [:create, :destroy]
+    end
+  end
+  resources :reviews, only: [:update, :destroy]
 end

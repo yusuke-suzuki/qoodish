@@ -1,5 +1,4 @@
 FROM ruby:2.3.3
-RUN apt-get update -qq
 RUN mkdir /qoodish
 WORKDIR /qoodish
 ADD Gemfile /qoodish/Gemfile
