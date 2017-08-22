@@ -1,24 +1,20 @@
-# README
+# Qoodish API
+Qoodish API.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Set Up
+`bundle`  
+`cp .env.sample .env`  
+`vim .env`  
+`bin/rails db:setup`
 
-Things you may want to cover:
+## Start app
+`bin/rails s`
 
-* Ruby version
+## Test
+`bin/rails test`
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## Development environment using Docker
+`docker-compose build`  
+`docker-compose up -d`  
+`docker-compose run api bundle exec rails db:setup`  
+`docker-compose logs -f api`  
