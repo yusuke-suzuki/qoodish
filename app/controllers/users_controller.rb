@@ -20,7 +20,9 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    current_user.destroy!
+    ActiveRecord::Base.transaction do
+      current_user.destroy!
+    end
   end
 
   private

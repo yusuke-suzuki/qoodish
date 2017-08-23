@@ -7,7 +7,9 @@ class ReviewsController < ApplicationController
   end
 
   def destroy
-    current_user.reviews.find_by!(id: params[:id]).destroy!
+    ActiveRecord::Base.transaction do
+      current_user.reviews.find_by!(id: params[:id]).destroy!
+    end
   end
 
   private

@@ -36,7 +36,9 @@ class MapsController < ApplicationController
   end
 
   def destroy
-    current_user.maps.find_by!(id: params[:id]).destroy!
+    ActiveRecord::Base.transaction do
+      current_user.maps.find_by!(id: params[:id]).destroy!
+    end
   end
 
   private

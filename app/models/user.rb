@@ -82,6 +82,13 @@ class User < ApplicationRecord
     )
   end
 
+  def delete_from_s3(key)
+    client.delete_object(
+      bucket: ENV['S3_BUCKET_NAME'],
+      key: key
+    )
+  end
+
   def fetch_fb_prof_image
     return unless facebook_user?
     prof = graph.get_connections('me', '?fields=name,link,picture')
@@ -97,8 +104,7 @@ class User < ApplicationRecord
   end
 
   def delete_profile_image
-    object = bucket.objects[image_path]
-    object.delete
+    delete_from_s3(image_path)
   end
 
   def fetch_github_user_id
