@@ -1,0 +1,28 @@
+version: '3'
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: docker/api/Dockerfile
+    env_file: .env
+    environment:
+      - RAILS_ENV=production
+      - PORT=5000
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_HOST=host
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - RAILS_LOG_TO_STDOUT=true
+      - SECRET_KEY_BASE=secret
+    expose:
+      - '5000'
+    command: bash -c 'bundle exec rails db:create && bundle exec rails db:migrate && bundle exec puma'
+  nginx:
+    build: docker/nginx
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+  redis:
+    image: redis

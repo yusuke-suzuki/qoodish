@@ -3,7 +3,9 @@ services:
   redis:
     image: redis
   api:
-    build: .
+    build:
+      context: ./
+      dockerfile: docker/api/Dockerfile
     command: bundle exec rails s -p 4000 -b '0.0.0.0'
     volumes:
       - .:/qoodish
