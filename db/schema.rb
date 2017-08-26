@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170817040207) do
+ActiveRecord::Schema.define(version: 20170826055656) do
 
   create_table "follows", force: :cascade do |t|
     t.string "followable_type", null: false
@@ -24,6 +24,16 @@ ActiveRecord::Schema.define(version: 20170817040207) do
     t.index ["followable_type", "followable_id"], name: "index_follows_on_followable_type_and_followable_id"
     t.index ["follower_id", "follower_type"], name: "fk_follows"
     t.index ["follower_type", "follower_id"], name: "index_follows_on_follower_type_and_follower_id"
+  end
+
+  create_table "inappropriate_contents", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "content_id_val", null: false
+    t.string "content_type", null: false
+    t.integer "reason_id_val", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_inappropriate_contents_on_user_id"
   end
 
   create_table "maps", force: :cascade do |t|
