@@ -14,4 +14,5 @@ Rails.application.routes.draw do
       resource :metadata, only: [:show]
     end
   end
+  resources :inappropriate_contents, only: [:create]
 end
