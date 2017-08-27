@@ -14,6 +14,10 @@ Qoodish API.
 `bin/rails test`
 
 ## Development environment using Docker
+`cp .env.sample .env`  
+`vim .env`  
+`cp docker-compose.dev.yml docker-compose.yml`  
+`vim docker-compose.yml`  
 `docker-compose build`  
 `docker-compose up -d`  
 `docker-compose run api bundle exec rails db:setup`  
