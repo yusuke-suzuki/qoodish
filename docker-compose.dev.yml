@@ -5,7 +5,7 @@ services:
   api:
     build:
       context: ./
-      dockerfile: docker/api/Dockerfile
+      dockerfile: Dockerfile
     command: bundle exec rails s -p 4000 -b '0.0.0.0'
     volumes:
       - .:/qoodish
