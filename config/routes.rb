@@ -9,7 +9,7 @@ Rails.application.routes.draw do
       resource :metadata, only: [:show]
     end
   end
-  resources :reviews, only: [:update, :destroy] do
+  resources :reviews, only: [:index, :update, :destroy] do
     scope module: :reviews do
       resource :metadata, only: [:show]
     end

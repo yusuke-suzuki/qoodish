@@ -55,6 +55,9 @@ class Review < ApplicationRecord
               scrict: Exceptions::InvalidUri
             }
 
+  scope :created_before, lambda { |created_at|
+    where('reviews.created_at > ?', created_at)
+  }
 
   def spot
     @spot ||= Spot.new(place_id_val, image_url)
