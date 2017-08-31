@@ -55,8 +55,19 @@ class Review < ApplicationRecord
               scrict: Exceptions::InvalidUri
             }
 
-  scope :created_before, lambda { |created_at|
-    where('reviews.created_at > ?', created_at)
+  FEED_PER_PAGE = 20
+
+  scope :map_posts_for, lambda { |current_user|
+    includes(:user, :map)
+      .where(map_id: current_user.following_maps.ids)
+  }
+
+  scope :latest_feed, lambda {
+    where(created_at: 1.month.ago...Time.now).order(created_at: :desc).limit(FEED_PER_PAGE)
+  }
+
+  scope :feed_before, lambda { |created_at|
+    where(created_at: 1.month.ago...Time.parse(created_at)).order(created_at: :desc).limit(FEED_PER_PAGE)
   }
 
   def spot

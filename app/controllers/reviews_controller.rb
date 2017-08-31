@@ -5,9 +5,9 @@ class ReviewsController < ApplicationController
     if current_user.following_maps.length.zero?
       @reviews = []
     elsif params[:next_timestamp]
-      @reviews = Review.includes(:user, :map).created_before(params[:next_timestamp]).where(map_id: current_user.following_maps.ids).order('reviews.created_at desc').limit(30)
+      @reviews = Review.map_posts_for(current_user).feed_before(params[:next_timestamp])
     else
-      @reviews = Review.includes(:user, :map).where(map_id: current_user.following_maps.ids).order('reviews.created_at desc').limit(30)
+      @reviews = Review.map_posts_for(current_user).latest_feed
     end
   end
 
