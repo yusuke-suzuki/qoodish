@@ -54,3 +54,6 @@ en:
       invalid_uri: Invalid URI.
 
       map_owner_cannot_removed: Map owner cannot be removed.
+
+      registration_token_is_required: Registration token is required.
+      registration_token_is_duplicated: Registration token is duplicated.
