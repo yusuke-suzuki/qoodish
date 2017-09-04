@@ -6,10 +6,9 @@ json.author do
 end
 json.comment review.comment
 json.image do
-  json.custom review.image_url.present?
-  json.url review.image_url.present? ? review.image_url : ENV['SUBSTITUTE_URL']
-  json.file_name review.image_url.present? ? File.basename(URI.decode(review.image_url)) : ''
-end
+  json.url review.image_url
+  json.file_name File.basename(URI.decode(review.image_url))
+end if review.image_url.present?
 json.spot do
   json.place_id review.spot.place_id
   json.name review.spot.name
