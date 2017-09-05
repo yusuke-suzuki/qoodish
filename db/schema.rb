@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170826055656) do
+ActiveRecord::Schema.define(version: 20170901041457) do
+
+  create_table "devices", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "registration_token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["registration_token"], name: "index_devices_on_registration_token"
+    t.index ["user_id", "registration_token"], name: "index_devices_on_user_id_and_registration_token", unique: true
+    t.index ["user_id"], name: "index_devices_on_user_id"
+  end
 
   create_table "follows", force: :cascade do |t|
     t.string "followable_type", null: false

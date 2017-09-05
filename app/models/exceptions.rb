@@ -127,8 +127,20 @@ module Exceptions
   end
 
   class MapOwnerCannotRemoved < BadRequest
-    def initialize(message = I18n.t('api_response.messages.map_owner_cannot_removed'))
+    def initialize(*)
       super(I18n.t('messages.api.map_owner_cannot_removed'))
+    end
+  end
+
+  class RegistrationTokenNotSpecified < BadRequest
+    def initialize(*)
+      super(I18n.t('messages.api.registration_token_is_required'))
+    end
+  end
+
+  class DuplicateRegistrationToken < BadRequest
+    def initialize(*)
+      super(I18n.t('messages.api.registration_token_is_duplicated'))
     end
   end
 end

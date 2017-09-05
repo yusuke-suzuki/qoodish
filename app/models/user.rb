@@ -22,6 +22,7 @@
 require 'open-uri'
 
 class User < ApplicationRecord
+  has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
   has_many :reviews, dependent: :destroy
 
@@ -113,6 +114,29 @@ class User < ApplicationRecord
     self.name = user['login']
   end
 
+  def subscribe_topic(topic)
+    devices.each do |device|
+      iid_client.subscribe_topic(device.registration_token, topic)
+    end
+  end
+
+  def unsubscribe_topic(topic)
+    devices.each do |device|
+      iid_client.unsubscribe_topic(device.registration_token, topic)
+    end
+  end
+
+  def send_message_to_topic(topic, message,request_path)
+    fcm_client.send_message_to_topic(topic, message, request_path)
+  end
+
+  def unfollow_all_maps
+    following_maps.each do |map|
+      stop_following(map)
+      unsubscribe_topic("map_#{map.id}")
+    end
+  end
+
   private
 
   def client
@@ -128,5 +152,13 @@ class User < ApplicationRecord
 
   def github_client
     @github_client ||= Github.new(endpoint: ENV['GITHUB_API_ENDPOINT'])
+  end
+
+  def iid_client
+    @iid_client ||= GoogleIid.new(endpoint: ENV['GOOGLE_IID_ENDPOINT'])
+  end
+
+  def fcm_client
+    @fcm_client ||= Fcm.new(endpoint: ENV['FCM_ENDPOINT'])
   end
 end

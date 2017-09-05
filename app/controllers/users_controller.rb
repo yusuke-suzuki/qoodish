@@ -21,6 +21,7 @@ class UsersController < ApplicationController
 
   def destroy
     ActiveRecord::Base.transaction do
+      current_user.unfollow_all_maps
       current_user.destroy!
     end
   end
