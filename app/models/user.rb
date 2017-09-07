@@ -116,17 +116,25 @@ class User < ApplicationRecord
 
   def subscribe_topic(topic)
     devices.each do |device|
-      iid_client.subscribe_topic(device.registration_token, topic)
+      begin
+        iid_client.subscribe_topic(device.registration_token, topic)
+      rescue Exceptions::NotFound
+        device.destroy!
+      end
     end
   end
 
   def unsubscribe_topic(topic)
     devices.each do |device|
-      iid_client.unsubscribe_topic(device.registration_token, topic)
+      begin
+        iid_client.unsubscribe_topic(device.registration_token, topic)
+      rescue Exceptions::NotFound
+        device.destroy!
+      end
     end
   end
 
-  def send_message_to_topic(topic, message,request_path)
+  def send_message_to_topic(topic, message, request_path)
     fcm_client.send_message_to_topic(topic, message, request_path)
   end
 
