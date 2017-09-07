@@ -115,23 +115,13 @@ class User < ApplicationRecord
   end
 
   def subscribe_topic(topic)
-    devices.each do |device|
-      begin
-        iid_client.subscribe_topic(device.registration_token, topic)
-      rescue Exceptions::NotFound
-        device.destroy!
-      end
-    end
+    registration_tokens = devices.pluck(:registration_token)
+    iid_client.bulk_subscribe_topic(registration_tokens, topic)
   end
 
   def unsubscribe_topic(topic)
-    devices.each do |device|
-      begin
-        iid_client.unsubscribe_topic(device.registration_token, topic)
-      rescue Exceptions::NotFound
-        device.destroy!
-      end
-    end
+    registration_tokens = devices.pluck(:registration_token)
+    iid_client.bulk_unsubscribe_topic(registration_tokens, topic)
   end
 
   def send_message_to_topic(topic, message, request_path)
