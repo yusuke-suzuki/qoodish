@@ -58,7 +58,7 @@ class Map < ApplicationRecord
   before_validation :remove_carriage_return
 
   scope :popular, lambda {
-    includes(:user, :reviews).where(maps: { private: false }).sort_by(&:followers_count).take(30)
+    includes(:user, :reviews).where(maps: { private: false }).sort_by(&:followers_count).take(30).reverse!
   }
 
   def base

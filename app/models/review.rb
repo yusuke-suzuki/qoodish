@@ -63,11 +63,15 @@ class Review < ApplicationRecord
   }
 
   scope :latest_feed, lambda {
-    where(created_at: 1.month.ago...Time.now).order(created_at: :desc).limit(FEED_PER_PAGE)
+    where(created_at: 6.month.ago...Time.now).order(created_at: :desc).limit(FEED_PER_PAGE)
   }
 
   scope :feed_before, lambda { |created_at|
-    where(created_at: 1.month.ago...Time.parse(created_at)).order(created_at: :desc).limit(FEED_PER_PAGE)
+    where(created_at: 6.month.ago...Time.parse(created_at)).order(created_at: :desc).limit(FEED_PER_PAGE)
+  }
+
+  scope :recent, lambda {
+    includes(:user, :map).where(maps: { private: false }).order(created_at: :desc).limit(4)
   }
 
   def spot
