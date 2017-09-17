@@ -2,7 +2,9 @@ class ReviewsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    if current_user.following_maps.length.zero?
+    if params[:recent]
+      @reviews = Review.recent
+    elsif current_user.following_maps.length.zero?
       @reviews = []
     elsif params[:next_timestamp]
       @reviews = Review.map_posts_for(current_user).feed_before(params[:next_timestamp])
