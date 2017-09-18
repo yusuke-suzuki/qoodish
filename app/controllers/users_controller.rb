@@ -1,5 +1,9 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!, only: [:destroy]
+  before_action :authenticate_user!, only: [:show, :destroy]
+
+  def show
+    @user = User.find_by!(uid: params[:id])
+  end
 
   def create
     Rails.logger.info(params)
