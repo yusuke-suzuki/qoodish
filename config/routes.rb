@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  resources :users, only: [:show, :create, :destroy]
+  resources :users, only: [:show, :create, :destroy] do
+    scope module: :users do
+      resources :maps, only: [:index]
+    end
+  end
   resources :devices, only: [:create]
   resources :maps do
     scope module: :maps do
