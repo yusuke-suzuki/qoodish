@@ -40,6 +40,7 @@ class MapsController < ApplicationController
     ActiveRecord::Base.transaction do
       map = current_user.maps.find_by!(id: params[:id])
       current_user.unsubscribe_topic("map_#{map.id}")
+      current_user.stop_following(map)
       map.destroy!
     end
   end
