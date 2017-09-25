@@ -21,7 +21,7 @@
 
 class Map < ApplicationRecord
   belongs_to :user
-  has_many :reviews
+  has_many :reviews, dependent: :destroy
 
   attr_accessor :base_lat, :base_lng
 
