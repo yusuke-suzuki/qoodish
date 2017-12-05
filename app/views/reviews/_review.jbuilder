@@ -5,10 +5,12 @@ json.author do
   json.profile_image_url review.user.image_url
 end
 json.comment review.comment
-json.image do
-  json.url review.image_url
-  json.file_name File.basename(URI.decode(review.image_url))
-end if review.image_url.present?
+if review.image_url.present?
+  json.image do
+    json.url review.image_url
+    json.file_name File.basename(CGI.unescape(review.image_url))
+  end
+end
 json.spot do
   json.place_id review.spot.place_id
   json.name review.spot.name
