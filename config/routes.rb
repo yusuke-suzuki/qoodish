@@ -20,4 +20,5 @@ Rails.application.routes.draw do
     end
   end
   resources :inappropriate_contents, only: [:create]
+  resources :places, only: [:index]
 end
