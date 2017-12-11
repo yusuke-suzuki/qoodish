@@ -49,11 +49,11 @@ class User < ApplicationRecord
   end
 
   def postable?(map)
-    following?(map) && (map_owner?(map) || map.shared)
+    map_owner?(map) || (map.shared && !map.private) || (map.private && following?(map) && map.shared)
   end
 
   def referenceable?(map)
-    following?(map) || (!following?(map) && !map.private)
+    map_owner?(map) || (map.private && following?(map)) || (!following?(map) && !map.private)
   end
 
   def github_user?
