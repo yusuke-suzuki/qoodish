@@ -12,6 +12,7 @@ if review.image_url.present?
   end
 end
 json.spot do
+  json.image_url review.spot.image_url.present? ? review.spot.image_url : ENV['SUBSTITUTE_URL']
   json.place_id review.spot.place_id
   json.name review.spot.name
   json.lat review.spot.lat
