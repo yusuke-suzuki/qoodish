@@ -53,7 +53,7 @@ class User < ApplicationRecord
   end
 
   def referenceable?(map)
-    map_owner?(map) || (map.private && following?(map)) || (!following?(map) && !map.private)
+    map_owner?(map) || following?(map) || (!following?(map) && !map.private)
   end
 
   def github_user?
