@@ -22,5 +22,7 @@ end
 json.map_id review.map_id
 json.map_name review.map.name
 json.editable current_user.author?(review)
+json.liked current_user.liked?(review)
+json.likes_count review.get_likes.size
 json.created_at review.created_at
 json.updated_at review.updated_at

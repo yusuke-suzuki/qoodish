@@ -24,6 +24,7 @@ gem 'jbuilder', '~> 2.5'
 # gem 'rack-cors'
 
 gem 'acts_as_follower', github: 'tcocca/acts_as_follower', branch: 'master'
+gem 'acts_as_votable', '~> 0.11.1'
 gem 'aws-sdk', '~> 2'
 gem 'faraday'
 gem 'google_places'
