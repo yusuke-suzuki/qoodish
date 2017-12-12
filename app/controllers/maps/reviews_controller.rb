@@ -5,11 +5,12 @@ module Maps
     def index
       map = Map.find_by!(id: params[:map_id])
       raise Exceptions::NotFound unless current_user.referenceable?(map)
-      if params[:place_id].present?
-        @reviews = map.reviews.includes(:user, :map).where(place_id_val: params[:place_id])
-      else
-        @reviews = map.reviews.includes(:user, :map).order(created_at: :desc)
-      end
+      @reviews =
+        if params[:place_id].present?
+          map.reviews.includes(:user).where(place_id_val: params[:place_id])
+        else
+          map.reviews.includes(:user).order(created_at: :desc)
+        end
     end
 
     def show

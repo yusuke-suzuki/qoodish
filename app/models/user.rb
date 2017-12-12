@@ -33,6 +33,7 @@ class User < ApplicationRecord
             uniqueness: true
 
   acts_as_follower
+  acts_as_voter
 
   before_validation :fetch_github_user_id
   before_destroy :delete_profile_image

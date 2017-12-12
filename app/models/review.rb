@@ -23,6 +23,8 @@ class Review < ApplicationRecord
   belongs_to :user
   belongs_to :map
 
+  acts_as_votable
+
   before_validation :remove_carriage_return
 
   validates :comment,

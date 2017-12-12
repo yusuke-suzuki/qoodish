@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   resources :reviews, only: [:index, :update, :destroy] do
     scope module: :reviews do
       resource :metadata, only: [:show]
+      resource :like, only: [:create, :destroy]
+      resources :likes, only: [:index]
     end
   end
   resources :inappropriate_contents, only: [:create]
