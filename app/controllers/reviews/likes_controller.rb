@@ -18,6 +18,7 @@ module Reviews
         recipient: @review.user,
         key: 'liked'
       )
+      current_user.send_message_to_user(@review.user, "#{current_user.name} liked your report.", "maps/#{@review.map_id}/reports/#{@review.id}")
     end
 
     def destroy

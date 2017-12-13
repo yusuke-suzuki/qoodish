@@ -130,6 +130,11 @@ class User < ApplicationRecord
     fcm_client.send_message_to_topic(topic, message, request_path)
   end
 
+  def send_message_to_user(recipient, message, request_path)
+    registration_tokens = recipient.devices.pluck(:registration_token)
+    fcm_client.send_message_to_devices(registration_tokens, message, request_path)
+  end
+
   def unfollow_all_maps
     following_maps.each do |map|
       stop_following(map)
