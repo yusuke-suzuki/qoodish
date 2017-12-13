@@ -23,4 +23,5 @@ Rails.application.routes.draw do
   end
   resources :inappropriate_contents, only: [:create]
   resources :places, only: [:index]
+  resources :notifications, only: [:index, :update]
 end

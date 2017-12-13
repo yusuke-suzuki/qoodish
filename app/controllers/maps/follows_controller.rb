@@ -8,8 +8,14 @@ module Maps
         raise Exceptions::NotFound unless current_user.referenceable?(map)
         current_user.follow(map)
         @map = map.reload
+        Notification.create!(
+          notifiable: @map,
+          notifier: current_user,
+          recipient: @map.user,
+          key: 'followed'
+        )
         current_user.subscribe_topic("map_#{@map.id}")
-        current_user.send_message_to_topic("map_#{@map.id}", "#{current_user.name} joined #{@map.name}.", "maps/#{@map.id}")
+        current_user.send_message_to_topic("map_#{@map.id}", "#{current_user.name} followed #{@map.name}.", "maps/#{@map.id}")
       end
     end
 

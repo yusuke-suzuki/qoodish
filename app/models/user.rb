@@ -25,6 +25,7 @@ class User < ApplicationRecord
   has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :notifications, as: :recipient
 
   validates :uid,
             presence: true
