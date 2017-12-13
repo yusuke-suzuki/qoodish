@@ -22,6 +22,7 @@
 class Review < ApplicationRecord
   belongs_to :user
   belongs_to :map
+  has_many :notifications, as: :notifiable
 
   acts_as_votable
 
