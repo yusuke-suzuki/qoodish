@@ -32,4 +32,26 @@ class Notification < ApplicationRecord
   scope :recent, lambda { |current_user|
     includes(:notifier, :notifiable).where.not(notifications: { notifier_id: current_user.id }).order(created_at: :desc).limit(10)
   }
+
+  def notifiable_name
+    case notifiable_type
+    when Review.name
+      'report'
+    when Map.name
+      'map'
+    else
+      ''
+    end
+  end
+
+  def click_action
+    case notifiable_type
+    when Review.name
+      "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
+    when Map.name
+      "/maps/#{notifiable.id}"
+    else
+      ''
+    end
+  end
 end
