@@ -35,7 +35,7 @@ class Fcm < ApiClientBase
       'Content-Type' => 'application/json'
     }
     params = {
-      to: registration_tokens.join(','),
+      registration_ids: registration_tokens,
       notification: {
         title: 'Qoodish',
         body: body,
