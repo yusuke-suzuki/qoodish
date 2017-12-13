@@ -70,6 +70,10 @@ class Map < ApplicationRecord
     reviews.group_by(&:place_id_val).map { |key, value| value[0].spot }
   end
 
+  def image_url
+    reviews.exists? && reviews[0].image_url.present? ? reviews[0].image_url : ENV['SUBSTITUTE_URL']
+  end
+
   private
 
   def remove_carriage_return

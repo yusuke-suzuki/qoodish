@@ -15,6 +15,6 @@ json.following current_user.following?(map)
 json.editable current_user.map_owner?(map)
 json.shared map.shared
 json.invitable map.invitable
-json.image_url map.reviews.exists? && map.reviews[0].image_url.present? ? map.reviews[0].image_url : ENV['SUBSTITUTE_URL']
+json.image_url map.image_url
 json.created_at map.created_at
 json.updated_at map.updated_at
