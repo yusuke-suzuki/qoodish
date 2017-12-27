@@ -4,11 +4,21 @@ class Spot
   def initialize(place_id, image_url = nil)
     @place_id = place_id
     detail = place_id.present? ? spot_detail : {}
-    @name = detail[:name]
+    @name = extract_place_name(detail)
     @lat = detail[:lat]
     @lng = detail[:lng]
     @formatted_address = detail[:formatted_address]
     @image_url = image_url
+  end
+
+  def extract_place_name(detail)
+    if detail[:name].present?
+      detail[:name]
+    elsif detail[:formatted_address].present?
+      detail[:formatted_address].split(',')[0]
+    else
+      ''
+    end
   end
 
   def spot_detail
