@@ -26,6 +26,7 @@ class UsersController < ApplicationController
   def destroy
     ActiveRecord::Base.transaction do
       current_user.unfollow_all_maps
+      current_user.unsubscribe_topic("user_#{current_user.id}")
       current_user.destroy!
     end
   end
