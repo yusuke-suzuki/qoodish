@@ -11,6 +11,7 @@ class DevicesController < ApplicationController
       current_user.following_maps.each do |map|
         current_user.subscribe_topic("map_#{map.id}")
       end
+      current_user.subscribe_topic("user_#{current_user.id}")
     end
   end
 
