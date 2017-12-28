@@ -4,7 +4,7 @@ Rails.application.routes.draw do
       resources :maps, only: [:index]
     end
   end
-  resources :devices, only: [:create]
+  resources :devices, only: [:create, :destroy]
   resources :maps do
     scope module: :maps do
       resources :reviews, only: [:index, :show, :create]
