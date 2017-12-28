@@ -2,7 +2,7 @@ class NotificationsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @notifications = current_user.notifications.recent(current_user).reject { |notification| notification.notifier.blank? || notification.notifier.blank? }
+    @notifications = current_user.notifications.recent(current_user).reject { |notification| notification.notifier.blank? || notification.notifiable.blank? }
   end
 
   def update
