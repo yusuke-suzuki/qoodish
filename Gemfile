@@ -31,6 +31,7 @@ gem 'google_places'
 gem 'http_accept_language'
 gem 'jwt'
 gem 'koala'
+gem 'mysql2'
 gem 'redis-namespace'
 gem 'redis-objects'
 
@@ -38,7 +39,6 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'dotenv-rails'
-  gem 'sqlite3'
 end
 
 group :development do
@@ -52,11 +52,6 @@ group :development do
   gem 'awesome_print'
   gem 'bullet'
   gem 'rails-erd'
-end
-
-group :production do
-  # Use mysql as the database for Active Record
-  gem 'mysql2', '>= 0.3.18', '< 0.5'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
