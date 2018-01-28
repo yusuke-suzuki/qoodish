@@ -12,8 +12,8 @@
 
 ActiveRecord::Schema.define(version: 20171213063648) do
 
-  create_table "devices", force: :cascade do |t|
-    t.integer "user_id", null: false
+  create_table "devices", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id", null: false
     t.string "registration_token", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -22,11 +22,11 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.index ["user_id"], name: "index_devices_on_user_id"
   end
 
-  create_table "follows", force: :cascade do |t|
+  create_table "follows", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "followable_type", null: false
-    t.integer "followable_id", null: false
+    t.bigint "followable_id", null: false
     t.string "follower_type", null: false
-    t.integer "follower_id", null: false
+    t.bigint "follower_id", null: false
     t.boolean "blocked", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.index ["follower_type", "follower_id"], name: "index_follows_on_follower_type_and_follower_id"
   end
 
-  create_table "inappropriate_contents", force: :cascade do |t|
+  create_table "inappropriate_contents", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "user_id", null: false
     t.integer "content_id_val", null: false
     t.string "content_type", null: false
@@ -46,8 +46,8 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.index ["user_id"], name: "index_inappropriate_contents_on_user_id"
   end
 
-  create_table "maps", force: :cascade do |t|
-    t.integer "user_id", null: false
+  create_table "maps", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id", null: false
     t.string "name", null: false
     t.string "description", null: false
     t.boolean "private", default: true
@@ -60,13 +60,13 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.index ["user_id"], name: "index_maps_on_user_id"
   end
 
-  create_table "notifications", force: :cascade do |t|
+  create_table "notifications", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "notifiable_type"
-    t.integer "notifiable_id"
+    t.bigint "notifiable_id"
     t.string "notifier_type"
-    t.integer "notifier_id"
+    t.bigint "notifier_id"
     t.string "recipient_type"
-    t.integer "recipient_id"
+    t.bigint "recipient_id"
     t.string "key"
     t.boolean "read", default: false
     t.datetime "created_at", null: false
@@ -79,9 +79,9 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
-  create_table "reviews", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "map_id", null: false
+  create_table "reviews", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id", null: false
+    t.bigint "map_id", null: false
     t.string "place_id_val", null: false
     t.string "comment", null: false
     t.string "image_url"
@@ -93,7 +93,7 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.string "email"
     t.string "uid", null: false
@@ -107,11 +107,11 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.index ["uid"], name: "index_users_on_uid"
   end
 
-  create_table "votes", force: :cascade do |t|
+  create_table "votes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "votable_type"
-    t.integer "votable_id"
+    t.bigint "votable_id"
     t.string "voter_type"
-    t.integer "voter_id"
+    t.bigint "voter_id"
     t.boolean "vote_flag"
     t.string "vote_scope"
     t.integer "vote_weight"
@@ -123,4 +123,8 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.index ["voter_type", "voter_id"], name: "index_votes_on_voter_type_and_voter_id"
   end
 
+  add_foreign_key "devices", "users"
+  add_foreign_key "maps", "users"
+  add_foreign_key "reviews", "maps"
+  add_foreign_key "reviews", "users"
 end

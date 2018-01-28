@@ -3,13 +3,13 @@
 # Table name: notifications
 #
 #  id              :integer          not null, primary key
-#  notifiable_type :string
+#  notifiable_type :string(255)
 #  notifiable_id   :integer
-#  notifier_type   :string
+#  notifier_type   :string(255)
 #  notifier_id     :integer
-#  recipient_type  :string
+#  recipient_type  :string(255)
 #  recipient_id    :integer
-#  key             :string
+#  key             :string(255)
 #  read            :boolean          default(FALSE)
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
