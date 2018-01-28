@@ -3,13 +3,13 @@
 # Table name: users
 #
 #  id             :integer          not null, primary key
-#  name           :string
-#  email          :string
-#  uid            :string           not null
-#  provider       :string           not null
-#  provider_uid   :string           not null
-#  provider_token :string
-#  image_path     :string
+#  name           :string(255)
+#  email          :string(255)
+#  uid            :string(255)      not null
+#  provider       :string(255)      not null
+#  provider_uid   :string(255)      not null
+#  provider_token :string(255)
+#  image_path     :string(255)
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #

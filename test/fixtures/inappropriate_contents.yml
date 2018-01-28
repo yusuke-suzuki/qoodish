@@ -5,7 +5,7 @@
 #  id             :integer          not null, primary key
 #  user_id        :integer          not null
 #  content_id_val :integer          not null
-#  content_type   :string           not null
+#  content_type   :string(255)      not null
 #  reason_id_val  :integer          not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
