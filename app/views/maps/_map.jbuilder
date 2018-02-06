@@ -13,6 +13,7 @@ json.base do
 end
 json.following current_user.following?(map)
 json.editable current_user.map_owner?(map)
+json.postable current_user.postable?(map)
 json.shared map.shared
 json.invitable map.invitable
 json.image_url map.image_url
