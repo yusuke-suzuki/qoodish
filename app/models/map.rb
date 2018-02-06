@@ -66,6 +66,10 @@ class Map < ApplicationRecord
     includes(:user, :reviews).where(maps: { private: false }).sort_by(&:followers_count).take(30).reverse!
   }
 
+  scope :postable, lambda { |current_user|
+    includes(:user, :reviews).order(created_at: :desc).select { |map| current_user.postable?(map) }
+  }
+
   def base
     @base ||= Spot.new(base_id_val)
   end

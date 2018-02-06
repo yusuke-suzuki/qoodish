@@ -5,6 +5,8 @@ class MapsController < ApplicationController
     @maps =
       if params[:popular]
         Map.popular
+      elsif params[:postable]
+        current_user.following_maps.postable(current_user)
       else
         current_user.following_maps.includes(:user, :reviews).order(created_at: :desc)
       end
