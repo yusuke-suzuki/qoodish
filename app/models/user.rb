@@ -37,6 +37,7 @@ class User < ApplicationRecord
   acts_as_voter
 
   before_validation :fetch_github_user_id
+  after_create :create_default_map
   before_destroy :delete_profile_image
 
   PROVIDER_GITHUB = 'github.com'.freeze
@@ -141,6 +142,15 @@ class User < ApplicationRecord
       stop_following(map)
       unsubscribe_topic("map_#{map.id}")
     end
+  end
+
+  def create_default_map
+    map = maps.create!(
+      name: "#{name}'s map",
+      description: "#{name}'s map."
+    )
+    follow(map)
+    subscribe_topic("map_#{map.id}")
   end
 
   private
