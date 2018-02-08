@@ -119,11 +119,13 @@ class User < ApplicationRecord
 
   def subscribe_topic(topic)
     registration_tokens = devices.pluck(:registration_token)
+    return if registration_tokens.blank?
     iid_client.bulk_subscribe_topic(registration_tokens, topic)
   end
 
   def unsubscribe_topic(topic)
     registration_tokens = devices.pluck(:registration_token)
+    return if registration_tokens.blank?
     iid_client.bulk_unsubscribe_topic(registration_tokens, topic)
   end
 
