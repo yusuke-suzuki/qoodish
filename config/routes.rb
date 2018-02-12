@@ -24,6 +24,11 @@ Rails.application.routes.draw do
     end
     resources :inappropriate_contents, only: [:create]
     resources :places, only: [:index]
+    resources :spots, only: [:show] do
+      scope module: :spots do
+        resources :reviews, only: [:index]
+      end
+    end
     resources :notifications, only: [:index, :update]
   end
 end
