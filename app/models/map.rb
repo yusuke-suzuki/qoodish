@@ -75,7 +75,7 @@ class Map < ApplicationRecord
   end
 
   def spots
-    reviews.group_by(&:place_id_val).map { |key, value| value[0].spot }
+    reviews.order(created_at: :desc).group_by(&:place_id_val).map { |key, value| value[0].spot }
   end
 
   def image_url
