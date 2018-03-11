@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171213063648) do
+ActiveRecord::Schema.define(version: 20180311144911) do
 
   create_table "devices", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "user_id", null: false
@@ -44,6 +44,26 @@ ActiveRecord::Schema.define(version: 20171213063648) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_inappropriate_contents_on_user_id"
+  end
+
+  create_table "invites", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "invitable_type"
+    t.bigint "invitable_id"
+    t.string "sender_type"
+    t.bigint "sender_id"
+    t.string "recipient_type"
+    t.bigint "recipient_id"
+    t.bigint "map_id", null: false
+    t.boolean "expired", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invitable_id", "invitable_type"], name: "index_invites_on_invitable_id_and_invitable_type"
+    t.index ["invitable_type", "invitable_id"], name: "index_invites_on_invitable_type_and_invitable_id"
+    t.index ["map_id"], name: "index_invites_on_map_id"
+    t.index ["recipient_id", "recipient_type"], name: "index_invites_on_recipient_id_and_recipient_type"
+    t.index ["recipient_type", "recipient_id"], name: "index_invites_on_recipient_type_and_recipient_id"
+    t.index ["sender_id", "sender_type"], name: "index_invites_on_sender_id_and_sender_type"
+    t.index ["sender_type", "sender_id"], name: "index_invites_on_sender_type_and_sender_id"
   end
 
   create_table "maps", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -124,6 +144,7 @@ ActiveRecord::Schema.define(version: 20171213063648) do
   end
 
   add_foreign_key "devices", "users"
+  add_foreign_key "invites", "maps"
   add_foreign_key "maps", "users"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"

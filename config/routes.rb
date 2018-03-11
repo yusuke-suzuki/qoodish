@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :users, only: [:show, :create, :destroy] do
+  resources :users, only: [:index, :show, :create, :destroy] do
     scope module: :users do
       resources :maps, only: [:index]
     end
@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       resources :reviews, only: [:index, :show, :create]
       resources :spots, only: [:index, :show]
       resources :collaborators, only: [:index]
+      resources :invites, only: [:create]
       resource :follow, only: [:create, :destroy]
       resource :metadata, only: [:show]
     end
@@ -29,4 +30,5 @@ Rails.application.routes.draw do
     end
   end
   resources :notifications, only: [:index, :update]
+  resources :invites, only: [:index]
 end

@@ -1,5 +1,12 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!, only: [:show, :destroy]
+  before_action :authenticate_user!, only: [:index, :show, :destroy]
+
+  def index
+    @users = []
+    if params[:input].present?
+      @users = User.where.not(id: current_user.id).where.like(name: "%#{params[:input]}%").limit(20)
+    end
+  end
 
   def show
     @user = User.find_by!(uid: params[:id])

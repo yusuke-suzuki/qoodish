@@ -45,6 +45,10 @@ class Notification < ApplicationRecord
   end
 
   def click_action
+    if key == 'invited'
+      return '/invites'
+    end
+
     case notifiable_type
     when Review.name
       "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"

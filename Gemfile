@@ -23,6 +23,7 @@ gem 'jbuilder', '~> 2.5'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
 
+gem 'activerecord-like'
 gem 'acts_as_follower', github: 'tcocca/acts_as_follower', branch: 'master'
 gem 'acts_as_votable', '~> 0.11.1'
 gem 'aws-sdk', '~> 2'
