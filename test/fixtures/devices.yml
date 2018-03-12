@@ -14,10 +14,6 @@
 #  index_devices_on_user_id                         (user_id)
 #  index_devices_on_user_id_and_registration_token  (user_id,registration_token) UNIQUE
 #
-# Foreign Keys
-#
-#  fk_rails_...  (user_id => users.id)
-#
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 

@@ -24,10 +24,6 @@
 #  index_invites_on_sender_id_and_sender_type        (sender_id,sender_type)
 #  index_invites_on_sender_type_and_sender_id        (sender_type,sender_id)
 #
-# Foreign Keys
-#
-#  fk_rails_...  (map_id => maps.id)
-#
 
 require 'test_helper'
 

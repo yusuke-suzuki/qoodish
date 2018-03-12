@@ -143,8 +143,6 @@ ActiveRecord::Schema.define(version: 20180311144911) do
     t.index ["voter_type", "voter_id"], name: "index_votes_on_voter_type_and_voter_id"
   end
 
-  add_foreign_key "devices", "users"
-  add_foreign_key "invites", "maps"
   add_foreign_key "maps", "users"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"
