@@ -53,13 +53,11 @@ ActiveRecord::Schema.define(version: 20180311144911) do
     t.bigint "sender_id"
     t.string "recipient_type"
     t.bigint "recipient_id"
-    t.bigint "map_id", null: false
     t.boolean "expired", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["invitable_id", "invitable_type"], name: "index_invites_on_invitable_id_and_invitable_type"
     t.index ["invitable_type", "invitable_id"], name: "index_invites_on_invitable_type_and_invitable_id"
-    t.index ["map_id"], name: "index_invites_on_map_id"
     t.index ["recipient_id", "recipient_type"], name: "index_invites_on_recipient_id_and_recipient_type"
     t.index ["recipient_type", "recipient_id"], name: "index_invites_on_recipient_type_and_recipient_id"
     t.index ["sender_id", "sender_type"], name: "index_invites_on_sender_id_and_sender_type"
@@ -143,6 +141,7 @@ ActiveRecord::Schema.define(version: 20180311144911) do
     t.index ["voter_type", "voter_id"], name: "index_votes_on_voter_type_and_voter_id"
   end
 
+  add_foreign_key "devices", "users"
   add_foreign_key "maps", "users"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"

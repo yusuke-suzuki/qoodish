@@ -9,7 +9,6 @@
 #  sender_id      :integer
 #  recipient_type :string(255)
 #  recipient_id   :integer
-#  map_id         :integer          not null
 #  expired        :boolean          default(FALSE)
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
@@ -18,7 +17,6 @@
 #
 #  index_invites_on_invitable_id_and_invitable_type  (invitable_id,invitable_type)
 #  index_invites_on_invitable_type_and_invitable_id  (invitable_type,invitable_id)
-#  index_invites_on_map_id                           (map_id)
 #  index_invites_on_recipient_id_and_recipient_type  (recipient_id,recipient_type)
 #  index_invites_on_recipient_type_and_recipient_id  (recipient_type,recipient_id)
 #  index_invites_on_sender_id_and_sender_type        (sender_id,sender_type)
