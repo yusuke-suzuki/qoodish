@@ -4,8 +4,14 @@ module Maps
 
     def create
       ActiveRecord::Base.transaction do
-        map = Map.includes(:user, :reviews).find_by!(id: params[:map_id])
-        raise Exceptions::NotFound unless current_user.referenceable?(map)
+        if params[:invite_id]
+          invite = current_user.invites.find_by!(id: params[:invite_id], expired: false)
+          invite.update!(expired: true)
+          map = invite.invitable
+        else
+          map = Map.includes(:user, :reviews).find_by!(id: params[:map_id])
+          raise Exceptions::NotFound unless current_user.referenceable?(map)
+        end
         current_user.follow(map)
         @map = map.reload
         Notification.create!(

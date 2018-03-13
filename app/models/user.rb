@@ -26,6 +26,7 @@ class User < ApplicationRecord
   has_many :maps, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :recipient
+  has_many :invites, as: :recipient
 
   validates :uid,
             presence: true

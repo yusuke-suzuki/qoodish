@@ -27,6 +27,7 @@ class Map < ApplicationRecord
   belongs_to :user
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :notifiable
+  has_many :invites, as: :invitable, dependent: :destroy
 
   attr_accessor :base_lat, :base_lng
 
