@@ -53,7 +53,7 @@ class Map < ApplicationRecord
             },
             length: {
               allow_blank: false,
-              maximum: 140,
+              maximum: 200,
               strict: Exceptions::MapDescriptionExceeded
             }
   validates :user_id,
