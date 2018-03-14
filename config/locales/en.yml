@@ -44,13 +44,13 @@ en:
       map_name_required: Map name is required.
       map_name_exceed: 'Map name is too long. (Max: 30)'
       map_description_required: Please enter a description of the map.
-      map_description_exceed: 'Description of the map is too long. (Max: 140)'
+      map_description_exceed: 'Description of the map is too long. (Max: 200)'
       map_owner_not_specified: Please specify the owner of the map.
 
       duplicate_reviews: You can not post about the same spot.
       place_id_not_specified: Place ID has not been specified.
       comment_required: Comment is required.
-      comment_exceeded: Comment is too long.
+      comment_exceeded: 'Comment is too long (Max: 200)'.
       invalid_uri: Invalid URI.
 
       map_owner_cannot_removed: Map owner cannot be removed.
