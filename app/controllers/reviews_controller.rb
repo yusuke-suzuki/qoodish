@@ -30,6 +30,7 @@ class ReviewsController < ApplicationController
     attributes = {}
     attributes[:comment] = params[:comment] if params[:comment]
     attributes[:image_url] = params[:image_url] if params[:image_url]
+    attributes[:place_id_val] = params[:place_id] if params[:place_id]
     attributes
   end
 end
