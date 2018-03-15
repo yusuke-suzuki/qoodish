@@ -86,7 +86,7 @@ class Map < ApplicationRecord
   private
 
   def remove_carriage_return
-    description.gsub!(/\r/, '') if name
+    name.gsub!(/\r/, '') if name
     description.gsub!(/\r/, '') if description
   end
 end
