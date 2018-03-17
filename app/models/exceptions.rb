@@ -102,6 +102,12 @@ module Exceptions
     end
   end
 
+  class PlaceNotFound < BadRequest
+    def initialize(*)
+      super(I18n.t('messages.api.place_not_found'))
+    end
+  end
+
   class CommentNotSpecified < BadRequest
     def initialize(*)
       super(I18n.t('messages.api.comment_required'))
