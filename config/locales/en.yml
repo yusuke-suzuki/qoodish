@@ -49,8 +49,10 @@ en:
 
       duplicate_reviews: You can not post about the same spot.
       place_id_not_specified: Place ID has not been specified.
+      place_not_found: Place not found.
+
       comment_required: Comment is required.
-      comment_exceeded: 'Comment is too long (Max: 200)'.
+      comment_exceeded: 'Comment is too long. (Max: 200)'
       invalid_uri: Invalid URI.
 
       map_owner_cannot_removed: Map owner cannot be removed.

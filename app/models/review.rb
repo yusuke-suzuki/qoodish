@@ -62,6 +62,7 @@ class Review < ApplicationRecord
               with: /\A#{URI::regexp(%w(http https))}\z/,
               scrict: Exceptions::InvalidUri
             }
+  validate :validate_spot
 
   FEED_PER_PAGE = 20
 
@@ -91,5 +92,9 @@ class Review < ApplicationRecord
   def remove_carriage_return
     return unless comment
     comment.gsub!(/\r/, '')
+  end
+
+  def validate_spot
+    raise Exceptions::PlaceNotFound if spot.name.blank?
   end
 end
