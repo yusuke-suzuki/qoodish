@@ -17,5 +17,6 @@ json.postable current_user.postable?(map)
 json.shared map.shared
 json.invitable map.invitable
 json.image_url map.image_url
+json.thumbnail_url map.thumbnail_url
 json.created_at map.created_at
 json.updated_at map.updated_at

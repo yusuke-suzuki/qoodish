@@ -8,7 +8,8 @@ json.comment review.comment
 if review.image_url.present?
   json.image do
     json.url review.image_url
-    json.file_name File.basename(CGI.unescape(review.image_url))
+    json.file_name review.image_name
+    json.thumbnail_url review.thumbnail_url
   end
 end
 json.spot do

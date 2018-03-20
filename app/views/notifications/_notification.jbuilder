@@ -4,7 +4,7 @@ json.click_action notification.click_action
 json.notifiable do
   json.id notification.notifiable_id
   json.type notification.notifiable_name
-  json.image_url notification.notifiable.image_url
+  json.thumbnail_url notification.notifiable.thumbnail_url
 end
 json.notifier do
   json.id notification.notifier_id
