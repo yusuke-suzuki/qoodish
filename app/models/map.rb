@@ -83,6 +83,10 @@ class Map < ApplicationRecord
     reviews.exists? && reviews[0].image_url.present? ? reviews[0].image_url : ENV['SUBSTITUTE_URL']
   end
 
+  def thumbnail_url
+    reviews.exists? && reviews[0].image_url.present? ? reviews[0].thumbnail_url : ENV['SUBSTITUTE_URL']
+  end
+
   private
 
   def remove_carriage_return

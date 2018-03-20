@@ -84,7 +84,18 @@ class Review < ApplicationRecord
   }
 
   def spot
-    @spot ||= Spot.new(place_id_val, image_url)
+    @spot ||= Spot.new(place_id_val, thumbnail_url)
+  end
+
+  def image_name
+    File.basename(CGI.unescape(image_url))
+  end
+
+  def thumbnail_url
+    return '' if image_url.blank?
+    return image_url if image_url.include?('amazonaws')
+    parsed = URI.parse(image_url)
+    "#{parsed.scheme}://#{parsed.host}#{File.dirname(parsed.path)}/images%2Fthumb_#{image_name}"
   end
 
   private
