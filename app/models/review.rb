@@ -93,7 +93,6 @@ class Review < ApplicationRecord
 
   def thumbnail_url
     return '' if image_url.blank?
-    return image_url if image_url.include?('amazonaws')
     parsed = URI.parse(image_url)
     "#{parsed.scheme}://#{parsed.host}#{File.dirname(parsed.path)}/images%2Fthumb_#{image_name}"
   end
