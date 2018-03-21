@@ -22,3 +22,6 @@
 .env
 
 .vscode
+
+# GCP credentials
+gcp-credentials.json
