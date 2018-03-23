@@ -265,7 +265,7 @@ GEM
     multi_json (1.13.1)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
-    mysql2 (0.5.0)
+    mysql2 (0.4.10)
     nio4r (2.3.0)
     nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
@@ -381,7 +381,7 @@ DEPENDENCIES
   jwt
   koala
   listen (>= 3.0.5, < 3.2)
-  mysql2
+  mysql2 (~> 0.4.10)
   pry-doc
   pry-rails
   puma (~> 3.7)
