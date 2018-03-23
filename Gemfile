@@ -33,7 +33,7 @@ gem 'google_places'
 gem 'http_accept_language'
 gem 'jwt'
 gem 'koala'
-gem 'mysql2'
+gem 'mysql2', '~> 0.4.10'
 gem 'redis-namespace'
 gem 'redis-objects'
 
