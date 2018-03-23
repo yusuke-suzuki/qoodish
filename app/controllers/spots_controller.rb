@@ -3,8 +3,8 @@ class SpotsController < ApplicationController
 
   def index
     if params[:popular]
-      @spots = Review.all.group_by(&:place_id_val)
-        .sort { |key, value| value.size }.reverse.take(10)
+      @spots = Review.includes(:map).where(maps: { private: false }).group_by(&:place_id_val)
+        .sort_by { |key, value| value.size }.reverse.take(10)
         .map { |key, value| value[0].spot }
     end
   end
