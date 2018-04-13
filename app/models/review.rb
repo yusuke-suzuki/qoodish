@@ -79,6 +79,14 @@ class Review < ApplicationRecord
     where(created_at: 6.month.ago...Time.parse(created_at)).order(created_at: :desc).limit(FEED_PER_PAGE)
   }
 
+  scope :my_feed, lambda {
+    order(created_at: :desc).limit(FEED_PER_PAGE)
+  }
+
+  scope :my_feed_before, lambda { |created_at|
+    where('created_at < ?', Time.parse(created_at)).order(created_at: :desc).limit(FEED_PER_PAGE)
+  }
+
   scope :recent, lambda {
     includes(:user, :map).where(maps: { private: false }).order(created_at: :desc).limit(4)
   }
