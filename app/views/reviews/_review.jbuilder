@@ -1,6 +1,7 @@
 json.id review.id
 json.place_id review.place_id_val
 json.author do
+  json.id review.user.id
   json.name review.user.name
   json.profile_image_url review.user.image_url
 end
