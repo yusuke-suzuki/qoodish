@@ -9,7 +9,12 @@ class UsersController < ApplicationController
   end
 
   def show
-    @user = User.find_by!(uid: params[:id])
+    @user =
+      if params[:id] == current_user.uid
+        current_user
+      else
+        User.find_by!(id: params[:id])
+      end
   end
 
   def create
