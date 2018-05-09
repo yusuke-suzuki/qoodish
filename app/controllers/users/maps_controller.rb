@@ -8,7 +8,7 @@ module Users
           current_user.maps.includes(:user, :reviews).order(created_at: :desc)
         else
           user = User.find_by!(id: params[:user_id])
-          user.maps.includes(:user, :reviews).where(maps: { private: false }).order(created_at: :desc)
+          user.maps.referenceable_by(current_user)
         end
     end
   end
