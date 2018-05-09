@@ -71,6 +71,12 @@ class Review < ApplicationRecord
       .where(map_id: current_user.following_maps.ids)
   }
 
+  scope :referenceable_by, lambda { |current_user|
+    includes(:user, :map)
+      .where(maps: { id: current_user.following_maps.ids })
+      .or(includes(:user, :map).where(maps: { private: false }))
+  }
+
   scope :latest_feed, lambda {
     where(created_at: 6.month.ago...Time.now).order(created_at: :desc).limit(FEED_PER_PAGE)
   }
