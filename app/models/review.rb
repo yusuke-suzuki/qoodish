@@ -94,7 +94,7 @@ class Review < ApplicationRecord
   }
 
   scope :recent, lambda {
-    includes(:user, :map).where(maps: { private: false }).order(created_at: :desc).limit(4)
+    includes(:user, :map).where(maps: { private: false }).order(created_at: :desc).limit(8)
   }
 
   def spot
