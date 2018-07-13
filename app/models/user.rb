@@ -130,14 +130,8 @@ class User < ApplicationRecord
     iid_client.bulk_unsubscribe_topic(registration_tokens, topic)
   end
 
-  def send_message_to_topic(topic, message, request_path)
-    fcm_client.send_message_to_topic(topic, message, request_path)
-  end
-
-  def send_message_to_user(recipient, message, request_path)
-    registration_tokens = recipient.devices.pluck(:registration_token)
-    return if registration_tokens.blank?
-    fcm_client.send_message_to_devices(registration_tokens, message, request_path)
+  def send_message_to_topic(topic, message, request_path, image = nil, data = {})
+    fcm_client.send_message_to_topic(topic, message, request_path, image, data)
   end
 
   def unfollow_all_maps

@@ -376,6 +376,7 @@ DEPENDENCIES
   faraday
   google-cloud
   google_places
+  googleauth
   http_accept_language
   jbuilder (~> 2.5)
   jwt

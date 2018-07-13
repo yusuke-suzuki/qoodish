@@ -21,7 +21,17 @@ module Maps
           key: 'followed'
         )
         current_user.subscribe_topic("map_#{@map.id}")
-        current_user.send_message_to_topic("user_#{@map.user.id}", "#{current_user.name} followed #{@map.name}.", "maps/#{@map.id}")
+        data = {
+          notification_type: 'follow_map',
+          map_id: @map.id
+        }
+        current_user.send_message_to_topic(
+          "user_#{@map.user.id}",
+          "#{current_user.name} followed #{@map.name}.",
+          "maps/#{@map.id}",
+          @map.thumbnail_url,
+          data
+        )
       end
     end
 

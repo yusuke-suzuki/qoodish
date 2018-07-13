@@ -1,49 +1,31 @@
 class Fcm < ApiClientBase
-  def send_message_to_topic(topic_name, body, request_path)
+  def send_message_to_topic(topic_name, body, request_path, image = nil, data = {})
+    auth_client = Firebase::Auth.new
+    token = auth_client.fetch_access_token
+
     headers = {
-      Authorization: "key=#{ENV['FCM_SERVER_KEY']}",
+      Authorization: "Bearer #{token}",
       'Content-Type' => 'application/json'
     }
+
+    notification = {
+      title: 'Qoodish',
+      body: body,
+      icon: ENV['SUBSTITUTE_URL'],
+      click_action: "#{ENV['WEB_ENDPOINT']}/#{request_path}"
+    }
+    notification.merge!(image: image) if image.present?
+    notification.merge!(data: data) if data.present?
+
     params = {
-      to: "/topics/#{topic_name}",
-      notification: {
-        title: 'Qoodish',
-        body: body,
-        icon: ENV['SUBSTITUTE_URL'],
-        click_action: "#{ENV['WEB_ENDPOINT']}/#{request_path}"
+      message: {
+        topic: topic_name,
+        webpush: {
+          notification: notification
+        }
       }
     }
-    response = request('/fcm/send', headers, params.to_json, :post)
-
-    case response.status
-    when 200
-      json = JSON.parse(response.body)
-    when 401
-      raise Exceptions::Unauthorized
-    when 404
-      raise Exceptions::NotFound
-    else
-      raise Exceptions::InternalServerError
-    end
-
-    json
-  end
-
-  def send_message_to_devices(registration_tokens, body, request_path)
-    headers = {
-      Authorization: "key=#{ENV['FCM_SERVER_KEY']}",
-      'Content-Type' => 'application/json'
-    }
-    params = {
-      registration_ids: registration_tokens,
-      notification: {
-        title: 'Qoodish',
-        body: body,
-        icon: ENV['SUBSTITUTE_URL'],
-        click_action: "#{ENV['WEB_ENDPOINT']}/#{request_path}"
-      }
-    }
-    response = request('/fcm/send', headers, params.to_json, :post)
+    response = request("/v1/projects/#{ENV['FIREBACE_PROJECT_ID']}/messages:send", headers, params.to_json, :post)
 
     case response.status
     when 200
