@@ -19,7 +19,17 @@ module Maps
           key: 'invited'
         )
         message = "#{current_user.name} invite you to #{map.name}."
-        current_user.send_message_to_topic("user_#{recipient.id}", message, '/invites')
+        data = {
+          notification_type: 'invite',
+          invite_id: invite.id
+        }
+        current_user.send_message_to_topic(
+          "user_#{recipient.id}",
+          message,
+          '/invites',
+          nil,
+          data
+        )
       end
     end
   end

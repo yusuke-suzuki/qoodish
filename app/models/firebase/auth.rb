@@ -5,6 +5,16 @@ module Firebase
     ALGORITHM = 'RS256'.freeze
     ISSUER_BASE_URL = 'https://securetoken.google.com/'.freeze
     CLIENT_CERT_URL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com'.freeze
+    FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
+
+    def fetch_access_token
+      authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
+        json_key_io: File.open(Rails.root.join('firebase-credentials.json')),
+        scope: FCM_SCOPE
+      )
+      token = authorizer.fetch_access_token!
+      token['access_token']
+    end
 
     def verify_id_token(token)
       Rails.logger.info('Try to verify firebase id token...')

@@ -30,7 +30,17 @@ module Maps
           image_url: params[:image_url]
         )
         message = "#{current_user.name} posted a report about #{@review.spot.name} on #{map.name}."
-        current_user.send_message_to_topic("map_#{map.id}", message, "maps/#{map.id}/reports/#{@review.id}")
+        data = {
+          notification_type: 'create_review',
+          review_id: @review.id
+        }
+        current_user.send_message_to_topic(
+          "map_#{map.id}",
+          message,
+          "maps/#{map.id}/reports/#{@review.id}",
+          @review.thumbnail_url,
+          data
+        )
       end
     end
   end
