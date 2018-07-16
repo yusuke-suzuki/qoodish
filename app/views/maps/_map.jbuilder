@@ -12,6 +12,7 @@ json.base do
   json.lng map.base.lng
 end
 json.following current_user.following?(map)
+json.followers_count map.followers_count
 json.editable current_user.map_owner?(map)
 json.postable current_user.postable?(map)
 json.shared map.shared
