@@ -39,6 +39,7 @@ en:
       error_409: A conflict has occurred for the requested resource.
       error_500: The request has failed due to some unknown error.
 
+      sign_in_required: This action requires sign in.
       firebase_auth_error: Firebase authentication failed.
       duplicate_map_name: Map name is duplicated.
       map_name_required: Map name is required.

@@ -43,6 +43,17 @@ class User < ApplicationRecord
 
   PROVIDER_GITHUB = 'github.com'.freeze
   PROVIDER_FACEBOOK = 'facebook.com'.freeze
+  PROVIDER_ANONYMOUS = 'anonymous'.freeze
+
+  attr_accessor :is_anonymous
+
+  def self.sign_in_anonymously(payload)
+    raise Exceptions::Unauthorized unless payload['provider_id'] == PROVIDER_ANONYMOUS
+    User.new(
+      uid: payload['user_id'],
+      is_anonymous: true
+    )
+  end
 
   def author?(review)
     review.user_id == id

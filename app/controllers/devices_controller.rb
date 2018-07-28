@@ -1,5 +1,6 @@
 class DevicesController < ApplicationController
   before_action :authenticate_user!
+  before_action :require_sign_in!
 
   def create
     ActiveRecord::Base.transaction do

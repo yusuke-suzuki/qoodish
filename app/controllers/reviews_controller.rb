@@ -1,5 +1,6 @@
 class ReviewsController < ApplicationController
   before_action :authenticate_user!
+  before_action :require_sign_in!, only: [:update, :destroy]
 
   def index
     if params[:recent]

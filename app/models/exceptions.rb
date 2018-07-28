@@ -48,8 +48,14 @@ module Exceptions
     end
   end
 
+  class SignInRequired < Unauthorized
+    def initialize(message = I18n.t('messages.api.sign_in_required'))
+      super(message)
+    end
+  end
+
   class FirebaseAuthError < Unauthorized
-    def initialize(message = I18n.t('message.api.firebase_auth_error'))
+    def initialize(message = I18n.t('messages.api.firebase_auth_error'))
       super(message)
     end
   end

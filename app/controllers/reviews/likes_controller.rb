@@ -1,6 +1,7 @@
 module Reviews
   class LikesController < ApplicationController
     before_action :authenticate_user!
+    before_action :require_sign_in!, only: [:create, :destroy]
 
     def index
       review = Review.includes(:map).find_by!(id: params[:review_id])
