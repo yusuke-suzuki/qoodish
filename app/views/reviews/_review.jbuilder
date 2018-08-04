@@ -3,7 +3,7 @@ json.place_id review.place_id_val
 json.author do
   json.id review.user.id
   json.name review.user.name
-  json.profile_image_url review.user.image_url
+  json.profile_image_url review.user.image_path
 end
 json.comment review.comment
 if review.image_url.present?

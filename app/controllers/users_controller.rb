@@ -23,17 +23,13 @@ class UsersController < ApplicationController
     auth_client = Firebase::Auth.new
     auth_client.verify_id_token(params[:user][:token])
 
-    @user = User.find_by(
-      provider: params[:user][:provider],
-      provider_uid: params[:user][:provider_uid]
-    )
+    @user = User.find_by(uid: params[:user][:uid])
     @user =
       if @user.present?
         update_user
       else
         create_user
       end
-    @user.upload_profile_image(params[:user][:photo_url])
   end
 
   def destroy
@@ -49,20 +45,15 @@ class UsersController < ApplicationController
   def create_user
     @user = User.create!(
       uid: params[:user][:uid],
-      provider: params[:user][:provider],
-      provider_uid: params[:user][:provider_uid],
-      email: params[:user][:email],
-      provider_token: params[:user][:provider_token],
-      name: params[:user][:display_name]
+      name: params[:user][:display_name],
+      image_path: params[:user][:photo_url]
     )
   end
 
   def update_user
     @user.update!(
-      uid: params[:user][:uid],
-      email: params[:user][:email],
-      provider_token: params[:user][:provider_token],
-      name: params[:user][:display_name]
+      name: params[:user][:display_name],
+      image_path: params[:user][:photo_url]
     )
     @user
   end
