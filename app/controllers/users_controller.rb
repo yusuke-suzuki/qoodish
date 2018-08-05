@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!, only: [:index, :show, :destroy]
-  before_action :require_sign_in!, only: [:index, :destroy]
+  before_action :authenticate_user!, only: [:index, :show, :update, :destroy]
+  before_action :require_sign_in!, only: [:index, :update, :destroy]
 
   def index
     @users = []
@@ -31,6 +31,13 @@ class UsersController < ApplicationController
         image_path: params[:user][:photo_url]
       )
     end
+  end
+
+  def update
+    current_user.update!(
+      name: params[:display_name]
+    )
+    @user = current_user
   end
 
   def destroy
