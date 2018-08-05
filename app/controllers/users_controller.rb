@@ -24,12 +24,13 @@ class UsersController < ApplicationController
     auth_client.verify_id_token(params[:user][:token])
 
     @user = User.find_by(uid: params[:user][:uid])
-    @user =
-      if @user.present?
-        update_user
-      else
-        create_user
-      end
+    if @user.blank?
+      @user = User.create!(
+        uid: params[:user][:uid],
+        name: params[:user][:display_name],
+        image_path: params[:user][:photo_url]
+      )
+    end
   end
 
   def destroy
@@ -38,23 +39,5 @@ class UsersController < ApplicationController
       current_user.unsubscribe_topic("user_#{current_user.id}")
       current_user.destroy!
     end
-  end
-
-  private
-
-  def create_user
-    @user = User.create!(
-      uid: params[:user][:uid],
-      name: params[:user][:display_name],
-      image_path: params[:user][:photo_url]
-    )
-  end
-
-  def update_user
-    @user.update!(
-      name: params[:user][:display_name],
-      image_path: params[:user][:photo_url]
-    )
-    @user
   end
 end
