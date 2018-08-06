@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!, only: [:index, :show, :destroy]
+  before_action :require_sign_in!, only: [:index, :destroy]
 
   def index
     @users = []

@@ -1,6 +1,7 @@
 module Maps
   class ReviewsController < ApplicationController
     before_action :authenticate_user!
+    before_action :require_sign_in!, only: :create
 
     def index
       map = Map.find_by!(id: params[:map_id])

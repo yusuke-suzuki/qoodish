@@ -1,5 +1,6 @@
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
+  before_action :require_sign_in!
 
   def index
     @notifications = current_user.notifications.recent(current_user).reject { |notification| notification.notifier.blank? || notification.notifiable.blank? }

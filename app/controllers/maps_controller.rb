@@ -1,5 +1,6 @@
 class MapsController < ApplicationController
   before_action :authenticate_user!
+  before_action :require_sign_in!, only: [:create, :update, :destroy]
 
   def index
     @maps =
