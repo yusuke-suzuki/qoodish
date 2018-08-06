@@ -9,7 +9,7 @@ end
 json.notifier do
   json.id notification.notifier_id
   json.name notification.notifier.name
-  json.profile_image_url notification.notifier.image_url
+  json.profile_image_url notification.notifier.thumbnail_url
 end
 json.read notification.read
 json.created_at notification.created_at

@@ -19,8 +19,6 @@
 #  index_users_on_uid                        (uid)
 #
 
-require 'open-uri'
-
 class User < ApplicationRecord
   has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
@@ -29,20 +27,14 @@ class User < ApplicationRecord
   has_many :invites, as: :recipient
 
   validates :uid,
-            presence: true
-  validates :provider_uid,
             presence: true,
             uniqueness: true
 
   acts_as_follower
   acts_as_voter
 
-  before_validation :fetch_github_user_id
   after_create :create_default_map
-  before_destroy :delete_profile_image
 
-  PROVIDER_GITHUB = 'github.com'.freeze
-  PROVIDER_FACEBOOK = 'facebook.com'.freeze
   PROVIDER_ANONYMOUS = 'anonymous'.freeze
 
   attr_accessor :is_anonymous
@@ -53,6 +45,17 @@ class User < ApplicationRecord
       uid: payload['user_id'],
       is_anonymous: true
     )
+  end
+
+  def thumbnail_url
+    return '' if image_path.blank?
+    parsed = URI.parse(image_path)
+    "#{parsed.scheme}://#{parsed.host}#{File.dirname(parsed.path)}/profile%2Fthumb_#{image_name}"
+  end
+
+  def image_name
+    return '' if image_path.blank?
+    File.basename(CGI.unescape(image_path))
   end
 
   def author?(review)
@@ -69,64 +72,6 @@ class User < ApplicationRecord
 
   def referenceable?(map)
     map_owner?(map) || following?(map) || (!following?(map) && !map.private)
-  end
-
-  def github_user?
-    provider == PROVIDER_GITHUB
-  end
-
-  def facebook_user?
-    provider == PROVIDER_FACEBOOK
-  end
-
-  def upload_profile_image(url)
-    url = fetch_fb_prof_image if facebook_user?
-    path = "profile_#{SecureRandom.uuid}.jpg"
-    open(url, 'rb') do |data|
-      put_to_s3(path, data)
-    end
-    update!(image_path: path)
-  end
-
-  def put_to_s3(key, body)
-    client.put_object(
-      bucket: ENV['S3_BUCKET_NAME'],
-      key: key,
-      body: body,
-      acl: 'public-read',
-      content_type: 'image/jpeg'
-    )
-  end
-
-  def delete_from_s3(key)
-    client.delete_object(
-      bucket: ENV['S3_BUCKET_NAME'],
-      key: key
-    )
-  end
-
-  def fetch_fb_prof_image
-    return unless facebook_user?
-    prof = graph.get_connections('me', '?fields=name,link,picture')
-    prof['picture']['data']['url']
-  end
-
-  def image_url
-    if image_path.present?
-      "#{ENV['S3_ENDPOINT']}/#{ENV['S3_BUCKET_NAME']}/#{image_path}"
-    else
-      ENV['SUBSTITUTE_URL']
-    end
-  end
-
-  def delete_profile_image
-    delete_from_s3(image_path)
-  end
-
-  def fetch_github_user_id
-    return unless github_user? && name.blank?
-    user = github_client.fetch_user(provider_token, provider_uid)
-    self.name = user['login']
   end
 
   def subscribe_topic(topic)
@@ -162,21 +107,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def client
-    @client ||= Aws::S3::Client.new(
-      access_key_id: ENV['AWS_ACCESS_KEY'],
-      secret_access_key: ENV['AWS_SECRET_KEY']
-    )
-  end
-
-  def graph
-    @graph ||= Koala::Facebook::API.new(provider_token)
-  end
-
-  def github_client
-    @github_client ||= Github.new(endpoint: ENV['GITHUB_API_ENDPOINT'])
-  end
 
   def iid_client
     @iid_client ||= GoogleIid.new(endpoint: ENV['GOOGLE_IID_ENDPOINT'])

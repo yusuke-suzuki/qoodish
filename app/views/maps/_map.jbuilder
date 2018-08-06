@@ -1,7 +1,7 @@
 json.id map.id
 json.owner_id map.user.id
 json.owner_name map.user.name
-json.owner_image_url map.user.image_url
+json.owner_image_url map.user.thumbnail_url
 json.name map.name
 json.description map.description
 json.private map.private
