@@ -32,6 +32,9 @@ class User < ApplicationRecord
   validates :name,
             presence: true,
             uniqueness: true
+  validates :image_path,
+            presence: true,
+            uniqueness: true
 
   acts_as_follower
   acts_as_voter
