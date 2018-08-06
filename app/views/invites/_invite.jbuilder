@@ -9,7 +9,7 @@ end
 json.sender do
   json.id invite.sender_id
   json.name invite.sender.name
-  json.profile_image_url invite.sender.image_url
+  json.profile_image_url invite.sender.thumbnail_url
 end
 json.expired invite.expired
 json.created_at invite.created_at
