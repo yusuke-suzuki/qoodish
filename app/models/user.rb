@@ -47,6 +47,17 @@ class User < ApplicationRecord
     )
   end
 
+  def thumbnail_url
+    return '' if image_path.blank?
+    parsed = URI.parse(image_path)
+    "#{parsed.scheme}://#{parsed.host}#{File.dirname(parsed.path)}/profile%2Fthumb_#{image_name}"
+  end
+
+  def image_name
+    return '' if image_path.blank?
+    File.basename(CGI.unescape(image_path))
+  end
+
   def author?(review)
     review.user_id == id
   end

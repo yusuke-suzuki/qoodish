@@ -102,6 +102,7 @@ class Review < ApplicationRecord
   end
 
   def image_name
+    return '' if image_url.blank?
     File.basename(CGI.unescape(image_url))
   end
 
