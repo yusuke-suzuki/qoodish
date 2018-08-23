@@ -21,8 +21,11 @@ json.spot do
   json.lng review.spot.lng
   json.formatted_address review.spot.formatted_address
 end
-json.map_id review.map_id
-json.map_name review.map.name
+json.map do
+  json.id review.map_id
+  json.name review.map.name
+  json.private review.map.private
+end
 json.editable current_user.author?(review)
 json.liked current_user.liked?(review)
 json.likes_count review.get_likes.size
