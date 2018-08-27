@@ -11,6 +11,5 @@ RUN apk add --no-cache --virtual=.build-dependencies \
       build-base \
       libxml2-dev \
       libxslt-dev && \
-    bundle install && \
-    apk del .build-dependencies
+    bundle install
 ADD . /qoodish
