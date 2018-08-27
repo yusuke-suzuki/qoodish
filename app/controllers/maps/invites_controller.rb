@@ -8,7 +8,7 @@ module Maps
         map = current_user.following_maps.find_by!(id: params[:map_id], private: true)
         raise Exceptions::NotFound unless current_user.map_owner?(map) || map.invitable
         recipient = User.find_by!(id: params[:user_id])
-        Invite.create!(
+        invite = Invite.create!(
           invitable: map,
           sender: current_user,
           recipient: recipient
