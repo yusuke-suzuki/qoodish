@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   def index
     @users = []
     if params[:input].present?
-      @users = User.where.not(id: current_user.id).where.like(name: "%#{params[:input]}%").limit(20)
+      @users = User.where.not(id: current_user.id).where('name LIKE ?', "%#{params[:input]}%").limit(20)
     end
   end
 
