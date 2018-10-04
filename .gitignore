@@ -26,3 +26,5 @@
 # GCP credentials
 gcp-credentials.json
 firebase-credentials.json
+
+nginx/nginx.conf
