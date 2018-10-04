@@ -1,0 +1,28 @@
+upstream app_servers {
+  server ${NGINX_UPSTREAM_HOST}:${NGINX_UPSTREAM_PORT};
+}
+
+server {
+  listen 80;
+  server_name ${NGINX_SERVER_NAME};
+
+  keepalive_timeout 5;
+
+  location / {
+    if ($request_method = 'OPTIONS') {
+      add_header Access-Control-Allow-Origin '${WEB_ENDPOINT}';
+      add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE';
+      add_header Access-Control-Allow-Headers 'Origin, Authorization, Accept, Content-Type';
+      add_header Access-Control-Max-Age 3600;
+      add_header Content-Type 'text/plain charset=UTF-8';
+      add_header Content-Length 0;
+      return 204;
+    }
+
+    proxy_pass http://app_servers;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Host $server_name;
+  }
+}
