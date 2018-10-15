@@ -23,8 +23,7 @@
 
 .vscode
 
-# GCP credentials
-gcp-credentials.json
+# FCM
 firebase-credentials.json
 
 nginx/nginx.conf
