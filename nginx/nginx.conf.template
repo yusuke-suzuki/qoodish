@@ -3,7 +3,7 @@ upstream app_servers {
 }
 
 server {
-  listen 80;
+  listen 8888;
   server_name ${NGINX_SERVER_NAME};
 
   keepalive_timeout 5;
