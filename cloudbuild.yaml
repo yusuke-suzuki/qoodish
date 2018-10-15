@@ -27,6 +27,16 @@ steps:
     '.'
   ]
   dir: 'nginx'
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+    - set
+    - image
+    - deployment/api
+    - api=gcr.io/$PROJECT_ID/$REPO_NAME-api:$COMMIT_SHA
+    - nginx=gcr.io/$PROJECT_ID/$REPO_NAME-nginx:$COMMIT_SHA
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_GKE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_GKE_CLUSTER_NAME}'
 images:
   - 'gcr.io/$PROJECT_ID/$REPO_NAME-api:$COMMIT_SHA'
   - 'gcr.io/$PROJECT_ID/$REPO_NAME-api:latest'
