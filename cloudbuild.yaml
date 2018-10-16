@@ -4,7 +4,7 @@ steps:
   args:
     - '-c'
     - |
-      gcloud kms decrypt --ciphertext-file=.env.production.enc --plaintext-file=.env.production --location=global --keyring=qoodish --key=qoodish
+      gcloud kms decrypt --ciphertext-file=.env.production.enc --plaintext-file=.env --location=global --keyring=qoodish --key=qoodish
       gcloud kms decrypt --ciphertext-file=firebase-credentials.prod.json.enc --plaintext-file=firebase-credentials.json --location=global --keyring=qoodish --key=qoodish
 - name: 'gcr.io/cloud-builders/docker'
   args: [
