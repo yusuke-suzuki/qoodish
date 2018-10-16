@@ -3,7 +3,7 @@
 require 'google/cloud'
 require 'open-uri'
 
-gcloud = Google::Cloud.new ENV['FIREBACE_PROJECT_ID'], './gcp-credentials.json'
+gcloud = Google::Cloud.new ENV['FIREBASE_PROJECT_ID'], './gcp-credentials.json'
 storage = gcloud.storage
 bucket = storage.bucket ENV['FIREBASE_IMAGE_BUCKET_NAME']
 

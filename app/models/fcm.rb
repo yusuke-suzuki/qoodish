@@ -25,7 +25,7 @@ class Fcm < ApiClientBase
         }
       }
     }
-    response = request("/v1/projects/#{ENV['FIREBACE_PROJECT_ID']}/messages:send", headers, params.to_json, :post)
+    response = request("/v1/projects/#{ENV['FIREBASE_PROJECT_ID']}/messages:send", headers, params.to_json, :post)
 
     case response.status
     when 200
