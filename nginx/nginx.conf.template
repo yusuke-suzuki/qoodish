@@ -1,3 +1,12 @@
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+   location / {
+    access_log off;
+    return 200 OK;
+  }
+}
+
 upstream app_servers {
   server ${NGINX_UPSTREAM_HOST}:${NGINX_UPSTREAM_PORT};
 }
