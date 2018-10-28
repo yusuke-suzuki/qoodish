@@ -228,7 +228,7 @@ DEPENDENCIES
   pry-rails
   puma (~> 3.7)
   rack-cors
-  rails (~> 5.2.0)
+  rails (~> 5.2.1)
   rails-erd
   redis-namespace
   redis-objects
