@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 2018_12_16_060157) do
 
-  create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
     t.bigint "commentable_id", null: false
     t.bigint "user_id", null: false
@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "registration_token", null: false
     t.datetime "created_at", null: false
@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["user_id"], name: "index_devices_on_user_id"
   end
 
-  create_table "follows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "follows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "followable_type", null: false
     t.bigint "followable_id", null: false
     t.string "follower_type", null: false
@@ -47,7 +47,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["follower_type", "follower_id"], name: "index_follows_on_follower_type_and_follower_id"
   end
 
-  create_table "inappropriate_contents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "inappropriate_contents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "content_id_val", null: false
     t.string "content_type", null: false
@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["user_id"], name: "index_inappropriate_contents_on_user_id"
   end
 
-  create_table "invites", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "invites", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "invitable_type"
     t.bigint "invitable_id"
     t.string "sender_type"
@@ -75,7 +75,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["sender_type", "sender_id"], name: "index_invites_on_sender_type_and_sender_id"
   end
 
-  create_table "maps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "maps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "name", null: false
     t.string "description", null: false
@@ -89,7 +89,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["user_id"], name: "index_maps_on_user_id"
   end
 
-  create_table "notifications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "notifications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "notifiable_type"
     t.bigint "notifiable_id"
     t.string "notifier_type"
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
-  create_table "reviews", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "reviews", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "map_id", null: false
     t.string "place_id_val", null: false
@@ -122,7 +122,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
-  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name"
     t.string "email"
     t.string "uid", null: false
@@ -135,7 +135,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
 
-  create_table "votes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "votes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "votable_type"
     t.bigint "votable_id"
     t.string "voter_type"
