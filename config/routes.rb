@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   resources :spots, only: [:index, :show] do
     scope module: :spots do
       resources :reviews, only: [:index]
+      resource :metadata, only: [:show]
     end
   end
   resources :notifications, only: [:index, :update]
