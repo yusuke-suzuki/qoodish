@@ -54,8 +54,7 @@ class User < ApplicationRecord
 
   def thumbnail_url
     return '' if image_path.blank?
-    parsed = URI.parse(image_path)
-    "#{parsed.scheme}://#{parsed.host}#{File.dirname(parsed.path)}/profile%2Fthumb_#{image_name}"
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/profile/thumb_#{image_name}"
   end
 
   def image_name
