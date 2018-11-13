@@ -6,6 +6,8 @@ class MapsController < ApplicationController
     @maps =
       if params[:recent]
         Map.recent
+      elsif params[:active]
+        Map.active
       elsif params[:popular]
         Map.popular
       elsif params[:postable]
