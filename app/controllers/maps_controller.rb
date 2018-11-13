@@ -4,7 +4,9 @@ class MapsController < ApplicationController
 
   def index
     @maps =
-      if params[:popular]
+      if params[:recent]
+        Map.recent
+      elsif params[:popular]
         Map.popular
       elsif params[:postable]
         current_user.following_maps.postable(current_user)
