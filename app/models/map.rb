@@ -64,7 +64,7 @@ class Map < ApplicationRecord
   before_validation :remove_carriage_return
 
   scope :recent, lambda {
-    includes(:user, :reviews).where(maps: { private: false }).order(created_at: :desc).limit(30)
+    includes(:user, :reviews).where(maps: { private: false }).order(created_at: :desc).limit(12)
   }
 
   scope :active, lambda {
@@ -73,10 +73,11 @@ class Map < ApplicationRecord
       .left_outer_joins(:reviews)
       .group('maps.id')
       .order('max(reviews.created_at) desc')
+      .limit(12)
   }
 
   scope :popular, lambda {
-    includes(:user, :reviews).where(maps: { private: false }).sort_by(&:followers_count).take(30).reverse!
+    includes(:user, :reviews).where(maps: { private: false }).sort_by(&:followers_count).take(10).reverse!
   }
 
   scope :postable, lambda { |current_user|
