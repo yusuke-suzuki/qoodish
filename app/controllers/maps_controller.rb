@@ -4,7 +4,9 @@ class MapsController < ApplicationController
 
   def index
     @maps =
-      if params[:recent]
+      if params[:input].present?
+        Map.includes(:user, :reviews).where(maps: { private: false }).where('name LIKE ?', "%#{params[:input]}%").limit(20).order(created_at: :desc)
+      elsif params[:recent]
         Map.recent
       elsif params[:active]
         Map.active
