@@ -91,8 +91,10 @@ class Map < ApplicationRecord
       .order(created_at: :desc)
   }
 
-  scope :search_by_names, lambda { |names|
-    names.map { |name| where('name LIKE :name', name: "%#{sanitize_sql_like(name)}%") }.inject(&:or)
+  scope :search_by_words, lambda { |words|
+    all.tap do |q|
+      words.each { |word| q.where!("name LIKE :word", word: "%#{sanitize_sql_like(word)}%") }
+    end
   }
 
   def base

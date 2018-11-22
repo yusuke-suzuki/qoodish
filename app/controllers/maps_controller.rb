@@ -7,7 +7,7 @@ class MapsController < ApplicationController
       if params[:input].present?
         Map.includes(:user, :reviews)
           .where(maps: { private: false })
-          .search_by_names(params[:input].strip.split(/[[:blank:]]+/))
+          .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
           .limit(20)
           .order(created_at: :desc)
       elsif params[:recent]
