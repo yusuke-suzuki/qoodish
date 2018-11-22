@@ -91,6 +91,12 @@ class Map < ApplicationRecord
       .order(created_at: :desc)
   }
 
+  scope :search_by_words, lambda { |words|
+    all.tap do |q|
+      words.each { |word| q.where!("name LIKE :word", word: "%#{sanitize_sql_like(word)}%") }
+    end
+  }
+
   def base
     @base ||= Spot.new(base_id_val)
   end
