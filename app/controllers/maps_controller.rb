@@ -5,7 +5,11 @@ class MapsController < ApplicationController
   def index
     @maps =
       if params[:input].present?
-        Map.includes(:user, :reviews).where(maps: { private: false }).where('name LIKE ?', "%#{params[:input]}%").limit(20).order(created_at: :desc)
+        Map.includes(:user, :reviews)
+          .where(maps: { private: false })
+          .search_by_names(params[:input].strip.split(/[[:blank:]]+/))
+          .limit(20)
+          .order(created_at: :desc)
       elsif params[:recent]
         Map.recent
       elsif params[:active]

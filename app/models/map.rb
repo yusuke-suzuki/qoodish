@@ -91,6 +91,10 @@ class Map < ApplicationRecord
       .order(created_at: :desc)
   }
 
+  scope :search_by_names, lambda { |names|
+    names.map { |name| where('name LIKE :name', name: "%#{sanitize_sql_like(name)}%") }.inject(&:or)
+  }
+
   def base
     @base ||= Spot.new(base_id_val)
   end
