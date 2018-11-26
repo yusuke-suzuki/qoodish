@@ -24,7 +24,9 @@ module Users
       ActiveRecord::Base.transaction do
         current_user.push_enabled = false
         current_user.save!
-        current_user.unfollow_all_maps
+        current_user.following_maps.each do |map|
+          current_user.unsubscribe_topic("map_#{map.id}")
+        end
         current_user.unsubscribe_topic("user_#{current_user.id}")
       end
     end
