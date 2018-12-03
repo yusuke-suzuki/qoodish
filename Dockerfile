@@ -13,3 +13,7 @@ RUN apk add --no-cache --virtual=.build-dependencies \
       libxslt-dev && \
     bundle install
 ADD . /qoodish
+
+ENV PORT 8080
+EXPOSE $PORT
+CMD ["bundle", "exec", "puma"]
