@@ -8,9 +8,9 @@ module Maps
       raise Exceptions::NotFound unless current_user.referenceable?(map)
       @reviews =
         if params[:place_id].present?
-          map.reviews.includes(:user).where(place_id_val: params[:place_id])
+          map.reviews.includes(:user, :comments).where(place_id_val: params[:place_id])
         else
-          map.reviews.includes(:user).order(created_at: :desc)
+          map.reviews.includes(:user, :comments).order(created_at: :desc)
         end
     end
 

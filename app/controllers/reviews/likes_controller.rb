@@ -10,7 +10,7 @@ module Reviews
     end
 
     def create
-      @review = Review.includes(:map, :user).find_by!(id: params[:review_id])
+      @review = Review.includes(:map, :user, :comments).find_by!(id: params[:review_id])
       raise Exceptions::NotFound unless current_user.referenceable?(@review.map)
       @review.liked_by(current_user)
       Notification.create!(

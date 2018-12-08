@@ -24,6 +24,7 @@ class User < ApplicationRecord
   has_many :maps, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :recipient
+  has_many :comments, dependent: :destroy
   has_many :invites, as: :recipient
 
   validates :uid,
@@ -62,8 +63,8 @@ class User < ApplicationRecord
     File.basename(CGI.unescape(image_path))
   end
 
-  def author?(review)
-    review.user_id == id
+  def author?(post)
+    post.user_id == id
   end
 
   def map_owner?(map)

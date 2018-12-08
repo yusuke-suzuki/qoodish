@@ -50,7 +50,7 @@ class Notification < ApplicationRecord
     end
 
     case notifiable_type
-    when Review.name
+    when Review.name, Comment.name
       "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
     when Map.name
       "/maps/#{notifiable.id}"
