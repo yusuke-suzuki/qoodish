@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       resource :metadata, only: [:show]
       resource :like, only: [:create, :destroy]
       resources :likes, only: [:index]
+      resources :comments, only: [:create, :destroy]
     end
   end
   resources :inappropriate_contents, only: [:create]

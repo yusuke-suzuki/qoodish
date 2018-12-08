@@ -28,6 +28,7 @@ class Review < ApplicationRecord
   belongs_to :user
   belongs_to :map
   has_many :notifications, as: :notifiable
+  has_many :comments, as: :commentable
 
   acts_as_votable
 
@@ -67,12 +68,12 @@ class Review < ApplicationRecord
   FEED_PER_PAGE = 20
 
   scope :map_posts_for, lambda { |current_user|
-    includes(:user, :map)
+    includes(:user, :map, :comments)
       .where(map_id: current_user.following_maps.ids)
   }
 
   scope :referenceable_by, lambda { |current_user|
-    includes(:user, :map)
+    includes(:user, :map, :comments)
       .where(maps: { id: current_user.following_maps.ids })
       .or(includes(:user, :map).where(maps: { private: false }))
   }
@@ -94,7 +95,7 @@ class Review < ApplicationRecord
   }
 
   scope :recent, lambda {
-    includes(:user, :map).where(maps: { private: false }).order(created_at: :desc).limit(8)
+    includes(:user, :map, :comments).where(maps: { private: false }).order(created_at: :desc).limit(8)
   }
 
   def spot

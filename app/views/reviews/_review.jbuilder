@@ -6,6 +6,18 @@ json.author do
   json.profile_image_url review.user.thumbnail_url
 end
 json.comment review.comment
+json.comments review.comments do |comment|
+  json.id comment.id
+  json.review_id review.id
+  json.author do
+    json.id comment.user.id
+    json.name comment.user.name
+    json.profile_image_url comment.user.thumbnail_url
+  end
+  json.body comment.body
+  json.editable current_user.author?(comment)
+  json.created_at comment.created_at
+end
 if review.image_url.present?
   json.image do
     json.url review.image_url
