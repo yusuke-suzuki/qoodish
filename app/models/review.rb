@@ -75,7 +75,7 @@ class Review < ApplicationRecord
   scope :referenceable_by, lambda { |current_user|
     includes(:user, :map, :comments)
       .where(maps: { id: current_user.following_maps.ids })
-      .or(includes(:user, :map).where(maps: { private: false }))
+      .or(includes(:user, :map, :comments).where(maps: { private: false }))
   }
 
   scope :latest_feed, lambda {
