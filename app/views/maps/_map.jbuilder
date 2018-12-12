@@ -11,6 +11,8 @@ json.base do
   json.lat map.base.lat
   json.lng map.base.lng
 end
+json.liked current_user.liked?(map)
+json.likes_count map.get_likes.size
 json.following current_user.following?(map)
 json.followers_count map.followers_count
 json.editable current_user.map_owner?(map)

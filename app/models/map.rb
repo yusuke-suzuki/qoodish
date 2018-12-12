@@ -32,6 +32,7 @@ class Map < ApplicationRecord
   attr_accessor :base_lat, :base_lng
 
   acts_as_followable
+  acts_as_votable
 
   validates :name,
             presence: {
