@@ -76,19 +76,21 @@ Rails.application.configure do
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
-    logger.formatter = proc do |severity, time, progname, msg|
-      request_id = msg.match(/\[(.*?)\].*/)[1] rescue ''
-      entry = {
-        severity: severity,
-        progname: 'rails',
-        request_id: request_id,
-        time: time,
-        message: msg
-      }
-      "#{entry.to_json}\n"
+    if (ENV["STACKDRIVER_LOGGING"]).present?
+      logger.formatter = proc do |severity, time, progname, msg|
+        request_id = msg.match(/\[(.*?)\].*/)[1] rescue ''
+        entry = {
+          severity: severity,
+          progname: 'rails',
+          request_id: request_id,
+          time: time,
+          message: msg
+        }
+        "#{entry.to_json}\n"
+      end
+      config.colorize_logging = false
     end
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
-    config.colorize_logging = false
   end
 
   # Do not dump schema after migrations.

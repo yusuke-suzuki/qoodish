@@ -14,6 +14,8 @@ Rails.application.routes.draw do
       resources :collaborators, only: [:index]
       resources :invites, only: [:create]
       resource :follow, only: [:create, :destroy]
+      resource :like, only: [:create, :destroy]
+      resources :likes, only: [:index]
       resource :metadata, only: [:show]
     end
   end
