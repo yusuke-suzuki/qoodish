@@ -6,5 +6,7 @@ json.image_url user.image_path
 json.thumbnail_url user.thumbnail_url
 json.file_name user.image_name
 json.maps_count user.maps.count
+json.following_maps_count user.follow_count
 json.reviews_count user.reviews.count
+json.likes_count user.votes.count
 json.push_enabled user.push_enabled

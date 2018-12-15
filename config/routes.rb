@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     scope module: :users do
       resources :maps, only: [:index]
       resources :reviews, only: [:index]
+      resources :likes, only: [:index]
       resource :push_notification, only: [:create, :destroy]
     end
   end
