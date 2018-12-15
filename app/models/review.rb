@@ -102,6 +102,10 @@ class Review < ApplicationRecord
     @spot ||= Spot.new(place_id_val, thumbnail_url)
   end
 
+  def name
+    spot.name
+  end
+
   def image_name
     return '' if image_url.blank?
     File.basename(CGI.unescape(image_url))
