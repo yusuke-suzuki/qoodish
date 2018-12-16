@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_08_071824) do
+ActiveRecord::Schema.define(version: 2018_12_16_060157) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -130,6 +130,7 @@ ActiveRecord::Schema.define(version: 2018_12_08_071824) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "push_enabled", default: false, null: false
+    t.string "biography"
     t.index ["image_path"], name: "index_users_on_image_path", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end

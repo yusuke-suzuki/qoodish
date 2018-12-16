@@ -36,6 +36,7 @@ class UsersController < ApplicationController
   def update
     current_user.name = params[:display_name] if params[:display_name].present?
     current_user.image_path = params[:image_url] if params[:image_url].present?
+    current_user.biography = params[:biography] if params[:biography].present?
     current_user.save!
     @user = current_user
   end

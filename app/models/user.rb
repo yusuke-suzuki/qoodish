@@ -32,6 +32,11 @@ class User < ApplicationRecord
             uniqueness: true
   validates :name,
             presence: true
+  validates :biography,
+            length: {
+              allow_blank: true,
+              maximum: 160
+            }
   validates :image_path,
             presence: true,
             uniqueness: true
