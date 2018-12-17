@@ -12,9 +12,9 @@ module Users
             return false if vote.votable.blank?
 
             if vote.votable_type == Review.name
-              user.referenceable?(vote.votable.map)
+              current_user.referenceable?(vote.votable.map)
             elsif vote.votable_type == Map.name
-              user.referenceable?(vote.votable)
+              current_user.referenceable?(vote.votable)
             else
               true
             end
