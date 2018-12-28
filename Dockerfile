@@ -1,4 +1,4 @@
-FROM ruby:2.5.3-alpine3.8
+FROM ruby:2.6.0-alpine3.8
 RUN mkdir /qoodish
 WORKDIR /qoodish
 ADD Gemfile /qoodish/Gemfile
