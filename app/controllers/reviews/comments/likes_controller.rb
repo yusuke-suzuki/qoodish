@@ -24,7 +24,7 @@ module Reviews
           review_id: @review.id
         }
         current_user.send_message_to_topic(
-          "user_#{@review.user.id}",
+          "user_#{comment.user.id}",
           "#{current_user.name} liked your comment.",
           "maps/#{@review.map_id}/reports/#{@review.id}",
           @review.thumbnail_url,
