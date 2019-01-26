@@ -12,13 +12,17 @@ module Reviews
     def create
       @review = Review.includes(:map, :user, :comments).find_by!(id: params[:review_id])
       raise Exceptions::NotFound unless current_user.referenceable?(@review.map)
-      @review.liked_by(current_user)
-      Notification.create!(
-        notifiable: @review,
-        notifier: current_user,
-        recipient: @review.user,
-        key: 'liked'
-      )
+
+      ActiveRecord::Base.transaction do
+        @review.liked_by(current_user)
+        Notification.create!(
+          notifiable: @review,
+          notifier: current_user,
+          recipient: @review.user,
+          key: 'liked'
+        )
+      end
+
       data = {
         notification_type: 'like_review',
         review_id: @review.id

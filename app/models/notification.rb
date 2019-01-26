@@ -39,6 +39,8 @@ class Notification < ApplicationRecord
       'report'
     when Map.name
       'map'
+    when Comment.name
+      'comment'
     else
       ''
     end
@@ -50,7 +52,9 @@ class Notification < ApplicationRecord
     end
 
     case notifiable_type
-    when Review.name, Comment.name
+    when Comment.name
+      "/maps/#{notifiable.commentable.map_id}/reports/#{notifiable.commentable.id}"
+    when Review.name
       "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
     when Map.name
       "/maps/#{notifiable.id}"
