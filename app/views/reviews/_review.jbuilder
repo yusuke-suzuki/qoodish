@@ -16,6 +16,7 @@ json.comments review.comments do |comment|
   end
   json.body comment.body
   json.editable current_user.author?(comment)
+  json.liked current_user.liked?(comment)
   json.created_at comment.created_at
 end
 if review.image_url.present?

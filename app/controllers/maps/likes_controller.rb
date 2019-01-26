@@ -13,13 +13,17 @@ module Maps
     def create
       @map = Map.includes(:user, :reviews).find_by!(id: params[:map_id])
       raise Exceptions::NotFound unless current_user.referenceable?(@map)
-      @map.liked_by(current_user)
-      Notification.create!(
-        notifiable: @map,
-        notifier: current_user,
-        recipient: @map.user,
-        key: 'liked'
-      )
+
+      ActiveRecord::Base.transaction do
+        @map.liked_by(current_user)
+        Notification.create!(
+          notifiable: @map,
+          notifier: current_user,
+          recipient: @map.user,
+          key: 'liked'
+        )
+      end
+
       data = {
         notification_type: 'like_map',
         map_id: @map.id
