@@ -10,30 +10,26 @@
 #   http://dev.mysql.com/doc/refman/5.7/en/old-client.html
 #
 default: &default
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-
-development:
-  <<: *default
   adapter: mysql2
-  encoding: utf8
-  database: qoodish_development
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  charset: utf8mb4
+  collation: utf8mb4_general_ci
+  encoding: utf8mb4
   username: <%= ENV['DB_USER']  %>
   password: <%= ENV['DB_PASSWORD'] %>
   host: <%= ENV['DB_HOST'] %>
   port: <%= ENV['DB_PORT'] %>
+
+development:
+  <<: *default
+  database: qoodish_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  adapter: mysql2
-  encoding: utf8
   database: qoodish_test
-  username: <%= ENV['DB_USER']  %>
-  password: <%= ENV['DB_PASSWORD'] %>
-  host: <%= ENV['DB_HOST'] %>
-  port: <%= ENV['DB_PORT'] %>
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -56,10 +52,4 @@ test:
 #
 production:
   <<: *default
-  adapter: mysql2
-  encoding: utf8
   database: qoodish_production
-  username: <%= ENV['DB_USER']  %>
-  password: <%= ENV['DB_PASSWORD'] %>
-  host: <%= ENV['DB_HOST'] %>
-  port: <%= ENV['DB_PORT'] %>
