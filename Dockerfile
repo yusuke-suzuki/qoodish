@@ -1,4 +1,4 @@
-FROM ruby:2.6.0-alpine3.8
+FROM ruby:2.6.1-alpine3.8
 RUN mkdir /qoodish
 WORKDIR /qoodish
 ADD Gemfile /qoodish/Gemfile
@@ -11,5 +11,5 @@ RUN apk add --no-cache --virtual=.build-dependencies \
       build-base \
       libxml2-dev \
       libxslt-dev && \
-    bundle install
+      bundle install
 ADD . /qoodish
