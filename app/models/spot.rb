@@ -1,5 +1,5 @@
 class Spot
-  attr_accessor :place_id, :name, :lat, :lng, :formatted_address, :image_url
+  attr_accessor :place_id, :name, :lat, :lng, :formatted_address, :url, :opening_hours, :image_url
 
   def initialize(place_id, image_url = nil)
     @place_id = place_id
@@ -8,6 +8,8 @@ class Spot
     @lat = detail[:lat]
     @lng = detail[:lng]
     @formatted_address = detail[:formatted_address]
+    @url = detail[:url]
+    @opening_hours = detail[:opening_hours]
     @image_url = image_url
   end
 
@@ -39,13 +41,15 @@ class Spot
       name: place.name,
       lat: place.lat,
       lng: place.lng,
-      formatted_address: place.formatted_address
+      formatted_address: place.formatted_address,
+      url: place.url,
+      opening_hours: place.opening_hours
     )
     cached_spot
   end
 
   def cached_spot
-    Redis::HashKey.new("#{@place_id}:#{I18n.locale}")
+    Redis::HashKey.new("#{@place_id}:#{I18n.locale}", expiration: 1.month)
   end
 
   def fetch_place
