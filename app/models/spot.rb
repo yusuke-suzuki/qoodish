@@ -43,7 +43,7 @@ class Spot
       lng: place.lng,
       formatted_address: place.formatted_address,
       url: place.url,
-      opening_hours: place.opening_hours
+      opening_hours: place.opening_hours.to_json
     )
     cached_spot
   end
