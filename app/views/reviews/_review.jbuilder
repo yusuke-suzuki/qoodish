@@ -33,6 +33,8 @@ json.spot do
   json.lat review.spot.lat
   json.lng review.spot.lng
   json.formatted_address review.spot.formatted_address
+  json.url review.spot.url
+  json.opening_hours review.spot.opening_hours
 end
 json.map do
   json.id review.map_id
