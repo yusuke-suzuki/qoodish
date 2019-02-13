@@ -20,6 +20,7 @@
 /vendor/bundle
 
 .env
+.env.development
 
 .vscode
 
