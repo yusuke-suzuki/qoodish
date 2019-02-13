@@ -1,40 +1,25 @@
 steps:
-- name: gcr.io/cloud-builders/gcloud
-  entrypoint: 'bash'
-  args:
-    - '-c'
-    - |
-      gcloud kms decrypt --ciphertext-file=firebase-credentials.prod.json.enc --plaintext-file=firebase-credentials.json --location=global --keyring=qoodish --key=qoodish
-- name: 'gcr.io/cloud-builders/docker'
-  args: [
-    'build',
-    '--no-cache',
-    '--build-arg',
-    'NGINX_SERVER_NAME=${_NGINX_SERVER_NAME}',
-    '--build-arg',
-    'NGINX_UPSTREAM_HOST=${_NGINX_UPSTREAM_HOST}',
-    '--build-arg',
-    'NGINX_UPSTREAM_PORT=${_NGINX_UPSTREAM_PORT}',
-    '--build-arg',
-    'WEB_ENDPOINT=${_WEB_ENDPOINT}',
-    '-t',
-    'gcr.io/$PROJECT_ID/$REPO_NAME-nginx:$COMMIT_SHA',
-    '-t',
-    'gcr.io/$PROJECT_ID/$REPO_NAME-nginx:latest',
-    '.'
-  ]
-  dir: 'nginx'
-- name: 'gcr.io/cloud-builders/docker'
-  args: [
-    'build',
-    '-t',
-    'gcr.io/$PROJECT_ID/$REPO_NAME-api:$COMMIT_SHA',
-    '-t',
-    'gcr.io/$PROJECT_ID/$REPO_NAME-api:latest',
-    '.'
-  ]
-images:
-  - 'gcr.io/$PROJECT_ID/$REPO_NAME-api:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/$REPO_NAME-api:latest'
-  - 'gcr.io/$PROJECT_ID/$REPO_NAME-nginx:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/$REPO_NAME-nginx:latest'
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud kms decrypt --ciphertext-file=firebase-credentials.dev.json.enc --plaintext-file=firebase-credentials.json --location=global --keyring=qoodish --key=qoodish
+        gcloud kms decrypt --ciphertext-file=.env.development.enc --plaintext-file=.env --location=global --keyring=qoodish --key=qoodish
+  - name: 'gcr.io/$PROJECT_ID/docker-compose'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        docker-compose build &&
+        docker-compose up -d &&
+        # wait for starting mysql
+        sleep 10 &&
+        docker-compose run api bundle exec rails db:setup RAILS_ENV=test
+  - name: 'gcr.io/$PROJECT_ID/docker-compose'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        docker-compose up -d &&
+        docker-compose run api bundle exec rails test
