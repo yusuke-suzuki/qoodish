@@ -33,7 +33,6 @@ gem 'googleauth'
 gem 'http_accept_language'
 gem 'jwt'
 gem 'mysql2', '~> 0.4.10'
-gem 'redis-namespace'
 gem 'redis-objects'
 
 group :development, :test do

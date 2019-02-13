@@ -175,8 +175,6 @@ GEM
     rb-inotify (0.10.0)
       ffi (~> 1.0)
     redis (4.1.0)
-    redis-namespace (1.6.0)
-      redis (>= 3.0.4)
     redis-objects (1.4.3)
       redis (~> 4.0)
     ruby_dep (1.5.0)
@@ -228,7 +226,6 @@ DEPENDENCIES
   puma (~> 3.7)
   rack-cors
   rails (~> 6.0.0.beta1)
-  redis-namespace
   redis-objects
   spring
   spring-watcher-listen (~> 2.0.0)
