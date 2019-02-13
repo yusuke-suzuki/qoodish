@@ -23,3 +23,12 @@ steps:
       - |
         docker-compose up -d &&
         docker-compose run api bundle exec rails test
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t',
+      'gcr.io/$PROJECT_ID/$REPO_NAME-api:$BRANCH_NAME',
+      '.'
+    ]
+images:
+  - 'gcr.io/$PROJECT_ID/$REPO_NAME-api:$BRANCH_NAME'
