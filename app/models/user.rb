@@ -31,6 +31,7 @@ class User < ApplicationRecord
 
   def self.sign_in_anonymously(payload)
     raise Exceptions::Unauthorized unless payload['provider_id'] == PROVIDER_ANONYMOUS
+
     User.new(
       uid: payload['user_id'],
       is_anonymous: true
@@ -39,11 +40,13 @@ class User < ApplicationRecord
 
   def thumbnail_url
     return '' if image_path.blank?
+
     "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/profile/thumb_#{image_name}"
   end
 
   def image_name
     return '' if image_path.blank?
+
     File.basename(CGI.unescape(image_path))
   end
 
@@ -65,14 +68,54 @@ class User < ApplicationRecord
 
   def subscribe_topic(topic)
     registration_tokens = devices.pluck(:registration_token)
-    return if registration_tokens.blank?
-    iid_client.bulk_subscribe_topic(registration_tokens, topic)
+    if registration_tokens.blank?
+      Rails.logger.info('User does not have registration tokens for subscribe topic.')
+      return
+    end
+
+    GoogleIidClient.configure do |config|
+      config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
+      config.debugging = true
+    end
+
+    api_instance = GoogleIidClient::RelationshipMapsApi.new
+    inline_object = GoogleIidClient::InlineObject.new(
+      to: "/topics/#{topic}",
+      registration_tokens: registration_tokens
+    )
+
+    begin
+      result = api_instance.iid_v1batch_add_post(inline_object)
+      Rails.logger.info(result)
+    rescue GoogleIidClient::ApiError => e
+      Rails.logger.info("Exception when calling RelationshipMapsApi->iid_v1batch_add_post: #{e}")
+    end
   end
 
   def unsubscribe_topic(topic)
     registration_tokens = devices.pluck(:registration_token)
-    return if registration_tokens.blank?
-    iid_client.bulk_unsubscribe_topic(registration_tokens, topic)
+    if registration_tokens.blank?
+      Rails.logger.info('User does not have registration tokens for unsubscribe topic.')
+      return
+    end
+
+    GoogleIidClient.configure do |config|
+      config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
+      config.debugging = true
+    end
+
+    api_instance = GoogleIidClient::RelationshipMapsApi.new
+    inline_object1 = GoogleIidClient::InlineObject1.new(
+      to: "/topics/#{topic}",
+      registration_tokens: registration_tokens
+    )
+
+    begin
+      result = api_instance.iid_v1batch_remove_post(inline_object1)
+      Rails.logger.info(result)
+    rescue GoogleIidClient::ApiError => e
+      Rails.logger.info("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
+    end
   end
 
   def send_message_to_topic(topic, message, request_path, image = nil, data = {})
@@ -96,10 +139,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def iid_client
-    @iid_client ||= GoogleIid.new(endpoint: ENV['GOOGLE_IID_ENDPOINT'])
-  end
 
   def fcm_client
     @fcm_client ||= Fcm.new(endpoint: ENV['FCM_ENDPOINT'])

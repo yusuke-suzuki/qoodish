@@ -4,7 +4,11 @@ class DevicesController < ApplicationController
 
   def create
     ActiveRecord::Base.transaction do
-      return if current_user.devices.exists?(registration_token: params[:registration_token])
+      if current_user.devices.exists?(registration_token: params[:registration_token])
+        Rails.logger.info("Registration token #{params[:registration_token]} already exists.")
+        return
+      end
+
       Rails.logger.info("Create new registration token. registration_token: #{params[:registration_token]} uid: #{current_user.uid}")
       current_user.devices.create!(
         registration_token: params[:registration_token]
@@ -19,6 +23,7 @@ class DevicesController < ApplicationController
   def destroy
     device = current_user.devices.find_by(registration_token: params[:id])
     return if device.blank?
+
     Rails.logger.info("Create new registration token. registration_token: #{params[:id]} uid: #{current_user.uid}")
     device.destroy!
   end

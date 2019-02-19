@@ -28,6 +28,7 @@ gem 'acts_as_votable', '~> 0.11.1'
 gem 'bootsnap', require: false
 gem 'dotenv-rails'
 gem 'faraday'
+gem 'google_iid_client', git: 'https://github.com/yusuke-suzuki/google_iid_client.git', branch: 'master', ref: '20618ec'
 gem 'google_places'
 gem 'googleauth'
 gem 'http_accept_language'
