@@ -7,6 +7,16 @@ GIT
       activerecord (>= 4.0)
 
 GIT
+  remote: https://github.com/yusuke-suzuki/fcm_client.git
+  revision: f5957a57a2ad6a7a1725b3e4dc932c659526937f
+  ref: f5957a5
+  branch: master
+  specs:
+    fcm_client (1.0.0)
+      json (~> 2.1, >= 2.1.0)
+      typhoeus (~> 1.0, >= 1.0.1)
+
+GIT
   remote: https://github.com/yusuke-suzuki/google_iid_client.git
   revision: 20618ec01ae43910ff2ea1b10f6238ce3750a8b6
   ref: 20618ec
@@ -229,6 +239,7 @@ DEPENDENCIES
   byebug
   dotenv-rails
   faraday
+  fcm_client!
   google_iid_client!
   google_places
   googleauth

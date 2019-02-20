@@ -30,12 +30,11 @@ class ApplicationController < ActionController::API
     I18n.locale = http_accept_language.compatible_language_from(I18n.available_locales)
   end
 
-  def current_user
-    @current_user
-  end
+  attr_reader :current_user
 
   def authenticate_user!
     raise Exceptions::Unauthorized if request.headers['Authorization'].blank?
+
     auth_client = Firebase::Auth.new
     decoded = auth_client.verify_id_token(request.headers['Authorization'].split(' ', 2).last)
 
