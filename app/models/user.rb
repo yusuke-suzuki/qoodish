@@ -26,6 +26,7 @@ class User < ApplicationRecord
   after_create :create_default_map
 
   PROVIDER_ANONYMOUS = 'anonymous'.freeze
+  FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   attr_accessor :is_anonymous
 
@@ -75,7 +76,7 @@ class User < ApplicationRecord
 
     GoogleIidClient.configure do |config|
       config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
-      config.debugging = true
+      config.debugging = Rails.env.development?
     end
 
     api_instance = GoogleIidClient::RelationshipMapsApi.new
@@ -88,7 +89,7 @@ class User < ApplicationRecord
       result = api_instance.iid_v1batch_add_post(inline_object)
       Rails.logger.info(result)
     rescue GoogleIidClient::ApiError => e
-      Rails.logger.info("Exception when calling RelationshipMapsApi->iid_v1batch_add_post: #{e}")
+      Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_add_post: #{e}")
     end
   end
 
@@ -101,7 +102,7 @@ class User < ApplicationRecord
 
     GoogleIidClient.configure do |config|
       config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
-      config.debugging = true
+      config.debugging = Rails.env.development?
     end
 
     api_instance = GoogleIidClient::RelationshipMapsApi.new
@@ -114,12 +115,50 @@ class User < ApplicationRecord
       result = api_instance.iid_v1batch_remove_post(inline_object1)
       Rails.logger.info(result)
     rescue GoogleIidClient::ApiError => e
-      Rails.logger.info("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
+      Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
     end
   end
 
-  def send_message_to_topic(topic, message, request_path, image = nil, data = {})
-    fcm_client.send_message_to_topic(topic, message, request_path, image, data)
+  def send_message_to_topic(topic, body, request_path, image = nil, data = {})
+    FcmClient.configure do |config|
+      config.api_key['Authorization'] = authenticate_firebase_admin
+      config.api_key_prefix['Authorization'] = 'Bearer'
+      config.debugging = Rails.env.development?
+    end
+    api_instance = FcmClient::MessagesApi.new
+
+    notification = FcmClient::Notification.new(
+      title: 'Qoodish',
+      body: body,
+      icon: ENV['SUBSTITUTE_URL'],
+      click_action: "#{ENV['WEB_ENDPOINT']}/#{request_path}"
+    )
+    notification.image = image if image.present?
+    notification.data = data if data.present?
+
+    message = FcmClient::Message.new(
+      topic: topic,
+      webpush: {
+        notification: notification
+      }
+    )
+    inline_object = FcmClient::InlineObject.new(message: message)
+
+    begin
+      result = api_instance.v1_projects_project_id_messagessend_post(ENV['FIREBASE_PROJECT_ID'], inline_object)
+      Rails.logger.info(result)
+    rescue FcmClient::ApiError => e
+      Rails.logger.error("Exception when calling MessagesApi->v1_projects_project_id_messagessend_post: #{e}")
+    end
+  end
+
+  def authenticate_firebase_admin
+    authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
+      json_key_io: File.open(Rails.root.join('firebase-credentials.json')),
+      scope: FCM_SCOPE
+    )
+    token = authorizer.fetch_access_token!
+    token['access_token']
   end
 
   def unfollow_all_maps
@@ -136,11 +175,5 @@ class User < ApplicationRecord
     )
     follow(map)
     subscribe_topic("map_#{map.id}")
-  end
-
-  private
-
-  def fcm_client
-    @fcm_client ||= Fcm.new(endpoint: ENV['FCM_ENDPOINT'])
   end
 end

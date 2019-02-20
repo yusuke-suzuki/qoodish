@@ -5,30 +5,20 @@ module Firebase
     ALGORITHM = 'RS256'.freeze
     ISSUER_BASE_URL = 'https://securetoken.google.com/'.freeze
     CLIENT_CERT_URL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com'.freeze
-    FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
-
-    def fetch_access_token
-      authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-        json_key_io: File.open(Rails.root.join('firebase-credentials.json')),
-        scope: FCM_SCOPE
-      )
-      token = authorizer.fetch_access_token!
-      token['access_token']
-    end
 
     def verify_id_token(token)
       Rails.logger.info('Try to verify firebase id token...')
       Rails.logger.info("Token: #{token}")
-      raise Exceptions::FirebaseAuthError.new('id token must be a String') unless token.is_a?(String)
+      raise Exceptions::FirebaseAuthError, 'id token must be a String' unless token.is_a?(String)
 
       full_decoded_token = decode_token(token)
 
       err_msg = validate_jwt(full_decoded_token)
-      raise Exceptions::FirebaseAuthError.new(err_msg) if err_msg
+      raise Exceptions::FirebaseAuthError, err_msg if err_msg
 
       public_key = fetch_public_keys[full_decoded_token[:header]['kid']]
       unless public_key
-        raise Exceptions::FirebaseAuthError.new('Firebase ID token has "kid" claim which does not correspond to a known public key. Most likely the ID token is expired, so get a fresh token from your client app and try again.')
+        raise Exceptions::FirebaseAuthError, 'Firebase ID token has "kid" claim which does not correspond to a known public key. Most likely the ID token is expired, so get a fresh token from your client app and try again.'
       end
 
       certificate = OpenSSL::X509::Certificate.new(public_key)
@@ -48,10 +38,10 @@ module Firebase
         decoded_token = JWT.decode(token, key, verify, options)
       rescue JWT::ExpiredSignature => e
         Rails.logger.error(e)
-        raise Exceptions::FirebaseAuthError.new('Firebase ID token has expired. Get a fresh token from your client app and try again.')
-      rescue => e
+        raise Exceptions::FirebaseAuthError, 'Firebase ID token has expired. Get a fresh token from your client app and try again.'
+      rescue StandardError => e
         Rails.logger.error(e)
-        raise Exceptions::FirebaseAuthError.new('Firebase ID token has invalid signature.')
+        raise Exceptions::FirebaseAuthError, 'Firebase ID token has invalid signature.'
       end
 
       {
@@ -74,7 +64,7 @@ module Firebase
         msg = "Error fetching public keys for Google certs: #{data['error']}"
         msg += " (#{res['error_description']})" if data['error_description']
 
-        raise Exceptions::FirebaseAuthError.new(msg)
+        raise Exceptions::FirebaseAuthError, msg
       end
 
       data
