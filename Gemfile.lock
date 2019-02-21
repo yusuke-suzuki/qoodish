@@ -238,7 +238,6 @@ DEPENDENCIES
   bootsnap
   byebug
   dotenv-rails
-  faraday
   fcm_client!
   google_iid_client!
   google_places
