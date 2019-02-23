@@ -21,14 +21,14 @@ class UsersController < ApplicationController
   def create
     Rails.logger.info(params)
     auth_client = Firebase::Auth.new
-    auth_client.verify_id_token(params[:user][:token])
+    auth_client.verify_id_token(params[:token])
 
-    @user = User.find_by(uid: params[:user][:uid])
+    @user = User.find_by(uid: params[:uid])
     if @user.blank?
       @user = User.create!(
-        uid: params[:user][:uid],
-        name: params[:user][:display_name],
-        image_path: params[:user][:photo_url]
+        uid: params[:uid],
+        name: params[:display_name],
+        image_path: params[:image_url]
       )
     end
   end
