@@ -14,7 +14,7 @@ class Map < ApplicationRecord
               strict: Exceptions::MapNameNotSpecified
             },
             uniqueness: {
-              scope:  :user_id,
+              scope: :user_id,
               strict: Exceptions::DuplicateMapName,
               on: :create
             },
@@ -38,6 +38,10 @@ class Map < ApplicationRecord
             }
 
   before_validation :remove_carriage_return
+
+  scope :recommend, lambda {
+    includes(:user, :reviews).where(maps: { private: false }).sample(10)
+  }
 
   scope :recent, lambda {
     includes(:user, :reviews).where(maps: { private: false }).order(created_at: :desc).limit(12)
@@ -69,7 +73,7 @@ class Map < ApplicationRecord
 
   scope :search_by_words, lambda { |words|
     all.tap do |q|
-      words.each { |word| q.where!("name LIKE :word", word: "%#{sanitize_sql_like(word)}%") }
+      words.each { |word| q.where!('name LIKE :word', word: "%#{sanitize_sql_like(word)}%") }
     end
   }
 
@@ -78,7 +82,7 @@ class Map < ApplicationRecord
   end
 
   def spots
-    reviews.order(created_at: :desc).group_by(&:place_id_val).map { |key, value| value[0].spot }
+    reviews.order(created_at: :desc).group_by(&:place_id_val).map { |_key, value| value[0].spot }
   end
 
   def image_url
@@ -92,7 +96,7 @@ class Map < ApplicationRecord
   private
 
   def remove_carriage_return
-    name.gsub!(/\r/, '') if name
-    description.gsub!(/\r/, '') if description
+    name.delete!("\r") if name
+    description.delete!("\r") if description
   end
 end

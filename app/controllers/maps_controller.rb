@@ -10,6 +10,8 @@ class MapsController < ApplicationController
           .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
           .limit(20)
           .order(created_at: :desc)
+      elsif params[:recommend]
+        Map.recommend
       elsif params[:recent]
         Map.recent
       elsif params[:active]
