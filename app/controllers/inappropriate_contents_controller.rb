@@ -3,7 +3,7 @@ class InappropriateContentsController < ApplicationController
   before_action :require_sign_in!
 
   def create
-    @inappropriate = InappropriateContent.create!(
+    InappropriateContent.create!(
       content_id_val: params[:content_id],
       content_type: params[:content_type],
       reason_id_val: params[:reason_id],
