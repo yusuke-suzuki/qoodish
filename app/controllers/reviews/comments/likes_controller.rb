@@ -6,7 +6,7 @@ module Reviews
 
       def index
         comment = Comment.find_by!(id: params[:comment_id])
-        raise Exceptions::NotFound unless current_user.referenceable?(comment.review.map)
+        raise Exceptions::NotFound unless current_user.referenceable?(comment.commentable.map)
 
         @likes = comment.get_likes
       end
