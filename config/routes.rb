@@ -28,6 +28,7 @@ Rails.application.routes.draw do
       resources :comments, only: [:create, :destroy] do
         scope module: :comments do
           resource :like, only: [:create, :destroy]
+          resources :likes, only: [:index]
         end
       end
     end
