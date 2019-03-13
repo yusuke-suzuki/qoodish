@@ -26,18 +26,6 @@ module Reviews
             key: 'liked'
           )
         end
-
-        data = {
-          notification_type: 'like_comment',
-          review_id: @review.id
-        }
-        current_user.send_message_to_topic(
-          "user_#{comment.user.id}",
-          "#{current_user.name} liked your comment.",
-          "maps/#{@review.map_id}/reports/#{@review.id}",
-          @review.thumbnail_url,
-          data
-        )
       end
 
       def destroy

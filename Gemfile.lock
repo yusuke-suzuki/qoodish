@@ -8,8 +8,8 @@ GIT
 
 GIT
   remote: https://github.com/yusuke-suzuki/fcm_client.git
-  revision: f5957a57a2ad6a7a1725b3e4dc932c659526937f
-  ref: f5957a5
+  revision: 57e92b6b49eff3b9739882f26f04fadbda2ef2d2
+  ref: 57e92b6
   branch: master
   specs:
     fcm_client (1.0.0)
