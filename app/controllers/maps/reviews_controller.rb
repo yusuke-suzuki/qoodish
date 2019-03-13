@@ -6,6 +6,7 @@ module Maps
     def index
       map = Map.find_by!(id: params[:map_id])
       raise Exceptions::NotFound unless current_user.referenceable?(map)
+
       @reviews =
         if params[:place_id].present?
           map.reviews.includes(:user, :comments).where(place_id_val: params[:place_id])
@@ -17,6 +18,7 @@ module Maps
     def show
       map = Map.find_by!(id: params[:map_id])
       raise Exceptions::NotFound unless current_user.referenceable?(map)
+
       @review = map.reviews.find_by!(id: params[:id])
     end
 
@@ -24,23 +26,12 @@ module Maps
       ActiveRecord::Base.transaction do
         map = Map.find_by!(id: params[:map_id])
         raise Exceptions::NotFound unless current_user.postable?(map)
+
         @review = current_user.reviews.create!(
           map: map,
           place_id_val: params[:place_id],
           comment: params[:comment],
           image_url: params[:image_url]
-        )
-        message = "#{current_user.name} posted a report about #{@review.spot.name} on #{map.name}."
-        data = {
-          notification_type: 'create_review',
-          review_id: @review.id
-        }
-        current_user.send_message_to_topic(
-          "map_#{map.id}",
-          message,
-          "maps/#{map.id}/reports/#{@review.id}",
-          @review.thumbnail_url,
-          data
         )
       end
     end

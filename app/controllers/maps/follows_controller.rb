@@ -22,17 +22,6 @@ module Maps
           key: 'followed'
         )
         current_user.subscribe_topic("map_#{@map.id}")
-        data = {
-          notification_type: 'follow_map',
-          map_id: @map.id
-        }
-        current_user.send_message_to_topic(
-          "user_#{@map.user.id}",
-          "#{current_user.name} followed #{@map.name}.",
-          "maps/#{@map.id}",
-          @map.thumbnail_url,
-          data
-        )
       end
     end
 
@@ -40,6 +29,7 @@ module Maps
       ActiveRecord::Base.transaction do
         map = Map.includes(:user, :reviews).find_by!(id: params[:map_id])
         raise Exceptions::MapOwnerCannotRemoved if current_user.map_owner?(map)
+
         current_user.stop_following(map)
         @map = map.reload
         current_user.unsubscribe_topic("map_#{@map.id}")

@@ -3,7 +3,7 @@ json.key notification.key
 json.click_action notification.click_action
 json.notifiable do
   json.id notification.notifiable_id
-  json.type notification.notifiable_name
+  json.type notification.notifiable_type.downcase
   json.thumbnail_url notification.notifiable.thumbnail_url
 end
 json.notifier do
