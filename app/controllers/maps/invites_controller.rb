@@ -19,18 +19,6 @@ module Maps
           recipient: recipient,
           key: 'invited'
         )
-        message = "#{current_user.name} invited you to #{map.name}."
-        data = {
-          notification_type: 'invite',
-          invite_id: invite.id
-        }
-        current_user.send_message_to_topic(
-          "user_#{recipient.id}",
-          message,
-          'invites',
-          nil,
-          data
-        )
       end
     end
   end
