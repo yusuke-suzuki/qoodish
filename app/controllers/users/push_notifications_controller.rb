@@ -1,33 +1,18 @@
 module Users
   class PushNotificationsController < ApplicationController
     before_action :authenticate_user!
+    before_action :require_sign_in!
 
-    def create
+    def update
       ActiveRecord::Base.transaction do
-        unless current_user.devices.exists?(registration_token: params[:registration_token])
-          current_user.devices.create!(
-            registration_token: params[:registration_token]
-          )
-        end
+        push_notification = PushNotification.find_or_initialize_by(user: current_user)
 
-        current_user.following_maps.each do |map|
-          current_user.subscribe_topic("map_#{map.id}")
-        end
-        current_user.subscribe_topic("user_#{current_user.id}")
-
-        current_user.push_enabled = true
-        current_user.save!
-      end
-    end
-
-    def destroy
-      ActiveRecord::Base.transaction do
-        current_user.push_enabled = false
-        current_user.save!
-        current_user.following_maps.each do |map|
-          current_user.unsubscribe_topic("map_#{map.id}")
-        end
-        current_user.unsubscribe_topic("user_#{current_user.id}")
+        push_notification.update!(
+          followed: params[:followed],
+          invited: params[:invited],
+          liked: params[:liked],
+          comment: params[:comment]
+        )
       end
     end
   end

@@ -53,6 +53,8 @@ class Notification < ApplicationRecord
   end
 
   def web_push
+    return unless allowed_web_push?
+
     FcmClient.configure do |config|
       config.api_key['Authorization'] = authenticate_firebase_admin
       config.api_key_prefix['Authorization'] = 'Bearer'
@@ -90,5 +92,13 @@ class Notification < ApplicationRecord
     )
     token = authorizer.fetch_access_token!
     token['access_token']
+  end
+
+  def allowed_web_push?
+    if recipient.push_notification.blank?
+      true
+    else
+      recipient.push_notification[key]
+    end
   end
 end

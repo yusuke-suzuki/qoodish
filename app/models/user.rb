@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :notifications, as: :recipient
   has_many :comments, dependent: :destroy
   has_many :invites, as: :recipient
+  has_one :push_notification, dependent: :destroy
 
   validates :uid,
             presence: true,
