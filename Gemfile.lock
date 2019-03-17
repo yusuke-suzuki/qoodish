@@ -18,8 +18,8 @@ GIT
 
 GIT
   remote: https://github.com/yusuke-suzuki/google_iid_client.git
-  revision: 20618ec01ae43910ff2ea1b10f6238ce3750a8b6
-  ref: 20618ec
+  revision: 79a60500e25598b1453fb14fd23ac933c693110c
+  ref: 79a6050
   branch: master
   specs:
     google_iid_client (1.0.0)

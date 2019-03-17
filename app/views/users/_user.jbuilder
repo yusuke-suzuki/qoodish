@@ -10,4 +10,9 @@ json.maps_count user.maps.count
 json.following_maps_count user.follow_count
 json.reviews_count user.reviews.count
 json.likes_count user.votes.count
-json.push_enabled user.push_enabled
+json.push_notification do
+  json.followed user.push_notification ? user.push_notification.followed : false
+  json.invited user.push_notification ? user.push_notification.invited : false
+  json.liked user.push_notification ? user.push_notification.liked : false
+  json.comment user.push_notification ? user.push_notification.comment : false
+end

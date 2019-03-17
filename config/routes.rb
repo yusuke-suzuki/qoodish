@@ -4,7 +4,7 @@ Rails.application.routes.draw do
       resources :maps, only: [:index]
       resources :reviews, only: [:index]
       resources :likes, only: [:index]
-      resource :push_notification, only: [:create, :destroy]
+      resource :push_notification, only: [:update]
     end
   end
   resources :devices, only: [:create, :destroy]

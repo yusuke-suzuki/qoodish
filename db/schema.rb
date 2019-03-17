@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_16_060157) do
+ActiveRecord::Schema.define(version: 2019_03_17_041543) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -108,6 +108,17 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
+  create_table "push_notifications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.boolean "folowed", default: false
+    t.boolean "invited", default: false
+    t.boolean "liked", default: false
+    t.boolean "comment", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_push_notifications_on_user_id"
+  end
+
   create_table "reviews", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "map_id", null: false
@@ -129,7 +140,6 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
     t.string "image_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "push_enabled", default: false, null: false
     t.string "biography"
     t.index ["image_path"], name: "index_users_on_image_path", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true
@@ -153,6 +163,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_060157) do
 
   add_foreign_key "devices", "users"
   add_foreign_key "maps", "users"
+  add_foreign_key "push_notifications", "users"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"
 end
