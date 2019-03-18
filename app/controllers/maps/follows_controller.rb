@@ -21,7 +21,6 @@ module Maps
           recipient: @map.user,
           key: 'followed'
         )
-        current_user.subscribe_topic("map_#{@map.id}")
       end
     end
 
@@ -32,7 +31,6 @@ module Maps
 
         current_user.stop_following(map)
         @map = map.reload
-        current_user.unsubscribe_topic("map_#{@map.id}")
       end
     end
   end

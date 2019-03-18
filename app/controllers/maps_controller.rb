@@ -42,7 +42,6 @@ class MapsController < ApplicationController
         base_name: params[:base_name]
       )
       current_user.follow(@map)
-      current_user.subscribe_topic("map_#{@map.id}")
     end
   end
 
@@ -54,7 +53,6 @@ class MapsController < ApplicationController
   def destroy
     ActiveRecord::Base.transaction do
       map = current_user.maps.find_by!(id: params[:id])
-      current_user.unsubscribe_topic("map_#{map.id}")
       current_user.stop_following(map)
       map.destroy!
     end
