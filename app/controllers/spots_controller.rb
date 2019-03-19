@@ -3,9 +3,14 @@ class SpotsController < ApplicationController
 
   def index
     if params[:popular]
-      @spots = Review.includes(:map).where(maps: { private: false }).group_by(&:place_id_val)
-        .sort_by { |key, value| value.size }.reverse.take(10)
-        .map { |key, value| value[0].spot }
+      @spots =
+        Review
+        .public_open
+        .group_by(&:place_id_val)
+        .sort_by { |_key, value| value.size }
+        .reverse
+        .take(10)
+        .map { |_key, value| value[0].spot }
     end
   end
 

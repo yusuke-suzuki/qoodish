@@ -3,6 +3,7 @@ class PlacesController < ApplicationController
 
   def index
     places_api = GooglePlaces::Client.new(ENV['GOOGLE_API_KEY_SERVER'])
+
     if params[:input].present?
       places = places_api.predictions_by_input(params[:input], language: I18n.locale)
     else
@@ -14,6 +15,7 @@ class PlacesController < ApplicationController
         language: I18n.locale
       ).map { |place| { description: place['name'], place_id: place['place_id'] } }
     end
+
     render json: places, status: :ok
   end
 end

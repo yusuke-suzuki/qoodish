@@ -3,6 +3,9 @@ class Notification < ApplicationRecord
   belongs_to :notifier, polymorphic: true
   belongs_to :recipient, polymorphic: true
 
+  KEYS = %w[followed invited liked comment]
+  FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
+
   validates :notifiable_type,
             inclusion: {
               in: [Review.name, Map.name, Comment.name]
@@ -17,16 +20,15 @@ class Notification < ApplicationRecord
             }
   validates :key,
             inclusion: {
-              in: %w[followed invited liked comment]
+              in: KEYS
             }
 
   after_create_commit :web_push
 
-  scope :recent, lambda { |current_user|
-    includes(:notifier, :notifiable).where.not(notifications: { notifier_id: current_user.id }).order(created_at: :desc).limit(10)
+  scope :recent, lambda {
+    order(created_at: :desc)
+      .limit(10)
   }
-
-  FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   def click_action
     case key

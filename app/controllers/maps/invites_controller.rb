@@ -5,19 +5,13 @@ module Maps
 
     def create
       ActiveRecord::Base.transaction do
-        map = current_user.following_maps.find_by!(id: params[:map_id], private: true)
-        raise Exceptions::NotFound unless current_user.map_owner?(map) || map.invitable
+        map = current_user.invitable_maps.find_by!(id: params[:map_id])
         recipient = User.find_by!(id: params[:user_id])
-        invite = Invite.create!(
+
+        Invite.create!(
           invitable: map,
           sender: current_user,
           recipient: recipient
-        )
-        Notification.create!(
-          notifiable: map,
-          notifier: current_user,
-          recipient: recipient,
-          key: 'invited'
         )
       end
     end

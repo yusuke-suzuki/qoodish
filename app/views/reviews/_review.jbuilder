@@ -17,7 +17,7 @@ json.comments review.comments do |comment|
   json.body comment.body
   json.editable current_user.author?(comment)
   json.liked current_user.liked?(comment)
-  json.likes_count comment.get_likes.size
+  json.likes_count comment.votes.size
   json.created_at comment.created_at
 end
 if review.image_url.present?
@@ -44,6 +44,6 @@ json.map do
 end
 json.editable current_user.author?(review)
 json.liked current_user.liked?(review)
-json.likes_count review.get_likes.size
+json.likes_count review.votes.size
 json.created_at review.created_at
 json.updated_at review.updated_at

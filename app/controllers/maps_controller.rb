@@ -1,33 +1,54 @@
 class MapsController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_sign_in!, only: [:create, :update, :destroy]
+  before_action :require_sign_in!, only: %i[create update destroy]
 
   def index
     @maps =
       if params[:input].present?
-        Map.includes(:user, :reviews)
-          .where(maps: { private: false })
-          .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
+        current_user
+          .referenceable_maps
+          .where(Map.search_by_words(params[:input].strip.split(/[[:blank:]]+/)))
           .limit(20)
+          .includes(:user, :reviews)
           .order(created_at: :desc)
       elsif params[:recommend]
-        Map.recommend
+        Map
+          .public_open
+          .includes(:user, :reviews)
+          .order(created_at: :desc)
+          .sample(10)
       elsif params[:recent]
-        Map.recent
+        Map
+          .public_open
+          .includes(:user, :reviews)
+          .order(created_at: :desc)
+          .limit(12)
       elsif params[:active]
-        Map.active
+        Map
+          .public_open
+          .includes(:user, :reviews)
+          .active
       elsif params[:popular]
-        Map.popular
+        Map
+          .public_open
+          .includes(:user, :reviews)
+          .popular
       elsif params[:postable]
-        current_user.following_maps.postable(current_user)
+        current_user.postable_maps
       else
-        current_user.following_maps.includes(:user, :reviews).order(created_at: :desc)
+        current_user
+          .following_maps
+          .includes(:user, :reviews)
+          .order(created_at: :desc)
       end
   end
 
   def show
-    @map = Map.includes(:user, :reviews).find_by!(id: params[:id])
-    raise Exceptions::NotFound if @map.private && !current_user.following?(@map)
+    @map =
+      current_user
+      .referenceable_maps
+      .includes(:user, :reviews)
+      .find_by!(id: params[:id])
   end
 
   def create
@@ -41,7 +62,6 @@ class MapsController < ApplicationController
         base_id_val: params[:base_id],
         base_name: params[:base_name]
       )
-      current_user.follow(@map)
     end
   end
 
@@ -52,9 +72,7 @@ class MapsController < ApplicationController
 
   def destroy
     ActiveRecord::Base.transaction do
-      map = current_user.maps.find_by!(id: params[:id])
-      current_user.stop_following(map)
-      map.destroy!
+      current_user.maps.find_by!(id: params[:id]).destroy!
     end
   end
 

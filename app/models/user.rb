@@ -5,6 +5,9 @@ class User < ApplicationRecord
   has_many :notifications, as: :recipient
   has_many :comments, dependent: :destroy
   has_many :invites, as: :recipient
+  has_many :follows, as: :follower, dependent: :destroy
+  has_many :following_maps, through: :follows, source: :followable, source_type: Map.name
+  has_many :votes, as: :voter, dependent: :destroy
   has_one :push_notification, dependent: :destroy
 
   validates :uid,
@@ -21,14 +24,16 @@ class User < ApplicationRecord
             presence: true,
             uniqueness: true
 
-  acts_as_follower
-  acts_as_voter
-
   after_create :create_default_map
 
   PROVIDER_ANONYMOUS = 'anonymous'.freeze
 
   attr_accessor :is_anonymous
+
+  scope :search_by_name, lambda { |name|
+    where('name LIKE ?', "%#{name}%")
+      .limit(20)
+  }
 
   def self.sign_in_anonymously(payload)
     raise Exceptions::Unauthorized unless payload['provider_id'] == PROVIDER_ANONYMOUS
@@ -60,11 +65,66 @@ class User < ApplicationRecord
   end
 
   def postable?(map)
-    map_owner?(map) || (map.shared && !map.private) || (map.private && following?(map) && map.shared)
+    map_owner?(map) || (following?(map) && map.shared)
   end
 
-  def referenceable?(map)
-    map_owner?(map) || following?(map) || (!following?(map) && !map.private)
+  def referenceable_maps
+    Map.referenceable_by(self)
+  end
+
+  def referenceable_reviews
+    Review.referenceable_by(self)
+  end
+
+  def postable_maps
+    Map.postable_by(self)
+  end
+
+  def invitable_maps
+    Map.invitable_by(self)
+  end
+
+  def following?(followable)
+    follows.exists?(followable: followable)
+  end
+
+  def follow_count
+    follows.where(follower: self).size
+  end
+
+  def follow!(followable)
+    follows.create!(followable: followable)
+  end
+
+  def unfollow!(followable)
+    follows.find_by!(followable: followable).destroy!
+  end
+
+  def referenceable_vote?(vote)
+    return false if vote.votable.blank?
+
+    case vote.votable_type
+    when Comment.name
+      false
+    when Review.name
+      referenceable_reviews.exists?(vote.votable.id)
+    when Map.name
+      referenceable_maps.exists?(vote.votable.id)
+    else
+      true
+    end
+  end
+
+  def liked!(votable)
+    votes.create!(votable: votable)
+  end
+
+  def unliked!(votable)
+    votes.find_by!(votable: votable).destroy!
+  end
+
+  def liked?(votable)
+    votes.exists?(votable: votable)
   end
 
   def subscribe_topic(topic)
@@ -119,19 +179,10 @@ class User < ApplicationRecord
     end
   end
 
-  def unfollow_all_maps
-    following_maps.each do |map|
-      stop_following(map)
-      unsubscribe_topic("map_#{map.id}")
-    end
-  end
-
   def create_default_map
-    map = maps.create!(
+    maps.create!(
       name: "#{name}'s map",
       description: "#{name}'s map."
     )
-    follow(map)
-    subscribe_topic("map_#{map.id}")
   end
 end

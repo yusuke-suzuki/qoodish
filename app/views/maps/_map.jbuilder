@@ -12,9 +12,9 @@ json.base do
   json.lng map.base.lng
 end
 json.liked current_user.liked?(map)
-json.likes_count map.get_likes.size
+json.likes_count map.votes.size
 json.following current_user.following?(map)
-json.followers_count map.followers_count
+json.followers_count map.follows.size
 json.editable current_user.map_owner?(map)
 json.postable current_user.postable?(map)
 json.shared map.shared

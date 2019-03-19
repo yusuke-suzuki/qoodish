@@ -3,8 +3,7 @@ class Review < ApplicationRecord
   belongs_to :map
   has_many :notifications, as: :notifiable
   has_many :comments, as: :commentable
-
-  acts_as_votable
+  has_many :votes, as: :votable, dependent: :destroy
 
   before_validation :remove_carriage_return
 
@@ -24,7 +23,7 @@ class Review < ApplicationRecord
               strict: Exceptions::PlaceIdNotSpecified
             },
             uniqueness: {
-              scope: [:map_id, :user_id],
+              scope: %i[map_id user_id],
               strict: Exceptions::DuplicateReview
             }
   validates :map_id,
@@ -34,42 +33,37 @@ class Review < ApplicationRecord
   validates :image_url,
             format: {
               allow_blank: true,
-              with: /\A#{URI::regexp(%w(http https))}\z/,
+              with: /\A#{URI.regexp(%w[http https])}\z/,
               scrict: Exceptions::InvalidUri
             }
   validate :validate_spot
 
-  FEED_PER_PAGE = 20
+  FEED_PER_PAGE = 10
 
-  scope :map_posts_for, lambda { |current_user|
-    includes(:user, :map, :comments)
-      .where(map_id: current_user.following_maps.ids)
+  scope :public_open, lambda {
+    joins(:map)
+      .where(maps: { private: false })
   }
 
   scope :referenceable_by, lambda { |current_user|
-    includes(:user, :map, :comments)
-      .where(maps: { id: current_user.following_maps.ids })
-      .or(includes(:user, :map, :comments).where(maps: { private: false }))
+    following_by(current_user)
+      .or(public_open)
+  }
+
+  scope :following_by, lambda { |user|
+    joins(:map).where(maps: { id: user.following_maps })
   }
 
   scope :latest_feed, lambda {
-    where(created_at: 6.month.ago...Time.now).order(created_at: :desc).limit(FEED_PER_PAGE)
+    where(created_at: 6.month.ago...Time.now)
+      .order(created_at: :desc)
+      .limit(FEED_PER_PAGE)
   }
 
   scope :feed_before, lambda { |created_at|
-    where(created_at: 6.month.ago...Time.parse(created_at)).order(created_at: :desc).limit(FEED_PER_PAGE)
-  }
-
-  scope :user_feed, lambda {
-    order(created_at: :desc).limit(FEED_PER_PAGE)
-  }
-
-  scope :user_feed_before, lambda { |created_at|
-    where('reviews.created_at < ?', Time.parse(created_at)).order(created_at: :desc).limit(FEED_PER_PAGE)
-  }
-
-  scope :recent, lambda {
-    includes(:user, :map, :comments).where(maps: { private: false }).order(created_at: :desc).limit(8)
+    where(created_at: 6.month.ago...Time.parse(created_at))
+      .order(created_at: :desc)
+      .limit(FEED_PER_PAGE)
   }
 
   def spot
@@ -82,11 +76,13 @@ class Review < ApplicationRecord
 
   def image_name
     return '' if image_url.blank?
+
     File.basename(CGI.unescape(image_url))
   end
 
   def thumbnail_url
     return '' if image_url.blank?
+
     "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/images/thumb_#{image_name}"
   end
 
@@ -94,7 +90,8 @@ class Review < ApplicationRecord
 
   def remove_carriage_return
     return unless comment
-    comment.gsub!(/\r/, '')
+
+    comment.delete!("\r")
   end
 
   def validate_spot
