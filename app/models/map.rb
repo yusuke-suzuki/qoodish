@@ -63,12 +63,14 @@ class Map < ApplicationRecord
 
   scope :following_by, lambda { |user|
     joins(:follows)
+      .group('maps.id')
       .where(follows: { follower: user })
   }
 
   scope :unfollowing_by, lambda { |user|
     joins(:follows)
-      .where.not(follows: { follower: user })
+      .group('maps.id')
+      .having('count(follows.follower_id = ? or null) < 1', user.id)
   }
 
   scope :active, lambda {
