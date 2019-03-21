@@ -55,13 +55,12 @@ class Review < ApplicationRecord
   }
 
   scope :latest_feed, lambda {
-    where(created_at: 6.month.ago...Time.now)
-      .order(created_at: :desc)
+    order(created_at: :desc)
       .limit(FEED_PER_PAGE)
   }
 
   scope :feed_before, lambda { |created_at|
-    where(created_at: 6.month.ago...Time.parse(created_at))
+    where('reviews.created_at < ?', Time.parse(created_at))
       .order(created_at: :desc)
       .limit(FEED_PER_PAGE)
   }
