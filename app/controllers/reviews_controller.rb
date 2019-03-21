@@ -9,6 +9,7 @@ class ReviewsController < ApplicationController
           .public_open
           .limit(8)
           .includes(:user, :map, :comments)
+          .order(created_at: :desc)
       elsif params[:next_timestamp]
         Review
           .following_by(current_user)
