@@ -6,7 +6,6 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :invites, as: :recipient
   has_many :follows, as: :follower, dependent: :destroy
-  has_many :following_maps, through: :follows, source: :followable, source_type: Map.name
   has_many :votes, as: :voter, dependent: :destroy
   has_one :push_notification, dependent: :destroy
 
@@ -82,6 +81,10 @@ class User < ApplicationRecord
 
   def invitable_maps
     Map.invitable_by(self)
+  end
+
+  def following_maps
+    Map.following_by(self)
   end
 
   def following?(followable)
