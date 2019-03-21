@@ -23,8 +23,6 @@ gem 'jbuilder', '~> 2.5'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
 
-gem 'acts_as_follower', github: 'tcocca/acts_as_follower', branch: 'master'
-gem 'acts_as_votable', '~> 0.11.1'
 gem 'bootsnap', require: false
 gem 'dotenv-rails'
 gem 'fcm_client', git: 'https://github.com/yusuke-suzuki/fcm_client.git', branch: 'master', ref: '57e92b6'

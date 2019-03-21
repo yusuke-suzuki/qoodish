@@ -4,32 +4,34 @@ module Reviews
     before_action :require_sign_in!, only: %i[create destroy]
 
     def index
-      review = Review.includes(:map).find_by!(id: params[:review_id])
-      raise Exceptions::NotFound unless current_user.referenceable?(review.map)
+      review =
+        current_user
+        .referenceable_reviews
+        .find_by!(id: params[:review_id])
 
-      @likes = review.get_likes
+      @likes = review.votes
     end
 
     def create
-      @review = Review.includes(:map, :user, :comments).find_by!(id: params[:review_id])
-      raise Exceptions::NotFound unless current_user.referenceable?(@review.map)
+      @review =
+        current_user
+        .referenceable_reviews
+        .includes(:map, :user, :comments)
+        .find_by!(id: params[:review_id])
 
       ActiveRecord::Base.transaction do
-        @review.liked_by(current_user)
-        Notification.create!(
-          notifiable: @review,
-          notifier: current_user,
-          recipient: @review.user,
-          key: 'liked'
-        )
+        current_user.liked!(@review)
       end
     end
 
     def destroy
-      @review = Review.includes(:map).find_by!(id: params[:review_id])
-      raise Exceptions::NotFound unless current_user.referenceable?(@review.map)
+      @review =
+        current_user
+        .referenceable_reviews
+        .includes(:map, :user, :comments)
+        .find_by!(id: params[:review_id])
 
-      @review.unliked_by(current_user)
+      current_user.unliked!(@review)
     end
   end
 end

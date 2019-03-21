@@ -3,11 +3,11 @@ class Map < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_many :invites, as: :invitable, dependent: :destroy
+  has_many :follows, as: :followable, dependent: :destroy
+  has_many :followers, through: :follows, source: :follower, source_type: User.name
+  has_many :votes, as: :votable, dependent: :destroy
 
   attr_accessor :base_lat, :base_lng
-
-  acts_as_followable
-  acts_as_votable
 
   validates :name,
             presence: {
@@ -38,37 +38,51 @@ class Map < ApplicationRecord
             }
 
   before_validation :remove_carriage_return
+  after_create :follow_by_owner
 
-  scope :recommend, lambda {
-    includes(:user, :reviews).where(maps: { private: false }).sample(10)
+  scope :public_open, lambda {
+    where(private: false)
   }
 
-  scope :recent, lambda {
-    includes(:user, :reviews).where(maps: { private: false }).order(created_at: :desc).limit(12)
+  scope :referenceable_by, lambda { |user|
+    following_by(user)
+      .or(unfollowing_by(user).public_open)
+  }
+
+  scope :postable_by, lambda { |user|
+    joins(:follows)
+      .where(maps: { user: user })
+      .or(following_by(user).where(maps: { shared: true }))
+  }
+
+  scope :invitable_by, lambda { |user|
+    joins(:follows)
+      .where(maps: { user: user })
+      .or(following_by(user).where(maps: { invitable: true }))
+  }
+
+  scope :following_by, lambda { |user|
+    joins(:follows)
+      .where(follows: { follower: user })
+  }
+
+  scope :unfollowing_by, lambda { |user|
+    joins(:follows)
+      .where.not(follows: { follower: user })
   }
 
   scope :active, lambda {
-    includes(:user, :reviews)
-      .where(maps: { private: false })
-      .left_outer_joins(:reviews)
+    left_joins(:reviews)
       .group('maps.id')
       .order('max(reviews.created_at) desc')
       .limit(12)
   }
 
   scope :popular, lambda {
-    includes(:user, :reviews).where(maps: { private: false }).sort_by(&:followers_count).take(10).reverse!
-  }
-
-  scope :postable, lambda { |current_user|
-    includes(:user, :reviews).order(created_at: :desc).select { |map| current_user.postable?(map) }
-  }
-
-  scope :referenceable_by, lambda { |current_user|
-    includes(:user, :reviews)
-      .where(maps: { id: current_user.following_maps.ids })
-      .or(includes(:user, :reviews).where(maps: { private: false }))
-      .order(created_at: :desc)
+    joins(:follows)
+      .group('maps.id')
+      .order('count(follows.id) desc')
+      .limit(10)
   }
 
   scope :search_by_words, lambda { |words|
@@ -98,5 +112,9 @@ class Map < ApplicationRecord
   def remove_carriage_return
     name.delete!("\r") if name
     description.delete!("\r") if description
+  end
+
+  def follow_by_owner
+    user.follow!(self)
   end
 end

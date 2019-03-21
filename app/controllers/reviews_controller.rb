@@ -1,17 +1,25 @@
 class ReviewsController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_sign_in!, only: [:update, :destroy]
+  before_action :require_sign_in!, only: %i[update destroy]
 
   def index
-    if params[:recent]
-      @reviews = Review.recent
-    elsif current_user.following_maps.length.zero?
-      @reviews = []
-    elsif params[:next_timestamp]
-      @reviews = Review.map_posts_for(current_user).feed_before(params[:next_timestamp])
-    else
-      @reviews = Review.map_posts_for(current_user).latest_feed
-    end
+    @reviews =
+      if params[:recent]
+        Review
+          .public_open
+          .limit(8)
+          .includes(:user, :map, :comments)
+      elsif params[:next_timestamp]
+        Review
+          .following_by(current_user)
+          .feed_before(params[:next_timestamp])
+          .includes(:user, :map, :comments)
+      else
+        Review
+          .following_by(current_user)
+          .latest_feed
+          .includes(:user, :map, :comments)
+      end
   end
 
   def update

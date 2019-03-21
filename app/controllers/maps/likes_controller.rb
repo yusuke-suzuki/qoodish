@@ -4,32 +4,35 @@ module Maps
     before_action :require_sign_in!, only: %i[create destroy]
 
     def index
-      map = Map.includes(:user, :reviews).find_by!(id: params[:map_id])
-      raise Exceptions::NotFound unless current_user.referenceable?(map)
+      map =
+        current_user
+        .referenceable_maps
+        .includes(:user, :reviews)
+        .find_by!(id: params[:map_id])
 
-      @likes = map.get_likes
+      @likes = map.votes
     end
 
     def create
-      @map = Map.includes(:user, :reviews).find_by!(id: params[:map_id])
-      raise Exceptions::NotFound unless current_user.referenceable?(@map)
+      @map =
+        current_user
+        .referenceable_maps
+        .includes(:user, :reviews)
+        .find_by!(id: params[:map_id])
 
       ActiveRecord::Base.transaction do
-        @map.liked_by(current_user)
-        Notification.create!(
-          notifiable: @map,
-          notifier: current_user,
-          recipient: @map.user,
-          key: 'liked'
-        )
+        current_user.liked!(@map)
       end
     end
 
     def destroy
-      @map = Map.includes(:user, :reviews).find_by!(id: params[:map_id])
-      raise Exceptions::NotFound unless current_user.referenceable?(@map)
+      @map =
+        current_user
+        .referenceable_maps
+        .includes(:user, :reviews)
+        .find_by!(id: params[:map_id])
 
-      @map.unliked_by(current_user)
+      current_user.unliked!(@map)
     end
   end
 end

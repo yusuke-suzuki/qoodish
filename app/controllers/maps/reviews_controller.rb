@@ -4,28 +4,35 @@ module Maps
     before_action :require_sign_in!, only: :create
 
     def index
-      map = Map.find_by!(id: params[:map_id])
-      raise Exceptions::NotFound unless current_user.referenceable?(map)
-
       @reviews =
         if params[:place_id].present?
-          map.reviews.includes(:user, :comments).where(place_id_val: params[:place_id])
+          current_user
+            .referenceable_reviews
+            .includes(:map, :user, :comments)
+            .where(place_id_val: params[:place_id])
         else
-          map.reviews.includes(:user, :comments).order(created_at: :desc)
+          current_user
+            .referenceable_reviews
+            .where(map_id: params[:map_id])
+            .includes(:map, :user, :comments)
+            .order(created_at: :desc)
         end
     end
 
     def show
-      map = Map.find_by!(id: params[:map_id])
-      raise Exceptions::NotFound unless current_user.referenceable?(map)
-
-      @review = map.reviews.find_by!(id: params[:id])
+      @review =
+        current_user
+        .referenceable_reviews
+        .includes(:map, :user, :comments)
+        .find_by!(id: params[:id])
     end
 
     def create
       ActiveRecord::Base.transaction do
-        map = Map.find_by!(id: params[:map_id])
-        raise Exceptions::NotFound unless current_user.postable?(map)
+        map =
+          current_user
+          .postable_maps
+          .find_by!(id: params[:map_id])
 
         @review = current_user.reviews.create!(
           map: map,

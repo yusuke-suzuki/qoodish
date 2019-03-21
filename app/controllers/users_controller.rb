@@ -1,11 +1,14 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!, only: [:index, :show, :update, :destroy]
-  before_action :require_sign_in!, only: [:index, :update, :destroy]
+  before_action :authenticate_user!, only: %i[index show update destroy]
+  before_action :require_sign_in!, only: %i[index update destroy]
 
   def index
     @users = []
     if params[:input].present?
-      @users = User.where.not(id: current_user.id).where('name LIKE ?', "%#{params[:input]}%").limit(20)
+      @users =
+        User
+        .where.not(id: current_user.id)
+        .search_by_name(params[:input])
     end
   end
 
@@ -43,8 +46,6 @@ class UsersController < ApplicationController
 
   def destroy
     ActiveRecord::Base.transaction do
-      current_user.unfollow_all_maps
-      current_user.unsubscribe_topic("user_#{current_user.id}")
       current_user.destroy!
     end
   end

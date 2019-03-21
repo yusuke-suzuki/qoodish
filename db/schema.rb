@@ -110,10 +110,10 @@ ActiveRecord::Schema.define(version: 2019_03_17_041543) do
 
   create_table "push_notifications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.boolean "folowed", default: false
-    t.boolean "invited", default: false
-    t.boolean "liked", default: false
-    t.boolean "comment", default: false
+    t.boolean "followed", default: false, null: false
+    t.boolean "invited", default: false, null: false
+    t.boolean "liked", default: false, null: false
+    t.boolean "comment", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_push_notifications_on_user_id"

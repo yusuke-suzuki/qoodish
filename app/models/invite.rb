@@ -3,6 +3,8 @@ class Invite < ApplicationRecord
   belongs_to :sender, polymorphic: true
   belongs_to :recipient, polymorphic: true
 
+  after_create :create_notification
+
   def invitable_name
     case invitable_type
     when Map.name
@@ -10,5 +12,16 @@ class Invite < ApplicationRecord
     else
       ''
     end
+  end
+
+  private
+
+  def create_notification
+    Notification.create!(
+      notifiable: invitable,
+      notifier: sender,
+      recipient: recipient,
+      key: 'invited'
+    )
   end
 end
