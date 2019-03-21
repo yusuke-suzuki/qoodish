@@ -46,6 +46,7 @@ class Map < ApplicationRecord
 
   scope :referenceable_by, lambda { |user|
     following_by(user)
+      .group('maps.id')
       .or(unfollowing_by(user).public_open)
   }
 
@@ -63,7 +64,6 @@ class Map < ApplicationRecord
 
   scope :following_by, lambda { |user|
     joins(:follows)
-      .group('maps.id')
       .where(follows: { follower: user })
   }
 
