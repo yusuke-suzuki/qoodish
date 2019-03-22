@@ -51,9 +51,9 @@ class Map < ApplicationRecord
   }
 
   scope :postable_by, lambda { |user|
-    joins(:follows)
-      .where(maps: { user: user })
-      .or(following_by(user).where(maps: { shared: true }))
+    following_by(user)
+      .where(maps: { shared: true })
+      .or(following_by(user).where(maps: { shared: false, user: user }))
   }
 
   scope :invitable_by, lambda { |user|
