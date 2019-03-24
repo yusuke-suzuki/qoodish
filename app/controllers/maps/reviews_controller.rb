@@ -9,7 +9,7 @@ module Maps
           current_user
             .referenceable_reviews
             .includes(:map, :user, :comments)
-            .where(place_id_val: params[:place_id])
+            .where(place_id_val: params[:place_id], map_id: params[:map_id])
         else
           current_user
             .referenceable_reviews
