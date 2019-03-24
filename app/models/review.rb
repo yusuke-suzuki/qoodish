@@ -38,7 +38,7 @@ class Review < ApplicationRecord
             }
   validate :validate_spot
 
-  FEED_PER_PAGE = 10
+  FEED_PER_PAGE = 12
 
   scope :public_open, lambda {
     joins(:map)
