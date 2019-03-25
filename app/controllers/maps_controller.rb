@@ -52,17 +52,15 @@ class MapsController < ApplicationController
   end
 
   def create
-    ActiveRecord::Base.transaction do
-      @map = current_user.maps.create!(
-        name: params[:name],
-        description: params[:description],
-        private: params[:private],
-        invitable: params[:invitable],
-        shared: params[:shared],
-        base_id_val: params[:base_id],
-        base_name: params[:base_name]
-      )
-    end
+    @map = current_user.maps.create!(
+      name: params[:name],
+      description: params[:description],
+      private: params[:private],
+      invitable: params[:invitable],
+      shared: params[:shared],
+      base_id_val: params[:base_id],
+      base_name: params[:base_name]
+    )
   end
 
   def update
@@ -71,9 +69,7 @@ class MapsController < ApplicationController
   end
 
   def destroy
-    ActiveRecord::Base.transaction do
-      current_user.maps.find_by!(id: params[:id]).destroy!
-    end
+    current_user.maps.find_by!(id: params[:id]).destroy!
   end
 
   private

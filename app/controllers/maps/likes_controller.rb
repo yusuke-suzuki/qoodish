@@ -20,9 +20,7 @@ module Maps
         .includes(:user, :reviews)
         .find_by!(id: params[:map_id])
 
-      ActiveRecord::Base.transaction do
-        current_user.liked!(@map)
-      end
+      current_user.liked!(@map)
     end
 
     def destroy

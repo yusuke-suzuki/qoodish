@@ -45,8 +45,6 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    ActiveRecord::Base.transaction do
-      current_user.destroy!
-    end
+    current_user.destroy!
   end
 end
