@@ -28,19 +28,17 @@ module Maps
     end
 
     def create
-      ActiveRecord::Base.transaction do
-        map =
-          current_user
-          .postable_maps
-          .find_by!(id: params[:map_id])
+      map =
+        current_user
+        .postable_maps
+        .find_by!(id: params[:map_id])
 
-        @review = current_user.reviews.create!(
-          map: map,
-          place_id_val: params[:place_id],
-          comment: params[:comment],
-          image_url: params[:image_url]
-        )
-      end
+      @review = current_user.reviews.create!(
+        map: map,
+        place_id_val: params[:place_id],
+        comment: params[:comment],
+        image_url: params[:image_url]
+      )
     end
   end
 end

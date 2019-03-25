@@ -23,9 +23,7 @@ module Reviews
 
         comment = @review.comments.find_by!(id: params[:comment_id])
 
-        ActiveRecord::Base.transaction do
-          current_user.liked!(comment)
-        end
+        current_user.liked!(comment)
       end
 
       def destroy
