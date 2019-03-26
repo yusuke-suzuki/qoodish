@@ -2,16 +2,10 @@ class DevicesController < ApplicationController
   before_action :authenticate_user!
   before_action :require_sign_in!
 
-  def create
-    if current_user.devices.exists?(registration_token: params[:registration_token])
-      Rails.logger.info("Registration token #{params[:registration_token]} already exists.")
-      return
-    end
-
-    current_user.devices.create!(
-      registration_token: params[:registration_token]
+  def update
+    current_user.devices.find_or_create_by(
+      registration_token: params[:id]
     )
-    Rails.logger.info("Create new registration token. registration_token: #{params[:registration_token]} uid: #{current_user.uid}")
   end
 
   def destroy
@@ -19,6 +13,6 @@ class DevicesController < ApplicationController
     return if device.blank?
 
     device.destroy!
-    Rails.logger.info("Deleted registration token: #{params[:id]} uid: #{current_user.uid}")
+    Rails.logger.debug("Deleted registration token: #{params[:id]} uid: #{current_user.uid}")
   end
 end

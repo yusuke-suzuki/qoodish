@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       resource :push_notification, only: [:update]
     end
   end
-  resources :devices, only: [:create, :destroy]
+  resources :devices, only: [:update, :destroy]
   resources :maps do
     scope module: :maps do
       resources :reviews, only: [:index, :show, :create]
