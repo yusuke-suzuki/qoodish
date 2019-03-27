@@ -14,6 +14,7 @@ class MapsController < ApplicationController
       elsif params[:recommend]
         Map
           .public_open
+          .unfollowing_by(current_user)
           .includes(:user, :reviews)
           .order(created_at: :desc)
           .sample(10)
