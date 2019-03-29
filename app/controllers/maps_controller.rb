@@ -7,7 +7,7 @@ class MapsController < ApplicationController
       if params[:input].present?
         current_user
           .referenceable_maps
-          .where(Map.search_by_words(params[:input].strip.split(/[[:blank:]]+/)))
+          .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
           .limit(20)
           .includes(:user, :reviews)
           .order(created_at: :desc)
