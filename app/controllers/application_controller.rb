@@ -4,7 +4,7 @@ class ApplicationController < ActionController::API
 
   if Rails.env.production?
     rescue_from Exception do |ex|
-      logger.error("#{ex.class}: #{ex.message}")
+      logger.fatal("#{ex.class}: #{ex.message}")
       render_error(Exceptions::InternalServerError.new)
     end
   end
