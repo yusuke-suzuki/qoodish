@@ -27,6 +27,7 @@ gem 'bootsnap', require: false
 gem 'dotenv-rails'
 gem 'fcm_client', git: 'https://github.com/yusuke-suzuki/fcm_client.git', branch: 'master', ref: '57e92b6'
 gem 'google_iid_client', git: 'https://github.com/yusuke-suzuki/google_iid_client.git', branch: 'master', ref: '79a6050'
+gem 'google-cloud-pubsub'
 gem 'google_places'
 gem 'googleauth'
 gem 'http_accept_language'

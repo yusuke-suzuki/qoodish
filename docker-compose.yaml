@@ -24,11 +24,23 @@ services:
       - DB_USER=root
       - DB_PASSWORD=password
     command: >
-      /bin/sh -c '
-      rm -rf tmp/pids/* &&
-      bundle exec rails s -p 3000 -b "0.0.0.0"'
+      /bin/bash -c "rm -f /qoodish/tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     ports:
       - '3000:3000'
     depends_on:
       - redis
+      - db
+  subscriber:
+    build: .
+    volumes:
+      - .:/qoodish
+    env_file: .env
+    environment:
+      - REDIS_HOST=redis
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=password
+    command: >
+      bundle exec rails subscriber:run --trace
+    depends_on:
       - db
