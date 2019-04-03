@@ -1,25 +1,26 @@
 steps:
   - name: gcr.io/cloud-builders/gcloud
-    entrypoint: 'bash'
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         gcloud kms decrypt --ciphertext-file=firebase-credentials.dev.json.enc --plaintext-file=firebase-credentials.json --location=global --keyring=qoodish --key=qoodish
+        gcloud kms decrypt --ciphertext-file=gcp-pubsub-credentials.dev.json.enc --plaintext-file=gcp-pubsub-credentials.json --location=global --keyring=qoodish --key=qoodish
         gcloud kms decrypt --ciphertext-file=.env.development.enc --plaintext-file=.env --location=global --keyring=qoodish --key=qoodish
-  - name: 'gcr.io/$PROJECT_ID/docker-compose'
-    entrypoint: 'bash'
+  - name: "gcr.io/$PROJECT_ID/docker-compose"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         docker-compose build &&
         docker-compose up -d &&
         # wait for starting mysql
         sleep 10 &&
         docker-compose run api bundle exec rails db:setup RAILS_ENV=test
-  - name: 'gcr.io/$PROJECT_ID/docker-compose'
-    entrypoint: 'bash'
+  - name: "gcr.io/$PROJECT_ID/docker-compose"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         docker-compose up -d &&
         docker-compose run api bundle exec rails test
