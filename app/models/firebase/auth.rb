@@ -71,7 +71,7 @@ module Firebase
     end
 
     def validate_jwt(json)
-      project_id = ENV['FIREBASE_PROJECT_ID']
+      project_id = ENV['GCP_PROJECT_ID']
       payload = json[:payload]
       header = json[:header]
 

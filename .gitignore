@@ -27,6 +27,9 @@
 # FCM
 firebase-credentials.json
 
+# GCP
+gcp-pubsub-credentials.json
+
 nginx/nginx.conf
 
 # Ignore master key for decrypting credentials and more.

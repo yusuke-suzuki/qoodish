@@ -12,12 +12,10 @@ class Device < ApplicationRecord
               strict: Exceptions::DuplicateRegistrationToken
             }
 
-  after_create :subscribe_topics
-  before_destroy :unsubscribe_topics
+  after_create :subscribe_topics_later
+  before_destroy :unsubscribe_topics_later
 
-  private
-
-  def topics
+  def related_topics
     topics = ["user_#{user_id}"]
     map_topics = user.following_maps.map do |map|
       "map_#{map.id}"
@@ -26,16 +24,9 @@ class Device < ApplicationRecord
   end
 
   def subscribe_topics
-    GoogleIidClient.configure do |config|
-      config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
-      config.debugging = Rails.env.development?
-    end
-
-    api_instance = GoogleIidClient::RelationshipMapsApi.new
-
-    topics.each do |topic|
+    related_topics.each do |topic|
       begin
-        result = api_instance.iid_v1_iid_token_rel_topics_topic_name_post(registration_token, topic)
+        result = iid_client.iid_v1_iid_token_rel_topics_topic_name_post(registration_token, topic)
         Rails.logger.info(result)
       rescue GoogleIidClient::ApiError => e
         Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
@@ -44,20 +35,32 @@ class Device < ApplicationRecord
   end
 
   def unsubscribe_topics
-    GoogleIidClient.configure do |config|
-      config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
-      config.debugging = Rails.env.development?
-    end
-
-    api_instance = GoogleIidClient::RelationshipMapsApi.new
-
-    topics.each do |topic|
+    related_topics.each do |topic|
       begin
-        result = api_instance.iid_v1_iid_token_rel_topics_topic_name_delete(registration_token, topic)
+        result = iid_client.iid_v1_iid_token_rel_topics_topic_name_delete(registration_token, topic)
         Rails.logger.info(result)
       rescue GoogleIidClient::ApiError => e
         Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
       end
     end
+  end
+
+  private
+
+  def iid_client
+    GoogleIidClient.configure do |config|
+      config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
+      config.debugging = Rails.env.development?
+    end
+
+    @iid_client ||= GoogleIidClient::RelationshipMapsApi.new
+  end
+
+  def subscribe_topics_later
+    PubSub.publish('SUBSCRIBE_TOPICS', device_id: id)
+  end
+
+  def unsubscribe_topics_later
+    PubSub.publish('UNSUBSCRIBE_TOPICS', device_id: id)
   end
 end

@@ -3,7 +3,7 @@ class Notification < ApplicationRecord
   belongs_to :notifier, polymorphic: true
   belongs_to :recipient, polymorphic: true
 
-  KEYS = %w[followed invited liked comment]
+  KEYS = %w[followed invited liked comment].freeze
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
@@ -80,7 +80,7 @@ class Notification < ApplicationRecord
     inline_object = FcmClient::InlineObject.new(message: message)
 
     begin
-      result = api_instance.v1_projects_project_id_messagessend_post(ENV['FIREBASE_PROJECT_ID'], inline_object)
+      result = api_instance.v1_projects_project_id_messagessend_post(ENV['GCP_PROJECT_ID'], inline_object)
       Rails.logger.info(result)
     rescue FcmClient::ApiError => e
       Rails.logger.error("Exception when calling MessagesApi->v1_projects_project_id_messagessend_post: #{e}")
