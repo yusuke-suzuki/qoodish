@@ -1,7 +1,7 @@
 server {
   listen 80 default_server;
   listen [::]:80 default_server;
-   location / {
+  location / {
     access_log off;
     return 200 OK;
   }
