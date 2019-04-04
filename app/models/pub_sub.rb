@@ -45,6 +45,7 @@ class PubSub
 end
 
 module SubscriberLogger
+  Rails.logger.level = Logger::INFO
   LOGGER = Rails.logger
 
   def logger
