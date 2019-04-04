@@ -24,6 +24,10 @@ class ApplicationController < ActionController::API
     render_error(Exceptions::BadRequest.new)
   end
 
+  def routing_error
+    raise Exceptions::NotFound, "No route matches [#{request.request_method}] '#{request.path}'"
+  end
+
   private
 
   def set_locale
