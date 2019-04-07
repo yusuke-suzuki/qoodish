@@ -1,5 +1,5 @@
 class Spot
-  attr_accessor :place_id, :name, :lat, :lng, :formatted_address, :url, :opening_hours, :image_url
+  attr_accessor :place_id, :name, :lat, :lng, :formatted_address, :url, :opening_hours, :image_url, :reviews
 
   def initialize(place_id, image_url = nil)
     @place_id = place_id
