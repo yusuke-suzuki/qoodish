@@ -6,3 +6,4 @@ json.formatted_address spot.formatted_address
 json.url spot.url
 json.opening_hours spot.opening_hours
 json.image_url spot.image_url.present? ? spot.image_url : ENV['SUBSTITUTE_URL']
+json.reviews spot.reviews, partial: 'reviews/review', as: :review

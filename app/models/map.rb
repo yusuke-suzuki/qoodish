@@ -101,7 +101,11 @@ class Map < ApplicationRecord
     reviews
       .order(created_at: :desc)
       .group_by(&:place_id_val)
-      .map { |_key, value| value[0].spot }
+      .map do |_place_id_val, spot_reviews|
+        spot = spot_reviews[0].spot
+        spot.reviews = spot_reviews
+        spot
+      end
   end
 
   def image_url
