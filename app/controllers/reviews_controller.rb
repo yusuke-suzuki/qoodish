@@ -15,6 +15,11 @@ class ReviewsController < ApplicationController
           .following_by(current_user)
           .feed_before(params[:next_timestamp])
           .includes(:user, :map, :comments)
+      elsif current_user.is_anonymous
+        Review
+          .public_open
+          .includes(:user, :map)
+          .popular
       else
         Review
           .following_by(current_user)

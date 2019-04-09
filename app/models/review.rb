@@ -65,6 +65,13 @@ class Review < ApplicationRecord
       .limit(FEED_PER_PAGE)
   }
 
+  scope :popular, lambda {
+    joins(:votes)
+      .group('reviews.id')
+      .order('count(votes.id) desc')
+      .limit(10)
+  }
+
   def spot
     @spot ||= Spot.new(place_id_val, thumbnail_url)
   end
