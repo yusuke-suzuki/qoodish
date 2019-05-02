@@ -12,15 +12,7 @@ steps:
     args:
       - "-c"
       - |
-        docker-compose build &&
-        docker-compose up -d &&
-        # wait for starting mysql
-        sleep 10 &&
+        docker-compose up -d
+        sleep 10
         docker-compose run api bundle exec rails db:setup RAILS_ENV=test
-  - name: "gcr.io/$PROJECT_ID/docker-compose"
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-        docker-compose up -d &&
         docker-compose run api bundle exec rails test
