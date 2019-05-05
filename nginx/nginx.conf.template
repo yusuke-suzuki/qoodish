@@ -19,7 +19,7 @@ server {
 
   location / {
     if ($request_method = 'OPTIONS') {
-      add_header Access-Control-Allow-Origin '${WEB_ENDPOINT}';
+      add_header Access-Control-Allow-Origin 'https://qoodish.com https://beta.qoodish.com';
       add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE';
       add_header Access-Control-Allow-Headers 'Origin, Authorization, Accept, Content-Type';
       add_header Access-Control-Max-Age 3600;
