@@ -16,10 +16,10 @@
 # end
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins ENV['WEB_ENDPOINT']
+    origins ENV['ALLOWED_ENDPOINTS'].split(',')
 
     resource '*',
-      headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head]
+             headers: :any,
+             methods: %i[get post put patch delete options head]
   end
 end
