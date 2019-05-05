@@ -23,8 +23,6 @@ steps:
       - NGINX_UPSTREAM_HOST=${_NGINX_UPSTREAM_HOST}
       - --build-arg
       - NGINX_UPSTREAM_PORT=${_NGINX_UPSTREAM_PORT}
-      - --build-arg
-      - WEB_ENDPOINT=${_WEB_ENDPOINT}
   - name: "gcr.io/kaniko-project/executor"
     args:
       - --cache=true
