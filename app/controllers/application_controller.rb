@@ -28,6 +28,10 @@ class ApplicationController < ActionController::API
     raise Exceptions::NotFound, "No route matches [#{request.request_method}] '#{request.path}'"
   end
 
+  def healthcheck
+    render plain: 'ok'
+  end
+
   private
 
   def set_locale

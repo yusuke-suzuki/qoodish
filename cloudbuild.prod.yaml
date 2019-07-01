@@ -7,23 +7,6 @@ steps:
         gcloud kms decrypt --ciphertext-file=firebase-credentials.prod.json.enc --plaintext-file=firebase-credentials.json --location=global --keyring=qoodish --key=qoodish
         gcloud kms decrypt --ciphertext-file=gcp-pubsub-credentials.prod.json.enc --plaintext-file=gcp-pubsub-credentials.json --location=global --keyring=qoodish --key=qoodish
   - name: "gcr.io/kaniko-project/executor"
-    dir: "nginx"
-    args:
-      - --context
-      - /workspace/nginx
-      - --cache=true
-      - --cache-ttl=6h
-      - --destination
-      - gcr.io/$PROJECT_ID/$REPO_NAME-nginx:$COMMIT_SHA
-      - --destination
-      - gcr.io/$PROJECT_ID/$REPO_NAME-nginx:latest
-      - --build-arg
-      - NGINX_SERVER_NAME=${_NGINX_SERVER_NAME}
-      - --build-arg
-      - NGINX_UPSTREAM_HOST=${_NGINX_UPSTREAM_HOST}
-      - --build-arg
-      - NGINX_UPSTREAM_PORT=${_NGINX_UPSTREAM_PORT}
-  - name: "gcr.io/kaniko-project/executor"
     args:
       - --cache=true
       - --cache-ttl=6h
