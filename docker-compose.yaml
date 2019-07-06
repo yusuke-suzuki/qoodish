@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   redis:
     image: redis
@@ -6,17 +6,17 @@ services:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: password
-    command: [
-      '--skip-character-set-client-handshake',
-      '--character-set-server=utf8mb4',
-      '--collation-server=utf8mb4_general_ci'
-    ]
+    command:
+      - --skip-character-set-client-handshake
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
     ports:
-      - '3306'
+      - "3306"
   api:
     build: .
     volumes:
       - .:/qoodish
+      - /qoodish/tmp
     env_file: .env
     environment:
       - REDIS_HOST=redis
@@ -24,10 +24,15 @@ services:
       - DB_USER=root
       - DB_PASSWORD=password
       - RAILS_LOG_LEVEL=debug
-    command: >
-      /bin/bash -c "rm -f /qoodish/tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    command:
+      - rails
+      - s
+      - -p
+      - "3000"
+      - -b
+      - "0.0.0.0"
     ports:
-      - '3000:3000'
+      - "3000:3000"
     depends_on:
       - redis
       - db
@@ -35,6 +40,7 @@ services:
     build: .
     volumes:
       - .:/qoodish
+      - /qoodish/tmp
     env_file: .env
     environment:
       - REDIS_HOST=redis
@@ -42,7 +48,9 @@ services:
       - DB_USER=root
       - DB_PASSWORD=password
       - RAILS_LOG_LEVEL=info
-    command: >
-      bundle exec rails subscriber:run --trace
+    command:
+      - rails
+      - subscriber:run
+      - --trace
     depends_on:
       - db
