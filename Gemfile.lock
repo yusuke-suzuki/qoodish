@@ -183,7 +183,8 @@ GEM
     pry-rails (0.3.9)
       pry (>= 0.10.4)
     public_suffix (3.1.1)
-    puma (3.12.1)
+    puma (4.0.0)
+      nio4r (~> 2.0)
     rack (2.0.7)
     rack-cors (1.0.3)
     rack-test (1.1.0)
@@ -264,13 +265,13 @@ DEPENDENCIES
   google_places
   googleauth
   http_accept_language
-  jbuilder (~> 2.5)
+  jbuilder
   jwt
   listen (>= 3.0.5, < 3.2)
   mysql2 (~> 0.4.10)
   pry-doc
   pry-rails
-  puma (~> 3.7)
+  puma
   rack-cors
   rails (~> 6.0.0.rc1)
   redis-objects
