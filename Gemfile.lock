@@ -272,7 +272,7 @@ DEPENDENCIES
   pry-rails
   puma (~> 3.7)
   rack-cors
-  rails (~> 6.0.0.beta3)
+  rails (~> 6.0.0.rc1)
   redis-objects
   spring
   spring-watcher-listen (~> 2.0.0)
