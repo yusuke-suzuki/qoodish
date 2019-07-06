@@ -1,11 +1,4 @@
 steps:
-  - name: gcr.io/cloud-builders/gcloud
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-        gcloud kms decrypt --ciphertext-file=firebase-credentials.prod.json.enc --plaintext-file=firebase-credentials.json --location=global --keyring=qoodish --key=qoodish
-        gcloud kms decrypt --ciphertext-file=gcp-pubsub-credentials.prod.json.enc --plaintext-file=gcp-pubsub-credentials.json --location=global --keyring=qoodish --key=qoodish
   - name: "gcr.io/kaniko-project/executor"
     args:
       - --cache=true

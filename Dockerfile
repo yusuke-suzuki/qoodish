@@ -1,4 +1,11 @@
+FROM google/cloud-sdk:252.0.0-alpine AS cloud-sdk
 FROM ruby:2.6.3
+
+RUN apt update && apt install -y python
+
+COPY --from=cloud-sdk /google-cloud-sdk /google-cloud-sdk
+ENV PATH /google-cloud-sdk/bin:$PATH
+VOLUME ["/root/.config"]
 
 RUN mkdir /qoodish
 WORKDIR /qoodish
