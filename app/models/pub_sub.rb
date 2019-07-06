@@ -4,7 +4,7 @@ class PubSub
   def self.pubsub
     @pubsub ||= Google::Cloud::PubSub.new(
       project_id: ENV['GCP_PROJECT_ID'],
-      credentials: Rails.root.join('gcp-pubsub-credentials.json')
+      credentials: ENV['PUBSUB_CREDENTIALS']
     )
   end
 
