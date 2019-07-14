@@ -13,7 +13,7 @@ class Review < ApplicationRecord
             },
             length: {
               allow_blank: false,
-              maximum: 200,
+              maximum: 500,
               strict: Exceptions::CommentExceeded
             }
   validates :user_id,

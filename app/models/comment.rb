@@ -12,10 +12,14 @@ class Comment < ApplicationRecord
   validates :user_id,
             presence: true
 
-  after_create :create_notification
+  after_create :create_notification, unless: :on_yourself?
 
   def thumbnail_url
     commentable.thumbnail_url
+  end
+
+  def on_yourself?
+    user.id == commentable.user.id
   end
 
   private
