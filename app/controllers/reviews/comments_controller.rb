@@ -6,9 +6,9 @@ module Reviews
     def create
       @review =
         current_user
-        .referenceable_reviews
-        .includes(:map, :user, :comments)
-        .find_by!(id: params[:review_id])
+          .referenceable_reviews
+          .includes(:map, :user, :comments)
+          .find_by!(id: params[:review_id])
 
       @review.comments.create!(
         user: current_user,
@@ -19,15 +19,17 @@ module Reviews
     def destroy
       @review =
         current_user
-        .referenceable_reviews
-        .includes(:map, :user, :comments)
-        .find_by!(id: params[:review_id])
+          .referenceable_reviews
+          .includes(:map, :user, :comments)
+          .find_by!(id: params[:review_id])
 
       comment =
         current_user
-        .comments
-        .find_by!(id: params[:id], review: @review)
+          .comments
+          .find_by!(id: params[:id], commentable: @review)
       comment.destroy!
+
+      @review.reload
     end
   end
 end
