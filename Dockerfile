@@ -1,4 +1,4 @@
-FROM google/cloud-sdk:255.0.0-alpine AS cloud-sdk
+FROM google/cloud-sdk:256.0.0-alpine AS cloud-sdk
 FROM ruby:2.6.3
 
 RUN apt update && apt install -y python
