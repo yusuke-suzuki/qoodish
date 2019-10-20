@@ -16,7 +16,6 @@ services:
     build: .
     volumes:
       - .:/qoodish
-      - /qoodish/tmp
     env_file: .env
     environment:
       - REDIS_HOST=redis
@@ -37,7 +36,6 @@ services:
     build: .
     volumes:
       - .:/qoodish
-      - /qoodish/tmp
     env_file: .env
     environment:
       - REDIS_HOST=redis
