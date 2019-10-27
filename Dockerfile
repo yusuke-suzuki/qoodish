@@ -1,7 +1,17 @@
-FROM google/cloud-sdk:262.0.0-alpine AS cloud-sdk
-FROM ruby:2.6.4
+FROM google/cloud-sdk:268.0.0-alpine AS cloud-sdk
+FROM ruby:2.6.5-alpine3.10
 
-RUN apt update && apt install -y python
+RUN apk add --no-cache \
+      mysql-dev \
+      tzdata \
+      python \
+      git \
+      build-base \
+      libxml2-dev \
+      libxslt-dev \
+      libc6-compat && \
+      ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2 && \
+      gem install bundler:2.0.2
 
 COPY --from=cloud-sdk /google-cloud-sdk /google-cloud-sdk
 ENV PATH /google-cloud-sdk/bin:$PATH
@@ -13,7 +23,8 @@ WORKDIR /qoodish
 COPY Gemfile /qoodish/Gemfile
 COPY Gemfile.lock /qoodish/Gemfile.lock
 
-RUN gem install bundler:2.0.1 && \
+RUN CFLAGS="-Wno-cast-function-type" \
+      BUNDLE_FORCE_RUBY_PLATFORM=1 \
       bundle install --jobs=4
 
 COPY . /qoodish

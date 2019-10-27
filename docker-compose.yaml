@@ -18,15 +18,13 @@ services:
       - .:/qoodish
     env_file: .env
     environment:
+      - RAILS_ENV=development
+      - RAILS_LOG_LEVEL=debug
       - REDIS_HOST=redis
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=password
-      - RAILS_LOG_LEVEL=debug
-    command: >
-      /bin/sh -c '
-      rm -rf tmp/pids/* &&
-      bundle exec rails s -p 3000 -b "0.0.0.0"'
+    command: /bin/sh -c "rm -f tmp/pids/server.pid && rails s -p 3000 -b '0.0.0.0'"
     ports:
       - "3000:3000"
     depends_on:
@@ -38,14 +36,11 @@ services:
       - .:/qoodish
     env_file: .env
     environment:
-      - REDIS_HOST=redis
+      - RAILS_ENV=development
+      - RAILS_LOG_LEVEL=info
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=password
-      - RAILS_LOG_LEVEL=info
-    command:
-      - rails
-      - subscriber:run
-      - --trace
+    command: rails subscriber:run --trace
     depends_on:
       - db
