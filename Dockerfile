@@ -1,4 +1,4 @@
-FROM google/cloud-sdk:268.0.0-alpine AS cloud-sdk
+FROM google/cloud-sdk:270.0.0-alpine AS cloud-sdk
 FROM ruby:2.6.5-alpine3.10
 
 RUN apk add --no-cache \
