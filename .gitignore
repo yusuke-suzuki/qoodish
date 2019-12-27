@@ -13,6 +13,9 @@
 !/log/.keep
 !/tmp/.keep
 
+!/tmp/pids/.keep
+!/tmp/sockets/.keep
+
 /db/*.sqlite3
 
 .byebug_history
@@ -21,16 +24,17 @@
 
 .env
 .env.development
+.env.production
 
 .vscode
 
 # FCM
 firebase-credentials.json
+firebase-credentials.*.json
 
 # GCP
 gcp-pubsub-credentials.json
-
-nginx/nginx.conf
+gcp-pubsub-credentials.*.json
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
