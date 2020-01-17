@@ -1,4 +1,4 @@
-FROM google/cloud-sdk:273.0.0-alpine AS cloud-sdk
+FROM google/cloud-sdk:276.0.0-alpine AS cloud-sdk
 FROM ruby:2.6.5-alpine3.10
 
 RUN apk add --no-cache \
@@ -11,7 +11,7 @@ RUN apk add --no-cache \
       libxslt-dev \
       libc6-compat && \
       ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2 && \
-      gem install bundler:2.0.2
+      gem install bundler:2.1.4
 
 COPY --from=cloud-sdk /google-cloud-sdk /google-cloud-sdk
 ENV PATH /google-cloud-sdk/bin:$PATH
@@ -23,7 +23,8 @@ WORKDIR /qoodish
 COPY Gemfile /qoodish/Gemfile
 COPY Gemfile.lock /qoodish/Gemfile.lock
 
-RUN CFLAGS="-Wno-cast-function-type" \
+RUN rm -rf tmp/cache && \
+      CFLAGS="-Wno-cast-function-type" \
       BUNDLE_FORCE_RUBY_PLATFORM=1 \
       bundle install --jobs=4
 
