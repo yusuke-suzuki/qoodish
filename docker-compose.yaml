@@ -24,7 +24,7 @@ services:
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=password
-    command: /bin/sh -c "rm -f tmp/pids/server.pid && rails s -p 3000 -b '0.0.0.0'"
+    command: /bin/sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     ports:
       - "3000:3000"
     depends_on:
@@ -41,6 +41,6 @@ services:
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=password
-    command: rails subscriber:run --trace
+    command: bundle exec rails subscriber:run --trace
     depends_on:
       - db
