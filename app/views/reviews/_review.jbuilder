@@ -23,7 +23,6 @@ end
 if review.image_url.present?
   json.image do
     json.url review.image_url
-    json.file_name review.image_name
     json.thumbnail_url review.thumbnail_url
   end
 end
