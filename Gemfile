@@ -19,6 +19,7 @@ gem 'grpc', '1.26.0', platforms: ['ruby']
 gem 'google-gax', '1.8.1', platforms: ['ruby']
 gem 'google-protobuf', '3.9.2', platforms: ['ruby']
 gem 'google-cloud-pubsub', '1.1.2', platforms: ['ruby']
+gem 'google-cloud-storage'
 gem 'google_places'
 gem 'googleauth'
 gem 'http_accept_language'

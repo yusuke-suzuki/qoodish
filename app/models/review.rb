@@ -1,3 +1,5 @@
+require 'google/cloud/storage'
+
 class Review < ApplicationRecord
   belongs_to :user
   belongs_to :map
@@ -72,6 +74,9 @@ class Review < ApplicationRecord
       .limit(10)
   }
 
+  before_update :update_image, if: :will_save_change_to_image_url?
+  before_destroy :delete_image, if: :image_url
+
   def spot
     @spot ||= Spot.new(place_id_val, thumbnail_url)
   end
@@ -84,6 +89,12 @@ class Review < ApplicationRecord
     return '' if image_url.blank?
 
     File.basename(CGI.unescape(image_url))
+  end
+
+  def image_name_was
+    return '' if image_url_was.blank?
+
+    File.basename(CGI.unescape(image_url_was))
   end
 
   def thumbnail_url
@@ -102,5 +113,41 @@ class Review < ApplicationRecord
 
   def validate_spot
     raise Exceptions::PlaceNotFound if spot.name.blank?
+  end
+
+  def update_image
+    if image_url_was.present?
+      delete_object(image_name_was)
+    end
+  end
+
+  def delete_image
+    return if image_url.blank?
+
+    delete_object(image_name)
+  end
+
+  def delete_object(file_name)
+    return if file_name.blank?
+
+    file = bucket.file("images/#{file_name}")
+
+    if file.blank?
+      Rails.logger.warn("Object #{file_name} not found")
+      return
+    end
+
+    file.delete
+  end
+
+  def storage
+    @storage ||= Google::Cloud::Storage.new(
+      project_id: ENV['GCP_PROJECT_ID'],
+      credentials: ENV['GCP_CREDENTIALS']
+    )
+  end
+
+  def bucket
+    @bucket ||= storage.bucket(ENV['CLOUD_STORAGE_BUCKET_NAME'])
   end
 end

@@ -2,5 +2,4 @@
 .env.test
 .env.development
 .env.production
-firebase-credentials.json
-gcp-pubsub-credentials.json
+gcp-credentials.json

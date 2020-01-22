@@ -28,13 +28,9 @@
 
 .vscode
 
-# FCM
-firebase-credentials.json
-firebase-credentials.*.json
-
 # GCP
-gcp-pubsub-credentials.json
-gcp-pubsub-credentials.*.json
+gcp-credentials.json
+gcp-credentials.*.json
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key

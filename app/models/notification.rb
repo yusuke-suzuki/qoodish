@@ -89,7 +89,7 @@ class Notification < ApplicationRecord
 
   def authenticate_firebase_admin
     authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-      json_key_io: File.open(ENV['FIREBASE_CREDENTIALS']),
+      json_key_io: File.open(ENV['GCP_CREDENTIALS']),
       scope: FCM_SCOPE
     )
     token = authorizer.fetch_access_token!
