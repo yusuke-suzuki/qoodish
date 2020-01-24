@@ -78,7 +78,7 @@ class Review < ApplicationRecord
   before_destroy :delete_image, if: :image_url
 
   def spot
-    @spot ||= Spot.new(place_id_val, thumbnail_url)
+    @spot ||= Spot.new(place_id_val, self)
   end
 
   def name
@@ -97,10 +97,11 @@ class Review < ApplicationRecord
     File.basename(CGI.unescape(image_url_was))
   end
 
-  def thumbnail_url
+  def thumbnail_url(size = '200x200')
     return '' if image_url.blank?
 
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/images/thumb_#{image_name}"
+    ext = File.extname(image_url)
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/images/thumbnails/#{File.basename(image_name, ext)}_#{size}#{ext}"
   end
 
   private

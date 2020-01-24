@@ -102,18 +102,18 @@ class Map < ApplicationRecord
       .order(created_at: :desc)
       .group_by(&:place_id_val)
       .map do |_place_id_val, spot_reviews|
-        spot = spot_reviews[0].spot
-        spot.reviews = spot_reviews
-        spot
-      end
+      spot = spot_reviews[0].spot
+      spot.reviews = spot_reviews
+      spot
+    end
+  end
+
+  def thumbnail_url(size = '200x200')
+    reviews.exists? && reviews[0].image_url.present? ? reviews[0].thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end
 
   def image_url
     reviews.exists? && reviews[0].image_url.present? ? reviews[0].image_url : ENV['SUBSTITUTE_URL']
-  end
-
-  def thumbnail_url
-    reviews.exists? && reviews[0].image_url.present? ? reviews[0].thumbnail_url : ENV['SUBSTITUTE_URL']
   end
 
   private

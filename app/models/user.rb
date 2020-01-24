@@ -43,10 +43,11 @@ class User < ApplicationRecord
     )
   end
 
-  def thumbnail_url
+  def thumbnail_url(size = '200x200')
     return '' if image_path.blank?
 
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/profile/thumb_#{image_name}"
+    ext = File.extname(image_path)
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/profile/thumbnails/#{File.basename(image_name, ext)}_#{size}#{ext}"
   end
 
   def image_name
