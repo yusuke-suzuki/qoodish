@@ -24,6 +24,8 @@ if review.image_url.present?
   json.image do
     json.url review.image_url
     json.thumbnail_url review.thumbnail_url
+    json.thumbnail_url_400 review.thumbnail_url('400x400')
+    json.thumbnail_url_800 review.thumbnail_url('800x800')
   end
 end
 json.spot do

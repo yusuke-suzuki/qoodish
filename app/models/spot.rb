@@ -1,16 +1,25 @@
 class Spot
   attr_accessor :place_id, :name, :lat, :lng, :formatted_address, :url, :opening_hours, :image_url, :reviews
 
-  def initialize(place_id, image_url = nil)
+  def initialize(place_id, review = nil)
     @place_id = place_id
-    detail = place_id.present? ? spot_detail : {}
+    @review = review
+
+    detail = @place_id.present? ? spot_detail : {}
     @name = extract_place_name(detail)
     @lat = detail[:lat]
     @lng = detail[:lng]
     @formatted_address = detail[:formatted_address]
     @url = detail[:url]
     @opening_hours = detail[:opening_hours]
-    @image_url = image_url
+  end
+
+  def thumbnail_url(size = '200x200')
+    @review.present? && @review.image_url.present? ? @review.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
+  end
+
+  def image_url
+    @review.present? && @review.image_url.present? ? @review.image_url : ENV['SUBSTITUTE_URL']
   end
 
   def extract_place_name(detail)
