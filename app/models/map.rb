@@ -109,11 +109,7 @@ class Map < ApplicationRecord
   end
 
   def thumbnail_url(size = '200x200')
-    reviews.exists? && reviews[0].image_url.present? ? reviews[0].thumbnail_url(size) : ENV['SUBSTITUTE_URL']
-  end
-
-  def image_url
-    reviews.exists? && reviews[0].image_url.present? ? reviews[0].image_url : ENV['SUBSTITUTE_URL']
+    reviews.exists? && reviews[0].images.exists? ? reviews[0].thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end
 
   private

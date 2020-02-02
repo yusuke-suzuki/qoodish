@@ -9,37 +9,43 @@ class MapsController < ApplicationController
           .referenceable_maps
           .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
           .limit(20)
-          .includes(:user, :reviews)
+          .includes(:user, reviews: :images)
           .order(created_at: :desc)
       elsif params[:recommend]
         Map
           .public_open
           .unfollowing_by(current_user)
-          .includes(:user, :reviews)
+          .includes(:user, reviews: :images)
           .order(created_at: :desc)
           .sample(10)
       elsif params[:recent]
-        Map
-          .public_open
-          .includes(:user, :reviews)
-          .order(created_at: :desc)
-          .limit(12)
+        Rails.cache.fetch('recent_maps', expires_in: 5.minutes) do
+          Map
+            .public_open
+            .includes(:user, reviews: :images)
+            .order(created_at: :desc)
+            .limit(12)
+        end
       elsif params[:active]
-        Map
-          .public_open
-          .includes(:user, :reviews)
-          .active
+        Rails.cache.fetch('active_maps', expires_in: 5.minutes) do
+          Map
+            .public_open
+            .includes(:user, reviews: :images)
+            .active
+        end
       elsif params[:popular]
-        Map
-          .public_open
-          .includes(:user, :reviews)
-          .popular
+        Rails.cache.fetch('popular_maps', expires_in: 5.minutes) do
+          Map
+            .public_open
+            .includes(:user, reviews: :images)
+            .popular
+        end
       elsif params[:postable]
         current_user.postable_maps
       else
         current_user
           .following_maps
-          .includes(:user, :reviews)
+          .includes(:user, reviews: :images)
           .order(created_at: :desc)
       end
   end
@@ -47,9 +53,9 @@ class MapsController < ApplicationController
   def show
     @map =
       current_user
-      .referenceable_maps
-      .includes(:user, :reviews)
-      .find_by!(id: params[:id])
+        .referenceable_maps
+        .includes(:user, reviews: :images)
+        .find_by!(id: params[:id])
   end
 
   def create
