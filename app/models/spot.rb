@@ -15,11 +15,7 @@ class Spot
   end
 
   def thumbnail_url(size = '200x200')
-    @review.present? && @review.image_url.present? ? @review.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
-  end
-
-  def image_url
-    @review.present? && @review.image_url.present? ? @review.image_url : ENV['SUBSTITUTE_URL']
+    @review.present? ? @review.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end
 
   def extract_place_name(detail)

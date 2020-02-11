@@ -20,13 +20,12 @@ json.comments review.comments do |comment|
   json.likes_count comment.votes.size
   json.created_at comment.created_at
 end
-if review.image_url.present?
-  json.image do
-    json.url review.image_url
-    json.thumbnail_url review.thumbnail_url
-    json.thumbnail_url_400 review.thumbnail_url('400x400')
-    json.thumbnail_url_800 review.thumbnail_url('800x800')
-  end
+json.images review.images do |image|
+  json.id image.id
+  json.url image.url
+  json.thumbnail_url image.thumbnail_url
+  json.thumbnail_url_400 image.thumbnail_url('400x400')
+  json.thumbnail_url_800 image.thumbnail_url('800x800')
 end
 json.spot do
   json.image_url review.spot.image_url.present? ? review.spot.image_url : ENV['SUBSTITUTE_URL']

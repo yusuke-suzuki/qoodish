@@ -22,23 +22,32 @@ module Maps
     def show
       @review =
         current_user
-        .referenceable_reviews
-        .includes(:map, :user, :comments)
-        .find_by!(id: params[:id])
+          .referenceable_reviews
+          .includes(:map, :user, :comments)
+          .find_by!(id: params[:id])
     end
 
     def create
       map =
         current_user
-        .postable_maps
-        .find_by!(id: params[:map_id])
+          .postable_maps
+          .find_by!(id: params[:map_id])
 
-      @review = current_user.reviews.create!(
-        map: map,
-        place_id_val: params[:place_id],
-        comment: params[:comment],
-        image_url: params[:image_url]
-      )
+      ActiveRecord::Base.transaction do
+        @review = current_user.reviews.create!(
+          map: map,
+          place_id_val: params[:place_id],
+          comment: params[:comment]
+        )
+
+        if params[:images].present?
+          params[:images].each do |image|
+            @review.images.create!(
+              url: image[:url]
+            )
+          end
+        end
+      end
     end
   end
 end
