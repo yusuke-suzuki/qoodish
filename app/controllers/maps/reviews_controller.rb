@@ -8,13 +8,13 @@ module Maps
         if params[:place_id].present?
           current_user
             .referenceable_reviews
-            .includes(:map, :user, :comments)
+            .includes(:map, :user, :comments, :images)
             .where(place_id_val: params[:place_id], map_id: params[:map_id])
         else
           current_user
             .referenceable_reviews
             .where(map_id: params[:map_id])
-            .includes(:map, :user, :comments)
+            .includes(:map, :user, :comments, :images)
             .order(created_at: :desc)
         end
     end

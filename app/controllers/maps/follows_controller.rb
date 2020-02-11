@@ -12,7 +12,7 @@ module Maps
         else
           current_user
             .referenceable_maps
-            .includes(:user, :reviews)
+            .includes(:user, reviews: :images)
             .find_by!(id: params[:map_id])
         end
 
@@ -25,7 +25,7 @@ module Maps
       map =
         current_user
         .following_maps
-        .includes(:user, :reviews)
+        .includes(:user, reviews: :images)
         .find_by!(id: params[:map_id])
       raise Exceptions::MapOwnerCannotRemoved if current_user.map_owner?(map)
 
