@@ -8,12 +8,12 @@ module Users
           if params[:following]
             current_user
               .following_maps
-              .includes(:user, :reviews)
+              .includes(:user, reviews: :images)
               .order(created_at: :desc)
           else
             current_user
               .maps
-              .includes(:user, :reviews)
+              .includes(:user, reviews: :images)
               .order(created_at: :desc)
           end
         else
@@ -22,13 +22,13 @@ module Users
             current_user
               .referenceable_maps
               .where(id: Map.following_by(user))
-              .includes(:user, :reviews)
+              .includes(:user, reviews: :images)
               .order(created_at: :desc)
           else
             current_user
               .referenceable_maps
               .where(id: user.maps)
-              .includes(:user, :reviews)
+              .includes(:user, reviews: :images)
               .order(created_at: :desc)
           end
         end
