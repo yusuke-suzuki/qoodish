@@ -21,7 +21,7 @@ class ReviewsController < ApplicationController
         Rails.cache.fetch('popular_reviews', expires_in: 5.minutes) do
           Review
             .public_open
-            .with_deps
+            .includes(:map, :user)
             .popular
         end
       else
