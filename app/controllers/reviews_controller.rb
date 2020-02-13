@@ -42,8 +42,10 @@ class ReviewsController < ApplicationController
         current_image_urls = @review.images.pluck(:url)
         next_image_urls = params[:images].map { |image| image[:url] }
 
-        image_urls_to_be_created = next_image_urls - current_image_urls
         image_urls_will_be_deleted = current_image_urls - next_image_urls
+        image_urls_to_be_created = next_image_urls - current_image_urls
+
+        @review.images.where(url: image_urls_will_be_deleted).destroy_all
 
         image_urls_to_be_created.each do |image_url|
           @review.images.create!(
@@ -51,9 +53,7 @@ class ReviewsController < ApplicationController
           )
         end
 
-        @review.images.where(url: image_urls_will_be_deleted).each do |image|
-          image.destroy!
-        end
+        @review.reload
       end
     end
   end
