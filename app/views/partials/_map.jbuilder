@@ -1,8 +1,12 @@
 json.id map.id
+json.owner_id map.user.id
+json.owner_name map.user.name
+json.owner_image_url map.user.thumbnail_url
 json.name map.name
 json.description map.description
 json.private map.private
 json.following current_user.following?(map)
+json.followers_count map.follows.size
 json.shared map.shared
 json.invitable map.invitable
 json.thumbnail_url map.thumbnail_url
