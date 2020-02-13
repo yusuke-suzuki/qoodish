@@ -38,7 +38,9 @@ class ReviewsController < ApplicationController
     ActiveRecord::Base.transaction do
       @review.update!(attributes_for_update)
 
-      if params[:images].present?
+      if params[:images].blank?
+        @review.images.destroy_all
+      else
         current_image_urls = @review.images.pluck(:url)
         next_image_urls = params[:images].map { |image| image[:url] }
 
@@ -53,9 +55,9 @@ class ReviewsController < ApplicationController
             url: image_url
           )
         end
-
-        @review.reload
       end
+
+      @review.reload
     end
   end
 
