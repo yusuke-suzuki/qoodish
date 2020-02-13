@@ -17,3 +17,4 @@ steps:
         sleep 10
         docker-compose run api bundle exec rails db:setup RAILS_ENV=test
         docker-compose run api bundle exec rails test
+timeout: 1200s

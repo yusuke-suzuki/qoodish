@@ -7,7 +7,7 @@ module Reviews
       @review =
         current_user
           .referenceable_reviews
-          .includes(:map, :user, :comments)
+          .with_deps
           .find_by!(id: params[:review_id])
 
       @review.comments.create!(
@@ -20,7 +20,7 @@ module Reviews
       @review =
         current_user
           .referenceable_reviews
-          .includes(:map, :user, :comments)
+          .with_deps
           .find_by!(id: params[:review_id])
 
       comment =

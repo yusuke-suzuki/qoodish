@@ -18,12 +18,10 @@ Rails.application.routes.draw do
         resource :follow, only: %i[create destroy]
         resource :like, only: %i[create destroy]
         resources :likes, only: [:index]
-        resource :metadata, only: [:show]
       end
     end
     resources :reviews, only: %i[index update destroy] do
       scope module: :reviews do
-        resource :metadata, only: [:show]
         resource :like, only: %i[create destroy]
         resources :likes, only: [:index]
         resources :comments, only: %i[create destroy] do
@@ -39,7 +37,6 @@ Rails.application.routes.draw do
     resources :spots, only: %i[index show] do
       scope module: :spots do
         resources :reviews, only: [:index]
-        resource :metadata, only: [:show]
       end
     end
     resources :notifications, only: %i[index update]

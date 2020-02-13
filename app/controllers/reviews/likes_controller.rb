@@ -16,7 +16,7 @@ module Reviews
       @review =
         current_user
         .referenceable_reviews
-        .includes(:map, :user, :comments)
+        .with_deps
         .find_by!(id: params[:review_id])
 
       current_user.liked!(@review)
@@ -26,7 +26,7 @@ module Reviews
       @review =
         current_user
         .referenceable_reviews
-        .includes(:map, :user, :comments)
+        .with_deps
         .find_by!(id: params[:review_id])
 
       current_user.unliked!(@review)

@@ -1,5 +1,5 @@
 if params[:id] == current_user.uid
-  json.partial! 'user', user: @user
+  json.partial! 'partials/user_details', user: @user
 else
-  json.partial! 'public_user', user: @user
+  json.partial! 'partials/public_user_details', user: @user
 end

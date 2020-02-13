@@ -9,12 +9,12 @@ module Users
             current_user
               .reviews
               .feed_before(params[:next_timestamp])
-              .includes(:user, :map, :comments)
+              .with_deps
           else
             current_user
               .reviews
               .latest_feed
-              .includes(:user, :map, :comments)
+              .with_deps
           end
         else
           user = User.find_by!(id: params[:user_id])
@@ -23,13 +23,13 @@ module Users
               .reviews
               .referenceable_by(current_user)
               .feed_before(params[:next_timestamp])
-              .includes(:user, :map, :comments)
+              .with_deps
           else
             user
               .reviews
               .referenceable_by(current_user)
               .latest_feed
-              .includes(:user, :map, :comments)
+              .with_deps
           end
         end
     end

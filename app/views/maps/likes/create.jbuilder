@@ -1,1 +1,1 @@
-json.partial! 'maps/map', map: @map
+json.partial! 'partials/map', map: @map
