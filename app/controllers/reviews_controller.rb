@@ -46,6 +46,7 @@ class ReviewsController < ApplicationController
         image_urls_to_be_created = next_image_urls - current_image_urls
 
         @review.images.where(url: image_urls_will_be_deleted).destroy_all
+        @review.reload
 
         image_urls_to_be_created.each do |image_url|
           @review.images.create!(
