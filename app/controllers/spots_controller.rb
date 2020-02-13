@@ -3,8 +3,8 @@ class SpotsController < ApplicationController
 
   def index
     if params[:popular]
-      Rails.cache.fetch('popular_spots', expires_in: 5.minutes) do
-        @spots =
+      @spots =
+        Rails.cache.fetch('popular_spots', expires_in: 5.minutes) do
           Review
             .public_open
             .group_by(&:place_id_val)
@@ -12,7 +12,7 @@ class SpotsController < ApplicationController
             .reverse
             .take(10)
             .map { |_key, value| value[0].spot }
-      end
+        end
     end
   end
 
