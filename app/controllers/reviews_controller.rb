@@ -9,31 +9,31 @@ class ReviewsController < ApplicationController
           Review
             .public_open
             .limit(8)
-            .includes(:user, :map, :comments, :images)
+            .with_deps
             .order(created_at: :desc)
         end
       elsif params[:next_timestamp]
         Review
           .following_by(current_user)
           .feed_before(params[:next_timestamp])
-          .includes(:user, :map, :comments, :images)
+          .with_deps
       elsif current_user.is_anonymous
         Rails.cache.fetch('popular_reviews', expires_in: 5.minutes) do
           Review
             .public_open
-            .includes(:user, :map)
+            .with_deps
             .popular
         end
       else
         Review
           .following_by(current_user)
           .latest_feed
-          .includes(:user, :map, :comments, :images)
+          .with_deps
       end
   end
 
   def update
-    @review = current_user.reviews.find_by!(id: params[:id])
+    @review = current_user.reviews.with_deps.find_by!(id: params[:id])
 
     ActiveRecord::Base.transaction do
       @review.update!(attributes_for_update)

@@ -40,6 +40,10 @@ class Map < ApplicationRecord
   before_validation :remove_carriage_return
   after_create :follow_by_owner
 
+  scope :with_deps, lambda {
+    includes(:user, reviews: :images)
+  }
+
   scope :public_open, lambda {
     where(private: false)
   }

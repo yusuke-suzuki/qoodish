@@ -37,6 +37,10 @@ class Review < ApplicationRecord
 
   FEED_PER_PAGE = 12
 
+  scope :with_deps, lambda {
+    includes(:map, :user, :comments, :images, :votes)
+  }
+
   scope :public_open, lambda {
     joins(:map)
       .where(maps: { private: false })

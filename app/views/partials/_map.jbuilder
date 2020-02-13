@@ -1,0 +1,11 @@
+json.id map.id
+json.name map.name
+json.description map.description
+json.private map.private
+json.following current_user.following?(map)
+json.shared map.shared
+json.invitable map.invitable
+json.thumbnail_url map.thumbnail_url
+json.thumbnail_url_400 map.thumbnail_url('400x400')
+json.created_at map.created_at
+json.updated_at map.updated_at

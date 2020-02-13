@@ -9,20 +9,20 @@ class MapsController < ApplicationController
           .referenceable_maps
           .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
           .limit(20)
-          .includes(:user, reviews: :images)
+          .with_deps
           .order(created_at: :desc)
       elsif params[:recommend]
         Map
           .public_open
           .unfollowing_by(current_user)
-          .includes(:user, reviews: :images)
+          .with_deps
           .order(created_at: :desc)
           .sample(10)
       elsif params[:recent]
         Rails.cache.fetch('recent_maps', expires_in: 5.minutes) do
           Map
             .public_open
-            .includes(:user, reviews: :images)
+            .with_deps
             .order(created_at: :desc)
             .limit(12)
         end
@@ -30,14 +30,14 @@ class MapsController < ApplicationController
         Rails.cache.fetch('active_maps', expires_in: 5.minutes) do
           Map
             .public_open
-            .includes(:user, reviews: :images)
+            .with_deps
             .active
         end
       elsif params[:popular]
         Rails.cache.fetch('popular_maps', expires_in: 5.minutes) do
           Map
             .public_open
-            .includes(:user, reviews: :images)
+            .with_deps
             .popular
         end
       elsif params[:postable]
@@ -45,7 +45,7 @@ class MapsController < ApplicationController
       else
         current_user
           .following_maps
-          .includes(:user, reviews: :images)
+          .with_deps
           .order(created_at: :desc)
       end
   end
@@ -54,7 +54,7 @@ class MapsController < ApplicationController
     @map =
       current_user
         .referenceable_maps
-        .includes(:user, reviews: :images)
+        .with_deps
         .find_by!(id: params[:id])
   end
 
@@ -71,7 +71,7 @@ class MapsController < ApplicationController
   end
 
   def update
-    @map = current_user.maps.find_by!(id: params[:id])
+    @map = current_user.maps.with_deps.find_by!(id: params[:id])
     @map.update!(attributes_for_update) if attributes_for_update.present?
   end
 

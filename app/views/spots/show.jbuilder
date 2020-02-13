@@ -1,1 +1,1 @@
-json.partial! 'maps/spots/spot', spot: @spot
+json.partial! 'partials/spot_details', spot: @spot

@@ -1,1 +1,1 @@
-json.array! @reviews, partial: 'reviews/review', as: :review
+json.array! @reviews, partial: 'partials/review', as: :review
