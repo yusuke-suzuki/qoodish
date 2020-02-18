@@ -25,23 +25,19 @@ class Device < ApplicationRecord
 
   def subscribe_topics
     related_topics.each do |topic|
-      begin
-        result = iid_client.iid_v1_iid_token_rel_topics_topic_name_post(registration_token, topic)
-        Rails.logger.info(result)
-      rescue GoogleIidClient::ApiError => e
-        Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
-      end
+      result = iid_client.iid_v1_iid_token_rel_topics_topic_name_post(registration_token, topic)
+      Rails.logger.info(result)
+    rescue GoogleIidClient::ApiError => e
+      Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
     end
   end
 
   def unsubscribe_topics
     related_topics.each do |topic|
-      begin
-        result = iid_client.iid_v1_iid_token_rel_topics_topic_name_delete(registration_token, topic)
-        Rails.logger.info(result)
-      rescue GoogleIidClient::ApiError => e
-        Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
-      end
+      result = iid_client.iid_v1_iid_token_rel_topics_topic_name_delete(registration_token, topic)
+      Rails.logger.info(result)
+    rescue GoogleIidClient::ApiError => e
+      Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
     end
   end
 
@@ -56,7 +52,7 @@ class Device < ApplicationRecord
     @iid_client ||= GoogleIidClient::RelationshipMapsApi.new
   end
 
-  def subscribe_topics_later
+  def subscribe_topics_later　
     PubSub.publish('SUBSCRIBE_TOPICS', device_id: id)
   end
 
