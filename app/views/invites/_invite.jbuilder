@@ -2,7 +2,7 @@ json.id invite.id
 json.invitable do
   json.id invite.invitable_id
   json.type invite.invitable_name
-  json.image_url invite.invitable.image_url
+  json.image_url invite.invitable.thumbnail_url
   json.name invite.invitable.name
   json.description invite.invitable.description
 end
