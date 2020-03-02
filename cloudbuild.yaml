@@ -8,13 +8,13 @@ steps:
         gcloud kms decrypt --ciphertext-file=gcp-credentials.dev.json.enc --plaintext-file=gcp-credentials.json --location=global --keyring=qoodish --key=qoodish
         gcloud kms decrypt --ciphertext-file=.env.development.enc --plaintext-file=.env --location=global --keyring=qoodish --key=qoodish
   - id: rails-test
-    name: "gcr.io/$PROJECT_ID/docker-compose"
-    entrypoint: "bash"
+    name: docker/compose:alpine-1.25.4
+    entrypoint: sh
     args:
-      - "-c"
+      - -c
       - |
         docker-compose up -d
-        sleep 10
+        sleep 20
         docker-compose run api bundle exec rails db:setup RAILS_ENV=test
         docker-compose run api bundle exec rails test
 timeout: 1200s
