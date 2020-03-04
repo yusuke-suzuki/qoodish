@@ -80,7 +80,7 @@ class Notification < ApplicationRecord
     inline_object = FcmClient::InlineObject.new(message: message)
 
     begin
-      result = api_instance.v1_projects_project_id_messagessend_post(ENV['GCP_PROJECT_ID'], inline_object)
+      result = api_instance.v1_projects_project_id_messagessend_post(ENV['GOOGLE_PROJECT_ID'], inline_object)
       Rails.logger.info(result)
     rescue FcmClient::ApiError => e
       Rails.logger.error("Exception when calling MessagesApi->v1_projects_project_id_messagessend_post: #{e}")
@@ -89,7 +89,6 @@ class Notification < ApplicationRecord
 
   def authenticate_firebase_admin
     authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-      json_key_io: File.open(ENV['GCP_CREDENTIALS']),
       scope: FCM_SCOPE
     )
     token = authorizer.fetch_access_token!
