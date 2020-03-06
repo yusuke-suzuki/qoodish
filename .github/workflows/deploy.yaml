@@ -1,0 +1,24 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: "283.0.0"
+          service_account_email: ${{ secrets.GCP_SA_EMAIL_DEPLOY }}
+          service_account_key: ${{ secrets.GCP_SA_KEY_DEPLOY }}
+          export_default_credentials: true
+      - run: |
+          gcloud auth configure-docker
+      - name: Build image
+        run: |
+          docker build -t gcr.io/api-project-411341268038/qoodish-api:$GITHUB_SHA .
+      - name: Push image
+        run: |
+          docker push gcr.io/api-project-411341268038/qoodish-api:$GITHUB_SHA

@@ -18,6 +18,11 @@ class Image < ApplicationRecord
 
   MAX_IMAGE_COUNT_PER_REVIEW = 4
 
+  STORAGE_SCOPES = [
+    'https://www.googleapis.com/auth/cloud-platform',
+    'https://www.googleapis.com/auth/devstorage.read_write'
+  ].freeze
+
   def file_name
     File.basename(CGI.unescape(url))
   end
@@ -54,8 +59,9 @@ class Image < ApplicationRecord
 
   def storage
     @storage ||= Google::Cloud::Storage.new(
-      project_id: ENV['GCP_PROJECT_ID'],
-      credentials: ENV['GCP_CREDENTIALS']
+      credentials: Google::Auth::ServiceAccountCredentials.make_creds(
+        scope: STORAGE_SCOPES
+      )
     )
   end
 

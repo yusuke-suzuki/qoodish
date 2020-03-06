@@ -52,11 +52,15 @@ class Device < ApplicationRecord
     @iid_client ||= GoogleIidClient::RelationshipMapsApi.new
   end
 
-  def subscribe_topics_later　
-    PubSub.publish('SUBSCRIBE_TOPICS', device_id: id)
+  def subscribe_topics_later
+    pubsub.publish('SUBSCRIBE_TOPICS', device_id: id)
   end
 
   def unsubscribe_topics_later
-    PubSub.publish('UNSUBSCRIBE_TOPICS', device_id: id)
+    pubsub.publish('UNSUBSCRIBE_TOPICS', device_id: id)
+  end
+
+  def pubsub
+    @pubsub ||= PubSub.new
   end
 end

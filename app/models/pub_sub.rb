@@ -1,29 +1,23 @@
 require 'google/cloud/pubsub'
 
 class PubSub
-  def self.pubsub
-    @pubsub ||= Google::Cloud::PubSub.new(
-      project_id: ENV['GCP_PROJECT_ID'],
-      credentials: ENV['GCP_CREDENTIALS']
-    )
+  PUBSUB_SCOPES = [
+    'https://www.googleapis.com/auth/cloud-platform',
+    'https://www.googleapis.com/auth/pubsub'
+  ].freeze
+
+  def initialize
   end
 
-  def self.topic
-    @topic ||= pubsub.topic(ENV['PUBSUB_TOPIC'])
-  end
-
-  def self.subscription
-    @subscription ||= pubsub.subscription(ENV['PUBSUB_SUBSCRIPTION'])
-  end
-
-  def self.publish(action_type, payload)
+  def publish(action_type, payload)
     Rails.logger.info("[Pub/Sub] Enqueue job: #{action_type} #{payload}")
 
     message = topic.publish(action_type, payload)
+
     Rails.logger.info("[Pub/Sub] Published message: #{message.inspect}")
   end
 
-  def self.run_subscriber!
+  def run_subscriber!
     Rails.logger.info('[Pub/Sub] Start running subscriber')
 
     subscriber = subscription.listen do |received_message|
@@ -41,6 +35,24 @@ class PubSub
 
     # Fade into a deep sleep as worker will run indefinitely
     sleep
+  end
+
+  private
+
+  def pubsub
+    @pubsub ||= Google::Cloud::PubSub.new(
+      credentials: Google::Auth::ServiceAccountCredentials.make_creds(
+        scope: PUBSUB_SCOPES
+      )
+    )
+  end
+
+  def topic
+    @topic ||= pubsub.topic(ENV['PUBSUB_TOPIC'])
+  end
+
+  def subscription
+    @subscription ||= pubsub.subscription(ENV['PUBSUB_SUBSCRIPTION'])
   end
 end
 
