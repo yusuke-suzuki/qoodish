@@ -1,4 +1,7 @@
+FROM gcr.io/berglas/berglas:latest AS berglas
 FROM ruby:2.6.5-alpine3.10
+
+COPY --from=berglas /bin/berglas /bin/berglas
 
 RUN apk add --no-cache \
       mysql-dev \

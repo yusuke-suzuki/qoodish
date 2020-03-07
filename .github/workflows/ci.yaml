@@ -23,6 +23,7 @@ jobs:
             GOOGLE_PRIVATE_KEY:my-project2-1132/GOOGLE_PRIVATE_KEY
       - name: Rails test
         env:
+          SKIP_BERGLAS: "true"
           RAILS_MASTER_KEY: ${{steps.secrets.outputs.RAILS_MASTER_KEY}}
           GOOGLE_API_KEY_SERVER: ${{steps.secrets.outputs.GOOGLE_API_KEY_SERVER}}
           FCM_SERVER_KEY: ${{steps.secrets.outputs.FCM_SERVER_KEY}}

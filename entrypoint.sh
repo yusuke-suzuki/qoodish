@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+# Remove a potentially pre-existing server.pid for Rails.
+rm -f /qoodish/tmp/pids/server.pid
+
+# Then exec the container's main process (what's set as CMD in the Dockerfile).
+if [ $SKIP_BERGLAS ]; then
+  exec "$@"
+else
+  exec berglas exec -- "$@"
+fi

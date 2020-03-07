@@ -16,7 +16,10 @@ services:
     build: .
     volumes:
       - .:/qoodish
+      # berglas / gcloud credentials
+      - ~/.config/gcloud:/root/.config/gcloud
     environment:
+      - SKIP_BERGLAS=${SKIP_BERGLAS}
       - RAILS_LOG_TO_STDOUT=true
       - RAILS_ENV=development
       - PORT=3000
@@ -34,13 +37,14 @@ services:
       - CLOUD_STORAGE_BUCKET_NAME=my-project2-1132
       - GOOGLE_PROJECT_ID=my-project2-1132
       - GOOGLE_ACCOUNT_TYPE=service_account
-      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
-      - GOOGLE_API_KEY_SERVER=${GOOGLE_API_KEY_SERVER}
-      - FCM_SERVER_KEY=${FCM_SERVER_KEY}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_EMAIL=${GOOGLE_CLIENT_EMAIL}
-      - GOOGLE_PRIVATE_KEY=${GOOGLE_PRIVATE_KEY}
-    command: /bin/sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+      - RAILS_MASTER_KEY=sm://my-project2-1132/RAILS_MASTER_KEY
+      - GOOGLE_API_KEY_SERVER=sm://my-project2-1132/GOOGLE_API_KEY_SERVER
+      - FCM_SERVER_KEY=sm://my-project2-1132/FCM_SERVER_KEY
+      - GOOGLE_CLIENT_ID=sm://my-project2-1132/GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_EMAIL=sm://my-project2-1132/GOOGLE_CLIENT_EMAIL
+      - GOOGLE_PRIVATE_KEY=sm://my-project2-1132/GOOGLE_PRIVATE_KEY
+    entrypoint: /qoodish/entrypoint.sh
+    command: bundle exec rails s -b 0.0.0.0
     ports:
       - "3000:3000"
     depends_on:
@@ -50,7 +54,10 @@ services:
     build: .
     volumes:
       - .:/qoodish
+      # berglas / gcloud credentials
+      - ~/.config/gcloud:/root/.config/gcloud
     environment:
+      - SKIP_BERGLAS=${SKIP_BERGLAS}
       - RAILS_LOG_TO_STDOUT=true
       - RAILS_ENV=development
       - RAILS_LOG_LEVEL=info
@@ -63,12 +70,13 @@ services:
       - CLOUD_STORAGE_BUCKET_NAME=my-project2-1132
       - GOOGLE_PROJECT_ID=my-project2-1132
       - GOOGLE_ACCOUNT_TYPE=service_account
-      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
-      - GOOGLE_API_KEY_SERVER=${GOOGLE_API_KEY_SERVER}
-      - FCM_SERVER_KEY=${FCM_SERVER_KEY}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_EMAIL=${GOOGLE_CLIENT_EMAIL}
-      - GOOGLE_PRIVATE_KEY=${GOOGLE_PRIVATE_KEY}
+      - RAILS_MASTER_KEY=sm://my-project2-1132/RAILS_MASTER_KEY
+      - GOOGLE_API_KEY_SERVER=sm://my-project2-1132/GOOGLE_API_KEY_SERVER
+      - FCM_SERVER_KEY=sm://my-project2-1132/FCM_SERVER_KEY
+      - GOOGLE_CLIENT_ID=sm://my-project2-1132/GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_EMAIL=sm://my-project2-1132/GOOGLE_CLIENT_EMAIL
+      - GOOGLE_PRIVATE_KEY=sm://my-project2-1132/GOOGLE_PRIVATE_KEY
+    entrypoint: /qoodish/entrypoint.sh
     command: bundle exec rails subscriber:run --trace
     depends_on:
       - db
