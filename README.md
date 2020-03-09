@@ -6,6 +6,11 @@ Qoodish API.
 
 1. Install [docker-compose](https://docs.docker.com/compose/install/)
 2. Install [gcloud](https://cloud.google.com/sdk/docs?hl=ja)
+3. Get secrets from Secret Manager
+
+```
+gcloud beta secrets versions access latest --secret=DOTENV > .env
+```
 
 ## Start app
 
