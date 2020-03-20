@@ -23,8 +23,7 @@
 /vendor/bundle
 
 .env
-.env.development
-.env.production
+.env.*
 
 .vscode
 
