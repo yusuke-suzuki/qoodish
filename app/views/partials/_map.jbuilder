@@ -5,6 +5,8 @@ json.owner_image_url map.user.thumbnail_url
 json.name map.name
 json.description map.description
 json.private map.private
+json.liked current_user.liked?(map)
+json.likes_count map.votes.size
 json.following current_user.following?(map)
 json.followers_count map.follows.size
 json.shared map.shared
