@@ -66,7 +66,8 @@ class MapsController < ApplicationController
       invitable: params[:invitable],
       shared: params[:shared],
       base_id_val: params[:base_id],
-      base_name: params[:base_name]
+      base_name: params[:base_name],
+      image_url: params[:image_url]
     )
   end
 
@@ -90,6 +91,7 @@ class MapsController < ApplicationController
     attributes[:base_name] = params[:base_name] if params[:base_name]
     attributes[:invitable] = params[:invitable] unless params[:invitable].nil?
     attributes[:shared] = params[:shared] unless params[:shared].nil?
+    attributes[:image_url] = params[:image_url] if params[:image_url].present?
     attributes
   end
 end

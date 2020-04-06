@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_02_090741) do
+ActiveRecord::Schema.define(version: 2020_04_06_144810) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(version: 2020_02_02_090741) do
     t.string "base_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "image_url"
     t.index ["user_id"], name: "index_maps_on_user_id"
   end
 

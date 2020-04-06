@@ -113,7 +113,16 @@ class Map < ApplicationRecord
   end
 
   def thumbnail_url(size = '200x200')
-    reviews.exists? && reviews[0].images.exists? ? reviews[0].thumbnail_url(size) : ENV['SUBSTITUTE_URL']
+    return '' if image_url.blank?
+
+    ext = File.extname(image_url)
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/maps/thumbnails/#{File.basename(image_name, ext)}_#{size}#{ext}"
+  end
+
+  def image_name
+    return '' if image_url.blank?
+
+    File.basename(CGI.unescape(image_url))
   end
 
   private
