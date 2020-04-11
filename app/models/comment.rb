@@ -2,6 +2,7 @@ class Comment < ApplicationRecord
   belongs_to :commentable, polymorphic: true
   belongs_to :user
   has_many :votes, as: :votable, dependent: :destroy
+  has_many :voters, through: :votes, source: :voter, source_type: User.name
 
   validates :body,
             presence: true,

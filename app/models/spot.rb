@@ -29,6 +29,6 @@ class Spot < ApplicationRecord
   after_find :load_cache
 
   def thumbnail_url(size = '200x200')
-    images.exists? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
+    images.present? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end
 end
