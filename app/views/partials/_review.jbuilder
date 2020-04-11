@@ -28,8 +28,7 @@ json.images review.images do |image|
   json.thumbnail_url_800 image.thumbnail_url('800x800')
 end
 json.spot do
-  json.image_url review.spot.image_url.present? ? review.spot.image_url : ENV['SUBSTITUTE_URL']
-  json.place_id review.spot.place_id
+  json.place_id review.spot.place_id_val
   json.name review.spot.name
   json.lat review.spot.lat
   json.lng review.spot.lng

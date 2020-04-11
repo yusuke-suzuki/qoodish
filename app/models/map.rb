@@ -1,13 +1,12 @@
 class Map < ApplicationRecord
   belongs_to :user
-  has_many :reviews, dependent: :destroy
+  has_many :reviews
+  has_many :spots, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_many :invites, as: :invitable, dependent: :destroy
   has_many :follows, as: :followable, dependent: :destroy
   has_many :followers, through: :follows, source: :follower, source_type: User.name
   has_many :votes, as: :votable, dependent: :destroy
-
-  attr_accessor :base_lat, :base_lng
 
   validates :name,
             presence: {
@@ -98,18 +97,8 @@ class Map < ApplicationRecord
   }
 
   def base
-    @base ||= Spot.new(base_id_val)
-  end
-
-  def spots
-    reviews
-      .order(created_at: :desc)
-      .group_by(&:place_id_val)
-      .map do |_place_id_val, spot_reviews|
-      spot = spot_reviews[0].spot
-      spot.reviews = spot_reviews
-      spot
-    end
+    return OpenStruct.new if base_id_val.blank?
+    @base ||= Base.new(base_id_val)
   end
 
   def thumbnail_url(size = '200x200')

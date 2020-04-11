@@ -1,69 +1,38 @@
-class Spot
-  attr_accessor :place_id, :name, :lat, :lng, :formatted_address, :url, :opening_hours, :image_url, :reviews
+class Spot < ApplicationRecord
+  include PlaceStore
 
-  def initialize(place_id, review = nil)
-    @place_id = place_id
-    @review = review
+  belongs_to :map
+  has_many :reviews, dependent: :destroy
+  has_many :images, through: :reviews
 
-    detail = @place_id.present? ? spot_detail : {}
-    @name = extract_place_name(detail)
-    @lat = detail[:lat]
-    @lng = detail[:lng]
-    @formatted_address = detail[:formatted_address]
-    @url = detail[:url]
-    @opening_hours = detail[:opening_hours]
-  end
+  validates :place_id_val,
+            presence: {
+              strict: Exceptions::PlaceIdNotSpecified
+            },
+            uniqueness: {
+              scope: %i[map_id],
+              strict: Exceptions::DuplicateReview
+            }
+  validates :map_id,
+            presence: {
+              strict: Exceptions::MapNotSpecified
+            }
+
+  attr_accessor :name,
+                :lat,
+                :lng,
+                :formatted_address,
+                :url,
+                :opening_hours
+
+  after_create :load_cache
+  after_find :load_cache
+
+  scope :with_deps, lambda {
+    includes(:reviews, :images)
+  }
 
   def thumbnail_url(size = '200x200')
-    @review.present? ? @review.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
-  end
-
-  def extract_place_name(detail)
-    if detail[:name].present?
-      detail[:name]
-    elsif detail[:formatted_address].present?
-      detail[:formatted_address].split(',')[0]
-    else
-      ''
-    end
-  end
-
-  def spot_detail
-    cache_place if cached_spot.blank?
-    cached_spot
-  rescue Redis::CannotConnectError
-    fetch_place
-  rescue GooglePlaces::NotFoundError => e
-    Rails.logger.error("Place not found on google. place_id: #{@place_id}")
-    Rails.logger.error(e)
-    {}
-  end
-
-  def cache_place
-    place = fetch_place
-    cached_spot.bulk_set(
-      place_id: place.place_id,
-      name: place.name,
-      lat: place.lat,
-      lng: place.lng,
-      formatted_address: place.formatted_address,
-      url: place.url,
-      opening_hours: place.opening_hours.to_json
-    )
-    cached_spot
-  end
-
-  def cached_spot
-    Redis::HashKey.new("#{@place_id}:#{I18n.locale}", expiration: 1.month)
-  end
-
-  def fetch_place
-    places_api.spot(@place_id, language: I18n.locale)
-  end
-
-  private
-
-  def places_api
-    @places_api = GooglePlaces::Client.new(ENV['GOOGLE_API_KEY_SERVER'])
+    images.exists? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end
 end

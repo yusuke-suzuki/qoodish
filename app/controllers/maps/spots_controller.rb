@@ -7,7 +7,7 @@ module Maps
         current_user
         .referenceable_maps
         .find_by!(id: params[:map_id])
-      @spots = map.spots
+      @spots = map.spots.with_deps
     end
 
     def show
