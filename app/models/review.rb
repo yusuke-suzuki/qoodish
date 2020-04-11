@@ -3,12 +3,14 @@ require 'google/cloud/storage'
 class Review < ApplicationRecord
   belongs_to :user
   belongs_to :map
+  belongs_to :spot
   has_many :images, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_many :comments, as: :commentable
   has_many :votes, as: :votable, dependent: :destroy
 
   before_validation :remove_carriage_return
+  before_validation :create_spot
 
   validates :comment,
             presence: {
@@ -21,10 +23,8 @@ class Review < ApplicationRecord
             }
   validates :user_id,
             presence: true
-  validates :place_id_val,
-            presence: {
-              strict: Exceptions::PlaceIdNotSpecified
-            },
+  validates :spot_id,
+            presence: true,
             uniqueness: {
               scope: %i[map_id user_id],
               strict: Exceptions::DuplicateReview
@@ -33,12 +33,11 @@ class Review < ApplicationRecord
             presence: {
               strict: Exceptions::MapNotSpecified
             }
-  validate :validate_spot
 
   FEED_PER_PAGE = 12
 
   scope :with_deps, lambda {
-    includes(:map, :user, :comments, :images, :votes)
+    includes(:map, :spot, :user, :comments, :images, :votes)
   }
 
   scope :public_open, lambda {
@@ -73,10 +72,6 @@ class Review < ApplicationRecord
       .limit(10)
   }
 
-  def spot
-    @spot ||= Spot.new(place_id_val, self)
-  end
-
   def name
     spot.name
   end
@@ -93,7 +88,10 @@ class Review < ApplicationRecord
     comment.delete!("\r")
   end
 
-  def validate_spot
-    raise Exceptions::PlaceNotFound if spot.name.blank?
+  def create_spot
+    self.spot = Spot.find_or_create_by!(
+      place_id_val: place_id_val,
+      map: map
+    )
   end
 end

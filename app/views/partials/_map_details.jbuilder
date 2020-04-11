@@ -6,7 +6,7 @@ json.name map.name
 json.description map.description
 json.private map.private
 json.base do
-  json.place_id map.base.place_id
+  json.place_id map.base.place_id_val
   json.name map.base.name
   json.lat map.base.lat
   json.lng map.base.lng
