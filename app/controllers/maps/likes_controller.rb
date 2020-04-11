@@ -7,7 +7,6 @@ module Maps
       map =
         current_user
           .referenceable_maps
-          .includes(:user, reviews: :images)
           .find_by!(id: params[:map_id])
 
       @likes = map.votes

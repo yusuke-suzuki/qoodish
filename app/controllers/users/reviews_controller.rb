@@ -8,28 +8,28 @@ module Users
           if params[:next_timestamp]
             current_user
               .reviews
+              .includes([:comments, :images, :spot, :map])
               .feed_before(params[:next_timestamp])
-              .with_deps
           else
             current_user
               .reviews
+              .includes([:comments, :images, :spot, :map])
               .latest_feed
-              .with_deps
           end
         else
           user = User.find_by!(id: params[:user_id])
           if params[:next_timestamp]
             user
               .reviews
+              .includes([:comments, :images, :spot, :map])
               .referenceable_by(current_user)
               .feed_before(params[:next_timestamp])
-              .with_deps
           else
             user
               .reviews
+              .includes([:comments, :images, :spot, :map])
               .referenceable_by(current_user)
               .latest_feed
-              .with_deps
           end
         end
     end

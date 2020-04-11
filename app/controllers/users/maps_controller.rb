@@ -8,12 +8,11 @@ module Users
           if params[:following]
             current_user
               .following_maps
-              .with_deps
+              .includes([:user])
               .order(created_at: :desc)
           else
             current_user
               .maps
-              .with_deps
               .order(created_at: :desc)
           end
         else
@@ -21,14 +20,14 @@ module Users
           if params[:following]
             current_user
               .referenceable_maps
+              .includes([:user])
               .where(id: Map.following_by(user))
-              .with_deps
               .order(created_at: :desc)
           else
             current_user
               .referenceable_maps
+              .includes([:user])
               .where(id: user.maps)
-              .with_deps
               .order(created_at: :desc)
           end
         end

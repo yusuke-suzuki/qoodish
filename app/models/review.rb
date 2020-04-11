@@ -8,6 +8,7 @@ class Review < ApplicationRecord
   has_many :notifications, as: :notifiable
   has_many :comments, as: :commentable
   has_many :votes, as: :votable, dependent: :destroy
+  has_many :voters, through: :votes, source: :voter, source_type: User.name
 
   before_validation :remove_carriage_return
   before_validation :create_spot
@@ -37,7 +38,7 @@ class Review < ApplicationRecord
   FEED_PER_PAGE = 12
 
   scope :with_deps, lambda {
-    includes(:map, :spot, :user, :comments, :images, :votes)
+    includes([:map, :spot, :user, :images, :votes, :voters, comments: [:user, :votes, :voters]])
   }
 
   scope :public_open, lambda {

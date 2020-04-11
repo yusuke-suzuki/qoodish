@@ -7,6 +7,7 @@ class Map < ApplicationRecord
   has_many :follows, as: :followable, dependent: :destroy
   has_many :followers, through: :follows, source: :follower, source_type: User.name
   has_many :votes, as: :votable, dependent: :destroy
+  has_many :voters, through: :votes, source: :voter, source_type: User.name
 
   validates :name,
             presence: {

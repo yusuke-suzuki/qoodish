@@ -128,7 +128,7 @@ class User < ApplicationRecord
   end
 
   def liked?(votable)
-    votes.exists?(votable: votable)
+    votable.voters.any? { |voter| voter.id == id }
   end
 
   def subscribe_topic(topic)
