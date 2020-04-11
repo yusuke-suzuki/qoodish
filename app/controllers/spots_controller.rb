@@ -11,12 +11,12 @@ class SpotsController < ApplicationController
             .sort_by { |_key, value| value.size }
             .reverse
             .take(10)
-            .map { |_key, value| value[0].spot }
+            .map { |_key, value| Place.new(value[0].place_id_val) }
         end
     end
   end
 
   def show
-    @spot = Spot.new(params[:id])
+    @spot = Place.new(params[:id])
   end
 end

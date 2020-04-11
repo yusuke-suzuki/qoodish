@@ -1,6 +1,7 @@
 FROM ruby:2.6.5-alpine3.11
 
 RUN apk add --no-cache \
+      less \
       mysql-dev \
       tzdata \
       git \

@@ -5,13 +5,17 @@ module Maps
     def index
       map =
         current_user
-        .referenceable_maps
-        .find_by!(id: params[:map_id])
-      @spots = map.spots.with_deps
+          .referenceable_maps
+          .find_by!(id: params[:map_id])
+      @spots = map.spots.includes(:images, reviews: [:map, :user, :comments, :images])
     end
 
     def show
-      @spot = Spot.new(params[:id])
+      map =
+        current_user
+          .referenceable_maps
+          .find_by!(id: params[:map_id])
+      @spot = map.spots.find_by!(place_id_val: params[:id])
     end
   end
 end

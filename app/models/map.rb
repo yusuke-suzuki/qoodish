@@ -40,7 +40,7 @@ class Map < ApplicationRecord
   after_create :follow_by_owner
 
   scope :with_deps, lambda {
-    includes(:user, reviews: :images)
+    includes(:user)
   }
 
   scope :public_open, lambda {
@@ -98,7 +98,7 @@ class Map < ApplicationRecord
 
   def base
     return OpenStruct.new if base_id_val.blank?
-    @base ||= Base.new(base_id_val)
+    @base ||= Place.new(base_id_val)
   end
 
   def thumbnail_url(size = '200x200')
