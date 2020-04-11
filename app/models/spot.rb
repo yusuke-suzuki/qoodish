@@ -28,10 +28,6 @@ class Spot < ApplicationRecord
   after_create :load_cache
   after_find :load_cache
 
-  scope :with_deps, lambda {
-    includes(:reviews, :images)
-  }
-
   def thumbnail_url(size = '200x200')
     images.exists? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end
