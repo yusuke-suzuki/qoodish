@@ -1,3 +1,4 @@
+json.map_id spot.map_id
 json.place_id spot.place_id_val
 json.name spot.name
 json.lat spot.lat
@@ -8,4 +9,4 @@ json.opening_hours spot.opening_hours
 json.thumbnail_url spot.thumbnail_url
 json.thumbnail_url_400 spot.thumbnail_url('400x400')
 json.thumbnail_url_800 spot.thumbnail_url('800x800')
-json.reviews spot.reviews, partial: 'partials/review', as: :review
+json.reviews_count spot.reviews.size

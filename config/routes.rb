@@ -12,7 +12,11 @@ Rails.application.routes.draw do
     resources :maps do
       scope module: :maps do
         resources :reviews, only: %i[index show create]
-        resources :spots, only: %i[index show]
+        resources :spots, only: %i[index show] do
+          scope module: :spots do
+            resources :reviews, only: [:index]
+          end
+        end
         resources :collaborators, only: [:index]
         resources :invites, only: [:create]
         resource :follow, only: %i[create destroy]

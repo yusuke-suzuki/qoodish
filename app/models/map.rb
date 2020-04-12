@@ -41,7 +41,7 @@ class Map < ApplicationRecord
   after_create :follow_by_owner
 
   scope :with_deps, lambda {
-    includes(:user)
+    includes([:user, :votes, :voters])
   }
 
   scope :public_open, lambda {

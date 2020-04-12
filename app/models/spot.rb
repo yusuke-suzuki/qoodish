@@ -28,6 +28,18 @@ class Spot < ApplicationRecord
   after_create :load_cache
   after_find :load_cache
 
+  scope :public_open, lambda {
+    joins(:map)
+      .where(maps: { private: false })
+  }
+
+  scope :popular, lambda {
+    select('spots.place_id_val')
+      .group('spots.place_id_val')
+      .order('count(spots.id) desc')
+      .limit(10)
+  }
+
   def thumbnail_url(size = '200x200')
     images.present? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end

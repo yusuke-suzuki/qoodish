@@ -41,7 +41,7 @@ class MapsController < ApplicationController
             .popular
         end
       elsif params[:postable]
-        current_user.postable_maps
+        current_user.postable_maps.with_deps
       else
         current_user
           .following_maps
@@ -72,7 +72,7 @@ class MapsController < ApplicationController
   end
 
   def update
-    @map = current_user.maps.with_deps.find_by!(id: params[:id])
+    @map = current_user.maps.includes([:votes, :voters]).find_by!(id: params[:id])
     @map.update!(attributes_for_update) if attributes_for_update.present?
   end
 
