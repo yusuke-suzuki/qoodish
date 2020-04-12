@@ -7,7 +7,7 @@ module Spots
         current_user
           .referenceable_reviews
           .with_deps
-          .where(reviews: { place_id_val: params[:spot_id] })
+          .where(spots: { place_id_val: params[:spot_id] })
     end
   end
 end

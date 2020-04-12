@@ -5,13 +5,7 @@ class SpotsController < ApplicationController
     if params[:popular]
       @spots =
         Rails.cache.fetch("popular_spots_#{I18n.locale}", expires_in: 5.minutes) do
-          Review
-            .public_open
-            .group_by(&:place_id_val)
-            .sort_by { |_key, value| value.size }
-            .reverse
-            .take(10)
-            .map { |_key, value| Place.new(value[0].place_id_val) }
+          Spot.public_open.popular.map { |spot| Place.new(spot.place_id_val) }
         end
     end
   end

@@ -1,4 +1,3 @@
-json.map_id spot.map_id
 json.place_id spot.place_id_val
 json.name spot.name
 json.lat spot.lat
