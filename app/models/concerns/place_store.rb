@@ -1,6 +1,13 @@
 module PlaceStore
   extend ActiveSupport::Concern
 
+  attr_accessor :name,
+                :lat,
+                :lng,
+                :formatted_address,
+                :url,
+                :opening_hours
+
   def place_id
     @place_id_val || place_id_val
   end

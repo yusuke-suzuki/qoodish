@@ -1,24 +1,23 @@
-class Place
+class Place < ApplicationRecord
   include PlaceStore
 
-  attr_accessor :place_id_val,
-                :name,
-                :lat,
-                :lng,
-                :formatted_address,
-                :url,
-                :opening_hours
+  has_many :spots, dependent: :destroy
+  has_many :reviews, through: :spots
 
-  def initialize(place_id)
-    @place_id_val = place_id
-    load_cache
-  end
+  validates :place_id_val,
+            presence: true,
+            uniqueness: true
 
-  def reviews
-    Review.public_open.where(place_id_val: @place_id_val)
-  end
+  after_find :load_cache
+
+  scope :popular, lambda {
+    joins(:reviews)
+      .group('places.id')
+      .order('count(reviews.id) desc')
+      .limit(10)
+  }
 
   def thumbnail_url(size = '200x200')
-    reviews.exists? ? reviews.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
+    reviews.public_open.exists? ? reviews.public_open.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end
 end
