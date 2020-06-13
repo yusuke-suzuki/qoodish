@@ -12,6 +12,7 @@ class Review < ApplicationRecord
 
   before_validation :remove_carriage_return
   before_validation :create_spot
+  after_destroy :destroy_empty_spot
 
   validates :comment,
             presence: {
@@ -94,5 +95,11 @@ class Review < ApplicationRecord
       place_id_val: place_id_val,
       map: map
     )
+  end
+
+  def destroy_empty_spot
+    return if spot.reviews.exists?
+
+    spot.destroy!
   end
 end

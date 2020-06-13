@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_11_090857) do
+ActiveRecord::Schema.define(version: 2020_04_13_154721) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -118,14 +118,21 @@ ActiveRecord::Schema.define(version: 2020_04_11_090857) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
+  create_table "places", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "place_id_val", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["place_id_val"], name: "index_places_on_place_id_val", unique: true
+  end
+
   create_table "push_notifications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.boolean "followed", default: false, null: false
     t.boolean "invited", default: false, null: false
     t.boolean "liked", default: false, null: false
     t.boolean "comment", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_push_notifications_on_user_id"
   end
 
@@ -149,8 +156,10 @@ ActiveRecord::Schema.define(version: 2020_04_11_090857) do
     t.string "place_id_val", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "place_id", null: false
     t.index ["map_id"], name: "index_spots_on_map_id"
     t.index ["place_id_val", "map_id"], name: "index_spots_on_place_id_val_and_map_id", unique: true
+    t.index ["place_id_val"], name: "index_spots_on_place_id_val"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
