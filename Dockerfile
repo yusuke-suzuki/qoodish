@@ -1,4 +1,4 @@
-FROM ruby:2.6.5-alpine3.11
+FROM ruby:2.6.6-alpine3.11
 
 RUN apk add --no-cache \
       less \
@@ -12,7 +12,6 @@ RUN apk add --no-cache \
       ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2 && \
       gem install bundler:2.1.4
 
-RUN mkdir /qoodish
 WORKDIR /qoodish
 
 COPY Gemfile /qoodish/Gemfile
