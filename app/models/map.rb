@@ -99,7 +99,7 @@ class Map < ApplicationRecord
 
   def base
     return OpenStruct.new if base_id_val.blank?
-    @base ||= Place.new(base_id_val)
+    @base ||= Base.new(base_id_val)
   end
 
   def thumbnail_url(size = '200x200')
