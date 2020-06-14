@@ -9,9 +9,9 @@ module Maps
             .referenceable_maps
             .find_by!(id: params[:map_id])
             .spots
-            .find_by!(place_id_val: params[:spot_id])
+            .find_by!(place: Place.find_by!(place_id_val: params[:spot_id]))
             .reviews
-            .includes([:map, :user, :images, :votes, :voters, comments: [:user, :votes, :voters]])
+            .with_deps
       end
     end
   end
