@@ -11,6 +11,6 @@ class SpotsController < ApplicationController
   end
 
   def show
-    @place = Place.new(params[:id])
+    @place = Place.find_by!(place_id_val: params[:id])
   end
 end

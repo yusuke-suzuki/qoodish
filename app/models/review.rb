@@ -36,10 +36,12 @@ class Review < ApplicationRecord
               strict: Exceptions::MapNotSpecified
             }
 
+  attr_accessor :place_id_val
+
   FEED_PER_PAGE = 12
 
   scope :with_deps, lambda {
-    includes([:map, :spot, :user, :images, :votes, :voters, comments: [:user, :votes, :voters]])
+    includes([:map, :user, :images, :votes, :voters, comments: [:user, :votes, :voters], spot: [:place]])
   }
 
   scope :public_open, lambda {
@@ -74,10 +76,6 @@ class Review < ApplicationRecord
       .limit(10)
   }
 
-  def name
-    spot.name
-  end
-
   def thumbnail_url(size = '200x200')
     images.exists? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
   end
@@ -91,8 +89,12 @@ class Review < ApplicationRecord
   end
 
   def create_spot
+    place = Place.find_or_create_by!(
+      place_id_val: place_id_val
+    )
+
     self.spot = Spot.find_or_create_by!(
-      place_id_val: place_id_val,
+      place: place,
       map: map
     )
   end

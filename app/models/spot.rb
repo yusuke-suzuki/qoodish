@@ -1,6 +1,4 @@
 class Spot < ApplicationRecord
-  include PlaceStore
-
   belongs_to :map
   belongs_to :place
   has_many :reviews
@@ -19,9 +17,6 @@ class Spot < ApplicationRecord
               strict: Exceptions::MapNotSpecified
             }
 
-  before_validation :create_place
-  after_create :load_cache
-  after_find :load_cache
   after_destroy :destroy_empty_place
 
   scope :public_open, lambda {
@@ -34,12 +29,6 @@ class Spot < ApplicationRecord
   end
 
   private
-
-  def create_place
-    self.place = Place.find_or_create_by!(
-      place_id_val: place_id_val
-    )
-  end
 
   def destroy_empty_place
     return if place.spots.exists?

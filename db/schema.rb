@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_13_154721) do
+ActiveRecord::Schema.define(version: 2020_06_14_091031) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -139,27 +139,23 @@ ActiveRecord::Schema.define(version: 2020_04_13_154721) do
   create_table "reviews", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "map_id", null: false
-    t.string "place_id_val", null: false
     t.text "comment", null: false
     t.string "image_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "spot_id", null: false
     t.index ["map_id"], name: "index_reviews_on_map_id"
-    t.index ["place_id_val", "map_id", "user_id"], name: "index_reviews_on_place_id_val_and_map_id_and_user_id", unique: true
-    t.index ["place_id_val"], name: "index_reviews_on_place_id_val"
+    t.index ["spot_id", "map_id", "user_id"], name: "index_reviews_on_spot_id_and_map_id_and_user_id", unique: true
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
   create_table "spots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "map_id", null: false
-    t.string "place_id_val", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "place_id", null: false
     t.index ["map_id"], name: "index_spots_on_map_id"
-    t.index ["place_id_val", "map_id"], name: "index_spots_on_place_id_val_and_map_id", unique: true
-    t.index ["place_id_val"], name: "index_spots_on_place_id_val"
+    t.index ["place_id", "map_id"], name: "index_spots_on_place_id_and_map_id", unique: true
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|

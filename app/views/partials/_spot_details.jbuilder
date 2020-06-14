@@ -6,7 +6,7 @@ json.lat spot.place.lat
 json.lng spot.place.lng
 json.formatted_address spot.place.formatted_address
 json.url spot.place.url
-json.opening_hours spot.opening_hours
+json.opening_hours spot.place.opening_hours
 json.thumbnail_url spot.thumbnail_url
 json.thumbnail_url_400 spot.thumbnail_url('400x400')
 json.thumbnail_url_800 spot.thumbnail_url('800x800')

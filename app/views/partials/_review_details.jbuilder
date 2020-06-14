@@ -1,5 +1,4 @@
 json.id review.id
-json.place_id review.place_id_val
 json.author do
   json.id review.user.id
   json.name review.user.name
@@ -28,13 +27,13 @@ json.images review.images do |image|
   json.thumbnail_url_800 image.thumbnail_url('800x800')
 end
 json.spot do
-  json.place_id review.spot.place_id_val
-  json.name review.spot.name
-  json.lat review.spot.lat
-  json.lng review.spot.lng
-  json.formatted_address review.spot.formatted_address
-  json.url review.spot.url
-  json.opening_hours review.spot.opening_hours
+  json.place_id review.spot.place.place_id_val
+  json.name review.spot.place.name
+  json.lat review.spot.place.lat
+  json.lng review.spot.place.lng
+  json.formatted_address review.spot.place.formatted_address
+  json.url review.spot.place.url
+  json.opening_hours review.spot.place.opening_hours
 end
 json.map do
   json.id review.map_id
