@@ -8,6 +8,7 @@ class Place < ApplicationRecord
             presence: true,
             uniqueness: true
 
+  after_create :load_cache
   after_find :load_cache
 
   scope :popular, lambda {
