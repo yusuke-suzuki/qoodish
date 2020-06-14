@@ -3,7 +3,7 @@ class SpotsController < ApplicationController
 
   def index
     if params[:popular]
-      @spots =
+      @places =
         Rails.cache.fetch("popular_spots_#{I18n.locale}", expires_in: 5.minutes) do
           Place.popular
         end
@@ -11,6 +11,6 @@ class SpotsController < ApplicationController
   end
 
   def show
-    @spot = Place.new(params[:id])
+    @place = Place.new(params[:id])
   end
 end
