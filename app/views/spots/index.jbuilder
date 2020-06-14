@@ -1,1 +1,1 @@
-json.array! @spots, partial: 'partials/place', as: :spot
+json.array! @places, partial: 'partials/place', as: :place
