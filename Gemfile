@@ -17,7 +17,7 @@ gem 'fcm_client', git: 'https://github.com/yusuke-suzuki/fcm_client.git', branch
 gem 'google_iid_client', git: 'https://github.com/yusuke-suzuki/google_iid_client.git', branch: 'master', ref: '79a6050'
 gem 'grpc', '1.26.0', platforms: ['ruby']
 gem 'google-gax', '1.8.1', platforms: ['ruby']
-gem 'google-protobuf', '3.9.2', platforms: ['ruby']
+gem 'google-protobuf', '3.13.0', platforms: ['ruby']
 gem 'google-cloud-pubsub', '1.1.2', platforms: ['ruby']
 gem 'google-cloud-storage'
 gem 'google_places'
