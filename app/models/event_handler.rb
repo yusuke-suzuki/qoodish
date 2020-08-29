@@ -1,27 +1,19 @@
+require 'base64'
+
 class EventHandler
-  def self.handle_event(action_type, payload)
+  def self.handle_event(action_type_base64, payload)
+    action_type = Base64.decode64(action_type_base64)
     Rails.logger.info("[Event Handler] Handle event: #{action_type} #{payload}")
 
-    job = detect_job(action_type)
-
-    if job.blank?
-      Rails.logger.warn("[Pub/Sub] Unknown action type received. End processing: #{action_type}")
-      return
-    end
-
-    job.perform(payload)
-  rescue StandardError => e
-    Rails.logger.fatal("[Pub/Sub] Failed to execute background job #{action_type}: #{e}")
-  end
-
-  private
-
-  def self.detect_job(action_type)
     case action_type
     when 'SUBSCRIBE_TOPICS'
-      Jobs::SubscribeTopics.new
+      SubscribeTopicsJob.perform_later(payload['device_id'].to_i)
     when 'UNSUBSCRIBE_TOPICS'
-      Jobs::UnsubscribeTopics.new
+      UnsubscribeTopicsJob.perform_later(payload['device_id'].to_i)
+    else
+      Rails.logger.warn("[Pub/Sub] Unknown action type received. End processing: #{action_type}")
     end
+  rescue StandardError => e
+    Rails.logger.fatal("[Pub/Sub] Failed to execute background job #{action_type}: #{e}")
   end
 end
