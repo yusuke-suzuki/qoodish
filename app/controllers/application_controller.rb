@@ -43,13 +43,13 @@ class ApplicationController < ActionController::API
   def authenticate_user!
     raise Exceptions::Unauthorized if request.headers['Authorization'].blank?
 
-    auth_client = Firebase::Auth.new
-    decoded = auth_client.verify_id_token(request.headers['Authorization'].split(' ', 2).last)
+    verifier = GoogleAuth.new
+    payload = verifier.verify_jwt(request.headers['Authorization'].split(' ', 2).last)
 
-    @current_user = User.find_by(uid: decoded[:uid])
+    @current_user = User.find_by(uid: payload['sub'])
 
     if @current_user.blank?
-      @current_user = User.sign_in_anonymously(decoded[:decoded_token][:payload])
+      @current_user = User.sign_in_anonymously(payload)
     end
   end
 
