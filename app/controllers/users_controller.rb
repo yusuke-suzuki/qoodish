@@ -22,9 +22,8 @@ class UsersController < ApplicationController
   end
 
   def create
-    Rails.logger.info(params)
-    auth_client = Firebase::Auth.new
-    auth_client.verify_id_token(params[:token])
+    verifier = GoogleAuth.new
+    verifier.verify_jwt(params[:token])
 
     @user = User.find_by(uid: params[:uid])
     if @user.blank?

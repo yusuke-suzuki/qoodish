@@ -29,38 +29,15 @@ services:
       - SUBSTITUTE_URL=https://storage.googleapis.com/qoodish/assets/icon-512-2019-04-06.png
       - OGP_IMAGE_URL=https://storage.googleapis.com/qoodish/assets/ogp-image-2019-04-05.png
       - PUBSUB_TOPIC=rails-api-topic
-      - PUBSUB_SUBSCRIPTION=rails-api-sub
       - ALLOWED_ENDPOINTS=http://localhost:5000
       - CLOUD_STORAGE_ENDPOINT=https://storage.cloud.google.com
       - CLOUD_STORAGE_BUCKET_NAME=my-project2-1132
       - GOOGLE_PROJECT_ID=my-project2-1132
       - GOOGLE_ACCOUNT_TYPE=service_account
-    entrypoint: /qoodish/entrypoint.sh
-    command: bundle exec rails s -b 0.0.0.0
+    entrypoint: ""
+    command: /bin/sh -c "rm -f /qoodish/tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0"
     ports:
       - "3000:3000"
     depends_on:
       - redis
-      - db
-  subscriber:
-    build: .
-    volumes:
-      - .:/qoodish
-    env_file: .env
-    environment:
-      - RAILS_LOG_TO_STDOUT=true
-      - RAILS_ENV=development
-      - RAILS_LOG_LEVEL=info
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - PUBSUB_TOPIC=rails-api-topic
-      - PUBSUB_SUBSCRIPTION=rails-api-sub
-      - ALLOWED_ENDPOINTS=http://localhost:5000
-      - CLOUD_STORAGE_BUCKET_NAME=my-project2-1132
-      - GOOGLE_PROJECT_ID=my-project2-1132
-      - GOOGLE_ACCOUNT_TYPE=service_account
-    entrypoint: /qoodish/entrypoint.sh
-    command: bundle exec rails subscriber:run --trace
-    depends_on:
       - db
