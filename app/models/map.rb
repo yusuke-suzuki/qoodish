@@ -98,7 +98,7 @@ class Map < ApplicationRecord
   }
 
   def base
-    return OpenStruct.new if base_id_val.blank?
+    return nil if base_id_val.blank?
     @base ||= Base.new(base_id_val)
   end
 
