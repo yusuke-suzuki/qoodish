@@ -6,7 +6,8 @@ module PlaceStore
                 :lng,
                 :formatted_address,
                 :url,
-                :opening_hours
+                :opening_hours,
+                :lost
 
   def place_id
     @place_id_val || place_id_val
@@ -32,7 +33,7 @@ module PlaceStore
   rescue GooglePlaces::NotFoundError => e
     Rails.logger.error("Place not found on google. place_id: #{place_id}")
     Rails.logger.error(e)
-    {}
+    self.lost = true
   end
 
   def store_cache

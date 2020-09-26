@@ -7,7 +7,9 @@ module Maps
         current_user
           .referenceable_maps
           .find_by!(id: params[:map_id])
-      @spots = map.spots.includes(:place, :images, reviews: [:images])
+      @spots = map.spots
+        .includes(:place, :images, reviews: [:images])
+        .reject { |spot| spot.place.lost }
     end
 
     def show
