@@ -27,6 +27,7 @@ json.images review.images do |image|
   json.thumbnail_url_800 image.thumbnail_url('800x800')
 end
 json.spot do
+  json.map_id review.map_id
   json.place_id review.spot.place.place_id_val
   json.name review.spot.place.name
   json.lat review.spot.place.lat
