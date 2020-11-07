@@ -9,7 +9,7 @@ class Place < ApplicationRecord
             uniqueness: true
 
   after_create :load_cache
-  after_find :load_cache
+  after_initialize :load_cache
 
   scope :popular, lambda {
     joins(:reviews)
