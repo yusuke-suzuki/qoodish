@@ -15,12 +15,13 @@ module PlaceStore
 
   private
 
-  def cache
-    Redis::HashKey.new("#{place_id}:#{I18n.locale}", expiration: 1.month)
-  end
-
   def load_cache
-    store_cache if cache.blank?
+    Rails.logger.debug("Loading cache of place: #{place_id}")
+    cache = Redis::HashKey.new("#{place_id}:#{I18n.locale}", expiration: 1.month)
+
+    if cache.blank?
+      cache = store_cache
+    end
 
     @name = extract_place_name(cache)
     @lat = cache[:lat]
@@ -44,7 +45,9 @@ module PlaceStore
   end
 
   def store_cache
+    Rails.logger.debug("Storing new cache of place: #{place_id}")
     place = fetch_place
+    cache = Redis::HashKey.new("#{place_id}:#{I18n.locale}", expiration: 1.month)
 
     cache.bulk_set(
       place_id: place.place_id,
