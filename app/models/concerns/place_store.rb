@@ -28,8 +28,15 @@ module PlaceStore
     @formatted_address = cache[:formatted_address]
     @url = cache[:url]
     @opening_hours = cache[:opening_hours]
-  rescue Redis::CannotConnectError
-    fetch_place
+  rescue Redis::CannotConnectError => e
+    Rails.logger.error(e)
+    place = fetch_place
+    @name = place.name
+    @lat = place.lat
+    @lng = place.lng
+    @formatted_address = place.formatted_address
+    @url = place.url
+    @opening_hours = place.opening_hours.to_json
   rescue GooglePlaces::NotFoundError => e
     Rails.logger.error("Place not found on google. place_id: #{place_id}")
     Rails.logger.error(e)
