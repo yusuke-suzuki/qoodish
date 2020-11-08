@@ -8,8 +8,8 @@ class Place < ApplicationRecord
             presence: true,
             uniqueness: true
 
-  after_create :load_cache
-  after_initialize :load_cache
+  after_create :load_place
+  after_initialize :load_place
 
   scope :popular, lambda {
     joins(:reviews)

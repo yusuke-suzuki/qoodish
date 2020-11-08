@@ -1,7 +1,5 @@
 version: "3"
 services:
-  redis:
-    image: redis
   db:
     image: mysql:5.7
     environment:
@@ -22,7 +20,6 @@ services:
       - RAILS_ENV=development
       - PORT=3000
       - RAILS_LOG_LEVEL=debug
-      - REDIS_HOST=redis
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=password
@@ -39,5 +36,4 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - redis
       - db
