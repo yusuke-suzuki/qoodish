@@ -15,23 +15,10 @@ module PlaceStore
 
   private
 
-  def load_cache
-    Rails.logger.debug("Loading cache of place: #{place_id}")
-    cache = Redis::HashKey.new("#{place_id}:#{I18n.locale}", expiration: 1.month)
-
-    if cache.blank?
-      cache = store_cache
-    end
-
-    @name = extract_place_name(cache)
-    @lat = cache[:lat]
-    @lng = cache[:lng]
-    @formatted_address = cache[:formatted_address]
-    @url = cache[:url]
-    @opening_hours = cache[:opening_hours]
-  rescue Redis::CannotConnectError => e
-    Rails.logger.error(e)
+  def load_place
+    Rails.logger.debug("Loading place details of #{place_id}")
     place = fetch_place
+
     @name = place.name
     @lat = place.lat
     @lng = place.lng
@@ -42,24 +29,8 @@ module PlaceStore
     Rails.logger.error("Place not found on google. place_id: #{place_id}")
     Rails.logger.error(e)
     self.lost = true
-  end
-
-  def store_cache
-    Rails.logger.debug("Storing new cache of place: #{place_id}")
-    place = fetch_place
-    cache = Redis::HashKey.new("#{place_id}:#{I18n.locale}", expiration: 1.month)
-
-    cache.bulk_set(
-      place_id: place.place_id,
-      name: place.name,
-      lat: place.lat,
-      lng: place.lng,
-      formatted_address: place.formatted_address,
-      url: place.url,
-      opening_hours: place.opening_hours.to_json
-    )
-
-    cache
+  rescue => e
+    Rails.logger.error(e)
   end
 
   def extract_place_name(detail)
@@ -73,7 +44,10 @@ module PlaceStore
   end
 
   def fetch_place
-    places_api.spot(place_id, language: I18n.locale)
+    Rails.cache.fetch("place_details/#{I18n.locale}/#{place_id}", expires_in: 1.month) do
+      Rails.logger.debug("Fetching place details of #{place_id} (#{I18n.locale})")
+      places_api.spot(place_id, language: I18n.locale)
+    end
   end
 
   def places_api

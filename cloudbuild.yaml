@@ -12,7 +12,7 @@ steps:
     args:
       - -c
       - |
-        docker-compose up -d redis db
+        docker-compose up -d db
         sleep 20
         docker-compose run api bundle exec rails db:setup
         docker-compose run api bundle exec rails test -b -v
