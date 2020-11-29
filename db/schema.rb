@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_29_044356) do
+ActiveRecord::Schema.define(version: 2020_11_29_105952) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -118,17 +118,25 @@ ActiveRecord::Schema.define(version: 2020_11_29_044356) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
-  create_table "places", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "place_details", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "place_id_val", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.string "name", null: false
+    t.integer "locale", null: false
+    t.string "name"
     t.float "lat", null: false
     t.float "lng", null: false
     t.string "formatted_address", null: false
     t.string "url"
     t.text "opening_hours"
-    t.boolean "lost", default: false
+    t.boolean "lost", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["place_id_val", "locale"], name: "index_place_details_on_place_id_val_and_locale", unique: true
+  end
+
+  create_table "places", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "place_id_val", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["place_id_val"], name: "index_places_on_place_id_val", unique: true
   end
 
