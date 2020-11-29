@@ -6,10 +6,6 @@ class PlaceDetail < ApplicationRecord
             }
   validates :locale,
             presence: true
-  validates :lat,
-            presence: true
-  validates :lng,
-            presence: true
 
   before_validation :load_place_detail
 
