@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_29_133235) do
+ActiveRecord::Schema.define(version: 2020_11_29_133236) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -122,9 +122,9 @@ ActiveRecord::Schema.define(version: 2020_11_29_133235) do
     t.string "place_id_val", null: false
     t.integer "locale", null: false
     t.string "name"
-    t.float "lat", null: false
-    t.float "lng", null: false
-    t.string "formatted_address", null: false
+    t.float "lat"
+    t.float "lng"
+    t.string "formatted_address"
     t.string "url"
     t.text "opening_hours"
     t.boolean "lost", default: false, null: false
