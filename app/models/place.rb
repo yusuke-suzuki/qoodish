@@ -7,9 +7,14 @@ class Place < ApplicationRecord
   validates :place_id_val,
             presence: true,
             uniqueness: true
+  validates :name,
+            presence: true
+  validates :lat,
+            presence: true
+  validates :lng,
+            presence: true
 
-  after_create :load_place
-  after_initialize :load_place
+  before_validation :load_place
 
   scope :popular, lambda {
     joins(:reviews)
