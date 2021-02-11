@@ -1,16 +1,13 @@
 class MigrateLatLngToDecimal
   def run
-    ActiveRecord::Base.transaction do
-      PlaceDetail.all.each do |place_detail|
-        puts "Start processing #{place_detail.id}"
+    PlaceDetail.all.each do |place_detail|
+      puts "[Migrate] Start processing #{place_detail.id}"
+      puts "[Migrate] before lat: #{place_detail.latitude}, lng: #{place_detail.longitude}"
 
-        place_detail.validate!
+      place_detail.save!
 
-        puts "Finish processing #{place_detail.id}"
-      rescue => e
-        puts e
-        next
-      end
+      puts "[Migrate] after lat: #{place_detail.latitude}, lng: #{place_detail.longitude}"
+      puts "[Migrate] Finish processing #{place_detail.id}"
     end
   end
 end
