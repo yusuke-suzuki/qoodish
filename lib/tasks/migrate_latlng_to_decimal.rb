@@ -1,6 +1,6 @@
 class MigrateLatLngToDecimal
   def run
-    PlaceDetail.where("id > ?", 1673).each do |place_detail|
+    PlaceDetail.where("id > ?", 0).each do |place_detail|
       puts "[Migrate] Start processing #{place_detail.id}"
       puts "[Migrate] before lat: #{place_detail.latitude}, lng: #{place_detail.longitude}"
 
