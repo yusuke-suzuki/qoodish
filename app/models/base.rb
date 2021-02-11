@@ -20,11 +20,11 @@ class Base
   end
 
   def lat
-    @place_detail.lat
+    @place_detail.latitude
   end
 
   def lng
-    @place_detail.lng
+    @place_detail.longitude
   end
 
   def lost

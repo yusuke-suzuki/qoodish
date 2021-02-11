@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_29_141625) do
+ActiveRecord::Schema.define(version: 2021_02_11_063444) do
 
   create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -130,6 +130,8 @@ ActiveRecord::Schema.define(version: 2020_11_29_141625) do
     t.boolean "lost", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.decimal "latitude", precision: 16, scale: 6, null: false
+    t.decimal "longitude", precision: 16, scale: 6, null: false
     t.index ["place_id_val", "locale"], name: "index_place_details_on_place_id_val_and_locale", unique: true
   end
 
