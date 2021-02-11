@@ -30,11 +30,11 @@ class Place < ApplicationRecord
   end
 
   def lat
-    @place_detail.latitude
+    @place_detail.latitude.to_f
   end
 
   def lng
-    @place_detail.longitude
+    @place_detail.longitude.to_f
   end
 
   def formatted_address
