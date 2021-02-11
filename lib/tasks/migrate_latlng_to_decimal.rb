@@ -1,7 +1,7 @@
 class MigrateLatLngToDecimal
   def run
     ActiveRecord::Base.transaction do
-      PlaceDetail.all.each do |place_detail|
+      PlaceDetail.all.offset(793).each do |place_detail|
         puts "Start processing #{place_detail.id}"
 
         place_detail.save!
