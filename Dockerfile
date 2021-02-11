@@ -17,4 +17,4 @@ ENTRYPOINT ["entrypoint.sh"]
 
 EXPOSE 8080
 
-CMD bundle exec rails db:migrate && bundle exec puma
+CMD bundle exec rails db:migrate && bundle exec rails runner lib/tasks/migrate_latlng_to_decimal.rb && bundle exec puma

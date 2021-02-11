@@ -4,7 +4,7 @@ class MigrateLatLngToDecimal
       PlaceDetail.all.each do |place_detail|
         puts "Start processing #{place_detail.id}"
 
-        place_detail.validate!
+        place_detail.save!
 
         puts "Finish processing #{place_detail.id}"
       rescue => e
