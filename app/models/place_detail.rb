@@ -19,8 +19,8 @@ class PlaceDetail < ApplicationRecord
 
     self.assign_attributes(
       name: place_detail[:name],
-      lat: place_detail[:lat],
-      lng: place_detail[:lng],
+      latitude: place_detail[:lat],
+      longitude: place_detail[:lng],
       formatted_address: place_detail[:formatted_address],
       url: place_detail[:url],
       opening_hours: place_detail[:opening_hours].to_json
