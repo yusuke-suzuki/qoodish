@@ -28,8 +28,8 @@ services:
       - PUBSUB_TOPIC=rails-api-topic
       - ALLOWED_ENDPOINTS=http://localhost:5000
       - CLOUD_STORAGE_ENDPOINT=https://storage.cloud.google.com
-      - CLOUD_STORAGE_BUCKET_NAME=my-project2-1132
-      - GOOGLE_PROJECT_ID=my-project2-1132
+      - CLOUD_STORAGE_BUCKET_NAME=qoodish-dev.appspot.com
+      - GOOGLE_PROJECT_ID=qoodish-dev
       - GOOGLE_ACCOUNT_TYPE=service_account
     entrypoint: ""
     command: /bin/sh -c "rm -f /qoodish/tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0"
