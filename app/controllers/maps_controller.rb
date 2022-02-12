@@ -3,8 +3,7 @@ class MapsController < ApplicationController
   before_action :require_sign_in!, only: %i[create update destroy]
 
   def index
-    @maps =
-      if params[:input].present?
+    @maps = if params[:input].present?
         current_user
           .referenceable_maps
           .search_by_words(params[:input].strip.split(/[[:blank:]]+/))

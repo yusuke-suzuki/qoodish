@@ -7,14 +7,13 @@ class UsersController < ApplicationController
     if params[:input].present?
       @users =
         User
-        .where.not(id: current_user.id)
-        .search_by_name(params[:input])
+          .where.not(id: current_user.id)
+          .search_by_name(params[:input])
     end
   end
 
   def show
-    @user =
-      if params[:id] == current_user.uid
+    @user = if params[:id] == current_user.uid
         current_user
       else
         User.find_by!(id: params[:id])

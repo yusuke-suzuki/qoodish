@@ -2,4 +2,4 @@
 .env.test
 .env.development
 .env.production
-gcp-credentials.json
+credentials.*.json

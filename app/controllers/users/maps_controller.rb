@@ -3,8 +3,7 @@ module Users
     before_action :authenticate_user!
 
     def index
-      @maps =
-        if params[:user_id] == current_user.uid
+      @maps = if params[:user_id] == current_user.uid
           if params[:following]
             current_user
               .following_maps

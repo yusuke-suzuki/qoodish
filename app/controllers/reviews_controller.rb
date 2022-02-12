@@ -3,8 +3,7 @@ class ReviewsController < ApplicationController
   before_action :require_sign_in!, only: %i[update destroy]
 
   def index
-    @reviews =
-      if params[:recent]
+    @reviews = if params[:recent]
         Rails.cache.fetch('recent_reviews', expires_in: 5.minutes) do
           Review
             .public_open

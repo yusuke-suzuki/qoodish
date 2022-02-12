@@ -3,8 +3,7 @@ module Users
     before_action :authenticate_user!
 
     def index
-      @likes =
-        if params[:user_id] == current_user.uid
+      @likes = if params[:user_id] == current_user.uid
           current_user
             .votes
             .includes(votable: [:user, :spot])

@@ -3,8 +3,7 @@ module Users
     before_action :authenticate_user!
 
     def index
-      @reviews =
-        if params[:user_id] == current_user.uid
+      @reviews = if params[:user_id] == current_user.uid
           if params[:next_timestamp]
             current_user
               .reviews

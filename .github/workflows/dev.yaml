@@ -1,0 +1,185 @@
+name: Dev
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+env:
+  PROJECT_ID: qoodish-dev
+  ARTIFACT_REGISTRY: asia-northeast1-docker.pkg.dev
+  BRANCH_NAME: ${{ github.head_ref }}
+  SERVICE_NAME: qoodish-api
+jobs:
+  build-image:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+      - name: Rufo
+        run: |
+          bundle exec rufo --check ./app
+      - run: |
+          gcloud auth configure-docker $ARTIFACT_REGISTRY --quiet
+      - name: Build image
+        run: |
+          docker build \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --cache-from $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$BRANCH_NAME \
+            -t $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
+            -t $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$BRANCH_NAME \
+            .
+        env:
+          DOCKER_BUILDKIT: 1
+      - name: Push image
+        run: |
+          docker push -a $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME
+  deploy-api:
+    needs:
+      - build-image
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Deploy revision
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+          CLOUD_RUN_SA_NAME: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
+          GOOGLE_CLIENT_ID: 110803867052316843263
+          DB_HOST: 10.78.96.3
+          PUBSUB_TOPIC: rails-api-topic
+          GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
+          SUBSTITUTE_URL: https://storage.googleapis.com/qoodish/assets/icon-512-2019-04-06.png
+          OGP_IMAGE_URL: https://storage.googleapis.com/qoodish/assets/ogp-image-2019-04-05.png
+          ALLOWED_ENDPOINTS: https://dev.qoodish.com
+          CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
+          CLOUD_STORAGE_BUCKET_NAME: qoodish-dev.appspot.com
+          GOOGLE_ACCOUNT_TYPE: service_account
+        run: |
+          gcloud beta run deploy qoodish-api \
+            --platform=managed \
+            --region=asia-northeast1 \
+            --project=$PROJECT_ID \
+            --cpu=1000m \
+            --memory=512Mi \
+            --max-instances=1 \
+            --port=8080 \
+            --service-account=$CLOUD_RUN_SA_NAME \
+            --ingress=all \
+            --allow-unauthenticated \
+            --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
+            --vpc-connector=projects/qoodish-dev/locations/asia-northeast1/connectors/qoodish \
+            --vpc-egress=private-ranges-only \
+            --set-env-vars "RAILS_ENV=production" \
+            --set-env-vars "GOOGLE_CLIENT_EMAIL=$CLOUD_RUN_SA_NAME" \
+            --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
+            --set-env-vars "DB_HOST=$DB_HOST" \
+            --set-env-vars "DB_PORT=3306" \
+            --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
+            --set-env-vars "RAILS_LOG_TO_STDOUT=true" \
+            --set-env-vars "STACKDRIVER_LOGGING=true" \
+            --set-env-vars "GOOGLE_IID_ENDPOINT=$GOOGLE_IID_ENDPOINT" \
+            --set-env-vars "SUBSTITUTE_URL=$SUBSTITUTE_URL" \
+            --set-env-vars "OGP_IMAGE_URL=$OGP_IMAGE_URL" \
+            --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
+            --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
+            --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \
+            --set-env-vars "GOOGLE_PROJECT_ID=$PROJECT_ID" \
+            --set-env-vars "GOOGLE_ACCOUNT_TYPE=$GOOGLE_ACCOUNT_TYPE" \
+            --set-secrets "FCM_SERVER_KEY=QOODISH_API_FCM_SERVER_KEY:latest" \
+            --set-secrets "GOOGLE_API_KEY_SERVER=QOODISH_API_GOOGLE_API_KEY:latest" \
+            --set-secrets "RAILS_MASTER_KEY=QOODISH_API_RAILS_MASTER_KEY:latest" \
+            --set-secrets "GOOGLE_PRIVATE_KEY=QOODISH_API_GOOGLE_PRIVATE_KEY:latest" \
+            --set-secrets "DB_PASSWORD=QOODISH_API_DB_PASSWORD:latest" \
+            --set-secrets "DB_USER=QOODISH_API_DB_USER:latest"
+  deploy-subscriber:
+    needs:
+      - build-image
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Deploy revision
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+          CLOUD_RUN_SA_NAME: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
+          GOOGLE_CLIENT_ID: 110803867052316843263
+          DB_HOST: 10.78.96.3
+          PUBSUB_TOPIC: rails-api-topic
+          GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
+          SUBSTITUTE_URL: https://storage.googleapis.com/qoodish/assets/icon-512-2019-04-06.png
+          OGP_IMAGE_URL: https://storage.googleapis.com/qoodish/assets/ogp-image-2019-04-05.png
+          ALLOWED_ENDPOINTS: https://dev.qoodish.com
+          CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
+          CLOUD_STORAGE_BUCKET_NAME: qoodish-dev.appspot.com
+          GOOGLE_ACCOUNT_TYPE: service_account
+        run: |
+          gcloud beta run deploy qoodish-subscriber \
+            --platform=managed \
+            --region=asia-northeast1 \
+            --project=$PROJECT_ID \
+            --cpu=1000m \
+            --memory=256Mi \
+            --max-instances=1 \
+            --port=8080 \
+            --service-account=$CLOUD_RUN_SA_NAME \
+            --ingress=all \
+            --allow-unauthenticated \
+            --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
+            --vpc-connector=projects/qoodish-dev/locations/asia-northeast1/connectors/qoodish \
+            --vpc-egress=private-ranges-only \
+            --set-env-vars "SUBSCRIBER_MODE=true" \
+            --set-env-vars "RAILS_ENV=production" \
+            --set-env-vars "GOOGLE_CLIENT_EMAIL=$CLOUD_RUN_SA_NAME" \
+            --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
+            --set-env-vars "DB_HOST=$DB_HOST" \
+            --set-env-vars "DB_PORT=3306" \
+            --set-env-vars "FCM_ENDPOINT=$FCM_ENDPOINT" \
+            --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
+            --set-env-vars "RAILS_LOG_TO_STDOUT=true" \
+            --set-env-vars "STACKDRIVER_LOGGING=true" \
+            --set-env-vars "GOOGLE_IID_ENDPOINT=$GOOGLE_IID_ENDPOINT" \
+            --set-env-vars "SUBSTITUTE_URL=$SUBSTITUTE_URL" \
+            --set-env-vars "OGP_IMAGE_URL=$OGP_IMAGE_URL" \
+            --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
+            --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
+            --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \
+            --set-env-vars "GOOGLE_PROJECT_ID=$PROJECT_ID" \
+            --set-env-vars "GOOGLE_ACCOUNT_TYPE=$GOOGLE_ACCOUNT_TYPE" \
+            --set-secrets "FCM_SERVER_KEY=QOODISH_API_FCM_SERVER_KEY:latest" \
+            --set-secrets "GOOGLE_API_KEY_SERVER=QOODISH_API_GOOGLE_API_KEY:latest" \
+            --set-secrets "RAILS_MASTER_KEY=QOODISH_API_RAILS_MASTER_KEY:latest" \
+            --set-secrets "GOOGLE_PRIVATE_KEY=QOODISH_API_GOOGLE_PRIVATE_KEY:latest" \
+            --set-secrets "DB_PASSWORD=QOODISH_API_DB_PASSWORD:latest" \
+            --set-secrets "DB_USER=QOODISH_API_DB_USER:latest"

@@ -7,8 +7,8 @@ module Reviews
       def index
         review =
           current_user
-          .referenceable_reviews
-          .find_by!(id: params[:review_id])
+            .referenceable_reviews
+            .find_by!(id: params[:review_id])
 
         comment = review.comments.find_by!(id: params[:comment_id])
         @likes = comment.votes
@@ -17,9 +17,9 @@ module Reviews
       def create
         @review =
           current_user
-          .referenceable_reviews
-          .includes(:map, :user, :comments)
-          .find_by!(id: params[:review_id])
+            .referenceable_reviews
+            .includes(:map, :user, :comments)
+            .find_by!(id: params[:review_id])
 
         comment = @review.comments.find_by!(id: params[:comment_id])
 
@@ -29,9 +29,9 @@ module Reviews
       def destroy
         @review =
           current_user
-          .referenceable_reviews
-          .includes(:map, :user, :comments)
-          .find_by!(id: params[:review_id])
+            .referenceable_reviews
+            .includes(:map, :user, :comments)
+            .find_by!(id: params[:review_id])
 
         comment = @review.comments.find_by!(id: params[:comment_id])
         current_user.unliked!(comment)
