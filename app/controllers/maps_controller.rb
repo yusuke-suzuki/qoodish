@@ -18,27 +18,21 @@ class MapsController < ApplicationController
           .order(created_at: :desc)
           .sample(10)
       elsif params[:recent]
-        Rails.cache.fetch('recent_maps', expires_in: 5.minutes) do
-          Map
-            .public_open
-            .with_deps
-            .order(created_at: :desc)
-            .limit(12)
-        end
+        Map
+          .public_open
+          .with_deps
+          .order(created_at: :desc)
+          .limit(12)
       elsif params[:active]
-        Rails.cache.fetch('active_maps', expires_in: 5.minutes) do
-          Map
-            .public_open
-            .with_deps
-            .active
-        end
+        Map
+          .public_open
+          .with_deps
+          .active
       elsif params[:popular]
-        Rails.cache.fetch('popular_maps', expires_in: 5.minutes) do
-          Map
-            .public_open
-            .with_deps
-            .popular
-        end
+        Map
+          .public_open
+          .with_deps
+          .popular
       elsif params[:postable]
         current_user.postable_maps.with_deps
       else

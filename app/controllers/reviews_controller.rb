@@ -4,25 +4,21 @@ class ReviewsController < ApplicationController
 
   def index
     @reviews = if params[:recent]
-        Rails.cache.fetch('recent_reviews', expires_in: 5.minutes) do
-          Review
-            .public_open
-            .limit(8)
-            .with_deps
-            .order(created_at: :desc)
-        end
+        Review
+          .public_open
+          .limit(8)
+          .with_deps
+          .order(created_at: :desc)
       elsif params[:next_timestamp]
         Review
           .following_by(current_user)
           .feed_before(params[:next_timestamp])
           .with_deps
       elsif current_user.is_anonymous
-        Rails.cache.fetch('popular_reviews', expires_in: 5.minutes) do
-          Review
-            .public_open
-            .includes(:map, :user)
-            .popular
-        end
+        Review
+          .public_open
+          .includes(:map, :user)
+          .popular
       else
         Review
           .following_by(current_user)
