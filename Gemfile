@@ -12,7 +12,6 @@ gem 'rails', '~> 6.1.4'
 # gem 'bcrypt', '~> 3.1.7'
 
 gem 'bootsnap', require: false
-gem 'fcm_client', git: 'https://github.com/yusuke-suzuki/fcm_client.git', branch: 'master', ref: '57e92b6'
 gem 'google_iid_client', git: 'https://github.com/yusuke-suzuki/google_iid_client.git', branch: 'master', ref: '79a6050'
 gem 'google-cloud-pubsub'
 gem 'google-cloud-storage'

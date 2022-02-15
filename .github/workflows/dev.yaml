@@ -165,7 +165,6 @@ jobs:
             --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
             --set-env-vars "DB_HOST=$DB_HOST" \
             --set-env-vars "DB_PORT=3306" \
-            --set-env-vars "FCM_ENDPOINT=$FCM_ENDPOINT" \
             --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
             --set-env-vars "RAILS_LOG_TO_STDOUT=true" \
             --set-env-vars "STACKDRIVER_LOGGING=true" \

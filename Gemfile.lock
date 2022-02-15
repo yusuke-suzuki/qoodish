@@ -1,14 +1,4 @@
 GIT
-  remote: https://github.com/yusuke-suzuki/fcm_client.git
-  revision: 57e92b6b49eff3b9739882f26f04fadbda2ef2d2
-  ref: 57e92b6
-  branch: master
-  specs:
-    fcm_client (1.0.0)
-      json (~> 2.1, >= 2.1.0)
-      typhoeus (~> 1.0, >= 1.0.1)
-
-GIT
   remote: https://github.com/yusuke-suzuki/google_iid_client.git
   revision: 79a60500e25598b1453fb14fd23ac933c693110c
   ref: 79a6050
@@ -322,7 +312,6 @@ DEPENDENCIES
   bootsnap
   bullet
   byebug
-  fcm_client!
   google-cloud-pubsub
   google-cloud-storage
   google_iid_client!
