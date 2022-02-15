@@ -102,6 +102,8 @@ class Review < ApplicationRecord
   def destroy_empty_spot
     return if spot.reviews.exists?
 
+    Rails.logger.debug('Delete the parent spot as there are no more reports')
+
     spot.destroy!
   end
 end

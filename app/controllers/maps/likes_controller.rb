@@ -9,7 +9,7 @@ module Maps
           .referenceable_maps
           .find_by!(id: params[:map_id])
 
-      @likes = map.votes
+      @likes = map.votes.uniq { |vote| vote.voter.id }
     end
 
     def create
