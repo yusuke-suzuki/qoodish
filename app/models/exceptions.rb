@@ -60,6 +60,12 @@ module Exceptions
     end
   end
 
+  class PubSubAuthError < Unauthorized
+    def initialize(message = I18n.t('messages.api.pubsub_auth_error'))
+      super(message)
+    end
+  end
+
   class DuplicateMapName < Conflict
     def initialize(*)
       super(I18n.t('messages.api.duplicate_map_name'))

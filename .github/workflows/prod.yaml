@@ -151,6 +151,8 @@ jobs:
           GOOGLE_CLIENT_ID: 115356917720757577784
           DB_HOST: 10.86.64.3
           PUBSUB_TOPIC: rails-api-topic
+          SUBSCRIBER_ENDPOINT: https://subscriber.qoodish.com
+          PUBSUB_SA_EMAIL: pubsub@qoodish.iam.gserviceaccount.com
           GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
           SUBSTITUTE_URL: https://storage.googleapis.com/qoodish/assets/icon-512-2019-04-06.png
           OGP_IMAGE_URL: https://storage.googleapis.com/qoodish/assets/ogp-image-2019-04-05.png
@@ -180,6 +182,8 @@ jobs:
             --set-env-vars "DB_HOST=$DB_HOST" \
             --set-env-vars "DB_PORT=3306" \
             --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
+            --set-env-vars "SUBSCRIBER_ENDPOINT=$SUBSCRIBER_ENDPOINT" \
+            --set-env-vars "PUBSUB_SA_EMAIL=$PUBSUB_SA_EMAIL" \
             --set-env-vars "RAILS_LOG_TO_STDOUT=true" \
             --set-env-vars "STACKDRIVER_LOGGING=true" \
             --set-env-vars "GOOGLE_IID_ENDPOINT=$GOOGLE_IID_ENDPOINT" \
