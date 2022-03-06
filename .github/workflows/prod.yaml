@@ -120,14 +120,6 @@ jobs:
             --set-secrets "GOOGLE_PRIVATE_KEY=QOODISH_API_GOOGLE_PRIVATE_KEY:latest" \
             --set-secrets "DB_PASSWORD=QOODISH_API_DB_PASSWORD:latest" \
             --set-secrets "DB_USER=QOODISH_API_DB_USER:latest"
-      - name: Create draft release
-        run: |
-          gh release create ${{ env.RELEASE_VERSION }} \
-            --draft \
-            --target $TARGET_BRANCH \
-            --title ${{ env.RELEASE_VERSION }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy-subscriber:
     needs:
       - build-image
