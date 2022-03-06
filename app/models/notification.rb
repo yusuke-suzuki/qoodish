@@ -57,33 +57,34 @@ class Notification < ApplicationRecord
   def web_push
     return unless allowed_web_push?
 
-    FcmClient.configure do |config|
-      config.api_key['Authorization'] = authenticate_firebase_admin
-      config.api_key_prefix['Authorization'] = 'Bearer'
-      config.debugging = Rails.env.development?
-    end
-    api_instance = FcmClient::MessagesApi.new
-
-    message = FcmClient::Message.new(
-      topic: "user_#{recipient.id}",
-      data: {
-        icon: notifier.thumbnail_url,
-        click_action: "#{ENV['WEB_ENDPOINT']}#{click_action}",
-        notification_id: id.to_s,
-        key: key,
-        notifier_id: notifier_id.to_s,
-        notifier_name: notifier.name,
-        notifiable_id: notifiable_id.to_s,
-        notifiable_type: notifiable_type.downcase
-      }
-    )
-    inline_object = FcmClient::InlineObject.new(message: message)
-
     begin
-      result = api_instance.v1_projects_project_id_messagessend_post(ENV['GOOGLE_PROJECT_ID'], inline_object)
-      Rails.logger.info(result)
-    rescue FcmClient::ApiError => e
-      Rails.logger.error("Exception when calling MessagesApi->v1_projects_project_id_messagessend_post: #{e}")
+      response = Faraday.post(
+        "https://fcm.googleapis.com/v1/projects/#{ENV['GOOGLE_PROJECT_ID']}/messages:send",
+        {
+          message: {
+            topic: "user_#{recipient.id}",
+            data: {
+              icon: notifier.thumbnail_url,
+              click_action: "#{ENV['WEB_ENDPOINT']}#{click_action}",
+              notification_id: id.to_s,
+              key: key,
+              notifier_id: notifier_id.to_s,
+              notifier_name: notifier.name,
+              notifiable_id: notifiable_id.to_s,
+              notifiable_type: notifiable_type.downcase
+            }
+          }
+        }.to_json,
+        {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': "Bearer #{authenticate_firebase_admin}"
+        }
+      )
+
+      Rails.logger.info(response.body)
+    rescue => e
+      Rails.logger.error("Exception when calling web_push: #{e}")
     end
   end
 

@@ -1,4 +1,6 @@
 class MessagesController < ApplicationController
+  before_action :authenticate_pubsub!
+
   def create
     Rails.logger.info("[Pub/Sub] Message received at #{Time.now}: #{params[:message]}")
 

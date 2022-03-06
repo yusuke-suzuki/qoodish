@@ -4,8 +4,7 @@ module Maps
     before_action :require_sign_in!, only: :create
 
     def index
-      @reviews =
-        if params[:place_id].present?
+      @reviews = if params[:place_id].present?
           current_user
             .referenceable_reviews
             .with_deps

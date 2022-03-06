@@ -1,6 +1,6 @@
 class Map < ApplicationRecord
   belongs_to :user
-  has_many :reviews
+  has_many :reviews, dependent: :destroy
   has_many :spots, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_many :invites, as: :invitable, dependent: :destroy

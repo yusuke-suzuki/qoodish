@@ -9,7 +9,7 @@ module Reviews
           .referenceable_reviews
           .find_by!(id: params[:review_id])
 
-      @likes = review.votes
+      @likes = review.votes.uniq { |vote| vote.voter.id }
     end
 
     def create

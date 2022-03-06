@@ -4,9 +4,7 @@ class SpotsController < ApplicationController
   def index
     if params[:popular]
       @places =
-        Rails.cache.fetch("popular_spots_#{I18n.locale}", expires_in: 5.minutes) do
-          Place.popular
-        end
+        Place.popular
     end
   end
 

@@ -19,9 +19,6 @@ class User < ApplicationRecord
               allow_blank: true,
               maximum: 160
             }
-  validates :image_path,
-            presence: true,
-            uniqueness: true
 
   after_create :create_default_map
 

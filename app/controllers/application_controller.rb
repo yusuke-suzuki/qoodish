@@ -44,13 +44,29 @@ class ApplicationController < ActionController::API
     raise Exceptions::Unauthorized if request.headers['Authorization'].blank?
 
     verifier = GoogleAuth.new
-    payload = verifier.verify_jwt(request.headers['Authorization'].split(' ', 2).last)
+
+    jwt = request.headers['Authorization'].split(' ', 2).last
+
+    payload = verifier.verify_jwt(jwt)
 
     @current_user = User.find_by(uid: payload['sub'])
 
     if @current_user.blank?
       @current_user = User.sign_in_anonymously(payload)
     end
+  end
+
+  def authenticate_pubsub!
+    raise Exceptions::Unauthorized if request.headers['Authorization'].blank?
+
+    verifier = GoogleAuth.new
+
+    jwt = request.headers['Authorization'].split(' ', 2).last
+    aud = ENV['SUBSCRIBER_ENDPOINT']
+
+    payload = verifier.verify_oidc(jwt, aud)
+
+    raise Exceptions::Unauthorized unless payload['email'] == ENV['PUBSUB_SA_EMAIL']
   end
 
   def require_sign_in!
