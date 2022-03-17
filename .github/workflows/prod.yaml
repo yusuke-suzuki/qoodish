@@ -75,8 +75,8 @@ jobs:
           DB_HOST: 10.86.64.3
           PUBSUB_TOPIC: rails-api-topic
           GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
-          SUBSTITUTE_URL: https://storage.googleapis.com/qoodish/assets/icon-512-2019-04-06.png
-          OGP_IMAGE_URL: https://storage.googleapis.com/qoodish/assets/ogp-image-2019-04-05.png
+          SUBSTITUTE_URL: https://storage.googleapis.com/qoodish.appspot.com/assets/icon-512-2019-04-06.png
+          OGP_IMAGE_URL: https://storage.googleapis.com/qoodish.appspot.com/assets/ogp-image-2019-04-05.png
           ALLOWED_ENDPOINTS: https://qoodish.com
           CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
           CLOUD_STORAGE_BUCKET_NAME: qoodish.appspot.com
@@ -146,8 +146,8 @@ jobs:
           SUBSCRIBER_ENDPOINT: https://subscriber.qoodish.com
           PUBSUB_SA_EMAIL: pubsub@qoodish.iam.gserviceaccount.com
           GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
-          SUBSTITUTE_URL: https://storage.googleapis.com/qoodish/assets/icon-512-2019-04-06.png
-          OGP_IMAGE_URL: https://storage.googleapis.com/qoodish/assets/ogp-image-2019-04-05.png
+          SUBSTITUTE_URL: https://storage.googleapis.com/qoodish.appspot.com/assets/icon-512-2019-04-06.png
+          OGP_IMAGE_URL: https://storage.googleapis.com/qoodish.appspot.com/assets/ogp-image-2019-04-05.png
           ALLOWED_ENDPOINTS: https://qoodish.com
           CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
           CLOUD_STORAGE_BUCKET_NAME: qoodish.appspot.com
