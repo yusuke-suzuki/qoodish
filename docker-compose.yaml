@@ -23,8 +23,8 @@ services:
       - DB_HOST=db
       - DB_USER=root
       - DB_PASSWORD=password
-      - SUBSTITUTE_URL=https://storage.googleapis.com/qoodish/assets/icon-512-2019-04-06.png
-      - OGP_IMAGE_URL=https://storage.googleapis.com/qoodish/assets/ogp-image-2019-04-05.png
+      - SUBSTITUTE_URL=https://storage.googleapis.com/qoodish.appspot.com/assets/icon-512-2019-04-06.png
+      - OGP_IMAGE_URL=https://storage.googleapis.com/qoodish.appspot.com/assets/ogp-image-2019-04-05.png
       - PUBSUB_TOPIC=rails-api-topic
       - ALLOWED_ENDPOINTS=http://localhost:5000
       - CLOUD_STORAGE_ENDPOINT=https://storage.cloud.google.com
