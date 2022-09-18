@@ -16,7 +16,7 @@ gcloud beta secrets versions access latest --secret=DOTENV_API > .env
 
 ```sh
 docker-compose up -d
-docker-compose run api bundle exec rails db:setup
+docker-compose run --rm api bundle exec rails db:setup
 ```
 
 ## Test
