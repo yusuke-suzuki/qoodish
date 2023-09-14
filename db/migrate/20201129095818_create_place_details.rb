@@ -14,6 +14,6 @@ class CreatePlaceDetails < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    add_index :place_details, [:place_id_val, :locale], unique: true
+    add_index :place_details, %i[place_id_val locale], unique: true
   end
 end

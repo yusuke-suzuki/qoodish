@@ -50,7 +50,6 @@ Rails.application.routes.draw do
   resources :notifications, only: %i[index update]
   resources :invites, only: [:index]
 
-
   get '/healthcheck' => 'application#healthcheck'
   root 'application#healthcheck'
 

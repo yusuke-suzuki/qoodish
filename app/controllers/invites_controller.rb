@@ -5,9 +5,9 @@ class InvitesController < ApplicationController
   def index
     @invites =
       current_user
-        .invites
-        .includes(:invitable)
-        .order(created_at: :desc)
-        .reject { |invite| invite.sender.blank? || invite.invitable.blank? }
+      .invites
+      .includes(:invitable)
+      .order(created_at: :desc)
+      .reject { |invite| invite.sender.blank? || invite.invitable.blank? }
   end
 end

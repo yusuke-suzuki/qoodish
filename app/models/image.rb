@@ -8,7 +8,7 @@ class Image < ApplicationRecord
             uniqueness: true,
             format: {
               allow_blank: false,
-              with: /\A#{URI.regexp(%w[http https])}\z/,
+              with: /\A#{URI::DEFAULT_PARSER.make_regexp(%w[http https])}\z/,
               scrict: Exceptions::InvalidUri
             }
 
@@ -35,15 +35,16 @@ class Image < ApplicationRecord
 
   def thumbnail_url(size = '200x200')
     ext = File.extname(url)
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/images/thumbnails/#{File.basename(file_name, ext)}_#{size}#{ext}"
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/images/thumbnails/#{File.basename(file_name,
+                                                                                                            ext)}_#{size}#{ext}"
   end
 
   private
 
   def validate_image_count
-    if MAX_IMAGE_COUNT_PER_REVIEW <= review.images.size
-      raise Exceptions::BadRequest.new('Images per report reached limit')
-    end
+    return unless MAX_IMAGE_COUNT_PER_REVIEW <= review.images.size
+
+    raise Exceptions::BadRequest, 'Images per report reached limit'
   end
 
   def delete_object

@@ -6,8 +6,8 @@ module Reviews
     def index
       review =
         current_user
-          .referenceable_reviews
-          .find_by!(id: params[:review_id])
+        .referenceable_reviews
+        .find_by!(id: params[:review_id])
 
       @likes = review.votes.uniq { |vote| vote.voter.id }
     end
@@ -15,9 +15,9 @@ module Reviews
     def create
       @review =
         current_user
-          .referenceable_reviews
-          .with_deps
-          .find_by!(id: params[:review_id])
+        .referenceable_reviews
+        .with_deps
+        .find_by!(id: params[:review_id])
 
       current_user.liked!(@review)
       @review.reload
@@ -26,9 +26,9 @@ module Reviews
     def destroy
       @review =
         current_user
-          .referenceable_reviews
-          .with_deps
-          .find_by!(id: params[:review_id])
+        .referenceable_reviews
+        .with_deps
+        .find_by!(id: params[:review_id])
 
       current_user.unliked!(@review)
       @review.reload

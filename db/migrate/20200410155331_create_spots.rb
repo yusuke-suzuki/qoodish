@@ -7,6 +7,6 @@ class CreateSpots < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    add_index :spots, [:place_id_val, :map_id], unique: true
+    add_index :spots, %i[place_id_val map_id], unique: true
   end
 end

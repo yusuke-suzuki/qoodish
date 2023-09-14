@@ -25,7 +25,7 @@ class Spot < ApplicationRecord
   }
 
   def thumbnail_url(size = '200x200')
-    images.present? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
+    images.present? ? images.first.thumbnail_url(size) : ''
   end
 
   private

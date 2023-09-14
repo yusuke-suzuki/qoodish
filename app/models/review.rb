@@ -41,7 +41,7 @@ class Review < ApplicationRecord
   FEED_PER_PAGE = 12
 
   scope :with_deps, lambda {
-    includes([:map, :user, :images, :votes, :voters, comments: [:user, :votes, :voters], spot: [:place]])
+    includes([:map, :user, :images, :votes, :voters, { comments: %i[user votes voters], spot: [:place] }])
   }
 
   scope :public_open, lambda {
@@ -77,7 +77,7 @@ class Review < ApplicationRecord
   }
 
   def thumbnail_url(size = '200x200')
-    images.exists? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
+    images.exists? ? images.first.thumbnail_url(size) : ''
   end
 
   private

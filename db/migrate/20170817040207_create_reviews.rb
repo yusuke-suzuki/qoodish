@@ -10,6 +10,6 @@ class CreateReviews < ActiveRecord::Migration[5.1]
       t.timestamps
     end
     add_index :reviews, :place_id_val
-    add_index :reviews, [:place_id_val, :map_id, :user_id], unique: true
+    add_index :reviews, %i[place_id_val map_id user_id], unique: true
   end
 end

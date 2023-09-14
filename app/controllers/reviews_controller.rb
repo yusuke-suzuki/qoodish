@@ -4,27 +4,27 @@ class ReviewsController < ApplicationController
 
   def index
     @reviews = if params[:recent]
-        Review
-          .public_open
-          .limit(8)
-          .with_deps
-          .order(created_at: :desc)
-      elsif params[:next_timestamp]
-        Review
-          .following_by(current_user)
-          .feed_before(params[:next_timestamp])
-          .with_deps
-      elsif current_user.is_anonymous
-        Review
-          .public_open
-          .includes(:map, :user)
-          .popular
-      else
-        Review
-          .following_by(current_user)
-          .latest_feed
-          .with_deps
-      end
+                 Review
+                   .public_open
+                   .limit(8)
+                   .with_deps
+                   .order(created_at: :desc)
+               elsif params[:next_timestamp]
+                 Review
+                   .following_by(current_user)
+                   .feed_before(params[:next_timestamp])
+                   .with_deps
+               elsif current_user.is_anonymous
+                 Review
+                   .public_open
+                   .includes(:map, :user)
+                   .popular
+               else
+                 Review
+                   .following_by(current_user)
+                   .latest_feed
+                   .with_deps
+               end
   end
 
   def update

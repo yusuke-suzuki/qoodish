@@ -41,7 +41,7 @@ class Map < ApplicationRecord
   after_create :follow_by_owner
 
   scope :with_deps, lambda {
-    includes([:user, :votes, :voters])
+    includes(%i[user votes voters])
   }
 
   scope :public_open, lambda {
@@ -99,6 +99,7 @@ class Map < ApplicationRecord
 
   def base
     return nil if base_id_val.blank?
+
     @base ||= Base.new(base_id_val)
   end
 
@@ -106,7 +107,8 @@ class Map < ApplicationRecord
     return '' if image_url.blank?
 
     ext = File.extname(image_url)
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/maps/thumbnails/#{File.basename(image_name, ext)}_#{size}#{ext}"
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/maps/thumbnails/#{File.basename(image_name,
+                                                                                                          ext)}_#{size}#{ext}"
   end
 
   def image_name

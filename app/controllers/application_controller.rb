@@ -51,9 +51,9 @@ class ApplicationController < ActionController::API
 
     @current_user = User.find_by(uid: payload['sub'])
 
-    if @current_user.blank?
-      @current_user = User.sign_in_anonymously(payload)
-    end
+    return unless @current_user.blank?
+
+    @current_user = User.sign_in_anonymously(payload)
   end
 
   def authenticate_pubsub!

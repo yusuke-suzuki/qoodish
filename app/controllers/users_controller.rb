@@ -4,20 +4,20 @@ class UsersController < ApplicationController
 
   def index
     @users = []
-    if params[:input].present?
-      @users =
-        User
-          .where.not(id: current_user.id)
-          .search_by_name(params[:input])
-    end
+    return unless params[:input].present?
+
+    @users =
+      User
+      .where.not(id: current_user.id)
+      .search_by_name(params[:input])
   end
 
   def show
     @user = if params[:id] == current_user.uid
-        current_user
-      else
-        User.find_by!(id: params[:id])
-      end
+              current_user
+            else
+              User.find_by!(id: params[:id])
+            end
   end
 
   def create
@@ -25,13 +25,13 @@ class UsersController < ApplicationController
     verifier.verify_jwt(params[:token])
 
     @user = User.find_by(uid: params[:uid])
-    if @user.blank?
-      @user = User.create!(
-        uid: params[:uid],
-        name: params[:display_name],
-        image_path: params[:image_url]
-      )
-    end
+    return unless @user.blank?
+
+    @user = User.create!(
+      uid: params[:uid],
+      name: params[:display_name],
+      image_path: params[:image_url]
+    )
   end
 
   def update

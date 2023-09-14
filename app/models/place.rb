@@ -54,6 +54,6 @@ class Place < ApplicationRecord
   end
 
   def thumbnail_url(size = '200x200')
-    reviews.public_open.exists? ? reviews.public_open.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
+    reviews.public_open.exists? ? reviews.public_open.first.thumbnail_url(size) : ''
   end
 end

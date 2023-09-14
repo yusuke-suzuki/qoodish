@@ -4,51 +4,51 @@ class MapsController < ApplicationController
 
   def index
     @maps = if params[:input].present?
-        current_user
-          .referenceable_maps
-          .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
-          .limit(20)
-          .with_deps
-          .order(created_at: :desc)
-      elsif params[:recommend]
-        Map
-          .public_open
-          .unfollowing_by(current_user)
-          .with_deps
-          .order(created_at: :desc)
-          .sample(10)
-      elsif params[:recent]
-        Map
-          .public_open
-          .with_deps
-          .order(created_at: :desc)
-          .limit(12)
-      elsif params[:active]
-        Map
-          .public_open
-          .with_deps
-          .active
-      elsif params[:popular]
-        Map
-          .public_open
-          .with_deps
-          .popular
-      elsif params[:postable]
-        current_user.postable_maps.with_deps
-      else
-        current_user
-          .following_maps
-          .with_deps
-          .order(created_at: :desc)
-      end
+              current_user
+                .referenceable_maps
+                .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
+                .limit(20)
+                .with_deps
+                .order(created_at: :desc)
+            elsif params[:recommend]
+              Map
+                .public_open
+                .unfollowing_by(current_user)
+                .with_deps
+                .order(created_at: :desc)
+                .sample(10)
+            elsif params[:recent]
+              Map
+                .public_open
+                .with_deps
+                .order(created_at: :desc)
+                .limit(12)
+            elsif params[:active]
+              Map
+                .public_open
+                .with_deps
+                .active
+            elsif params[:popular]
+              Map
+                .public_open
+                .with_deps
+                .popular
+            elsif params[:postable]
+              current_user.postable_maps.with_deps
+            else
+              current_user
+                .following_maps
+                .with_deps
+                .order(created_at: :desc)
+            end
   end
 
   def show
     @map =
       current_user
-        .referenceable_maps
-        .with_deps
-        .find_by!(id: params[:id])
+      .referenceable_maps
+      .with_deps
+      .find_by!(id: params[:id])
   end
 
   def create
@@ -65,7 +65,7 @@ class MapsController < ApplicationController
   end
 
   def update
-    @map = current_user.maps.includes([:votes, :voters]).find_by!(id: params[:id])
+    @map = current_user.maps.includes(%i[votes voters]).find_by!(id: params[:id])
     @map.update!(attributes_for_update) if attributes_for_update.present?
   end
 

@@ -6,8 +6,8 @@ module Maps
     def index
       map =
         current_user
-          .referenceable_maps
-          .find_by!(id: params[:map_id])
+        .referenceable_maps
+        .find_by!(id: params[:map_id])
 
       @likes = map.votes.uniq { |vote| vote.voter.id }
     end
@@ -15,9 +15,9 @@ module Maps
     def create
       @map =
         current_user
-          .referenceable_maps
-          .includes(:user, reviews: :images)
-          .find_by!(id: params[:map_id])
+        .referenceable_maps
+        .includes(:user, reviews: :images)
+        .find_by!(id: params[:map_id])
 
       current_user.liked!(@map)
     end
@@ -25,9 +25,9 @@ module Maps
     def destroy
       @map =
         current_user
-          .referenceable_maps
-          .includes(:user, reviews: :images)
-          .find_by!(id: params[:map_id])
+        .referenceable_maps
+        .includes(:user, reviews: :images)
+        .find_by!(id: params[:map_id])
 
       current_user.unliked!(@map)
     end

@@ -2,10 +2,10 @@ class SpotsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    if params[:popular]
-      @places =
-        Place.popular
-    end
+    return unless params[:popular]
+
+    @places =
+      Place.popular
   end
 
   def show

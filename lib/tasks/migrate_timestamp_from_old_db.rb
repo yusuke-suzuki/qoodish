@@ -5,6 +5,7 @@ ActiveRecord::Base.transaction do
     maps_json.each do |json|
       map = Map.find_by(id: json['id'])
       next if map.blank?
+
       map.update!(
         created_at: json['created_at'],
         updated_at: json['updated_at']
@@ -18,6 +19,7 @@ ActiveRecord::Base.transaction do
     reviews_json.each do |json|
       review = Review.find_by(id: json['id'])
       next if review.blank?
+
       review.update!(
         created_at: json['created_at'],
         updated_at: json['updated_at']

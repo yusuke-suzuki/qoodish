@@ -44,7 +44,9 @@ class User < ApplicationRecord
     return '' if image_path.blank?
 
     ext = File.extname(image_path)
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/profile/thumbnails/#{File.basename(image_name, ext)}_#{size}#{ext}"
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/profile/thumbnails/#{File.basename(
+      image_name, ext
+    )}_#{size}#{ext}"
   end
 
   def image_name

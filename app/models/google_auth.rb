@@ -9,14 +9,14 @@ class GoogleAuth
     key_source = Google::Auth::IDTokens::X509CertHttpKeySource.new(CLIENT_CERT_URL, algorithm: 'RS256')
     verifier = Google::Auth::IDTokens::Verifier.new
     verifier.verify(jwt, key_source: key_source, aud: aud, iss: iss)
-  rescue => e
+  rescue StandardError => e
     Rails.logger.fatal("Failed to verify ID Token: #{e}")
     raise Exceptions::FirebaseAuthError
   end
 
   def verify_oidc(jwt, aud)
     Google::Auth::IDTokens.verify_oidc(jwt, aud: aud)
-  rescue => e
+  rescue StandardError => e
     Rails.logger.fatal("Failed to verify ID Token: #{e}")
     raise Exceptions::PubSubAuthError
   end

@@ -42,6 +42,7 @@ ActiveRecord::Base.transaction do
       follower = User.find_by!(id: json['follower_id'])
       map = Map.find_by(id: json['followable_id'])
       next if map.blank?
+
       follower.follow(map)
     end
   end
@@ -60,12 +61,10 @@ ActiveRecord::Base.transaction do
         user_id: json['user_id'],
         comment: json['comment'],
         map_id: json['map_id'],
-        place_id_val: json['place_id_val'],
+        place_id_val: json['place_id_val']
       )
       image = images_json.find { |image_json| image_json['review_id'] == review.id }
-      if image.present?
-        review.update!(image_url: "https://s3-ap-northeast-1.amazonaws.com/qoodish/#{image['path']}")
-      end
+      review.update!(image_url: "https://s3-ap-northeast-1.amazonaws.com/qoodish/#{image['path']}") if image.present?
     end
   end
   p 'Successfully migrated reviews!'
