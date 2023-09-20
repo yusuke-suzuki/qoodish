@@ -1,4 +1,5 @@
 json.id user.id
+json.uid user.uid
 json.name user.name
 json.biography user.biography
 json.image_url user.image_path

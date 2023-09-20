@@ -8,8 +8,8 @@ on:
 env:
   PROJECT_ID: qoodish-dev
   ARTIFACT_REGISTRY: asia-northeast1-docker.pkg.dev
-  BRANCH_NAME: ${{ github.head_ref }}
   SERVICE_NAME: qoodish-api
+  BRANCH_NAME: ${{ github.head_ref }}
 jobs:
   build-image:
     permissions:
@@ -21,32 +21,59 @@ jobs:
       - id: auth
         uses: google-github-actions/auth@v1
         with:
+          token_format: access_token
           workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
           service_account: github-actions@qoodish-common.iam.gserviceaccount.com
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
-      - uses: ruby/setup-ruby@v1
+      - name: Decrypt secrets
+        run: |
+          gcloud secrets versions access latest \
+            --secret=QOODISH_API_DOTENV \
+            --project=$PROJECT_ID \
+            --out-file=.env
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GAR
+        uses: docker/login-action@v3
         with:
-          ruby-version: 3.2
-          bundler-cache: true
-      # - name: rubocop
-      #   run: |
-      #     bundle exec rubocop --format github
-      - run: |
-          gcloud auth configure-docker $ARTIFACT_REGISTRY --quiet
+          registry: ${{ env.ARTIFACT_REGISTRY }}
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}
+          labels: |
+            org.opencontainers.image.revision=${{ env.GITHUB_SHA }}
+          tags: |
+            type=ref,event=pr,prefix=pr-,suffix=
+            type=sha,prefix=,suffix=,format=long
       - name: Build image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Rails test
         run: |
-          docker build \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --cache-from $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$BRANCH_NAME \
-            -t $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
-            -t $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$BRANCH_NAME \
-            .
-        env:
-          DOCKER_BUILDKIT: 1
+          docker compose run app bundle exec rails db:setup
+          docker compose run app bundle exec rails test -b -v
       - name: Push image
-        run: |
-          docker push -a $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME
+        id: push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
   deploy-api:
     needs:
       - build-image
@@ -71,7 +98,7 @@ jobs:
           DB_HOST: 10.78.96.3
           PUBSUB_TOPIC: rails-api-topic
           GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
-          ALLOWED_ENDPOINTS: https://dev.qoodish.com
+          ALLOWED_ENDPOINTS: https://dev.qoodish.com@http://127.0.0.1:5000
           CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
           CLOUD_STORAGE_BUCKET_NAME: qoodish-dev.appspot.com
           GOOGLE_ACCOUNT_TYPE: service_account
@@ -87,6 +114,8 @@ jobs:
             --service-account=$CLOUD_RUN_SA_NAME \
             --ingress=all \
             --allow-unauthenticated \
+            --execution-environment=gen2 \
+            --tag=$BRANCH_NAME \
             --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
             --network=default \
             --subnet=default \
@@ -151,6 +180,8 @@ jobs:
             --service-account=$CLOUD_RUN_SA_NAME \
             --ingress=all \
             --allow-unauthenticated \
+            --execution-environment=gen2 \
+            --tag=$BRANCH_NAME \
             --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
             --network=default \
             --subnet=default \

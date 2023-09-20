@@ -1,21 +1,13 @@
 module Maps
   class ReviewsController < ApplicationController
     before_action :authenticate_user!
-    before_action :require_sign_in!, only: :create
 
     def index
-      @reviews = if params[:place_id].present?
-                   current_user
-                     .referenceable_reviews
-                     .with_deps
-                     .where(place_id_val: params[:place_id], map_id: params[:map_id])
-                 else
-                   current_user
-                     .referenceable_reviews
-                     .where(map_id: params[:map_id])
-                     .with_deps
-                     .order(created_at: :desc)
-                 end
+      @reviews = current_user
+                 .referenceable_reviews
+                 .where(map_id: params[:map_id])
+                 .with_deps
+                 .order(created_at: :desc)
     end
 
     def show

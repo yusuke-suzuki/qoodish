@@ -1,6 +1,5 @@
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_sign_in!
 
   def index
     @notifications =

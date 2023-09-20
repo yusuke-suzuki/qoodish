@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!, only: %i[index show update destroy]
-  before_action :require_sign_in!, only: %i[index update destroy]
 
   def index
     @users = []
@@ -22,15 +21,15 @@ class UsersController < ApplicationController
 
   def create
     verifier = GoogleAuth.new
-    verifier.verify_jwt(params[:token])
+    jwt = request.headers['Authorization'].split(' ', 2).last
+    payload = verifier.verify_jwt(jwt)
 
-    @user = User.find_by(uid: params[:uid])
-    return unless @user.blank?
+    @user = User.find_by(uid: payload[:sub])
+    return if @user.present?
 
     @user = User.create!(
-      uid: params[:uid],
-      name: params[:display_name],
-      image_path: params[:image_url]
+      uid: payload['sub'],
+      name: payload['name']
     )
   end
 

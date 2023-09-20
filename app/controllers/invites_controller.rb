@@ -1,6 +1,5 @@
 class InvitesController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_sign_in!
 
   def index
     @invites =

@@ -1,40 +1,14 @@
 class MapsController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_sign_in!, only: %i[create update destroy]
 
   def index
-    @maps = if params[:input].present?
-              current_user
-                .referenceable_maps
-                .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
-                .limit(20)
-                .with_deps
-                .order(created_at: :desc)
-            elsif params[:recommend]
+    @maps = if params[:recommend]
               Map
                 .public_open
                 .unfollowing_by(current_user)
                 .with_deps
                 .order(created_at: :desc)
                 .sample(10)
-            elsif params[:recent]
-              Map
-                .public_open
-                .with_deps
-                .order(created_at: :desc)
-                .limit(12)
-            elsif params[:active]
-              Map
-                .public_open
-                .with_deps
-                .active
-            elsif params[:popular]
-              Map
-                .public_open
-                .with_deps
-                .popular
-            elsif params[:postable]
-              current_user.postable_maps.with_deps
             else
               current_user
                 .following_maps
@@ -52,16 +26,8 @@ class MapsController < ApplicationController
   end
 
   def create
-    @map = current_user.maps.create!(
-      name: params[:name],
-      description: params[:description],
-      private: params[:private],
-      invitable: params[:invitable],
-      shared: params[:shared],
-      base_id_val: params[:base_id],
-      base_name: params[:base_name],
-      image_url: params[:image_url]
-    )
+    Rails.logger.info(create_params)
+    @map = current_user.maps.create!(create_params)
   end
 
   def update
@@ -74,6 +40,12 @@ class MapsController < ApplicationController
   end
 
   private
+
+  def create_params
+    params
+      .permit(:name, :description, :private, :invitable, :shared, :base_id, :base_name, :image_url)
+      .to_h { |key, value| [key == :base_id ? :base_id_val : key, value] }
+  end
 
   def attributes_for_update
     attributes = {}

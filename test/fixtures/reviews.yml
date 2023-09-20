@@ -1,11 +1,37 @@
-one:
-  user_id: 1
-  map_id: 1
-  place_id_val: MyString
-  comment: MyString
+private:
+  user: me
+  map: private
+  spot: private_one
+  comment: This is a comment
 
-two:
-  user_id: 1
-  map_id: 1
-  place_id_val: MyString
-  comment: MyString
+private_you:
+  user: you
+  map: private
+  spot: private_one
+  comment: This is a comment
+
+public_one:
+  user: me
+  map: public_one
+  spot: public_one
+  comment: This is a comment
+
+public_you_one:
+  user: you
+  map: public_one
+  spot: public_one
+  comment: This is a comment
+  created_at: 2020-01-01 00:00:00
+
+public_you_two:
+  user: you
+  map: public_one
+  spot: public_two
+  comment: This is a comment
+  created_at: 2020-02-01 00:00:00
+
+public_two:
+  user: me
+  map: public_one
+  spot: public_two
+  comment: This is a comment

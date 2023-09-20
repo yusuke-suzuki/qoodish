@@ -22,23 +22,10 @@ class User < ApplicationRecord
 
   after_create :create_default_map
 
-  PROVIDER_ANONYMOUS = 'anonymous'.freeze
-
-  attr_accessor :is_anonymous
-
   scope :search_by_name, lambda { |name|
     where('name LIKE ?', "%#{name}%")
       .limit(20)
   }
-
-  def self.sign_in_anonymously(payload)
-    raise Exceptions::Unauthorized unless payload['provider_id'] == PROVIDER_ANONYMOUS
-
-    User.new(
-      uid: payload['user_id'],
-      is_anonymous: true
-    )
-  end
 
   def thumbnail_url(size = '200x200')
     return '' if image_path.blank?

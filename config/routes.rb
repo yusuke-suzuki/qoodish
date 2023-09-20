@@ -50,6 +50,27 @@ Rails.application.routes.draw do
   resources :notifications, only: %i[index update]
   resources :invites, only: [:index]
 
+  namespace :guest do
+    resources :maps, only: %i[index show] do
+      scope module: :maps do
+        resources :reviews, only: [:index]
+        resources :spots, only: %i[index show] do
+          scope module: :spots do
+            resources :reviews, only: [:index]
+          end
+        end
+        resources :collaborators, only: [:index]
+      end
+    end
+    resources :reviews, only: %i[index show]
+    resources :users, only: %i[show] do
+      scope module: :users do
+        resources :maps, only: [:index]
+        resources :reviews, only: [:index]
+      end
+    end
+  end
+
   get '/healthcheck' => 'application#healthcheck'
   root 'application#healthcheck'
 

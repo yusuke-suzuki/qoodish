@@ -65,4 +65,6 @@ Rails.application.configure do
     Bullet.bullet_logger = true
     Bullet.raise = false
   end
+
+  config.hosts << 'host.docker.internal'
 end

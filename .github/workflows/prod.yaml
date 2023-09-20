@@ -7,7 +7,6 @@ env:
   PROJECT_ID: qoodish
   ARTIFACT_REGISTRY: asia-northeast1-docker.pkg.dev
   SERVICE_NAME: qoodish-api
-  TARGET_BRANCH: master
 jobs:
   build-image:
     permissions:
@@ -19,32 +18,37 @@ jobs:
       - id: auth
         uses: google-github-actions/auth@v1
         with:
+          token_format: access_token
           workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
           service_account: github-actions@qoodish-common.iam.gserviceaccount.com
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-      - uses: ruby/setup-ruby@v1
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GAR
+        uses: docker/login-action@v3
         with:
-          ruby-version: 3.2
-          bundler-cache: true
-      # - name: rubocop
-      #   run: |
-      #     bundle exec rubocop --format github
-      - run: |
-          gcloud auth configure-docker $ARTIFACT_REGISTRY --quiet
-      - name: Build image
-        run: |
-          docker build \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --cache-from $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:${GITHUB_REF##*/} \
-            -t $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
-            -t $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:${GITHUB_REF##*/} \
-            .
-        env:
-          DOCKER_BUILDKIT: 1
-      - name: Push image
-        run: |
-          docker push -a $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME
+          registry: ${{ env.ARTIFACT_REGISTRY }}
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}
+          labels: |
+            org.opencontainers.image.revision=${{ env.GITHUB_SHA }}
+          tags: |
+            type=ref,event=tag,prefix=,suffix=
+            type=sha,prefix=,suffix=,format=long
+      - name: Build and push image
+        id: build-and-push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
   deploy-api:
     needs:
       - build-image
@@ -101,6 +105,7 @@ jobs:
             --service-account=$CLOUD_RUN_SA_NAME \
             --ingress=all \
             --allow-unauthenticated \
+            --execution-environment=gen2 \
             --no-traffic \
             --tag=${{ env.CLOUD_RUN_TAG }} \
             --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
@@ -177,6 +182,7 @@ jobs:
             --service-account=$CLOUD_RUN_SA_NAME \
             --ingress=all \
             --allow-unauthenticated \
+            --execution-environment=gen2 \
             --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
             --network=default \
             --subnet=default \

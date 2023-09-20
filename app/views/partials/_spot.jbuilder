@@ -11,3 +11,4 @@ json.thumbnail_url spot.thumbnail_url
 json.thumbnail_url_400 spot.thumbnail_url('400x400')
 json.thumbnail_url_800 spot.thumbnail_url('800x800')
 json.reviews_count spot.reviews.size
+json.reviews spot.reviews, partial: 'partials/review', as: :review

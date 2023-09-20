@@ -1,0 +1,23 @@
+public_one:
+  followable_type: Map
+  followable: public_one
+  follower_type: User
+  follower: me
+
+public_two:
+  followable_type: Map
+  followable: public_one
+  follower_type: User
+  follower: you
+
+private_one:
+  followable_type: Map
+  followable: private_one
+  follower_type: User
+  follower: me
+
+private_two:
+  followable_type: Map
+  followable: private_one
+  follower_type: User
+  follower: you

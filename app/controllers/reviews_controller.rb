@@ -1,24 +1,12 @@
 class ReviewsController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_sign_in!, only: %i[update destroy]
 
   def index
-    @reviews = if params[:recent]
-                 Review
-                   .public_open
-                   .limit(8)
-                   .with_deps
-                   .order(created_at: :desc)
-               elsif params[:next_timestamp]
+    @reviews = if params[:next_timestamp]
                  Review
                    .following_by(current_user)
                    .feed_before(params[:next_timestamp])
                    .with_deps
-               elsif current_user.is_anonymous
-                 Review
-                   .public_open
-                   .includes(:map, :user)
-                   .popular
                else
                  Review
                    .following_by(current_user)

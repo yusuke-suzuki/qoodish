@@ -1,0 +1,26 @@
+version: "3"
+services:
+  app:
+    build: .
+    volumes:
+      - .:/qoodish
+    command: sleep infinity
+    network_mode: service:db
+    env_file: .env
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=password
+  db:
+    image: mysql:5.7
+    restart: unless-stopped
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    command:
+      - --skip-character-set-client-handshake
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+volumes:
+  mysql-data:

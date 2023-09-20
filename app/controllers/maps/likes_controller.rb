@@ -1,7 +1,6 @@
 module Maps
   class LikesController < ApplicationController
     before_action :authenticate_user!
-    before_action :require_sign_in!, only: %i[create destroy]
 
     def index
       map =

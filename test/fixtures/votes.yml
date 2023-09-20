@@ -1,0 +1,11 @@
+public_one:
+  votable_type: Review
+  votable: public_one
+  voter_type: User
+  voter: me
+
+public_two:
+  votable_type: Review
+  votable: public_one
+  voter_type: User
+  voter: you

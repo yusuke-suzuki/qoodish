@@ -1,7 +1,6 @@
 module Maps
   class FollowsController < ApplicationController
     before_action :authenticate_user!
-    before_action :require_sign_in!
 
     def create
       map = if params[:invite_id]

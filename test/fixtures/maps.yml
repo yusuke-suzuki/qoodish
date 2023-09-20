@@ -1,19 +1,27 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user_id: 1
-  name: MyString
-  description: MyString
+private:
+  user: me
+  name: Private map
+  description: This is a private map.
+  private: true
+  invitable: false
+  base_id_val: ""
+  base_name: ""
+
+public_one:
+  user: me
+  name: Public map
+  description: This is a public map.
   private: false
   invitable: false
-  base_id_val: MyString
-  base_name: MyString
+  base_id_val: ""
+  base_name: ""
 
-two:
-  user_id: 1
-  name: MyString
-  description: MyString
+public_two:
+  user: me
+  name: Public map two
+  description: This is a public map.
   private: false
   invitable: false
-  base_id_val: MyString
-  base_name: MyString
+  base_id_val: ""
+  base_name: ""

@@ -1,6 +1,5 @@
 class DevicesController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_sign_in!
 
   def update
     current_user.devices.find_or_create_by(
