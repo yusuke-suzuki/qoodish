@@ -6,7 +6,7 @@ module Maps
       @reviews = current_user
                  .referenceable_reviews
                  .where(map_id: params[:map_id])
-                 .with_deps
+                 .preload(:map, :user, :images, { comments: :user }, :voters, :votes)
                  .order(created_at: :desc)
     end
 
@@ -14,7 +14,7 @@ module Maps
       @review =
         current_user
         .referenceable_reviews
-        .with_deps
+        .preload(:map, :user, :images, { comments: :user }, :voters, :votes)
         .find_by!(id: params[:id])
     end
 
@@ -25,20 +25,28 @@ module Maps
         .find_by!(id: params[:map_id])
 
       ActiveRecord::Base.transaction do
-        @review = current_user.reviews.create!(
-          map: map,
-          place_id_val: params[:place_id],
-          comment: params[:comment]
-        )
+        @review = current_user.reviews.create!(review_params)
 
-        if params[:images].present?
-          params[:images].each do |image|
-            @review.images.create!(
-              url: image[:url]
-            )
-          end
+        images_params[:images].each do |image|
+          @review.images.create!(
+            url: image[:url]
+          )
         end
       end
+    end
+
+    private
+
+    def review_params
+      params
+        .permit(:map_id, :name, :comment, :latitude, :longitude)
+        .to_h
+    end
+
+    def images_params
+      params
+        .permit(images: [:url])
+        .to_h
     end
   end
 end

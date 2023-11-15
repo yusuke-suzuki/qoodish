@@ -5,13 +5,13 @@ class Guest::Users::ReviewsController < ApplicationController
         Review
           .public_open
           .where(user_id: params[:user_id])
-          .preload(:map, :user, :images, { spot: :place }, { comments: :user })
+          .preload(:map, :user, :images, { comments: :user })
           .feed_before(params[:next_timestamp])
       else
         Review
           .public_open
           .where(user_id: params[:user_id])
-          .preload(:map, :user, :images, { spot: :place }, { comments: :user })
+          .preload(:map, :user, :images, { comments: :user })
           .latest_feed
       end
   end

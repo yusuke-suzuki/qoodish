@@ -3,7 +3,7 @@ class Guest::Users::MapsController < ApplicationController
     @maps = Map
             .public_open
             .where(user_id: params[:user_id])
-            .preload(:user, :reviews)
+            .preload(:user)
             .order(created_at: :desc)
   end
 end

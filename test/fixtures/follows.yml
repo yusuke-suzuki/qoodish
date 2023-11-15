@@ -21,3 +21,15 @@ private_two:
   followable: private_one
   follower_type: User
   follower: you
+
+private_unfollowing:
+  followable_type: Map
+  followable: private_unfollowing
+  follower_type: User
+  follower: you
+
+private_following:
+  followable_type: Map
+  followable: private_following
+  follower_type: User
+  follower: me

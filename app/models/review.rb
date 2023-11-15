@@ -3,7 +3,6 @@ require 'google/cloud/storage'
 class Review < ApplicationRecord
   belongs_to :user
   belongs_to :map
-  belongs_to :spot
   has_many :images, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_many :comments, as: :commentable
@@ -11,8 +10,6 @@ class Review < ApplicationRecord
   has_many :voters, through: :votes, source: :voter, source_type: User.name
 
   before_validation :remove_carriage_return
-  before_validation :create_spot
-  after_destroy :destroy_empty_spot
 
   validates :comment,
             presence: {
@@ -25,24 +22,20 @@ class Review < ApplicationRecord
             }
   validates :user_id,
             presence: true
-  validates :spot_id,
-            presence: true,
-            uniqueness: {
-              scope: %i[map_id user_id],
-              strict: Exceptions::DuplicateReview
-            }
   validates :map_id,
-            presence: {
-              strict: Exceptions::MapNotSpecified
+            presence: true
+  validates :latitude,
+            presence: true
+  validates :longitude,
+            presence: true
+  validates :name,
+            presence: true,
+            length: {
+              allow_blank: false,
+              maximum: 100
             }
-
-  attr_accessor :place_id_val
 
   FEED_PER_PAGE = 12
-
-  scope :with_deps, lambda {
-    includes([:map, :user, :images, :votes, :voters, { comments: %i[user votes voters], spot: [:place] }])
-  }
 
   scope :public_open, lambda {
     joins(:map)
@@ -80,30 +73,18 @@ class Review < ApplicationRecord
     images.exists? ? images.first.thumbnail_url(size) : ''
   end
 
+  def lat
+    latitude.to_f
+  end
+
+  def lng
+    longitude.to_f
+  end
+
   private
 
   def remove_carriage_return
-    return unless comment
-
-    comment.delete!("\r")
-  end
-
-  def create_spot
-    place = Place.find_or_create_by!(
-      place_id_val: place_id_val
-    )
-
-    self.spot = Spot.find_or_create_by!(
-      place: place,
-      map: map
-    )
-  end
-
-  def destroy_empty_spot
-    return if spot.reviews.exists?
-
-    Rails.logger.debug('Delete the parent spot as there are no more reports')
-
-    spot.destroy!
+    name.delete!("\r") if name.present?
+    comment.delete!("\r") if comment.present?
   end
 end

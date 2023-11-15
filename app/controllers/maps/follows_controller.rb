@@ -10,7 +10,7 @@ module Maps
             else
               current_user
                 .referenceable_maps
-                .includes(:user, reviews: :images)
+                .preload(:user, :reviews)
                 .find_by!(id: params[:map_id])
             end
 
@@ -23,8 +23,9 @@ module Maps
       map =
         current_user
         .following_maps
-        .includes(:user, reviews: :images)
+        .preload(:user, :reviews)
         .find_by!(id: params[:map_id])
+
       raise Exceptions::MapOwnerCannotRemoved if current_user.map_owner?(map)
 
       current_user.unfollow!(map)

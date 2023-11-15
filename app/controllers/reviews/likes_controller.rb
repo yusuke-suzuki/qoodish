@@ -15,10 +15,11 @@ module Reviews
       @review =
         current_user
         .referenceable_reviews
-        .with_deps
+        .preload(:map, :user, :images, { comments: :user })
         .find_by!(id: params[:review_id])
 
       current_user.liked!(@review)
+
       @review.reload
     end
 
@@ -26,10 +27,11 @@ module Reviews
       @review =
         current_user
         .referenceable_reviews
-        .with_deps
+        .preload(:map, :user, :images, { comments: :user })
         .find_by!(id: params[:review_id])
 
       current_user.unliked!(@review)
+
       @review.reload
     end
   end

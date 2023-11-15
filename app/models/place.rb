@@ -6,9 +6,6 @@ class Place < ApplicationRecord
             presence: true,
             uniqueness: true
 
-  before_validation :load_place_detail
-  after_find :load_place_detail
-
   scope :popular, lambda {
     joins(:reviews)
       .group('places.id')

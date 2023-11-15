@@ -7,26 +7,27 @@ module Users
                 if params[:following]
                   current_user
                     .following_maps
-                    .includes(%i[user votes voters])
+                    .preload(:user)
                     .order(created_at: :desc)
                 else
                   current_user
                     .maps
-                    .includes(%i[votes voters])
+                    .preload(:user)
                     .order(created_at: :desc)
                 end
               else
                 user = User.find_by!(id: params[:user_id])
+
                 if params[:following]
                   current_user
                     .referenceable_maps
-                    .with_deps
+                    .preload(:user)
                     .where(id: Map.following_by(user))
                     .order(created_at: :desc)
                 else
                   current_user
                     .referenceable_maps
-                    .with_deps
+                    .preload(:user)
                     .where(id: user.maps)
                     .order(created_at: :desc)
                 end
