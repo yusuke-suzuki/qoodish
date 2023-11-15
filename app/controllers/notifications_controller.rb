@@ -17,6 +17,7 @@ class NotificationsController < ApplicationController
       current_user
       .notifications
       .find_by!(id: params[:id])
+
     @notification.update!(read: true)
   end
 end

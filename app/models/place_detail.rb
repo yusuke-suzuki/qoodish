@@ -7,8 +7,6 @@ class PlaceDetail < ApplicationRecord
   validates :locale,
             presence: true
 
-  before_validation :load_place_detail
-
   enum locale: %i[en ja]
 
   def load_place_detail

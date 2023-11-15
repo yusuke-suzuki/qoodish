@@ -1,12 +1,29 @@
-
 private:
   user: me
   name: Private map
   description: This is a private map.
   private: true
   invitable: false
-  base_id_val: ""
-  base_name: ""
+  latitude: 35.681382
+  longitude: 139.766084
+
+private_unfollowing:
+  user: you
+  name: Private map
+  description: This is a private map.
+  private: true
+  invitable: false
+  latitude: 35.681382
+  longitude: 139.766084
+
+private_following:
+  user: you
+  name: Private map
+  description: This is a private map.
+  private: true
+  invitable: false
+  latitude: 35.681382
+  longitude: 139.766084
 
 public_one:
   user: me
@@ -14,8 +31,8 @@ public_one:
   description: This is a public map.
   private: false
   invitable: false
-  base_id_val: ""
-  base_name: ""
+  latitude: 35.681382
+  longitude: 139.766084
 
 public_two:
   user: me
@@ -23,5 +40,5 @@ public_two:
   description: This is a public map.
   private: false
   invitable: false
-  base_id_val: ""
-  base_name: ""
+  latitude: 35.681382
+  longitude: 139.766084

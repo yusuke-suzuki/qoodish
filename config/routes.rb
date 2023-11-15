@@ -4,11 +4,10 @@ Rails.application.routes.draw do
     return
   end
 
-  resources :users do
+  resources :users, only: %i[show create update destroy] do
     scope module: :users do
       resources :maps, only: [:index]
       resources :reviews, only: [:index]
-      resources :likes, only: [:index]
       resource :push_notification, only: [:update]
     end
   end
@@ -16,16 +15,8 @@ Rails.application.routes.draw do
   resources :maps do
     scope module: :maps do
       resources :reviews, only: %i[index show create]
-      resources :spots, only: %i[index show] do
-        scope module: :spots do
-          resources :reviews, only: [:index]
-        end
-      end
       resources :collaborators, only: [:index]
-      resources :invites, only: [:create]
       resource :follow, only: %i[create destroy]
-      resource :like, only: %i[create destroy]
-      resources :likes, only: [:index]
     end
   end
   resources :reviews, only: %i[index update destroy] do
@@ -41,14 +32,7 @@ Rails.application.routes.draw do
     end
   end
   resources :inappropriate_contents, only: [:create]
-  resources :places, only: [:index]
-  resources :spots, only: %i[index show] do
-    scope module: :spots do
-      resources :reviews, only: [:index]
-    end
-  end
   resources :notifications, only: %i[index update]
-  resources :invites, only: [:index]
 
   namespace :guest do
     resources :maps, only: %i[index show] do

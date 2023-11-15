@@ -1,9 +1,25 @@
 require File.expand_path('../config/environment', __dir__)
 require 'rails/test_help'
 
+require 'minitest/autorun'
+
 class ActiveSupport::TestCase
-  # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
-  # Add more helper methods to be used by all tests here...
+  def stub_google_auth(current_user, &block)
+    GoogleAuth.stub :new, GoogleAuthMock.new(current_user), &block
+  end
+
+  class GoogleAuthMock
+    def initialize(current_user)
+      @current_user = current_user
+    end
+
+    def verify_jwt(_jwt)
+      {
+        'sub' => @current_user.uid,
+        'name' => @current_user.name
+      }
+    end
+  end
 end

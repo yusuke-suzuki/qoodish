@@ -6,11 +6,12 @@ json.owner do
 end
 json.name map.name
 json.description map.description
-json.private map.private
-json.liked current_user.liked?(map)
-json.likes_count map.voters.size
+json.latitude map.lat
+json.longitude map.lng
 json.following current_user.following?(map)
-json.followers_count map.followers.size
+json.editable current_user.map_owner?(map)
+json.postable current_user.postable?(map)
+json.private map.private
 json.shared map.shared
 json.invitable map.invitable
 json.thumbnail_url map.image_url.present? ? map.thumbnail_url : ''

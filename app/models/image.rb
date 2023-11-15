@@ -42,7 +42,7 @@ class Image < ApplicationRecord
   private
 
   def validate_image_count
-    return unless MAX_IMAGE_COUNT_PER_REVIEW <= review.images.size
+    return unless review.images.size >= MAX_IMAGE_COUNT_PER_REVIEW
 
     raise Exceptions::BadRequest, 'Images per report reached limit'
   end

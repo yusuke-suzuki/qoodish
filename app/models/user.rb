@@ -138,7 +138,7 @@ class User < ApplicationRecord
     begin
       result = api_instance.iid_v1batch_add_post(inline_object)
       Rails.logger.info(result)
-    rescue GoogleIidClient::ApiError => e
+    rescue StandardError => e
       Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_add_post: #{e}")
     end
   end
@@ -164,7 +164,7 @@ class User < ApplicationRecord
     begin
       result = api_instance.iid_v1batch_remove_post(inline_object1)
       Rails.logger.info(result)
-    rescue GoogleIidClient::ApiError => e
+    rescue StandardError => e
       Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
     end
   end

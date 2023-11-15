@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_17_084320) do
+ActiveRecord::Schema.define(version: 2023_11_08_143416) do
 
   create_table "comments", charset: "utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -96,6 +96,8 @@ ActiveRecord::Schema.define(version: 2023_09_17_084320) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "image_url"
+    t.decimal "latitude", precision: 16, scale: 6, default: "0.0", null: false
+    t.decimal "longitude", precision: 16, scale: 6, default: "0.0", null: false
     t.index ["user_id"], name: "index_maps_on_user_id"
   end
 
@@ -155,12 +157,13 @@ ActiveRecord::Schema.define(version: 2023_09_17_084320) do
     t.bigint "user_id", null: false
     t.bigint "map_id", null: false
     t.text "comment", null: false
-    t.string "image_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "spot_id", null: false
+    t.bigint "spot_id"
+    t.decimal "latitude", precision: 16, scale: 6, null: false
+    t.decimal "longitude", precision: 16, scale: 6, null: false
+    t.text "name", null: false
     t.index ["map_id"], name: "index_reviews_on_map_id"
-    t.index ["spot_id", "map_id", "user_id"], name: "index_reviews_on_spot_id_and_map_id_and_user_id", unique: true
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
@@ -205,7 +208,6 @@ ActiveRecord::Schema.define(version: 2023_09_17_084320) do
   add_foreign_key "maps", "users"
   add_foreign_key "push_notifications", "users"
   add_foreign_key "reviews", "maps"
-  add_foreign_key "reviews", "spots"
   add_foreign_key "reviews", "users"
   add_foreign_key "spots", "places"
 end
