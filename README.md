@@ -1,26 +1,23 @@
 # Qoodish API
 
-Qoodish API.
+## Description
 
-## Set up development environment
+https://qoodish.com
 
-1. Install [docker-compose](https://docs.docker.com/compose/install/)
-2. Install [gcloud](https://cloud.google.com/sdk/docs?hl=ja)
-3. Get secrets from Secret Manager
+## Installation
 
-```
-gcloud beta secrets versions access latest --secret=DOTENV_API > .env
+```bash
+$ bundle install
 ```
 
-## Start app
+## Decrypt secrets
 
-```sh
-docker-compose up -d
-docker-compose run --rm api bundle exec rails db:setup
+```bash
+$ gcloud secrets versions access latest --secret=QOODISH_API_DOTENV --project=$PROJECT_ID --out-file=.env
 ```
 
-## Test
+## Running app
 
-```sh
-docker-compose run api bundle exec rails test
+```bash
+$ pnpm dev
 ```

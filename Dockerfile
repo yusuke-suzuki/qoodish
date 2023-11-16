@@ -15,4 +15,4 @@ ENTRYPOINT ["entrypoint.sh"]
 
 EXPOSE 8080
 
-CMD rails db:migrate && puma
+CMD puma
