@@ -62,6 +62,8 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Rails test
         run: |
+          docker compose up -d
+          sleep 10
           docker compose run app bundle exec rails db:setup
           docker compose run app bundle exec rails test -b -v
       - name: Push image
