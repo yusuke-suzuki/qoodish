@@ -19,5 +19,5 @@ $ gcloud secrets versions access latest --secret=QOODISH_API_DOTENV --project=$P
 ## Running app
 
 ```bash
-$ pnpm dev
+$ rails s
 ```
