@@ -214,7 +214,7 @@ jobs:
             --region=asia-northeast1 \
             --project=$PROJECT_ID \
             --cpu=1000m \
-            --memory=256Mi \
+            --memory=512Mi \
             --max-instances=2 \
             --port=8080 \
             --service-account=$CLOUD_RUN_SA_NAME \
