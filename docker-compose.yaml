@@ -1,39 +1,26 @@
 version: "3"
 services:
+  app:
+    build: .
+    volumes:
+      - .:/qoodish
+    command: sleep infinity
+    network_mode: service:db
+    env_file: .env
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=password
   db:
     image: mysql:5.7
+    restart: unless-stopped
+    volumes:
+      - mysql-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: password
     command:
       - --skip-character-set-client-handshake
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_general_ci
-    ports:
-      - "3306:3306"
-  api:
-    build: .
-    volumes:
-      - .:/qoodish
-    env_file: .env
-    environment:
-      - RAILS_LOG_TO_STDOUT=true
-      - RAILS_ENV=development
-      - PORT=3000
-      - RAILS_LOG_LEVEL=debug
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - SUBSTITUTE_URL=https://storage.googleapis.com/qoodish.appspot.com/assets/icon-512-2019-04-06.png
-      - OGP_IMAGE_URL=https://storage.googleapis.com/qoodish.appspot.com/assets/ogp-image-2019-04-05.png
-      - PUBSUB_TOPIC=rails-api-topic
-      - ALLOWED_ENDPOINTS=http://localhost:5000
-      - CLOUD_STORAGE_ENDPOINT=https://storage.cloud.google.com
-      - CLOUD_STORAGE_BUCKET_NAME=qoodish-dev.appspot.com
-      - GOOGLE_PROJECT_ID=qoodish-dev
-      - GOOGLE_ACCOUNT_TYPE=service_account
-    entrypoint: ""
-    command: /bin/sh -c "rm -f /qoodish/tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0"
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
+volumes:
+  mysql-data:

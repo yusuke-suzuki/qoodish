@@ -1,15 +1,11 @@
-one:
-  name: MyString
-  email: MyString
-  uid: MyString
-  provider: MyString
-  provider_uid: MyString
-  image_path: MyString
+me:
+  name: watame
+  email: watame@qoodish.com
+  uid: 1234abcde
+  image_path: https://example.com/1
 
-two:
-  name: MyString
-  email: MyString
-  uid: MyString
-  provider: MyString
-  provider_uid: MyString
-  image_path: MyString
+you:
+  name: okayu
+  email: okayu@qoodish.com
+  uid: 5678fghij
+  image_path: https://example.com/2

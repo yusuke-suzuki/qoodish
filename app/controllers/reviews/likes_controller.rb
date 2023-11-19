@@ -1,13 +1,12 @@
 module Reviews
   class LikesController < ApplicationController
     before_action :authenticate_user!
-    before_action :require_sign_in!, only: %i[create destroy]
 
     def index
       review =
         current_user
-          .referenceable_reviews
-          .find_by!(id: params[:review_id])
+        .referenceable_reviews
+        .find_by!(id: params[:review_id])
 
       @likes = review.votes.uniq { |vote| vote.voter.id }
     end
@@ -15,22 +14,24 @@ module Reviews
     def create
       @review =
         current_user
-          .referenceable_reviews
-          .with_deps
-          .find_by!(id: params[:review_id])
+        .referenceable_reviews
+        .preload(:map, :user, :images, { comments: :user })
+        .find_by!(id: params[:review_id])
 
       current_user.liked!(@review)
+
       @review.reload
     end
 
     def destroy
       @review =
         current_user
-          .referenceable_reviews
-          .with_deps
-          .find_by!(id: params[:review_id])
+        .referenceable_reviews
+        .preload(:map, :user, :images, { comments: :user })
+        .find_by!(id: params[:review_id])
 
       current_user.unliked!(@review)
+
       @review.reload
     end
   end

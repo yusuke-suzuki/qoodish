@@ -17,22 +17,12 @@ class Spot < ApplicationRecord
               strict: Exceptions::MapNotSpecified
             }
 
-  after_destroy :destroy_empty_place
-
   scope :public_open, lambda {
     joins(:map)
       .where(maps: { private: false })
   }
 
   def thumbnail_url(size = '200x200')
-    images.present? ? images.first.thumbnail_url(size) : ENV['SUBSTITUTE_URL']
-  end
-
-  private
-
-  def destroy_empty_place
-    return if place.spots.exists?
-
-    place.destroy!
+    images.present? ? images.first.thumbnail_url(size) : ''
   end
 end

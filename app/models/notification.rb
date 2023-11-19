@@ -83,7 +83,7 @@ class Notification < ApplicationRecord
       )
 
       Rails.logger.info(response.body)
-    rescue => e
+    rescue StandardError => e
       Rails.logger.error("Exception when calling web_push: #{e}")
     end
   end

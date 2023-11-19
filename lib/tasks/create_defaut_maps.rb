@@ -2,6 +2,7 @@
 ActiveRecord::Base.transaction do
   User.all.each do |user|
     next if user.maps.exists?
+
     user.create_default_map
   end
 end

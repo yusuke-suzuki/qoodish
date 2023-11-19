@@ -16,7 +16,7 @@
 # end
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins ENV['ALLOWED_ENDPOINTS'].split(',')
+    origins ENV['ALLOWED_ENDPOINTS'].split('@')
 
     resource '*',
              headers: :any,

@@ -1,19 +1,44 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+private:
+  user: me
+  name: Private map
+  description: This is a private map.
+  private: true
+  invitable: false
+  latitude: 35.681382
+  longitude: 139.766084
 
-one:
-  user_id: 1
-  name: MyString
-  description: MyString
+private_unfollowing:
+  user: you
+  name: Private map
+  description: This is a private map.
+  private: true
+  invitable: false
+  latitude: 35.681382
+  longitude: 139.766084
+
+private_following:
+  user: you
+  name: Private map
+  description: This is a private map.
+  private: true
+  invitable: false
+  latitude: 35.681382
+  longitude: 139.766084
+
+public_one:
+  user: me
+  name: Public map
+  description: This is a public map.
   private: false
   invitable: false
-  base_id_val: MyString
-  base_name: MyString
+  latitude: 35.681382
+  longitude: 139.766084
 
-two:
-  user_id: 1
-  name: MyString
-  description: MyString
+public_two:
+  user: me
+  name: Public map two
+  description: This is a public map.
   private: false
   invitable: false
-  base_id_val: MyString
-  base_name: MyString
+  latitude: 35.681382
+  longitude: 139.766084

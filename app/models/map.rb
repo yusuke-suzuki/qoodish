@@ -1,7 +1,6 @@
 class Map < ApplicationRecord
   belongs_to :user
   has_many :reviews, dependent: :destroy
-  has_many :spots, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_many :invites, as: :invitable, dependent: :destroy
   has_many :follows, as: :followable, dependent: :destroy
@@ -39,10 +38,6 @@ class Map < ApplicationRecord
 
   before_validation :remove_carriage_return
   after_create :follow_by_owner
-
-  scope :with_deps, lambda {
-    includes([:user, :votes, :voters])
-  }
 
   scope :public_open, lambda {
     where(private: false)
@@ -97,22 +92,26 @@ class Map < ApplicationRecord
     end
   }
 
-  def base
-    return nil if base_id_val.blank?
-    @base ||= Base.new(base_id_val)
-  end
-
   def thumbnail_url(size = '200x200')
     return '' if image_url.blank?
 
     ext = File.extname(image_url)
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/maps/thumbnails/#{File.basename(image_name, ext)}_#{size}#{ext}"
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/maps/thumbnails/#{File.basename(image_name,
+                                                                                                          ext)}_#{size}#{ext}"
   end
 
   def image_name
     return '' if image_url.blank?
 
     File.basename(CGI.unescape(image_url))
+  end
+
+  def lat
+    latitude.to_f
+  end
+
+  def lng
+    longitude.to_f
   end
 
   private

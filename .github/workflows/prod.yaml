@@ -7,7 +7,6 @@ env:
   PROJECT_ID: qoodish
   ARTIFACT_REGISTRY: asia-northeast1-docker.pkg.dev
   SERVICE_NAME: qoodish-api
-  TARGET_BRANCH: master
 jobs:
   build-image:
     permissions:
@@ -15,36 +14,41 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - id: auth
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
+          token_format: access_token
           workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
           service_account: github-actions@qoodish-common.iam.gserviceaccount.com
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
-      - uses: ruby/setup-ruby@v1
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GAR
+        uses: docker/login-action@v3
         with:
-          ruby-version: 2.7
-          bundler-cache: true
-      - name: Rufo
-        run: |
-          bundle exec rufo --check ./app
-      - run: |
-          gcloud auth configure-docker $ARTIFACT_REGISTRY --quiet
-      - name: Build image
-        run: |
-          docker build \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --cache-from $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:${GITHUB_REF##*/} \
-            -t $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
-            -t $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:${GITHUB_REF##*/} \
-            .
-        env:
-          DOCKER_BUILDKIT: 1
-      - name: Push image
-        run: |
-          docker push -a $ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME
+          registry: ${{ env.ARTIFACT_REGISTRY }}
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}
+          labels: |
+            org.opencontainers.image.revision=${{ env.GITHUB_SHA }}
+          tags: |
+            type=ref,event=tag,prefix=,suffix=
+            type=sha,prefix=,suffix=,format=long
+      - name: Build and push image
+        id: build-and-push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
   deploy-api:
     needs:
       - build-image
@@ -53,20 +57,30 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - id: auth
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
           service_account: github-actions@qoodish-common.iam.gserviceaccount.com
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
       - name: Set release version
         run: |
           echo "RELEASE_VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Set Cloud Run tag name
         run: |
           echo "CLOUD_RUN_TAG=$(echo ${RELEASE_VERSION} | sed -e "s/\./\-/g")" >> $GITHUB_ENV
+      - name: Clear VPC connector
+        env:
+          CLOUD_RUN_SA_NAME: prod-qoodish-api@qoodish-common.iam.gserviceaccount.com
+        run: |
+          gcloud run services update qoodish-api \
+            --clear-vpc-connector \
+            --platform=managed \
+            --region=asia-northeast1 \
+            --service-account=$CLOUD_RUN_SA_NAME \
+            --project=$PROJECT_ID
       - name: Deploy revision
         env:
           CLOUDSDK_CORE_DISABLE_PROMPTS: 1
@@ -75,8 +89,6 @@ jobs:
           DB_HOST: 10.86.64.3
           PUBSUB_TOPIC: rails-api-topic
           GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
-          SUBSTITUTE_URL: https://storage.googleapis.com/qoodish.appspot.com/assets/icon-512-2019-04-06.png
-          OGP_IMAGE_URL: https://storage.googleapis.com/qoodish.appspot.com/assets/ogp-image-2019-04-05.png
           ALLOWED_ENDPOINTS: https://qoodish.com
           CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
           CLOUD_STORAGE_BUCKET_NAME: qoodish.appspot.com
@@ -93,10 +105,12 @@ jobs:
             --service-account=$CLOUD_RUN_SA_NAME \
             --ingress=all \
             --allow-unauthenticated \
+            --execution-environment=gen2 \
             --no-traffic \
             --tag=${{ env.CLOUD_RUN_TAG }} \
             --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
-            --vpc-connector=projects/qoodish/locations/asia-northeast1/connectors/qoodish \
+            --network=default \
+            --subnet=default \
             --vpc-egress=private-ranges-only \
             --set-env-vars "RAILS_ENV=production" \
             --set-env-vars "GOOGLE_CLIENT_EMAIL=$CLOUD_RUN_SA_NAME" \
@@ -104,11 +118,7 @@ jobs:
             --set-env-vars "DB_HOST=$DB_HOST" \
             --set-env-vars "DB_PORT=3306" \
             --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
-            --set-env-vars "RAILS_LOG_TO_STDOUT=true" \
-            --set-env-vars "STACKDRIVER_LOGGING=true" \
             --set-env-vars "GOOGLE_IID_ENDPOINT=$GOOGLE_IID_ENDPOINT" \
-            --set-env-vars "SUBSTITUTE_URL=$SUBSTITUTE_URL" \
-            --set-env-vars "OGP_IMAGE_URL=$OGP_IMAGE_URL" \
             --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
             --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
             --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \
@@ -128,14 +138,24 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - id: auth
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
           service_account: github-actions@qoodish-common.iam.gserviceaccount.com
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Clear VPC connector
+        env:
+          CLOUD_RUN_SA_NAME: prod-qoodish-api@qoodish-common.iam.gserviceaccount.com
+        run: |
+          gcloud run services update qoodish-subscriber \
+            --clear-vpc-connector \
+            --platform=managed \
+            --region=asia-northeast1 \
+            --service-account=$CLOUD_RUN_SA_NAME \
+            --project=$PROJECT_ID
       - name: Deploy revision
         env:
           CLOUDSDK_CORE_DISABLE_PROMPTS: 1
@@ -146,8 +166,6 @@ jobs:
           SUBSCRIBER_ENDPOINT: https://subscriber.qoodish.com
           PUBSUB_SA_EMAIL: pubsub@qoodish.iam.gserviceaccount.com
           GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
-          SUBSTITUTE_URL: https://storage.googleapis.com/qoodish.appspot.com/assets/icon-512-2019-04-06.png
-          OGP_IMAGE_URL: https://storage.googleapis.com/qoodish.appspot.com/assets/ogp-image-2019-04-05.png
           ALLOWED_ENDPOINTS: https://qoodish.com
           CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
           CLOUD_STORAGE_BUCKET_NAME: qoodish.appspot.com
@@ -164,8 +182,10 @@ jobs:
             --service-account=$CLOUD_RUN_SA_NAME \
             --ingress=all \
             --allow-unauthenticated \
+            --execution-environment=gen2 \
             --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
-            --vpc-connector=projects/qoodish/locations/asia-northeast1/connectors/qoodish \
+            --network=default \
+            --subnet=default \
             --vpc-egress=private-ranges-only \
             --set-env-vars "SUBSCRIBER_MODE=true" \
             --set-env-vars "RAILS_ENV=production" \
@@ -176,11 +196,7 @@ jobs:
             --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
             --set-env-vars "SUBSCRIBER_ENDPOINT=$SUBSCRIBER_ENDPOINT" \
             --set-env-vars "PUBSUB_SA_EMAIL=$PUBSUB_SA_EMAIL" \
-            --set-env-vars "RAILS_LOG_TO_STDOUT=true" \
-            --set-env-vars "STACKDRIVER_LOGGING=true" \
             --set-env-vars "GOOGLE_IID_ENDPOINT=$GOOGLE_IID_ENDPOINT" \
-            --set-env-vars "SUBSTITUTE_URL=$SUBSTITUTE_URL" \
-            --set-env-vars "OGP_IMAGE_URL=$OGP_IMAGE_URL" \
             --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
             --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
             --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \

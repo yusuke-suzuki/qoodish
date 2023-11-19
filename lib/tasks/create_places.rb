@@ -22,7 +22,7 @@ class CreatePlaces
         spot.update!(place: place)
 
         puts "Finish processing #{spot.id}"
-      rescue => e
+      rescue StandardError => e
         puts e
         next
       end

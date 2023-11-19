@@ -7,9 +7,7 @@ class PlaceDetail < ApplicationRecord
   validates :locale,
             presence: true
 
-  before_validation :load_place_detail
-
-  enum locale: [:en, :ja]
+  enum locale: %i[en ja]
 
   def load_place_detail
     Rails.logger.debug("[PlaceDetail] Loading place details of #{place_id_val} with locale #{locale}")
@@ -17,7 +15,7 @@ class PlaceDetail < ApplicationRecord
 
     Rails.logger.debug(place_detail)
 
-    self.assign_attributes(
+    assign_attributes(
       name: place_detail[:name],
       latitude: place_detail[:lat],
       longitude: place_detail[:lng],
@@ -29,7 +27,7 @@ class PlaceDetail < ApplicationRecord
     Rails.logger.error("Place not found on google. place_id: #{place_id_val}")
     Rails.logger.error(e)
     self.lost = true
-  rescue => e
+  rescue StandardError => e
     Rails.logger.error(e)
   end
 

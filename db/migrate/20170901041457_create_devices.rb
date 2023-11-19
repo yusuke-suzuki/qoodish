@@ -7,6 +7,6 @@ class CreateDevices < ActiveRecord::Migration[5.1]
       t.timestamps
     end
     add_index :devices, :registration_token
-    add_index :devices, [:user_id, :registration_token], unique: true
+    add_index :devices, %i[user_id registration_token], unique: true
   end
 end

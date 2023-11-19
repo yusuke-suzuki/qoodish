@@ -1,4 +1,4 @@
-FROM ruby:2.7.5
+FROM ruby:3.2
 
 WORKDIR /qoodish
 
@@ -15,4 +15,4 @@ ENTRYPOINT ["entrypoint.sh"]
 
 EXPOSE 8080
 
-CMD rails db:migrate && puma
+CMD puma

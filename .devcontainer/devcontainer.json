@@ -1,0 +1,24 @@
+{
+  "name": "Ruby on Rails & MySQL",
+  "dockerComposeFile": "docker-compose.yaml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [
+    3000
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "Shopify.ruby-lsp",
+        "redhat.vscode-yaml",
+        "hoovercj.vscode-power-mode"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/ruby:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
+}

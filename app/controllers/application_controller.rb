@@ -51,9 +51,7 @@ class ApplicationController < ActionController::API
 
     @current_user = User.find_by(uid: payload['sub'])
 
-    if @current_user.blank?
-      @current_user = User.sign_in_anonymously(payload)
-    end
+    raise Exceptions::Unauthorized if @current_user.blank?
   end
 
   def authenticate_pubsub!
@@ -67,10 +65,6 @@ class ApplicationController < ActionController::API
     payload = verifier.verify_oidc(jwt, aud)
 
     raise Exceptions::Unauthorized unless payload['email'] == ENV['PUBSUB_SA_EMAIL']
-  end
-
-  def require_sign_in!
-    raise Exceptions::SignInRequired if @current_user.is_anonymous
   end
 
   def render_error(ex)

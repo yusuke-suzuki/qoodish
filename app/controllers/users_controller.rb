@@ -1,48 +1,42 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!, only: %i[index show update destroy]
-  before_action :require_sign_in!, only: %i[index update destroy]
-
-  def index
-    @users = []
-    if params[:input].present?
-      @users =
-        User
-          .where.not(id: current_user.id)
-          .search_by_name(params[:input])
-    end
-  end
+  before_action :authenticate_user!, only: %i[show update destroy]
 
   def show
     @user = if params[:id] == current_user.uid
-        current_user
-      else
-        User.find_by!(id: params[:id])
-      end
+              current_user
+            else
+              User.find_by!(id: params[:id])
+            end
   end
 
   def create
     verifier = GoogleAuth.new
-    verifier.verify_jwt(params[:token])
+    jwt = request.headers['Authorization'].split(' ', 2).last
+    payload = verifier.verify_jwt(jwt)
 
-    @user = User.find_by(uid: params[:uid])
-    if @user.blank?
-      @user = User.create!(
-        uid: params[:uid],
-        name: params[:display_name],
-        image_path: params[:image_url]
-      )
-    end
+    @user = User.find_by(uid: payload['sub'])
+    return if @user.present?
+
+    @user = User.create!(
+      uid: payload['sub'],
+      name: payload['name']
+    )
   end
 
   def update
-    current_user.name = params[:display_name] if params[:display_name].present?
-    current_user.image_path = params[:image_url] if params[:image_url].present?
-    current_user.biography = params[:biography]
-    current_user.save!
+    current_user.update!(user_params)
     @user = current_user
   end
 
   def destroy
     current_user.destroy!
+  end
+
+  private
+
+  def user_params
+    params
+      .permit(:name, :biography, :image_path)
+      .to_h
   end
 end

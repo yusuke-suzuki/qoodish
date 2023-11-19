@@ -6,8 +6,7 @@ class PubSub
     'https://www.googleapis.com/auth/pubsub'
   ].freeze
 
-  def initialize
-  end
+  def initialize; end
 
   def publish(action_type, payload)
     Rails.logger.info("[Pub/Sub] Enqueue job: #{action_type} #{payload}")
