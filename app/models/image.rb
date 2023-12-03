@@ -33,8 +33,11 @@ class Image < ApplicationRecord
     File.basename(CGI.unescape(url_was))
   end
 
+  def ext
+    File.extname(url)
+  end
+
   def thumbnail_url(size = '200x200')
-    ext = File.extname(url)
     "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/images/thumbnails/#{File.basename(file_name,
                                                                                                             ext)}_#{size}#{ext}"
   end
