@@ -48,12 +48,6 @@ module Exceptions
     end
   end
 
-  class SignInRequired < Unauthorized
-    def initialize(message = I18n.t('messages.api.sign_in_required'))
-      super(message)
-    end
-  end
-
   class FirebaseAuthError < Unauthorized
     def initialize(message = I18n.t('messages.api.firebase_auth_error'))
       super(message)
@@ -102,24 +96,6 @@ module Exceptions
     end
   end
 
-  class MapNotSpecified < BadRequest
-    def initialize(*)
-      super(I18n.t('messages.api.map_not_specified'))
-    end
-  end
-
-  class PlaceIdNotSpecified < BadRequest
-    def initialize(*)
-      super(I18n.t('messages.api.place_id_not_specified'))
-    end
-  end
-
-  class PlaceNotFound < BadRequest
-    def initialize(*)
-      super(I18n.t('messages.api.place_not_found'))
-    end
-  end
-
   class CommentNotSpecified < BadRequest
     def initialize(*)
       super(I18n.t('messages.api.comment_required'))
@@ -129,12 +105,6 @@ module Exceptions
   class CommentExceeded < BadRequest
     def initialize(*)
       super(I18n.t('messages.api.comment_exceeded'))
-    end
-  end
-
-  class DuplicateReview < Conflict
-    def initialize(*)
-      super(I18n.t('messages.api.duplicate_reviews'))
     end
   end
 

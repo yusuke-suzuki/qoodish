@@ -15,7 +15,6 @@ gem 'bootsnap', require: false
 gem 'google-cloud-pubsub'
 gem 'google-cloud-storage'
 gem 'google_iid_client', git: 'https://github.com/yusuke-suzuki/google_iid_client.git', branch: 'master', ref: '79a6050'
-gem 'http_accept_language'
 gem 'jbuilder'
 gem 'jwt'
 gem 'mysql2', '~> 0.5.3'
