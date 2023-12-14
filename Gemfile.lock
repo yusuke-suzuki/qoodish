@@ -152,8 +152,6 @@ GEM
       google-cloud-errors (~> 1.0)
       grpc-google-iam-v1 (~> 1.1)
     google-protobuf (3.24.3)
-    google_places (2.0.0)
-      httparty (>= 0.13.1)
     googleapis-common-protos (1.4.0)
       google-protobuf (~> 3.14)
       googleapis-common-protos-types (~> 1.2)
@@ -174,9 +172,6 @@ GEM
       googleapis-common-protos (~> 1.4)
       grpc (~> 1.41)
     http_accept_language (2.1.1)
-    httparty (0.21.0)
-      mini_mime (>= 1.0.0)
-      multi_xml (>= 0.5.2)
     httpclient (2.8.3)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
@@ -204,7 +199,6 @@ GEM
     minitest (5.20.0)
     msgpack (1.7.2)
     multi_json (1.15.0)
-    multi_xml (0.6.0)
     mysql2 (0.5.5)
     net-imap (0.3.7)
       date
@@ -345,7 +339,6 @@ DEPENDENCIES
   google-cloud-pubsub
   google-cloud-storage
   google_iid_client!
-  google_places
   http_accept_language
   jbuilder
   jwt

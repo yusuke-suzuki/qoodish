@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_08_143416) do
+ActiveRecord::Schema.define(version: 2023_12_14_051127) do
 
   create_table "comments", charset: "utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -120,28 +120,6 @@ ActiveRecord::Schema.define(version: 2023_11_08_143416) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
-  create_table "place_details", charset: "utf8mb4", force: :cascade do |t|
-    t.string "place_id_val", null: false
-    t.integer "locale", null: false
-    t.text "name"
-    t.text "formatted_address"
-    t.text "url"
-    t.text "opening_hours"
-    t.boolean "lost", default: false, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.decimal "latitude", precision: 16, scale: 6, null: false
-    t.decimal "longitude", precision: 16, scale: 6, null: false
-    t.index ["place_id_val", "locale"], name: "index_place_details_on_place_id_val_and_locale", unique: true
-  end
-
-  create_table "places", charset: "utf8mb4", force: :cascade do |t|
-    t.string "place_id_val", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["place_id_val"], name: "index_places_on_place_id_val", unique: true
-  end
-
   create_table "push_notifications", charset: "utf8mb4", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.boolean "followed", default: false, null: false
@@ -165,15 +143,6 @@ ActiveRecord::Schema.define(version: 2023_11_08_143416) do
     t.text "name", null: false
     t.index ["map_id"], name: "index_reviews_on_map_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"
-  end
-
-  create_table "spots", charset: "utf8mb4", force: :cascade do |t|
-    t.bigint "map_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.bigint "place_id", null: false
-    t.index ["map_id"], name: "index_spots_on_map_id"
-    t.index ["place_id", "map_id"], name: "index_spots_on_place_id_and_map_id", unique: true
   end
 
   create_table "users", charset: "utf8mb4", force: :cascade do |t|
@@ -209,5 +178,4 @@ ActiveRecord::Schema.define(version: 2023_11_08_143416) do
   add_foreign_key "push_notifications", "users"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"
-  add_foreign_key "spots", "places"
 end
