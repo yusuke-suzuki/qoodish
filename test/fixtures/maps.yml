@@ -42,3 +42,12 @@ public_two:
   invitable: false
   latitude: 35.681382
   longitude: 139.766084
+
+public_unfollowing:
+  user: you
+  name: Public map
+  description: This is a public map.
+  private: false
+  invitable: false
+  latitude: 35.681382
+  longitude: 139.766084

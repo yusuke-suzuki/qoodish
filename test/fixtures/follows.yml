@@ -33,3 +33,9 @@ private_following:
   followable: private_following
   follower_type: User
   follower: me
+
+public_unfollowing:
+  followable_type: Map
+  followable: public_unfollowing
+  follower_type: User
+  follower: you
