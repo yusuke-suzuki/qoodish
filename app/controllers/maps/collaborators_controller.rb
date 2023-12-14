@@ -3,8 +3,8 @@ module Maps
     before_action :authenticate_user!
 
     def index
-      @map = current_user.referenceable_maps.find_by!(id: params[:map_id])
-      @collaborators = @map.followers
+      @map = current_user.referenceable_maps.find_by(id: params[:map_id])
+      @collaborators = @map ? @map.followers : []
     end
   end
 end

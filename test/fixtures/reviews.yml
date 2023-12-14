@@ -38,6 +38,22 @@ private_unfollowing_you:
   latitude: 35.681382
   longitude: 139.766084
 
+public_unfollowing:
+  user: me
+  map: public_unfollowing
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+public_unfollowing_you:
+  user: you
+  map: public_unfollowing
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
 public_one:
   user: me
   map: public_one
