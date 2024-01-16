@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::API
-  before_action :set_locale
+  around_action :switch_locale
   helper_method :current_user, :authenticate_user!
 
   if Rails.env.production?
@@ -32,10 +32,17 @@ class ApplicationController < ActionController::API
     render plain: 'ok'
   end
 
+  def switch_locale(&action)
+    locale = extract_locale_from_accept_language_header || I18n.default_locale
+    I18n.with_locale(locale, &action)
+  end
+
   private
 
-  def set_locale
-    I18n.locale = http_accept_language.compatible_language_from(I18n.available_locales)
+  def extract_locale_from_accept_language_header
+    return nil if request.env['HTTP_ACCEPT_LANGUAGE'].blank?
+
+    request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
   end
 
   attr_reader :current_user
