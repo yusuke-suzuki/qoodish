@@ -168,6 +168,7 @@ jobs:
             --region=asia-northeast1 \
             --project=$PROJECT_ID \
             --cpu=1000m \
+            --cpu-boost \
             --memory=512Mi \
             --max-instances=1 \
             --port=8080 \
@@ -234,6 +235,7 @@ jobs:
             --region=asia-northeast1 \
             --project=$PROJECT_ID \
             --cpu=1000m \
+            --cpu-boost \
             --memory=512Mi \
             --max-instances=1 \
             --port=8080 \
