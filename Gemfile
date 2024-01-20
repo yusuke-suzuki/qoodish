@@ -12,9 +12,7 @@ gem 'rails', '~> 6.1.7'
 # gem 'bcrypt', '~> 3.1.7'
 
 gem 'bootsnap', require: false
-gem 'google-cloud-pubsub'
 gem 'google-cloud-storage'
-gem 'google_iid_client', git: 'https://github.com/yusuke-suzuki/google_iid_client.git', branch: 'master', ref: '79a6050'
 gem 'jbuilder'
 gem 'jwt'
 gem 'mysql2', '~> 0.5.3'

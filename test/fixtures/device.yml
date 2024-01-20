@@ -1,0 +1,7 @@
+notifier:
+  user: me
+  registration_token: myregistrationtoken
+
+recipient:
+  user: you
+  registration_token: yourregistrationtoken

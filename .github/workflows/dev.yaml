@@ -98,8 +98,6 @@ jobs:
           CLOUD_RUN_SA_NAME: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
           GOOGLE_CLIENT_ID: 110803867052316843263
           DB_HOST: 10.78.96.3
-          PUBSUB_TOPIC: rails-api-topic
-          GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
           ALLOWED_ENDPOINTS: https://dev.qoodish.com@http://127.0.0.1:5000
           CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
           CLOUD_STORAGE_BUCKET_NAME: qoodish-dev.appspot.com
@@ -121,14 +119,11 @@ jobs:
             --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
             --set-env-vars "DB_HOST=$DB_HOST" \
             --set-env-vars "DB_PORT=3306" \
-            --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
-            --set-env-vars "GOOGLE_IID_ENDPOINT=$GOOGLE_IID_ENDPOINT" \
             --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
             --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
             --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \
             --set-env-vars "GOOGLE_PROJECT_ID=$PROJECT_ID" \
             --set-env-vars "GOOGLE_ACCOUNT_TYPE=$GOOGLE_ACCOUNT_TYPE" \
-            --set-secrets "FCM_SERVER_KEY=QOODISH_API_FCM_SERVER_KEY:latest" \
             --set-secrets "GOOGLE_API_KEY_SERVER=QOODISH_API_GOOGLE_API_KEY:latest" \
             --set-secrets "RAILS_MASTER_KEY=QOODISH_API_RAILS_MASTER_KEY:latest" \
             --set-secrets "GOOGLE_PRIVATE_KEY=QOODISH_API_GOOGLE_PRIVATE_KEY:latest" \
@@ -156,8 +151,6 @@ jobs:
           CLOUD_RUN_SA_NAME: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
           GOOGLE_CLIENT_ID: 110803867052316843263
           DB_HOST: 10.78.96.3
-          PUBSUB_TOPIC: rails-api-topic
-          GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
           ALLOWED_ENDPOINTS: https://dev.qoodish.com@http://127.0.0.1:5000
           CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
           CLOUD_STORAGE_BUCKET_NAME: qoodish-dev.appspot.com
@@ -186,84 +179,11 @@ jobs:
             --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
             --set-env-vars "DB_HOST=$DB_HOST" \
             --set-env-vars "DB_PORT=3306" \
-            --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
-            --set-env-vars "GOOGLE_IID_ENDPOINT=$GOOGLE_IID_ENDPOINT" \
             --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
             --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
             --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \
             --set-env-vars "GOOGLE_PROJECT_ID=$PROJECT_ID" \
             --set-env-vars "GOOGLE_ACCOUNT_TYPE=$GOOGLE_ACCOUNT_TYPE" \
-            --set-secrets "FCM_SERVER_KEY=QOODISH_API_FCM_SERVER_KEY:latest" \
-            --set-secrets "GOOGLE_API_KEY_SERVER=QOODISH_API_GOOGLE_API_KEY:latest" \
-            --set-secrets "RAILS_MASTER_KEY=QOODISH_API_RAILS_MASTER_KEY:latest" \
-            --set-secrets "GOOGLE_PRIVATE_KEY=QOODISH_API_GOOGLE_PRIVATE_KEY:latest" \
-            --set-secrets "DB_PASSWORD=QOODISH_API_DB_PASSWORD:latest" \
-            --set-secrets "DB_USER=QOODISH_API_DB_USER:latest"
-  deploy-subscriber:
-    needs:
-      - build-image
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - id: auth
-        uses: google-github-actions/auth@v1
-        with:
-          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
-          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-      - name: Deploy revision
-        env:
-          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
-          CLOUD_RUN_SA_NAME: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
-          GOOGLE_CLIENT_ID: 110803867052316843263
-          DB_HOST: 10.78.96.3
-          PUBSUB_TOPIC: rails-api-topic
-          SUBSCRIBER_ENDPOINT: https://subscriber-dev.qoodish.com
-          PUBSUB_SA_EMAIL: pubsub@qoodish-dev.iam.gserviceaccount.com
-          GOOGLE_IID_ENDPOINT: https://iid.googleapis.com
-          ALLOWED_ENDPOINTS: https://dev.qoodish.com
-          CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
-          CLOUD_STORAGE_BUCKET_NAME: qoodish-dev.appspot.com
-          GOOGLE_ACCOUNT_TYPE: service_account
-        run: |
-          gcloud beta run deploy qoodish-subscriber \
-            --platform=managed \
-            --region=asia-northeast1 \
-            --project=$PROJECT_ID \
-            --cpu=1000m \
-            --cpu-boost \
-            --memory=512Mi \
-            --max-instances=1 \
-            --port=8080 \
-            --service-account=$CLOUD_RUN_SA_NAME \
-            --ingress=all \
-            --allow-unauthenticated \
-            --execution-environment=gen2 \
-            --tag=$BRANCH_NAME \
-            --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
-            --network=default \
-            --subnet=default \
-            --vpc-egress=private-ranges-only \
-            --set-env-vars "SUBSCRIBER_MODE=true" \
-            --set-env-vars "RAILS_ENV=production" \
-            --set-env-vars "GOOGLE_CLIENT_EMAIL=$CLOUD_RUN_SA_NAME" \
-            --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
-            --set-env-vars "DB_HOST=$DB_HOST" \
-            --set-env-vars "DB_PORT=3306" \
-            --set-env-vars "PUBSUB_TOPIC=$PUBSUB_TOPIC" \
-            --set-env-vars "SUBSCRIBER_ENDPOINT=$SUBSCRIBER_ENDPOINT" \
-            --set-env-vars "PUBSUB_SA_EMAIL=$PUBSUB_SA_EMAIL" \
-            --set-env-vars "GOOGLE_IID_ENDPOINT=$GOOGLE_IID_ENDPOINT" \
-            --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
-            --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
-            --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \
-            --set-env-vars "GOOGLE_PROJECT_ID=$PROJECT_ID" \
-            --set-env-vars "GOOGLE_ACCOUNT_TYPE=$GOOGLE_ACCOUNT_TYPE" \
-            --set-secrets "FCM_SERVER_KEY=QOODISH_API_FCM_SERVER_KEY:latest" \
             --set-secrets "GOOGLE_API_KEY_SERVER=QOODISH_API_GOOGLE_API_KEY:latest" \
             --set-secrets "RAILS_MASTER_KEY=QOODISH_API_RAILS_MASTER_KEY:latest" \
             --set-secrets "GOOGLE_PRIVATE_KEY=QOODISH_API_GOOGLE_PRIVATE_KEY:latest" \

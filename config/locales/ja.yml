@@ -9,7 +9,7 @@ ja:
       error_500: サーバー内部エラーが発生しました。
 
       firebase_auth_error: 認証エラーが発生しました。
-      pubsub_auth_error: 認証エラーが発生しました。
+      oidc_auth_error: 認証エラーが発生しました。
       duplicate_map_name: 既に存在するマップ名です。
       map_name_required: マップ名を入力してください。
       map_name_exceed: "マップ名が長すぎます。(最大: 30 文字)"

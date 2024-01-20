@@ -40,7 +40,7 @@ en:
       error_500: The request has failed due to some unknown error.
 
       firebase_auth_error: Firebase authentication failed.
-      pubsub_auth_error: Pub/Sub authentication failed.
+      oidc_auth_error: Invalid OIDC token.
       duplicate_map_name: Map name is duplicated.
       map_name_required: Map name is required.
       map_name_exceed: "Map name is too long. (Max: 30)"

@@ -13,7 +13,7 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     assert_equal res['id'], maps(:public_one).id
   end
 
-  test 'request to single unfolloeing private map should raise not found error' do
+  test 'request to single unfollowing private map should raise not found error' do
     stub_google_auth(users(:me)) do
       get "/maps/#{maps(:private_unfollowing).id}", headers: { 'Authorization': 'Bearer dummytoken' }
     end
