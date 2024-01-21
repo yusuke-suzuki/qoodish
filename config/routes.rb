@@ -1,9 +1,4 @@
 Rails.application.routes.draw do
-  if ENV['SUBSCRIBER_MODE']
-    resources :messages, only: [:create]
-    return
-  end
-
   resources :users, only: %i[show create update destroy] do
     scope module: :users do
       resources :maps, only: [:index]

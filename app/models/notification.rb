@@ -4,7 +4,6 @@ class Notification < ApplicationRecord
   belongs_to :recipient, polymorphic: true
 
   KEYS = %w[followed invited liked comment].freeze
-  FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
             inclusion: {
@@ -23,7 +22,7 @@ class Notification < ApplicationRecord
               in: KEYS
             }
 
-  after_create_commit :web_push
+  after_create_commit :bloadcast_web_push_later
 
   scope :recent, lambda {
     order(created_at: :desc)
@@ -54,53 +53,67 @@ class Notification < ApplicationRecord
     end
   end
 
-  def web_push
-    return unless allowed_web_push?
+  def bloadcast_web_push
+    google_auth = GoogleAuth.new
+    access_token = google_auth.fetch_access_token(GoogleAuth::FCM_SCOPE)
 
-    begin
+    headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': "Bearer #{access_token}"
+    }
+
+    data = {
+      icon: notifier.thumbnail_url,
+      click_action: "#{ENV['WEB_ENDPOINT']}#{click_action}",
+      notification_id: id.to_s,
+      key: key,
+      notifier_id: notifier_id.to_s,
+      notifier_name: notifier.name,
+      notifiable_id: notifiable_id.to_s,
+      notifiable_type: notifiable_type.downcase
+    }
+
+    recipient.devices.each do |device|
+      body = {
+        validate_only: Rails.env.test?,
+        message: {
+          token: device.registration_token,
+          data: data
+        }
+      }
+
       response = Faraday.post(
         "https://fcm.googleapis.com/v1/projects/#{ENV['GOOGLE_PROJECT_ID']}/messages:send",
-        {
-          message: {
-            topic: "user_#{recipient.id}",
-            data: {
-              icon: notifier.thumbnail_url,
-              click_action: "#{ENV['WEB_ENDPOINT']}#{click_action}",
-              notification_id: id.to_s,
-              key: key,
-              notifier_id: notifier_id.to_s,
-              notifier_name: notifier.name,
-              notifiable_id: notifiable_id.to_s,
-              notifiable_type: notifiable_type.downcase
-            }
-          }
-        }.to_json,
-        {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': "Bearer #{authenticate_firebase_admin}"
-        }
+        body.to_json,
+        headers
       )
 
       Rails.logger.info(response.body)
+
+      if response.status == 404 || response.status == 400
+        device.destroy!
+
+        Rails.logger.info("Device #{device.id} is destroyed because it is not found or unregistered.")
+      end
     rescue StandardError => e
       Rails.logger.error("Exception when calling web_push: #{e}")
     end
   end
 
-  def authenticate_firebase_admin
-    authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-      scope: FCM_SCOPE
-    )
-    token = authorizer.fetch_access_token!
-    token['access_token']
-  end
-
   def allowed_web_push?
     if recipient.push_notification.blank?
-      true
+      false
     else
       recipient.push_notification[key]
     end
+  end
+
+  private
+
+  def bloadcast_web_push_later
+    return unless allowed_web_push?
+
+    BloadcastWebPushJob.perform_later(self)
   end
 end

@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::API
-  around_action :switch_locale
+  before_action :set_locale
   helper_method :current_user, :authenticate_user!
 
   if Rails.env.production?
@@ -32,9 +32,10 @@ class ApplicationController < ActionController::API
     render plain: 'ok'
   end
 
-  def switch_locale(&action)
+  def set_locale
     locale = extract_locale_from_accept_language_header || I18n.default_locale
-    I18n.with_locale(locale, &action)
+    Rails.logger.info("Switch locale to #{locale}")
+    I18n.locale = locale
   end
 
   private
@@ -59,19 +60,6 @@ class ApplicationController < ActionController::API
     @current_user = User.find_by(uid: payload['sub'])
 
     raise Exceptions::Unauthorized if @current_user.blank?
-  end
-
-  def authenticate_pubsub!
-    raise Exceptions::Unauthorized if request.headers['Authorization'].blank?
-
-    verifier = GoogleAuth.new
-
-    jwt = request.headers['Authorization'].split(' ', 2).last
-    aud = ENV['SUBSCRIBER_ENDPOINT']
-
-    payload = verifier.verify_oidc(jwt, aud)
-
-    raise Exceptions::Unauthorized unless payload['email'] == ENV['PUBSUB_SA_EMAIL']
   end
 
   def render_error(ex)

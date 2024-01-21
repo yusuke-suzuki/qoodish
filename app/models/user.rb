@@ -117,58 +117,6 @@ class User < ApplicationRecord
     votable.voters.any? { |voter| voter.id == id }
   end
 
-  def subscribe_topic(topic)
-    registration_tokens = devices.pluck(:registration_token)
-    if registration_tokens.blank?
-      Rails.logger.info('User does not have registration tokens for subscribe topic.')
-      return
-    end
-
-    GoogleIidClient.configure do |config|
-      config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
-      config.debugging = Rails.env.development?
-    end
-
-    api_instance = GoogleIidClient::RelationshipMapsApi.new
-    inline_object = GoogleIidClient::InlineObject.new(
-      to: "/topics/#{topic}",
-      registration_tokens: registration_tokens
-    )
-
-    begin
-      result = api_instance.iid_v1batch_add_post(inline_object)
-      Rails.logger.info(result)
-    rescue StandardError => e
-      Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_add_post: #{e}")
-    end
-  end
-
-  def unsubscribe_topic(topic)
-    registration_tokens = devices.pluck(:registration_token)
-    if registration_tokens.blank?
-      Rails.logger.info('User does not have registration tokens for unsubscribe topic.')
-      return
-    end
-
-    GoogleIidClient.configure do |config|
-      config.api_key['Authorization'] = "key=#{ENV['FCM_SERVER_KEY']}"
-      config.debugging = Rails.env.development?
-    end
-
-    api_instance = GoogleIidClient::RelationshipMapsApi.new
-    inline_object1 = GoogleIidClient::InlineObject1.new(
-      to: "/topics/#{topic}",
-      registration_tokens: registration_tokens
-    )
-
-    begin
-      result = api_instance.iid_v1batch_remove_post(inline_object1)
-      Rails.logger.info(result)
-    rescue StandardError => e
-      Rails.logger.error("Exception when calling RelationshipMapsApi->iid_v1batch_remove_post: #{e}")
-    end
-  end
-
   def create_default_map
     maps.create!(
       name: "#{name}'s map",

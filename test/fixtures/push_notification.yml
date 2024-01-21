@@ -1,0 +1,11 @@
+notifier:
+  user: me
+  followed: true
+  liked: true
+  comment: true
+
+recipient:
+  user: you
+  followed: true
+  liked: true
+  comment: true
