@@ -11,7 +11,54 @@ env:
   SERVICE_NAME: qoodish-api
   BRANCH_NAME: ${{ github.head_ref }}
 jobs:
-  build-image:
+  test:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Decrypt secrets
+        run: |
+          gcloud secrets versions access latest \
+            --secret=QOODISH_API_DOTENV \
+            --project=$PROJECT_ID \
+            --out-file=.env
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+          bundler-cache: true
+      - name: Rails test
+        env:
+          DB_USER: root
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+        run: |
+          bundle exec rails db:setup
+          bundle exec rails test
+  build-and-push-image:
+    needs: test
     permissions:
       contents: read
       id-token: write
@@ -50,23 +97,7 @@ jobs:
           tags: |
             type=ref,event=pr,prefix=pr-,suffix=
             type=sha,prefix=,suffix=,format=long
-      - name: Build image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: Rails test
-        run: |
-          docker compose up -d
-          sleep 10
-          docker compose run app bundle exec rails db:setup
-          docker compose run app bundle exec rails test -b -v
-      - name: Push image
+      - name: Build and push image
         id: push
         uses: docker/build-push-action@v5
         with:
@@ -78,7 +109,7 @@ jobs:
           cache-to: type=gha,mode=max
   deploy-runner:
     needs:
-      - build-image
+      - build-and-push-image
     permissions:
       contents: read
       id-token: write
@@ -131,7 +162,7 @@ jobs:
             --set-secrets "DB_USER=QOODISH_API_DB_USER:latest"
   deploy-api:
     needs:
-      - build-image
+      - build-and-push-image
     permissions:
       contents: read
       id-token: write

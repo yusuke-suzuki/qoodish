@@ -8,7 +8,7 @@ env:
   ARTIFACT_REGISTRY: asia-northeast1-docker.pkg.dev
   SERVICE_NAME: qoodish-api
 jobs:
-  build-image:
+  build-and-push-image:
     permissions:
       contents: read
       id-token: write
@@ -51,7 +51,7 @@ jobs:
           cache-to: type=gha,mode=max
   deploy-runner:
     needs:
-      - build-image
+      - build-and-push-image
     permissions:
       contents: read
       id-token: write
@@ -105,7 +105,7 @@ jobs:
             --set-secrets "DB_USER=QOODISH_API_DB_USER:latest"
   deploy-api:
     needs:
-      - build-image
+      - build-and-push-image
     permissions:
       contents: read
       id-token: write
