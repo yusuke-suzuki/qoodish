@@ -1,23 +1,19 @@
-version: "3"
 services:
   app:
-    build: .
+    image: ghcr.io/rails/devcontainer/images/ruby:3.3.0
     volumes:
-      - .:/qoodish
+      - ../..:/workspaces:cached
     command: sleep infinity
-    network_mode: service:db
-    env_file: .env
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-  db:
-    image: mysql:5.7
+    network_mode: service:mysql
+  mysql:
+    image: mysql/mysql-server:5.7
     restart: unless-stopped
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./create-db-user.sql:/docker-entrypoint-initdb.d/create-db-user.sql
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+      MYSQL_ROOT_HOST: "%"
     command:
       - --skip-character-set-client-handshake
       - --character-set-server=utf8mb4
