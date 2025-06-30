@@ -89,15 +89,11 @@ class Notification < ApplicationRecord
         headers
       )
 
-      Rails.logger.info(response.body)
+      next unless [404, 400].include?(response.status)
 
-      if response.status == 404 || response.status == 400
-        device.destroy!
+      device.destroy!
 
-        Rails.logger.info("Device #{device.id} is destroyed because it is not found or unregistered.")
-      end
-    rescue StandardError => e
-      Rails.logger.error("Exception when calling web_push: #{e}")
+      Rails.logger.info("Device #{device.id} is destroyed because it is not found or unregistered.")
     end
   end
 

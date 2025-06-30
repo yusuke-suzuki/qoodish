@@ -1,28 +1,10 @@
 class ApplicationController < ActionController::API
-  before_action :set_locale
   helper_method :current_user, :authenticate_user!
 
-  if Rails.env.production?
-    rescue_from Exception do |ex|
-      logger.fatal("#{ex.class}: #{ex.message}")
-      render_error(Exceptions::InternalServerError.new)
-    end
-  end
-
-  rescue_from Exceptions::ApplicationError do |ex|
-    logger.error("#{ex.class}: #{ex.message}")
-    render_error(ex)
-  end
-
-  rescue_from ActiveRecord::RecordNotFound do |ex|
-    logger.error("#{ex.class}: #{ex.message}")
-    render_error(Exceptions::NotFound.new)
-  end
-
-  rescue_from ActiveRecord::RecordInvalid do |ex|
-    logger.error("#{ex.class}: #{ex.message}")
-    render_error(Exceptions::BadRequest.new)
-  end
+  rescue_from Exceptions::ApplicationError, with: :handle_application_error
+  rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
+  rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
+  rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
 
   def routing_error
     raise Exceptions::NotFound, "No route matches [#{request.request_method}] '#{request.path}'"
@@ -32,34 +14,35 @@ class ApplicationController < ActionController::API
     render plain: 'ok'
   end
 
-  def set_locale
-    locale = extract_locale_from_accept_language_header || I18n.default_locale
-    Rails.logger.info("Switch locale to #{locale}")
-    I18n.locale = locale
-  end
-
   private
 
-  def extract_locale_from_accept_language_header
-    return nil if request.env['HTTP_ACCEPT_LANGUAGE'].blank?
-
-    request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
+  def handle_application_error(exception)
+    severity = exception.status >= 500 ? :fatal : :error
+    Rails.logger.send(severity, exception)
+    render_error(exception)
   end
 
-  attr_reader :current_user
+  def handle_record_not_found(exception)
+    Rails.logger.warn(exception)
+    render_error(Exceptions::NotFound.new)
+  end
+
+  def handle_parameter_missing(exception)
+    Rails.logger.warn(exception)
+    render_error(Exceptions::BadRequest.new(exception.message))
+  end
+
+  def handle_record_invalid(exception)
+    Rails.logger.warn(exception)
+    render_error(Exceptions::UnprocessableContent.new(exception.message))
+  end
+
+  def current_user
+    RequestContext.user
+  end
 
   def authenticate_user!
-    raise Exceptions::Unauthorized if request.headers['Authorization'].blank?
-
-    verifier = GoogleAuth.new
-
-    jwt = request.headers['Authorization'].split(' ', 2).last
-
-    payload = verifier.verify_jwt(jwt)
-
-    @current_user = User.find_by(uid: payload['sub'])
-
-    raise Exceptions::Unauthorized if @current_user.blank?
+    raise Exceptions::Unauthorized if current_user.blank?
   end
 
   def render_error(ex)
