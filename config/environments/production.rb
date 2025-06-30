@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require 'active_support/core_ext/integer/time'
+require Rails.root.join('lib', 'google_cloud_log_formatter')
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -39,13 +42,18 @@ Rails.application.configure do
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
-  # Log to STDOUT by default
-  config.logger = ActiveSupport::Logger.new(STDOUT)
-                                       .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
-                                       .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+  # Log to STDOUT by default with Google Cloud Logging optimized formatter
+  config.logger = ActiveSupport::Logger.new($stdout)
+                                       .tap  { |logger| logger.formatter = GoogleCloudLogFormatter.new }
 
   # Prepend all log lines with the following tags.
-  config.log_tags = [:request_id]
+  # config.log_tags = [:request_id]
+
+  # Enable Rails instrumentation logging for detailed performance monitoring
+  config.after_initialize do
+    require Rails.root.join('lib', 'rails_instrumentation_logger')
+    RailsInstrumentationLogger.setup!
+  end
 
   # "info" includes generic and useful information about system operation, but avoids logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII). If you
