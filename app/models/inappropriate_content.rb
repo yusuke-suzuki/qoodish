@@ -1,18 +1,10 @@
 class InappropriateContent < ApplicationRecord
   validates :user_id,
-            presence: {
-              strict: Exceptions::BadRequest
-            }
+            presence: true
   validates :content_id_val,
-            presence: {
-              strict: Exceptions::BadRequest
-            }
+            presence: true
   validates :content_type,
-            presence: {
-              strict: Exceptions::BadRequest
-            }
+            presence: true
   validates :reason_id_val,
-            presence: {
-              strict: Exceptions::BadRequest
-            }
+            presence: true
 end
