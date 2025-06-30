@@ -1,50 +1,56 @@
-module Exceptions
-  class CommonError < ActiveModel::StrictValidationFailed
-    attr_reader :status, :title
-  end
+# frozen_string_literal: true
 
-  class ApplicationError < CommonError
+module Exceptions
+  class ApplicationError < StandardError
+    attr_reader :status, :code, :message
+
+    def initialize(status = 500, message = 'An error occurred')
+      super()
+      @status = status
+      @code = ActiveSupport::Inflector.demodulize(self)
+      @message = message
+    end
   end
 
   class BadRequest < ApplicationError
     def initialize(message = I18n.t('messages.api.error_400'))
-      super(message)
-      @status = 400
+      super(400, message)
     end
   end
 
   class Unauthorized < ApplicationError
     def initialize(message = I18n.t('messages.api.error_401'))
-      super(message)
-      @status = 401
+      super(401, message)
     end
   end
 
   class Forbidden < ApplicationError
     def initialize(message = I18n.t('messages.api.error_403'))
-      super(message)
-      @status = 403
+      super(403, message)
     end
   end
 
   class NotFound < ApplicationError
     def initialize(message = I18n.t('messages.api.error_404'))
-      super(message)
-      @status = 404
+      super(404, message)
     end
   end
 
   class Conflict < ApplicationError
     def initialize(message = I18n.t('messages.api.error_409'))
-      super(message)
-      @status = 409
+      super(409, message)
     end
   end
 
-  class InternalServerError < CommonError
+  class UnprocessableContent < ApplicationError
+    def initialize(message = I18n.t('messages.api.error_422'))
+      super(422, message)
+    end
+  end
+
+  class InternalServerError < ApplicationError
     def initialize(message = I18n.t('messages.api.error_500'))
-      super(message)
-      @status = 500
+      super(500, message)
     end
   end
 
