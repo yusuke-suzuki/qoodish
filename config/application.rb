@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'boot'
 
 require 'rails'
@@ -18,6 +20,10 @@ require 'rails/test_unit/railtie'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Require custom middleware
+require_relative '../lib/trace_context_middleware'
+require_relative '../lib/request_context_middleware'
+
 module Qoodish
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -35,6 +41,12 @@ module Qoodish
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Trace context middleware for Google Cloud Logging
+    config.middleware.use TraceContextMiddleware
+
+    # Request context middleware for Google Cloud Logging
+    config.middleware.use RequestContextMiddleware
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.

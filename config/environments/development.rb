@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 require 'active_support/core_ext/integer/time'
+require 'google_cloud_log_formatter'
+require 'rails_instrumentation_logger'
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -16,6 +20,20 @@ Rails.application.configure do
 
   # Enable server timing.
   config.server_timing = true
+
+  # Structured logging setup for development (optional)
+  if ENV['USE_STRUCTURED_LOGGING'] == 'true'
+    config.middleware.delete Rails::Rack::Logger
+
+    config.colorize_logging = false
+
+    config.logger = ActiveSupport::Logger.new($stdout)
+                                         .tap do |logger|
+      logger.formatter = GoogleCloudLogFormatter.new
+    end
+
+    RailsInstrumentationLogger.setup!
+  end
 
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
