@@ -17,6 +17,20 @@ Rails.application.configure do
   # Enable server timing.
   config.server_timing = true
 
+  # Structured logging setup for development (optional)
+  if ENV['USE_STRUCTURED_LOGGING'] == 'true'
+    require Rails.root.join('lib', 'google_cloud_log_formatter')
+
+    config.logger = ActiveSupport::Logger.new($stdout)
+                                         .tap { |logger| logger.formatter = GoogleCloudLogFormatter.new }
+
+    # Enable Rails instrumentation logging for development debugging
+    config.after_initialize do
+      require Rails.root.join('lib', 'rails_instrumentation_logger')
+      RailsInstrumentationLogger.setup!
+    end
+  end
+
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join('tmp/caching-dev.txt').exist?

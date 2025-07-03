@@ -1,26 +1,26 @@
 class ApplicationController < ActionController::API
-  before_action :set_locale
+  before_action :set_locale, :set_user_context
   helper_method :current_user, :authenticate_user!
 
   if Rails.env.production?
     rescue_from Exception do |ex|
-      logger.fatal("#{ex.class}: #{ex.message}")
+      Rails.logger.fatal(ex)
       render_error(Exceptions::InternalServerError.new)
     end
   end
 
   rescue_from Exceptions::ApplicationError do |ex|
-    logger.error("#{ex.class}: #{ex.message}")
+    Rails.logger.error(ex)
     render_error(ex)
   end
 
   rescue_from ActiveRecord::RecordNotFound do |ex|
-    logger.error("#{ex.class}: #{ex.message}")
+    Rails.logger.error(ex)
     render_error(Exceptions::NotFound.new)
   end
 
   rescue_from ActiveRecord::RecordInvalid do |ex|
-    logger.error("#{ex.class}: #{ex.message}")
+    Rails.logger.error(ex)
     render_error(Exceptions::BadRequest.new)
   end
 
@@ -36,6 +36,15 @@ class ApplicationController < ActionController::API
     locale = extract_locale_from_accept_language_header || I18n.default_locale
     Rails.logger.info("Switch locale to #{locale}")
     I18n.locale = locale
+  end
+
+  def set_user_context
+    # 認証が必要なアクションでない場合や、認証前に実行される場合は無視
+    return unless respond_to?(:current_user, true)
+
+    # current_user が設定される前に実行される可能性があるため、安全に取得
+    user = instance_variable_get(:@current_user)
+    Thread.current[:user_id] = user&.id
   end
 
   private
