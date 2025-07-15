@@ -37,10 +37,9 @@ en:
       error_403: Operation not allowed.
       error_404: Resource not found.
       error_409: A conflict has occurred for the requested resource.
+      error_422: The request is invalid or malformed.
       error_500: The request has failed due to some unknown error.
 
-      firebase_auth_error: Firebase authentication failed.
-      oidc_auth_error: Invalid OIDC token.
       duplicate_map_name: Map name is duplicated.
       map_name_required: Map name is required.
       map_name_exceed: "Map name is too long. (Max: 30)"
@@ -51,6 +50,7 @@ en:
       comment_required: Comment is required.
       comment_exceeded: "Comment is too long. (Max: 500)"
       invalid_uri: Invalid URI.
+      images_per_report_reached_limit: "The limit of images per report has been reached."
 
       map_owner_cannot_removed: Map owner cannot be removed.
 

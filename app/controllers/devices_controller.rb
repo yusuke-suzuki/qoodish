@@ -12,7 +12,5 @@ class DevicesController < ApplicationController
     return if device.blank?
 
     device.destroy!
-
-    Rails.logger.debug("Deleted registration token: #{params[:id]} uid: #{current_user.uid}")
   end
 end
