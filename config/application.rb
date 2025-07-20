@@ -21,7 +21,6 @@ require 'rails/test_unit/railtie'
 Bundler.require(*Rails.groups)
 
 # Require custom middleware
-require_relative '../lib/trace_context_middleware'
 require_relative '../lib/request_context_middleware'
 
 module Qoodish
@@ -41,9 +40,6 @@ module Qoodish
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-
-    # Trace context middleware for Google Cloud Logging
-    config.middleware.use TraceContextMiddleware
 
     # Request context middleware for Google Cloud Logging
     config.middleware.use RequestContextMiddleware

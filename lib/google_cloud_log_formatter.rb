@@ -132,13 +132,16 @@ class GoogleCloudLogFormatter < Logger::Formatter
       }
     end
 
-    trace_context = RequestContext.trace_context
+    current_span_context = OpenTelemetry::Trace.current_span.context
 
-    if trace_context && ENV['GOOGLE_PROJECT_ID']
-      trace_id, span_id = trace_context.split(';').first.split('/')
-      result['logging.googleapis.com/trace'] = "projects/#{ENV['GOOGLE_PROJECT_ID']}/traces/#{trace_id}"
+    if current_span_context.valid?
+      trace_id = current_span_context.hex_trace_id
+      span_id = current_span_context.hex_span_id
+      sampled = current_span_context.trace_flags.sampled?
+
       result['logging.googleapis.com/spanId'] = span_id
-      result['logging.googleapis.com/trace_sampled'] = true
+      result['logging.googleapis.com/trace'] = "projects/#{ENV['GOOGLE_PROJECT_ID']}/traces/#{trace_id}"
+      result['logging.googleapis.com/trace_sampled'] = sampled
     end
 
     request_id = RequestContext.request_id
