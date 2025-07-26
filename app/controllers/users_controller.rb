@@ -10,12 +10,13 @@ class UsersController < ApplicationController
   end
 
   def create
-    verifier = GoogleAuth.new
-    jwt = request.headers['Authorization'].split(' ', 2).last
-    payload = verifier.verify_jwt(jwt)
+    if current_user
+      @user = current_user
+      return
+    end
 
-    @user = User.find_by(uid: payload['sub'])
-    return if @user.present?
+    payload = RequestContext.jwt_payload
+    raise Exceptions::Unauthorized if payload.blank?
 
     @user = User.create!(
       uid: payload['sub'],

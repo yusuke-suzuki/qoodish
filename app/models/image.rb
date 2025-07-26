@@ -9,14 +9,10 @@ class Image < ApplicationRecord
             format: {
               allow_blank: false,
               with: /\A#{URI::DEFAULT_PARSER.make_regexp(%w[http https])}\z/,
-              scrict: Exceptions::InvalidUri
+              message: I18n.t('messages.api.invalid_url')
             }
 
-  validate :validate_image_count
-
   before_destroy :delete_object
-
-  MAX_IMAGE_COUNT_PER_REVIEW = 4
 
   STORAGE_SCOPES = [
     'https://www.googleapis.com/auth/cloud-platform',
@@ -44,17 +40,11 @@ class Image < ApplicationRecord
 
   private
 
-  def validate_image_count
-    return unless review.images.size >= MAX_IMAGE_COUNT_PER_REVIEW
-
-    raise Exceptions::BadRequest, 'Images per report reached limit'
-  end
-
   def delete_object
     file = bucket.file("images/#{file_name}")
 
     if file.blank?
-      Rails.logger.warn("Object #{file_name} not found")
+      Rails.logger.warn("Object #{file_name} not found.")
       return
     end
 

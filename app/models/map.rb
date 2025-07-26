@@ -10,30 +10,30 @@ class Map < ApplicationRecord
 
   validates :name,
             presence: {
-              strict: Exceptions::MapNameNotSpecified
+              message: I18n.t('messages.api.map_name_required')
             },
             uniqueness: {
               scope: :user_id,
-              strict: Exceptions::DuplicateMapName,
+              message: I18n.t('messages.api.map_name_already_exists'),
               on: :create
             },
             length: {
               allow_blank: false,
               maximum: 30,
-              strict: Exceptions::MapNameExceeded
+              message: I18n.t('messages.api.map_name_exceeded')
             }
   validates :description,
             presence: {
-              strict: Exceptions::MapDescriptionNotSpecified
+              message: I18n.t('messages.api.map_description_required')
             },
             length: {
               allow_blank: false,
               maximum: 200,
-              strict: Exceptions::MapDescriptionExceeded
+              message: I18n.t('messages.api.map_description_exceed')
             }
   validates :user_id,
             presence: {
-              strict: Exceptions::MapOwnerNotSpecified
+              message: I18n.t('messages.api.map_owner_not_specified')
             }
 
   before_validation :remove_carriage_return
@@ -117,8 +117,8 @@ class Map < ApplicationRecord
   private
 
   def remove_carriage_return
-    name.delete!("\r") if name
-    description.delete!("\r") if description
+    name&.delete!("\r")
+    description&.delete!("\r")
   end
 
   def follow_by_owner

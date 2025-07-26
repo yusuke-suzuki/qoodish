@@ -4,11 +4,8 @@ class Device < ApplicationRecord
   validates :user_id,
             presence: true
   validates :registration_token,
-            presence: {
-              strict: Exceptions::RegistrationTokenNotSpecified
-            },
+            presence: true,
             uniqueness: {
-              scope: :user_id,
-              strict: Exceptions::DuplicateRegistrationToken
+              scope: :user_id
             }
 end

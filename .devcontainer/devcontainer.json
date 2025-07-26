@@ -21,6 +21,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "google.geminicodeassist",
         "GitHub.copilot",
         "GitHub.copilot-chat",
         "redhat.vscode-yaml",
