@@ -1,0 +1,69 @@
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: qoodish-runner
+  labels:
+    cloud.googleapis.com/location: asia-northeast1
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/network-interfaces: '[{"network":"default","subnetwork":"default"}]'
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+    spec:
+      template:
+        spec:
+          serviceAccountName: prod-qoodish-api@qoodish-common.iam.gserviceaccount.com
+          containers:
+            - image: IMAGE_PLACEHOLDER
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 512Mi
+              env:
+                - name: RAILS_ENV
+                  value: production
+                - name: GOOGLE_CLIENT_EMAIL
+                  value: prod-qoodish-api@qoodish-common.iam.gserviceaccount.com
+                - name: GOOGLE_CLIENT_ID
+                  value: "115356917720757577784"
+                - name: DB_HOST
+                  value: 10.86.64.3
+                - name: DB_PORT
+                  value: "3306"
+                - name: ALLOWED_ENDPOINTS
+                  value: https://qoodish.com
+                - name: CLOUD_STORAGE_ENDPOINT
+                  value: https://storage.googleapis.com
+                - name: CLOUD_STORAGE_BUCKET_NAME
+                  value: qoodish.appspot.com
+                - name: GOOGLE_PROJECT_ID
+                  value: qoodish
+                - name: GOOGLE_ACCOUNT_TYPE
+                  value: service_account
+                - name: GOOGLE_API_KEY_SERVER
+                  valueFrom:
+                    secretKeyRef:
+                      name: QOODISH_API_GOOGLE_API_KEY
+                      key: latest
+                - name: RAILS_MASTER_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: QOODISH_API_RAILS_MASTER_KEY
+                      key: latest
+                - name: GOOGLE_PRIVATE_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: QOODISH_API_GOOGLE_PRIVATE_KEY
+                      key: latest
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: QOODISH_API_DB_PASSWORD
+                      key: latest
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: QOODISH_API_DB_USER
+                      key: latest

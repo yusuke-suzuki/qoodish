@@ -7,9 +7,12 @@ on:
       - synchronize
 env:
   PROJECT_ID: qoodish-dev
+  REGION: asia-northeast1
   ARTIFACT_REGISTRY: asia-northeast1-docker.pkg.dev
   SERVICE_NAME: qoodish-api
+  JOB_NAME: qoodish-runner
   BRANCH_NAME: ${{ github.head_ref }}
+
 jobs:
   test:
     permissions:
@@ -57,6 +60,7 @@ jobs:
         run: |
           bundle exec rails db:setup
           bundle exec rails test
+
   build-and-push-image:
     needs: test
     permissions:
@@ -93,7 +97,7 @@ jobs:
         with:
           images: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}
           labels: |
-            org.opencontainers.image.revision=${{ env.GITHUB_SHA }}
+            org.opencontainers.image.revision=${{ github.sha }}
           tags: |
             type=ref,event=pr,prefix=pr-,suffix=
             type=sha,prefix=,suffix=,format=long
@@ -107,6 +111,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
   deploy-runner:
     needs:
       - build-and-push-image
@@ -123,43 +128,23 @@ jobs:
           service_account: github-actions@qoodish-common.iam.gserviceaccount.com
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
-      - name: Deploy Job
+      - name: Deploy Job using kustomize
+        working-directory: run/dev/runner
         env:
+          IMAGE_URL: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           CLOUDSDK_CORE_DISABLE_PROMPTS: 1
-          CLOUD_RUN_SA_NAME: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
-          GOOGLE_CLIENT_ID: 110803867052316843263
-          DB_HOST: 10.78.96.3
-          ALLOWED_ENDPOINTS: https://dev.qoodish.com@http://127.0.0.1:5000
-          CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
-          CLOUD_STORAGE_BUCKET_NAME: qoodish-dev.appspot.com
-          GOOGLE_ACCOUNT_TYPE: service_account
         run: |
-          gcloud beta run jobs deploy qoodish-runner \
-            --region=asia-northeast1 \
+          echo "Setting image to $IMAGE_URL"
+          kustomize edit set image IMAGE_PLACEHOLDER=$IMAGE_URL
+
+          echo "--- Generated job manifest ---"
+          kustomize build .
+          echo "----------------------------"
+
+          kustomize build . | gcloud beta run jobs replace - \
             --project=$PROJECT_ID \
-            --cpu=1000m \
-            --memory=512Mi \
-            --service-account=$CLOUD_RUN_SA_NAME \
-            --execution-environment=gen2 \
-            --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
-            --network=default \
-            --subnet=default \
-            --vpc-egress=private-ranges-only \
-            --set-env-vars "RAILS_ENV=production" \
-            --set-env-vars "GOOGLE_CLIENT_EMAIL=$CLOUD_RUN_SA_NAME" \
-            --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
-            --set-env-vars "DB_HOST=$DB_HOST" \
-            --set-env-vars "DB_PORT=3306" \
-            --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
-            --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
-            --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \
-            --set-env-vars "GOOGLE_PROJECT_ID=$PROJECT_ID" \
-            --set-env-vars "GOOGLE_ACCOUNT_TYPE=$GOOGLE_ACCOUNT_TYPE" \
-            --set-secrets "GOOGLE_API_KEY_SERVER=QOODISH_API_GOOGLE_API_KEY:latest" \
-            --set-secrets "RAILS_MASTER_KEY=QOODISH_API_RAILS_MASTER_KEY:latest" \
-            --set-secrets "GOOGLE_PRIVATE_KEY=QOODISH_API_GOOGLE_PRIVATE_KEY:latest" \
-            --set-secrets "DB_PASSWORD=QOODISH_API_DB_PASSWORD:latest" \
-            --set-secrets "DB_USER=QOODISH_API_DB_USER:latest"
+            --region=$REGION
+
   deploy-api:
     needs:
       - build-and-push-image
@@ -182,57 +167,27 @@ jobs:
           NORMALIZED_TAG=$(echo "${{ env.BRANCH_NAME }}" | sed 's/[._]/-/g')
           echo "tag=$NORMALIZED_TAG" >> $GITHUB_OUTPUT
           echo "Normalized tag: $NORMALIZED_TAG"
-      - name: Deploy revision
+      - name: Deploy Service using kustomize
+        working-directory: run/dev/api
+        env:
+          IMAGE_URL: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+        run: |
+          echo "Setting image to $IMAGE_URL"
+          kustomize edit set image IMAGE_PLACEHOLDER=$IMAGE_URL
+
+          echo "--- Generated service manifest ---"
+          kustomize build .
+          echo "----------------------------------"
+
+          kustomize build . | gcloud beta run services replace - \
+            --project=$PROJECT_ID \
+            --region=$REGION
+      - name: Update traffic tag to the new revision
         env:
           CLOUDSDK_CORE_DISABLE_PROMPTS: 1
-          CLOUD_RUN_SA_NAME: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
-          GOOGLE_CLIENT_ID: 110803867052316843263
-          DB_HOST: 10.78.96.3
-          ALLOWED_ENDPOINTS: https://dev.qoodish.com@http://127.0.0.1:5000
-          CLOUD_STORAGE_ENDPOINT: https://storage.googleapis.com
-          CLOUD_STORAGE_BUCKET_NAME: qoodish-dev.appspot.com
-          GOOGLE_ACCOUNT_TYPE: service_account
-          OTELCOL_IMAGE_REPO: qoodish-common
-          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4317
         run: |
-          gcloud beta run deploy qoodish-api \
-            --allow-unauthenticated \
-            --cpu-boost \
-            --execution-environment=gen2 \
-            --ingress=all \
-            --max-instances=1 \
-            --network=default \
-            --platform=managed \
+          gcloud beta run services update-traffic ${{ env.SERVICE_NAME }} \
+            --update-tags=${{ steps.normalize.outputs.tag }}=LATEST \
             --project=$PROJECT_ID \
-            --region=asia-northeast1 \
-            --service-account=$CLOUD_RUN_SA_NAME \
-            --subnet=default \
-            --tag=${{ steps.normalize.outputs.tag }} \
-            --vpc-egress=private-ranges-only \
-            \
-            --container qoodish-api \
-              --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:$GITHUB_SHA \
-              --cpu=1000m \
-              --depends-on=otelcol \
-              --memory=512Mi \
-              --port=8080 \
-              --set-env-vars "RAILS_ENV=production" \
-              --set-env-vars "OTEL_EXPORTER_OTLP_ENDPOINT=$OTEL_EXPORTER_OTLP_ENDPOINT" \
-              --set-env-vars "GOOGLE_CLIENT_EMAIL=$CLOUD_RUN_SA_NAME" \
-              --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
-              --set-env-vars "DB_HOST=$DB_HOST" \
-              --set-env-vars "DB_PORT=3306" \
-              --set-env-vars "ALLOWED_ENDPOINTS=$ALLOWED_ENDPOINTS" \
-              --set-env-vars "CLOUD_STORAGE_ENDPOINT=$CLOUD_STORAGE_ENDPOINT" \
-              --set-env-vars "CLOUD_STORAGE_BUCKET_NAME=$CLOUD_STORAGE_BUCKET_NAME" \
-              --set-env-vars "GOOGLE_PROJECT_ID=$PROJECT_ID" \
-              --set-env-vars "GOOGLE_ACCOUNT_TYPE=$GOOGLE_ACCOUNT_TYPE" \
-              --set-secrets "GOOGLE_API_KEY_SERVER=QOODISH_API_GOOGLE_API_KEY:latest" \
-              --set-secrets "RAILS_MASTER_KEY=QOODISH_API_RAILS_MASTER_KEY:latest" \
-              --set-secrets "GOOGLE_PRIVATE_KEY=QOODISH_API_GOOGLE_PRIVATE_KEY:latest" \
-              --set-secrets "DB_PASSWORD=QOODISH_API_DB_PASSWORD:latest" \
-              --set-secrets "DB_USER=QOODISH_API_DB_USER:latest" \
-            \
-            --container otelcol \
-              --image=$ARTIFACT_REGISTRY/$PROJECT_ID/$OTELCOL_IMAGE_REPO/otelcol:latest \
-              --startup-probe="httpGet.port=13133,httpGet.path=/,initialDelaySeconds=5,timeoutSeconds=2,periodSeconds=10,failureThreshold=3"
+            --region=$REGION
