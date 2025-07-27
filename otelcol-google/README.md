@@ -1,22 +1,23 @@
-# Custom OpenTelemetry Collector for Qoodish on Cloud Run
+# OpenTelemetry Collector Config
 
-This directory contains the configuration to build a custom container image for the OpenTelemetry Collector. This image is deployed alongside the application on Google Cloud Run to collect and export telemetry data.
+このディレクトリにある `collector-config.yaml` は OpenTelemetry Collector の設定ファイルです。
+Cloud Run にサイドカーとしてデプロイするために、この設定ファイルを Secret Manager に登録する必要があります。
 
-## Collector Distribution
+## Secret Manager への登録
 
-We use the `otelopscol` distribution from Google Cloud's `opentelemetry-operations-collector` repository.
+以下のコマンドを実行して、`collector-config.yaml` を Secret Manager に登録します。
+`$PROJECT_ID` は対象の Google Cloud プロジェクト ID に置き換えてください。
 
-As noted in the official documentation, `otelopscol` is the OpenTelemetry Collector that backs the Google Cloud Ops Agent. It is specifically tooled for exporting telemetry data to Google Cloud's operations suite.
+### シークレットの作成 (初回のみ)
 
-While it is officially supported by Google only as a component of the Ops Agent, it is suitable for our use case of building a standalone collector container.
+```bash
+gcloud secrets create QOODISH_OTELCOL_CONFIG --data-file=otelcol-google/collector-config.yaml --project=$PROJECT_ID
+```
 
-## Purpose in this Project
+### シークレットの更新
 
-The primary goal is to run the OpenTelemetry Collector as a sidecar container in our Cloud Run service. This collector receives OTLP metrics from the main application container and forwards them to Google Cloud Managed Service for Prometheus.
+設定ファイルを更新した場合は、以下のコマンドで新しいバージョンを追加します。
 
-This directory contains a custom `collector-config.yaml` to configure the collector's behavior. We build a container image that includes this configuration and push it to Google Cloud's Artifact Registry.
-
-## Reference
-
-For more detailed information about the `otelopscol` distribution, please refer to the official repository:
-https://github.com/GoogleCloudPlatform/opentelemetry-operations-collector
+```bash
+gcloud secrets versions add QOODISH_OTELCOL_CONFIG --data-file=otelcol-google/collector-config.yaml --project=$PROJECT_ID
+```
