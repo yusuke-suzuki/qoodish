@@ -6,10 +6,9 @@ ja:
       error_403: 許可されていない操作です。
       error_404: リソースが見つかりませんでした。
       error_409: リクエストの内容が競合しています。
+      error_422: リクエストの内容が不正です。
       error_500: サーバー内部エラーが発生しました。
 
-      firebase_auth_error: 認証エラーが発生しました。
-      oidc_auth_error: 認証エラーが発生しました。
       duplicate_map_name: 既に存在するマップ名です。
       map_name_required: マップ名を入力してください。
       map_name_exceed: "マップ名が長すぎます。(最大: 30 文字)"
@@ -20,6 +19,7 @@ ja:
       comment_required: コメントを入力してください。
       comment_exceeded: "コメントが長すぎます。(最大: 500 文字)"
       invalid_uri: 不正な URL です。
+      images_per_report_reached_limit: "レポートごとの画像数の上限に達しました。"
 
       map_owner_cannot_removed: マップのオーナーはアンフォローできません。
 
