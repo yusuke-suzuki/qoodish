@@ -1,4 +1,9 @@
+# frozen_string_literal: true
+
 require 'google/cloud/storage'
+
+FEED_PER_PAGE = 12
+MAX_IMAGE_COUNT_PER_REVIEW = 4
 
 class Review < ApplicationRecord
   belongs_to :user
@@ -13,12 +18,12 @@ class Review < ApplicationRecord
 
   validates :comment,
             presence: {
-              strict: Exceptions::CommentNotSpecified
+              message: I18n.t('messages.api.comment_required')
             },
             length: {
               allow_blank: false,
               maximum: 500,
-              strict: Exceptions::CommentExceeded
+              message: I18n.t('messages.api.comment_exceeded')
             }
   validates :user_id,
             presence: true
@@ -34,8 +39,10 @@ class Review < ApplicationRecord
               allow_blank: false,
               maximum: 100
             }
-
-  FEED_PER_PAGE = 12
+  validates :images, length: {
+    maximum: MAX_IMAGE_COUNT_PER_REVIEW,
+    message: I18n.t('messages.api.images_per_report_reached_limit')
+  }
 
   scope :public_open, lambda {
     joins(:map)

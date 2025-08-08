@@ -1,0 +1,117 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: qoodish-api
+  labels:
+    cloud.googleapis.com/location: asia-northeast1
+  annotations:
+    run.googleapis.com/launch-stage: ALPHA
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/cpu-throttling: "false"
+        run.googleapis.com/network-interfaces: '[{"network":"default","subnetwork":"default"}]'
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/startup-cpu-boost: "true"
+        autoscaling.knative.dev/maxScale: "1"
+        run.googleapis.com/container-dependencies: "{qoodish-api:[otelcol]}"
+        run.googleapis.com/secrets: "QOODISH_OTELCOL_CONFIG:projects/qoodish-dev/secrets/QOODISH_OTELCOL_CONFIG"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
+      containers:
+        - image: IMAGE_PLACEHOLDER
+          name: qoodish-api
+          ports:
+            - name: http1
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          startupProbe:
+            timeoutSeconds: 240
+            periodSeconds: 240
+            failureThreshold: 1
+            tcpSocket:
+              port: 8080
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: OTEL_SERVICE_NAME
+              value: qoodish-api
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://localhost:4318
+            - name: GOOGLE_CLIENT_EMAIL
+              value: dev-qoodish-api@qoodish-common.iam.gserviceaccount.com
+            - name: GOOGLE_CLIENT_ID
+              value: "110803867052316843263"
+            - name: DB_HOST
+              value: 10.78.96.3
+            - name: DB_PORT
+              value: "3306"
+            - name: ALLOWED_ENDPOINTS
+              value: https://dev.qoodish.com@http://127.0.0.1:5000
+            - name: CLOUD_STORAGE_ENDPOINT
+              value: https://storage.googleapis.com
+            - name: CLOUD_STORAGE_BUCKET_NAME
+              value: qoodish-dev.appspot.com
+            - name: GOOGLE_PROJECT_ID
+              value: qoodish-dev
+            - name: GOOGLE_ACCOUNT_TYPE
+              value: service_account
+            - name: GOOGLE_API_KEY_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: QOODISH_API_GOOGLE_API_KEY
+                  key: latest
+            - name: RAILS_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: QOODISH_API_RAILS_MASTER_KEY
+                  key: latest
+            - name: GOOGLE_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: QOODISH_API_GOOGLE_PRIVATE_KEY
+                  key: latest
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: QOODISH_API_DB_PASSWORD
+                  key: latest
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: QOODISH_API_DB_USER
+                  key: latest
+        - image: "us-docker.pkg.dev/cloud-ops-agents-artifacts/google-cloud-opentelemetry-collector/otelcol-google:0.129.0"
+          name: otelcol
+          args:
+            - --config=/etc/otelcol-google/config.yaml
+          startupProbe:
+            httpGet:
+              path: /
+              port: 13133
+            timeoutSeconds: 30
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+            timeoutSeconds: 30
+            periodSeconds: 30
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/otelcol-google
+      volumes:
+        - name: config-volume
+          secret:
+            secretName: QOODISH_OTELCOL_CONFIG
+            items:
+              - key: latest
+                path: config.yaml
