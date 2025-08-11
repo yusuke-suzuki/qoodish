@@ -10,7 +10,7 @@
 #   http://dev.mysql.com/doc/refman/5.7/en/old-client.html
 #
 default: &default
-  adapter: mysql2
+  adapter: trilogy
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   charset: utf8mb4
   collation: utf8mb4_general_ci
