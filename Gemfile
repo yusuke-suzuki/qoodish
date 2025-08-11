@@ -15,12 +15,12 @@ gem 'bootsnap', require: false
 gem 'google-cloud-storage'
 gem 'jbuilder'
 gem 'jwt'
-gem 'mysql2', '~> 0.5.3'
 gem 'opentelemetry-exporter-otlp'
 gem 'opentelemetry-instrumentation-all'
 gem 'opentelemetry-sdk'
 gem 'puma'
 gem 'rack-cors'
+gem 'trilogy'
 
 group :development, :test do
   gem 'bullet'
