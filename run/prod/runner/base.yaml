@@ -29,7 +29,7 @@ spec:
                 - name: GOOGLE_CLIENT_ID
                   value: "115356917720757577784"
                 - name: DB_HOST
-                  value: 10.86.64.3
+                  value: 10.86.64.26
                 - name: DB_PORT
                   value: "3306"
                 - name: ALLOWED_ENDPOINTS
