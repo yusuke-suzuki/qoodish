@@ -6,7 +6,7 @@ services:
     command: sleep infinity
     network_mode: service:mysql
   mysql:
-    image: mysql/mysql-server:5.7
+    image: mysql/mysql-server:8.0
     restart: unless-stopped
     volumes:
       - mysql-data:/var/lib/mysql
