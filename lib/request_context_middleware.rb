@@ -19,7 +19,14 @@ class RequestContextMiddleware
 
   def calculate_locale(request)
     header = request.env['HTTP_ACCEPT_LANGUAGE']
-    locale = header&.scan(/^[a-z]{2}/)&.first || I18n.default_locale
+    extracted_locale = header&.scan(/^[a-z]{2}/)&.first
+
+    locale = if I18n.available_locales.map(&:to_s).include?(extracted_locale)
+               extracted_locale
+             else
+               I18n.default_locale
+             end
+
     I18n.locale = locale
     locale
   end
