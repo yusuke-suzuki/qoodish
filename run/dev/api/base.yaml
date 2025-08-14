@@ -8,6 +8,12 @@ metadata:
     run.googleapis.com/launch-stage: ALPHA
     run.googleapis.com/ingress: all
 spec:
+  traffic:
+    - latestRevision: true
+      percent: 0
+    - latestRevision: false
+      tag: stable
+      percent: 100
   template:
     metadata:
       annotations:
