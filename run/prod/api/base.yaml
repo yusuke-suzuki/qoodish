@@ -9,8 +9,10 @@ metadata:
     run.googleapis.com/ingress: all
 spec:
   traffic:
-    - percent: 100
-      tag: stable
+    - latestRevision: true
+      percent: 0
+    - tag: stable
+      percent: 100
   template:
     metadata:
       annotations:
