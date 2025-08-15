@@ -16,7 +16,8 @@
   "features": {
     "ghcr.io/rails/devcontainer/features/bundler-cache:1": {},
     "ghcr.io/rails/devcontainer/features/mysql-client": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}
   },
   "customizations": {
     "vscode": {
