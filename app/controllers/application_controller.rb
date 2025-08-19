@@ -7,7 +7,9 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
 
   def routing_error
-    raise Exceptions::NotFound, "No route matches [#{request.request_method}] '#{request.path}'"
+    exception = Exceptions::NotFound.new("No route matches [#{request.request_method}] '#{request.path}'")
+    Rails.logger.warn(exception)
+    render_error(exception)
   end
 
   def healthcheck
