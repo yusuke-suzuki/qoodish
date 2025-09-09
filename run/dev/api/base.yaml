@@ -11,7 +11,6 @@ spec:
   template:
     metadata:
       annotations:
-        run.googleapis.com/cpu-throttling: "false"
         run.googleapis.com/network-interfaces: '[{"network":"default","subnetwork":"default"}]'
         run.googleapis.com/vpc-access-egress: private-ranges-only
         run.googleapis.com/execution-environment: gen2
