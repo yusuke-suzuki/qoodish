@@ -1,6 +1,6 @@
-# Gemini Code Assist Context for Qoodish
+# Claude Code Context for Qoodish
 
-This document provides essential context for Gemini Code Assist to understand the Qoodish project. Please use this information to generate code that is consistent with the existing architecture, conventions, and dependencies.
+This document provides essential context for Claude Code to understand the Qoodish project. Please use this information to generate code that is consistent with the existing architecture, conventions, and dependencies.
 
 ## 1. Project Overview
 
