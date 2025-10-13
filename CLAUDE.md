@@ -45,13 +45,13 @@ This document provides essential context for Claude Code to understand the Qoodi
 
 When generating commit messages, please follow these rules:
 
-- Use conventional commit message format.
+- Use conventional commit message format (e.g., `fix:`, `feat:`, `docs:`, `refactor:`).
 - Write in English.
-- Use imperative mood.
+- Use imperative mood (e.g., "add feature" not "added feature").
 - Use the present tense.
-- Limit the first line to 50 characters or less.
+- **CRITICAL: The subject line MUST be 50 characters or less. Count characters carefully before committing. If the subject exceeds 50 characters, rephrase it to be more concise.**
 - Separate the subject from the body with a blank line.
 - Ensure each line in the body does not exceed 72 characters by inserting line breaks where necessary, including within sentences.
 - Separate distinct paragraphs with a blank line.
 - Use the body to explain what and why vs. how.
-- Reference pull requests.
+- Reference pull requests when applicable.
