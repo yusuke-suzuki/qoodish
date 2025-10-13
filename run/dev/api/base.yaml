@@ -54,7 +54,7 @@ spec:
             - name: DB_PORT
               value: "3306"
             - name: ALLOWED_ENDPOINTS
-              value: https://dev.qoodish.com@http://127.0.0.1:5000
+              value: https://dev.qoodish.com@http://127.0.0.1:5000@http://localhost:5000
             - name: CLOUD_STORAGE_ENDPOINT
               value: https://storage.googleapis.com
             - name: CLOUD_STORAGE_BUCKET_NAME
