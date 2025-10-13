@@ -164,7 +164,7 @@ jobs:
       - name: Normalize branch name for Cloud Run tag
         id: normalize
         run: |
-          NORMALIZED_TAG=$(echo "${{ env.BRANCH_NAME }}" | sed 's/[._]/-/g')
+          NORMALIZED_TAG=$(echo "${{ env.BRANCH_NAME }}" | sed 's/[._/]/-/g')
           echo "tag=$NORMALIZED_TAG" >> $GITHUB_OUTPUT
           echo "Normalized tag: $NORMALIZED_TAG"
       - name: Deploy Service using kustomize
