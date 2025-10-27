@@ -17,7 +17,20 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins ENV['ALLOWED_ENDPOINTS'].split('@')
+    allowed_origins = (ENV['ALLOWED_ENDPOINTS'] || '')
+                      .split("\n")
+                      .map(&:strip)
+                      .reject(&:empty?)
+                      .map do |origin|
+      # Support regex literals in /pattern/ format
+      if origin.start_with?('/') && origin.end_with?('/')
+        Regexp.new(origin[1..-2])
+      else
+        origin
+      end
+    end
+
+    origins allowed_origins
 
     resource '*',
              headers: :any,
