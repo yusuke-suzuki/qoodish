@@ -14,13 +14,13 @@ class Map < ApplicationRecord
             },
             uniqueness: {
               scope: :user_id,
-              message: I18n.t('messages.api.map_name_already_exists'),
+              message: I18n.t('messages.api.duplicate_map_name'),
               on: :create
             },
             length: {
               allow_blank: false,
               maximum: 30,
-              message: I18n.t('messages.api.map_name_exceeded')
+              message: I18n.t('messages.api.map_name_exceed')
             }
   validates :description,
             presence: {
