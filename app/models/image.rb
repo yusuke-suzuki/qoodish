@@ -9,7 +9,7 @@ class Image < ApplicationRecord
             format: {
               allow_blank: false,
               with: /\A#{URI::DEFAULT_PARSER.make_regexp(%w[http https])}\z/,
-              message: I18n.t('messages.api.invalid_url')
+              message: I18n.t('messages.api.invalid_uri')
             }
 
   before_destroy :delete_object
