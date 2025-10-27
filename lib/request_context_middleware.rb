@@ -9,7 +9,9 @@ class RequestContextMiddleware
     request = ActionDispatch::Request.new(env)
 
     RequestContext.locale = calculate_locale(request)
-    RequestContext.user = authenticate_user(request)
+    user = authenticate_user(request)
+    RequestContext.user = user
+    RequestContext.user_id = user&.id
     RequestContext.request_id = request.request_id
 
     @app.call(env)

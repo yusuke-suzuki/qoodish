@@ -145,7 +145,7 @@ class GoogleCloudLogFormatter < Logger::Formatter
     end
 
     request_id = RequestContext.request_id
-    user_id = RequestContext.user&.id
+    user_id = RequestContext.user_id
     locale = RequestContext.locale
 
     result[:request_id] = request_id if request_id
