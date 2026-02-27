@@ -12,9 +12,8 @@
     3000,
     3306
   ],
-  "postCreateCommand": "bin/setup",
+  "postCreateCommand": "bin/setup && curl -fsSL https://claude.ai/install.sh | bash",
   "features": {
-    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/rails/devcontainer/features/bundler-cache:1": {},
     "ghcr.io/rails/devcontainer/features/mysql-client": {},
