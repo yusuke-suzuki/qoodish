@@ -11,7 +11,6 @@ env:
   ARTIFACT_REGISTRY: asia-northeast1-docker.pkg.dev
   SERVICE_NAME: qoodish-api
   JOB_NAME: qoodish-runner
-  BRANCH_NAME: ${{ github.head_ref }}
 
 jobs:
   test:
@@ -161,12 +160,6 @@ jobs:
           service_account: github-actions@qoodish-common.iam.gserviceaccount.com
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
-      - name: Normalize branch name for Cloud Run tag
-        id: normalize
-        run: |
-          NORMALIZED_TAG=$(echo "${{ env.BRANCH_NAME }}" | sed 's/[._/]/-/g')
-          echo "tag=$NORMALIZED_TAG" >> $GITHUB_OUTPUT
-          echo "Normalized tag: $NORMALIZED_TAG"
       - name: Deploy Service using kustomize
         working-directory: run/dev/api
         env:
@@ -188,6 +181,6 @@ jobs:
           CLOUDSDK_CORE_DISABLE_PROMPTS: 1
         run: |
           gcloud beta run services update-traffic ${{ env.SERVICE_NAME }} \
-            --update-tags=${{ steps.normalize.outputs.tag }}=LATEST \
+            --update-tags=pr-${{ github.event.number }}=LATEST \
             --project=$PROJECT_ID \
             --region=$REGION
