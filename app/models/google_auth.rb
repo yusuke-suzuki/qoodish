@@ -1,6 +1,5 @@
 class GoogleAuth
   CLIENT_CERT_URL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com'.freeze
-  FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   def initialize
     @project_id = ENV['GOOGLE_PROJECT_ID']
@@ -16,10 +15,12 @@ class GoogleAuth
     Google::Auth::IDTokens.verify_oidc(jwt, aud: aud)
   end
 
+  def make_credentials(scopes)
+    Google::Auth::ServiceAccountCredentials.make_creds(scope: scopes)
+  end
+
   def fetch_access_token(scope)
-    authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-      scope: scope
-    )
+    authorizer = make_credentials(scope)
     token = authorizer.fetch_access_token!
     token['access_token']
   end

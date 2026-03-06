@@ -12,6 +12,14 @@ class ActiveSupport::TestCase
     GoogleAuth.stub :new, GoogleAuthMock.new(current_user), &block
   end
 
+  def stub_identity_platform(&block)
+    IdentityPlatform.stub :new, IdentityPlatformMock.new, &block
+  end
+
+  def stub_cloud_storage(&block)
+    Google::Cloud::Storage.stub :new, CloudStorageMock.new, &block
+  end
+
   class GoogleAuthMock
     def initialize(current_user)
       @current_user = current_user
@@ -22,6 +30,30 @@ class ActiveSupport::TestCase
         'sub' => @current_user.uid,
         'name' => @current_user.name
       }
+    end
+
+    def make_credentials(_scopes)
+      nil
+    end
+
+    def fetch_access_token(_scope)
+      'dummy_access_token'
+    end
+  end
+
+  class IdentityPlatformMock
+    def delete_account(_uid); end
+  end
+
+  class CloudStorageMock
+    def bucket(_name)
+      BucketMock.new
+    end
+
+    class BucketMock
+      def file(_path)
+        nil
+      end
     end
   end
 end
