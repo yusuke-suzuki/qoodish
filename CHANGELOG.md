@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.5.1](https://github.com/yusuke-suzuki/qoodish/compare/v1.5.0...v1.5.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* delete Identity Platform account on destroy ([7a1b066](https://github.com/yusuke-suzuki/qoodish/commit/7a1b066e1abd90a70cd459f6ce62543bbfb33954))
+* delete Identity Platform account on destroy ([4adde10](https://github.com/yusuke-suzuki/qoodish/commit/4adde10afd60c75b40964229d28dafd0e87f6c30))
+* use GitHub App token to trigger workflows ([f0bde22](https://github.com/yusuke-suzuki/qoodish/commit/f0bde2241e679e02978abfb2c47f23a597e53499))
+* use GitHub App token to trigger workflows ([832d3ef](https://github.com/yusuke-suzuki/qoodish/commit/832d3efb1c09df9621229cb8954a4577fd832f25))
+* use PR number as Cloud Run traffic tag ([9fbe8e5](https://github.com/yusuke-suzuki/qoodish/commit/9fbe8e556b44e2bc84ca40b61ecc8a262de1c308))
+
 ## [1.5.0](https://github.com/yusuke-suzuki/qoodish/compare/v1.4.2...v1.5.0) (2026-02-27)
 
 
