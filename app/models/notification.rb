@@ -4,6 +4,7 @@ class Notification < ApplicationRecord
   belongs_to :recipient, polymorphic: true
 
   KEYS = %w[followed invited liked comment].freeze
+  FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
             inclusion: {
@@ -55,7 +56,7 @@ class Notification < ApplicationRecord
 
   def bloadcast_web_push
     google_auth = GoogleAuth.new
-    access_token = google_auth.fetch_access_token(GoogleAuth::FCM_SCOPE)
+    access_token = google_auth.fetch_access_token(FCM_SCOPE)
 
     headers = {
       'Content-Type': 'application/json',

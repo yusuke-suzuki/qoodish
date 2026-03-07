@@ -20,6 +20,7 @@ class User < ApplicationRecord
               maximum: 160
             }
 
+  before_destroy :delete_id_platform_account
   after_create :create_default_map
 
   scope :search_by_name, lambda { |name|
@@ -115,6 +116,16 @@ class User < ApplicationRecord
 
   def liked?(votable)
     votable.voters.any? { |voter| voter.id == id }
+  end
+
+  private
+
+  def delete_id_platform_account
+    id_platform.delete_account(uid)
+  end
+
+  def id_platform
+    @id_platform ||= IdentityPlatform.new
   end
 
   def create_default_map

@@ -51,11 +51,13 @@ class Image < ApplicationRecord
     file.delete
   end
 
+  def google_auth
+    @google_auth ||= GoogleAuth.new
+  end
+
   def storage
     @storage ||= Google::Cloud::Storage.new(
-      credentials: Google::Auth::ServiceAccountCredentials.make_creds(
-        scope: STORAGE_SCOPES
-      )
+      credentials: google_auth.make_credentials(STORAGE_SCOPES)
     )
   end
 

@@ -26,4 +26,19 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal res['id'], users(:you).id
     assert res['push_notification'].blank?
   end
+
+  test 'delete account should be success' do
+    uid = users(:me).uid
+
+    stub_google_auth(users(:me)) do
+      stub_identity_platform do
+        stub_cloud_storage do
+          delete "/users/#{uid}", headers: { 'Authorization': 'Bearer dummytoken' }
+        end
+      end
+    end
+
+    assert_response :no_content
+    assert_nil User.find_by(uid: uid)
+  end
 end
