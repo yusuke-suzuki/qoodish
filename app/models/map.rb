@@ -1,4 +1,6 @@
 class Map < ApplicationRecord
+  self.ignored_columns = %w[image_url]
+
   belongs_to :user
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :notifiable
@@ -7,6 +9,7 @@ class Map < ApplicationRecord
   has_many :followers, through: :follows, source: :follower, source_type: User.name
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
+  has_many :images, as: :imageable, dependent: :destroy
 
   validates :name,
             presence: {
@@ -35,6 +38,7 @@ class Map < ApplicationRecord
             presence: {
               message: I18n.t('messages.api.map_owner_not_specified')
             }
+  validates :images, length: { maximum: 1 }
 
   before_validation :remove_carriage_return
   after_create :follow_by_owner
@@ -93,17 +97,36 @@ class Map < ApplicationRecord
   }
 
   def thumbnail_url(size = '200x200')
-    return '' if image_url.blank?
+    primary = images.first
+    return '' if primary&.url.blank?
+    return Cloudflare::Images.variant_url_for_legacy_size(primary.url, size) if primary.url.include?(Cloudflare::Images::DELIVERY_HOST)
 
-    ext = File.extname(image_url)
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/maps/thumbnails/#{File.basename(image_name,
-                                                                                                          ext)}_#{size}#{ext}"
+    ext = File.extname(primary.url)
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/maps/thumbnails/" \
+      "#{File.basename(File.basename(CGI.unescape(primary.url)), ext)}_#{size}#{ext}"
   end
 
-  def image_name
-    return '' if image_url.blank?
+  def image_url
+    images.first&.url.to_s
+  end
 
-    File.basename(CGI.unescape(image_url))
+  def image_variants
+    primary = images.first
+    return nil unless primary
+
+    if primary.url.include?(Cloudflare::Images::DELIVERY_HOST)
+      Cloudflare::Images::NAMED_VARIANTS
+        .index_with { |variant| Cloudflare::Images.variant_url(primary.url, variant) }
+        .merge(url: primary.url)
+    else
+      {
+        url: primary.url,
+        avatar: thumbnail_url('200x200'),
+        card: thumbnail_url('400x400'),
+        hero: thumbnail_url('800x800'),
+        ogp: primary.url
+      }
+    end
   end
 
   def lat

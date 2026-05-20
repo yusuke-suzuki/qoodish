@@ -12,6 +12,8 @@ gem 'rails', '~> 7.2.2.1'
 # gem 'bcrypt', '~> 3.1.7'
 
 gem 'bootsnap', require: false
+gem 'faraday'
+gem 'faraday-multipart', require: 'faraday/multipart'
 gem 'google-cloud-storage'
 gem 'jbuilder'
 gem 'jwt'

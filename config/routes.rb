@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   end
   resources :inappropriate_contents, only: [:create]
   resources :notifications, only: %i[index update]
+  resources :images, only: [:create]
 
   namespace :guest do
     resources :maps, only: %i[index show] do

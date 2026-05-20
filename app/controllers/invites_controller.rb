@@ -5,7 +5,7 @@ class InvitesController < ApplicationController
     @invites =
       current_user
       .invites
-      .includes(:invitable)
+      .includes({ invitable: :images }, { sender: :images })
       .order(created_at: :desc)
       .reject { |invite| invite.sender.blank? || invite.invitable.blank? }
   end

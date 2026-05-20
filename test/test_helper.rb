@@ -5,6 +5,10 @@ require 'rails/test_help'
 
 require 'minitest/autorun'
 
+ENV['CLOUDFLARE_ACCOUNT_ID'] ||= 'test-account'
+ENV['CLOUDFLARE_IMAGES_ACCOUNT_HASH'] ||= 'mockhash'
+ENV['CLOUDFLARE_IMAGES_API_TOKEN'] ||= 'test-token'
+
 class ActiveSupport::TestCase
   fixtures :all
 
@@ -16,8 +20,8 @@ class ActiveSupport::TestCase
     IdentityPlatform.stub :new, IdentityPlatformMock.new, &block
   end
 
-  def stub_cloud_storage(&block)
-    Google::Cloud::Storage.stub :new, CloudStorageMock.new, &block
+  def stub_cloudflare_images(&block)
+    Cloudflare::Images.stub :new, CloudflareImagesMock.new, &block
   end
 
   class GoogleAuthMock
@@ -45,15 +49,17 @@ class ActiveSupport::TestCase
     def delete_account(_uid); end
   end
 
-  class CloudStorageMock
-    def bucket(_name)
-      BucketMock.new
+  class CloudflareImagesMock
+    MOCK_ID = 'qoodish/test/mock-cf-id'
+
+    def create_direct_upload
+      { id: MOCK_ID, upload_url: "https://upload.example.com/#{MOCK_ID}" }
     end
 
-    class BucketMock
-      def file(_path)
-        nil
-      end
+    def upload_from_url(_source_url)
+      "https://imagedelivery.net/mockhash/#{MOCK_ID}/public"
     end
+
+    def delete(_image_id); end
   end
 end

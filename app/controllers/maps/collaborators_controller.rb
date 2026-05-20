@@ -4,7 +4,7 @@ module Maps
 
     def index
       @map = current_user.referenceable_maps.find_by(id: params[:map_id])
-      @collaborators = @map ? @map.followers : []
+      @collaborators = @map ? @map.followers.preload(:images) : []
     end
   end
 end

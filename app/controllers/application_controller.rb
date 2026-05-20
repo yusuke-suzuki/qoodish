@@ -5,6 +5,8 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
   rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
   rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
+  rescue_from ActiveRecord::RecordNotSaved, with: :handle_record_invalid
+  rescue_from Faraday::Error, with: :handle_faraday_error
 
   def routing_error
     exception = Exceptions::NotFound.new("No route matches [#{request.request_method}] '#{request.path}'")
@@ -37,6 +39,11 @@ class ApplicationController < ActionController::API
   def handle_record_invalid(exception)
     Rails.logger.warn(exception)
     render_error(Exceptions::UnprocessableContent.new(exception.message))
+  end
+
+  def handle_faraday_error(exception)
+    Rails.logger.error(exception)
+    render_error(Exceptions::InternalServerError.new)
   end
 
   def current_user

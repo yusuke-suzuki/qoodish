@@ -7,12 +7,12 @@ module Users
                    if params[:next_timestamp]
                      current_user
                        .reviews
-                       .preload(:map, :user, :images, { comments: :user })
+                       .preload(:map, { user: :images }, :images, { comments: { user: :images } })
                        .feed_before(params[:next_timestamp])
                    else
                      current_user
                        .reviews
-                       .preload(:map, :user, :images, { comments: :user })
+                       .preload(:map, { user: :images }, :images, { comments: { user: :images } })
                        .latest_feed
                    end
                  else
@@ -21,13 +21,13 @@ module Users
                    if params[:next_timestamp]
                      user
                        .reviews
-                       .preload(:map, :user, :images, { comments: :user })
+                       .preload(:map, { user: :images }, :images, { comments: { user: :images } })
                        .referenceable_by(current_user)
                        .feed_before(params[:next_timestamp])
                    else
                      user
                        .reviews
-                       .preload(:map, :user, :images, { comments: :user })
+                       .preload(:map, { user: :images }, :images, { comments: { user: :images } })
                        .referenceable_by(current_user)
                        .latest_feed
                    end

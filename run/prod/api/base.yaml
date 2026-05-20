@@ -44,6 +44,8 @@ spec:
           env:
             - name: RAILS_ENV
               value: production
+            - name: APP_ENV
+              value: production
             - name: OTEL_SERVICE_NAME
               value: qoodish-api
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
@@ -62,6 +64,15 @@ spec:
               value: https://storage.googleapis.com
             - name: CLOUD_STORAGE_BUCKET_NAME
               value: qoodish.appspot.com
+            - name: CLOUDFLARE_ACCOUNT_ID
+              value: 9671c836ad132f87d892b12ccd1809e0
+            - name: CLOUDFLARE_IMAGES_ACCOUNT_HASH
+              value: ij3ygWRDWuATHKgheHKS5A
+            - name: CLOUDFLARE_IMAGES_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: QOODISH_API_CLOUDFLARE_IMAGES_API_TOKEN
+                  key: latest
             - name: GOOGLE_PROJECT_ID
               value: qoodish
             - name: GOOGLE_ACCOUNT_TYPE

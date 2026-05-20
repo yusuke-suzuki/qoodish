@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_12_14_051127) do
+ActiveRecord::Schema.define(version: 2026_05_20_063537) do
 
   create_table "comments", charset: "utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -48,12 +48,17 @@ ActiveRecord::Schema.define(version: 2023_12_14_051127) do
   end
 
   create_table "images", charset: "utf8mb4", force: :cascade do |t|
-    t.bigint "review_id", null: false
+    t.bigint "review_id"
     t.string "url", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "user_id"
+    t.string "imageable_type"
+    t.bigint "imageable_id"
+    t.index ["imageable_type", "imageable_id"], name: "index_images_on_imageable"
     t.index ["review_id"], name: "index_images_on_review_id"
     t.index ["url"], name: "index_images_on_url", unique: true
+    t.index ["user_id"], name: "index_images_on_user_id"
   end
 
   create_table "inappropriate_contents", charset: "utf8mb4", force: :cascade do |t|
@@ -174,6 +179,7 @@ ActiveRecord::Schema.define(version: 2023_12_14_051127) do
   end
 
   add_foreign_key "images", "reviews"
+  add_foreign_key "images", "users"
   add_foreign_key "maps", "users"
   add_foreign_key "push_notifications", "users"
   add_foreign_key "reviews", "maps"

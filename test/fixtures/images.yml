@@ -1,7 +1,9 @@
 one:
-  review: public_one
-  url: https://example.com/1
+  user: me
+  imageable: public_one (Review)
+  url: https://imagedelivery.net/mockhash/image-one/public
 
 two:
-  review: public_one
-  url: https://example.com/2
+  user: me
+  imageable: public_one (Review)
+  url: https://imagedelivery.net/mockhash/image-two/public

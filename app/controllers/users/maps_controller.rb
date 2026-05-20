@@ -7,12 +7,12 @@ module Users
                 if params[:following]
                   current_user
                     .following_maps
-                    .preload(:user)
+                    .preload(:images, user: :images)
                     .order(created_at: :desc)
                 else
                   current_user
                     .maps
-                    .preload(:user)
+                    .preload(:images, user: :images)
                     .order(created_at: :desc)
                 end
               else
@@ -21,13 +21,13 @@ module Users
                 if params[:following]
                   current_user
                     .referenceable_maps
-                    .preload(:user)
+                    .preload(:images, user: :images)
                     .where(id: Map.following_by(user))
                     .order(created_at: :desc)
                 else
                   current_user
                     .referenceable_maps
-                    .preload(:user)
+                    .preload(:images, user: :images)
                     .where(id: user.maps)
                     .order(created_at: :desc)
                 end
