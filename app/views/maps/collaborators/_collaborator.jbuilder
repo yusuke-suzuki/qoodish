@@ -1,5 +1,7 @@
 json.id collaborator.id
 json.name collaborator.name
+json.image collaborator.image_variants
+json.image_url collaborator.image_url
 json.profile_image_url collaborator.thumbnail_url
 json.owner collaborator.map_owner?(@map)
 json.editable current_user.map_owner?(@map)

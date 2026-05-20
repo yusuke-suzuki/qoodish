@@ -19,6 +19,14 @@ class Comment < ApplicationRecord
     commentable.thumbnail_url
   end
 
+  def image_url
+    commentable.image_url
+  end
+
+  def image_variants
+    commentable.image_variants
+  end
+
   def on_yourself?
     user.id == commentable.user.id
   end

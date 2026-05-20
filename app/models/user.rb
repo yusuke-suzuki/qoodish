@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  self.ignored_columns = %w[image_path]
+
   has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
   has_many :reviews, dependent: :destroy
@@ -7,6 +9,8 @@ class User < ApplicationRecord
   has_many :invites, as: :recipient
   has_many :follows, as: :follower, dependent: :destroy
   has_many :votes, as: :voter, dependent: :destroy
+  has_many :owned_images, class_name: 'Image', dependent: :destroy
+  has_many :images, as: :imageable, dependent: :destroy
   has_one :push_notification, dependent: :destroy
 
   validates :uid,
@@ -19,6 +23,7 @@ class User < ApplicationRecord
               allow_blank: true,
               maximum: 160
             }
+  validates :images, length: { maximum: 1 }
 
   before_destroy :delete_id_platform_account
   after_create :create_default_map
@@ -29,18 +34,36 @@ class User < ApplicationRecord
   }
 
   def thumbnail_url(size = '200x200')
-    return '' if image_path.blank?
+    primary = images.first
+    return '' if primary&.url.blank?
+    return Cloudflare::Images.variant_url_for_legacy_size(primary.url, size) if primary.url.include?(Cloudflare::Images::DELIVERY_HOST)
 
-    ext = File.extname(image_path)
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/profile/thumbnails/#{File.basename(
-      image_name, ext
-    )}_#{size}#{ext}"
+    ext = File.extname(primary.url)
+    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/profile/thumbnails/" \
+      "#{File.basename(File.basename(CGI.unescape(primary.url)), ext)}_#{size}#{ext}"
   end
 
-  def image_name
-    return '' if image_path.blank?
+  def image_url
+    images.first&.url.to_s
+  end
 
-    File.basename(CGI.unescape(image_path))
+  def image_variants
+    primary = images.first
+    return nil unless primary
+
+    if primary.url.include?(Cloudflare::Images::DELIVERY_HOST)
+      Cloudflare::Images::NAMED_VARIANTS
+        .index_with { |variant| Cloudflare::Images.variant_url(primary.url, variant) }
+        .merge(url: primary.url)
+    else
+      {
+        url: primary.url,
+        avatar: thumbnail_url('200x200'),
+        card: thumbnail_url('400x400'),
+        hero: thumbnail_url('800x800'),
+        ogp: primary.url
+      }
+    end
   end
 
   def author?(post)

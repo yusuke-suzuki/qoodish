@@ -24,6 +24,8 @@ spec:
               env:
                 - name: RAILS_ENV
                   value: production
+                - name: APP_ENV
+                  value: production
                 - name: GOOGLE_CLIENT_EMAIL
                   value: prod-qoodish-api@qoodish-common.iam.gserviceaccount.com
                 - name: GOOGLE_CLIENT_ID
@@ -42,6 +44,15 @@ spec:
                   value: qoodish
                 - name: GOOGLE_ACCOUNT_TYPE
                   value: service_account
+                - name: CLOUDFLARE_ACCOUNT_ID
+                  value: 9671c836ad132f87d892b12ccd1809e0
+                - name: CLOUDFLARE_IMAGES_ACCOUNT_HASH
+                  value: ij3ygWRDWuATHKgheHKS5A
+                - name: CLOUDFLARE_IMAGES_API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: QOODISH_API_CLOUDFLARE_IMAGES_API_TOKEN
+                      key: latest
                 - name: GOOGLE_API_KEY_SERVER
                   valueFrom:
                     secretKeyRef:

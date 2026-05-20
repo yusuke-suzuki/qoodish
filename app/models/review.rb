@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
-require 'google/cloud/storage'
-
 FEED_PER_PAGE = 12
 MAX_IMAGE_COUNT_PER_REVIEW = 4
 
 class Review < ApplicationRecord
   belongs_to :user
   belongs_to :map
-  has_many :images, dependent: :destroy
+  has_many :images, as: :imageable, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_many :comments, as: :commentable
   has_many :votes, as: :votable, dependent: :destroy
@@ -77,7 +75,15 @@ class Review < ApplicationRecord
   }
 
   def thumbnail_url(size = '200x200')
-    images.exists? ? images.first.thumbnail_url(size) : ''
+    images.first&.thumbnail_url(size).to_s
+  end
+
+  def image_url
+    images.first&.url.to_s
+  end
+
+  def image_variants
+    images.first&.variants
   end
 
   def lat

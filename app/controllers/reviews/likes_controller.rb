@@ -15,7 +15,7 @@ module Reviews
       @review =
         current_user
         .referenceable_reviews
-        .preload(:map, :user, :images, { comments: :user })
+        .preload(:map, { user: :images }, :images, { comments: { user: :images } })
         .find_by!(id: params[:review_id])
 
       current_user.liked!(@review)
@@ -27,7 +27,7 @@ module Reviews
       @review =
         current_user
         .referenceable_reviews
-        .preload(:map, :user, :images, { comments: :user })
+        .preload(:map, { user: :images }, :images, { comments: { user: :images } })
         .find_by!(id: params[:review_id])
 
       current_user.unliked!(@review)

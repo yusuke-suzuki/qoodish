@@ -6,44 +6,23 @@ class ReviewsController < ApplicationController
                  Review
                    .following_by(current_user)
                    .feed_before(params[:next_timestamp])
-                   .preload(:map, :user, :images, { comments: :user }, :voters, :votes)
+                   .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
                else
                  Review
                    .following_by(current_user)
                    .latest_feed
-                   .preload(:map, :user, :images, { comments: :user }, :voters, :votes)
+                   .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
                end
   end
 
   def update
-    @review = current_user.reviews
-                          .preload(:map, :user, :images, { comments: :user }, :voters, :votes)
-                          .find_by!(id: params[:id])
+    @review = current_user.reviews.find_by!(id: params[:id])
+    @review.update!(review_params)
 
-    ActiveRecord::Base.transaction do
-      @review.update!(review_params)
-
-      if images_params[:images].blank?
-        @review.images.destroy_all
-      else
-        current_image_urls = @review.images.pluck(:url)
-        next_image_urls = images_params[:images].map { |image| image[:url] }
-
-        image_urls_will_be_deleted = current_image_urls - next_image_urls
-        image_urls_to_be_created = next_image_urls - current_image_urls
-
-        @review.images.where(url: image_urls_will_be_deleted).destroy_all
-        @review.reload
-
-        image_urls_to_be_created.each do |image_url|
-          @review.images.create!(
-            url: image_url
-          )
-        end
-      end
-
-      @review.reload
-    end
+    ActiveRecord::Associations::Preloader.new(
+      records: [@review],
+      associations: [:map, :images, { comments: { user: :images } }, :voters, :votes]
+    ).call
   end
 
   def destroy
@@ -53,14 +32,27 @@ class ReviewsController < ApplicationController
   private
 
   def review_params
-    params
-      .permit(:name, :comment, :latitude, :longitude)
-      .to_h
+    attrs = params.permit(:name, :comment, :latitude, :longitude, image_ids: []).to_h
+    attrs['image_ids'] ||= legacy_image_ids_from_images
+    attrs
   end
 
-  def images_params
-    params
-      .permit(images: [:url])
-      .to_h
+  # Phase 1 backward compatibility: convert legacy `images: [{url: "..."}]`
+  # into an `image_ids` array. Remove together with the legacy schema in Phase 3.
+  def legacy_image_ids_from_images
+    return unless params.key?(:images)
+    return [] if params[:images].blank?
+
+    params.permit(images: [:url]).fetch(:images, []).filter_map do |image|
+      url = image[:url]
+      next if url.blank?
+
+      # Find globally to avoid colliding with Image's global url uniqueness
+      # when the URL already belongs to another user; drop foreign-owned URLs.
+      record = Image.find_or_create_by!(url: url) { |img| img.user_id = current_user.id }
+      next if record.user_id != current_user.id
+
+      record.id
+    end
   end
 end

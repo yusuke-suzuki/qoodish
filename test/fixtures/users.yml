@@ -2,10 +2,8 @@ me:
   name: watame
   email: watame@qoodish.com
   uid: 1234abcde
-  image_path: https://example.com/1
 
 you:
   name: okayu
   email: okayu@qoodish.com
   uid: 5678fghij
-  image_path: https://example.com/2
