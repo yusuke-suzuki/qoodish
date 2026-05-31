@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/yusuke-suzuki/qoodish/compare/v1.6.0...v1.6.1) (2026-05-31)
+
+
+### Bug Fixes
+
+* read legacy columns directly in backfill ([d50be3e](https://github.com/yusuke-suzuki/qoodish/commit/d50be3ee3fc8feb3d2b4059a3ffc226807fc08ec))
+
 ## [1.6.0](https://github.com/yusuke-suzuki/qoodish/compare/v1.5.1...v1.6.0) (2026-05-31)
 
 
