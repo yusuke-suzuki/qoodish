@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/yusuke-suzuki/qoodish/compare/v1.5.1...v1.6.0) (2026-05-31)
+
+
+### Features
+
+* integrate Cloudflare Images upload flow ([da524ae](https://github.com/yusuke-suzuki/qoodish/commit/da524ae5ffa7f5e488326ecb454abe20acf74d63))
+
 ## [1.5.1](https://github.com/yusuke-suzuki/qoodish/compare/v1.5.0...v1.5.1) (2026-03-07)
 
 
