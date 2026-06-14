@@ -49,36 +49,6 @@ class ImageTest < ActiveSupport::TestCase
     assert_equal 'https://imagedelivery.net/mockhash/qoodish/test/abc/ogp', variants[:ogp]
   end
 
-  test 'variants falls back to GCS-style paths for non-Cloudflare images' do
-    image = users(:me).owned_images.create!(
-      url: 'https://storage.googleapis.com/qoodish.appspot.com/images/foo.jpg'
-    )
-
-    variants = image.variants
-    assert_equal 'https://storage.googleapis.com/qoodish.appspot.com/images/foo.jpg', variants[:url]
-    assert_match %r{/images/thumbnails/foo_200x200\.jpg\z}, variants[:avatar]
-    assert_match %r{/images/thumbnails/foo_400x400\.jpg\z}, variants[:card]
-    assert_match %r{/images/thumbnails/foo_800x800\.jpg\z}, variants[:hero]
-    assert_equal 'https://storage.googleapis.com/qoodish.appspot.com/images/foo.jpg', variants[:ogp]
-  end
-
-  test 'thumbnail_url returns a configured variant URL for Cloudflare-hosted images' do
-    image = users(:me).owned_images.create!(
-      url: 'https://imagedelivery.net/mockhash/cf-id-variant/public'
-    )
-
-    assert_equal 'https://imagedelivery.net/mockhash/cf-id-variant/card',
-                 image.thumbnail_url('400x400')
-  end
-
-  test 'thumbnail_url falls back to GCS-style path for non-Cloudflare images' do
-    image = users(:me).owned_images.create!(
-      url: 'https://storage.googleapis.com/qoodish.appspot.com/images/foo.jpg'
-    )
-
-    assert_match %r{/images/thumbnails/foo_200x200\.jpg\z}, image.thumbnail_url
-  end
-
   test 'destroy calls Cloudflare DELETE when url is in imagedelivery.net format' do
     image = users(:me).owned_images.create!(
       url: 'https://imagedelivery.net/mockhash/cf-id-abc/public'

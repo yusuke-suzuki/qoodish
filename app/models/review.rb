@@ -74,10 +74,6 @@ class Review < ApplicationRecord
       .limit(10)
   }
 
-  def thumbnail_url(size = '200x200')
-    images.first&.thumbnail_url(size).to_s
-  end
-
   def image_url
     images.first&.url.to_s
   end

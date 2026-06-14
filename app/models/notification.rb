@@ -65,7 +65,7 @@ class Notification < ApplicationRecord
     }
 
     data = {
-      icon: notifier.thumbnail_url,
+      icon: notifier.image_variants&.dig(:avatar).to_s,
       click_action: "#{ENV['WEB_ENDPOINT']}#{click_action}",
       notification_id: id.to_s,
       key: key,
