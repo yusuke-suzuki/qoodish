@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_05_20_063537) do
+ActiveRecord::Schema.define(version: 2026_06_14_104139) do
 
   create_table "comments", charset: "utf8mb4", force: :cascade do |t|
     t.string "commentable_type", null: false
@@ -48,15 +48,13 @@ ActiveRecord::Schema.define(version: 2026_05_20_063537) do
   end
 
   create_table "images", charset: "utf8mb4", force: :cascade do |t|
-    t.bigint "review_id"
     t.string "url", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "user_id"
+    t.bigint "user_id", null: false
     t.string "imageable_type"
     t.bigint "imageable_id"
     t.index ["imageable_type", "imageable_id"], name: "index_images_on_imageable"
-    t.index ["review_id"], name: "index_images_on_review_id"
     t.index ["url"], name: "index_images_on_url", unique: true
     t.index ["user_id"], name: "index_images_on_user_id"
   end
@@ -100,7 +98,6 @@ ActiveRecord::Schema.define(version: 2026_05_20_063537) do
     t.string "base_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "image_url"
     t.decimal "latitude", precision: 16, scale: 6, default: "0.0", null: false
     t.decimal "longitude", precision: 16, scale: 6, default: "0.0", null: false
     t.index ["user_id"], name: "index_maps_on_user_id"
@@ -154,11 +151,9 @@ ActiveRecord::Schema.define(version: 2026_05_20_063537) do
     t.string "name"
     t.string "email"
     t.string "uid", null: false
-    t.string "image_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "biography"
-    t.index ["image_path"], name: "index_users_on_image_path", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
 
@@ -178,7 +173,6 @@ ActiveRecord::Schema.define(version: 2026_05_20_063537) do
     t.index ["voter_type", "voter_id"], name: "index_votes_on_voter_type_and_voter_id"
   end
 
-  add_foreign_key "images", "reviews"
   add_foreign_key "images", "users"
   add_foreign_key "maps", "users"
   add_foreign_key "push_notifications", "users"

@@ -1,6 +1,4 @@
 class Map < ApplicationRecord
-  self.ignored_columns = %w[image_url]
-
   belongs_to :user
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :notifiable
@@ -96,16 +94,6 @@ class Map < ApplicationRecord
     end
   }
 
-  def thumbnail_url(size = '200x200')
-    primary = images.first
-    return '' if primary&.url.blank?
-    return Cloudflare::Images.variant_url_for_legacy_size(primary.url, size) if primary.url.include?(Cloudflare::Images::DELIVERY_HOST)
-
-    ext = File.extname(primary.url)
-    "#{ENV['CLOUD_STORAGE_ENDPOINT']}/#{ENV['CLOUD_STORAGE_BUCKET_NAME']}/maps/thumbnails/" \
-      "#{File.basename(File.basename(CGI.unescape(primary.url)), ext)}_#{size}#{ext}"
-  end
-
   def image_url
     images.first&.url.to_s
   end
@@ -114,19 +102,9 @@ class Map < ApplicationRecord
     primary = images.first
     return nil unless primary
 
-    if primary.url.include?(Cloudflare::Images::DELIVERY_HOST)
-      Cloudflare::Images::NAMED_VARIANTS
-        .index_with { |variant| Cloudflare::Images.variant_url(primary.url, variant) }
-        .merge(url: primary.url)
-    else
-      {
-        url: primary.url,
-        avatar: thumbnail_url('200x200'),
-        card: thumbnail_url('400x400'),
-        hero: thumbnail_url('800x800'),
-        ogp: primary.url
-      }
-    end
+    Cloudflare::Images::NAMED_VARIANTS
+      .index_with { |variant| Cloudflare::Images.variant_url(primary.url, variant) }
+      .merge(url: primary.url)
   end
 
   def lat

@@ -60,10 +60,6 @@ spec:
               value: "3306"
             - name: ALLOWED_ENDPOINTS
               value: https://qoodish.com
-            - name: CLOUD_STORAGE_ENDPOINT
-              value: https://storage.googleapis.com
-            - name: CLOUD_STORAGE_BUCKET_NAME
-              value: qoodish.appspot.com
             - name: CLOUDFLARE_ACCOUNT_ID
               value: 9671c836ad132f87d892b12ccd1809e0
             - name: CLOUDFLARE_IMAGES_ACCOUNT_HASH

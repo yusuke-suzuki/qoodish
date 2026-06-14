@@ -71,40 +71,4 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [images(:one).id, images(:two).id].sort,
                  reviews(:public_one).reload.image_ids.sort
   end
-
-  test 'update accepts legacy images param and converts to image_ids' do
-    review = reviews(:public_one)
-    new_url = 'https://imagedelivery.net/mockhash/review-legacy/public'
-
-    stub_google_auth(users(:me)) do
-      stub_cloudflare_images do
-        put "/reviews/#{review.id}",
-            params: { images: [{ url: new_url }] },
-            headers: { 'Authorization': 'Bearer dummytoken' }
-      end
-    end
-
-    assert_response :success
-    images = review.reload.images
-    assert_equal [new_url], images.map(&:url)
-    assert_equal [users(:me).id], images.map(&:user_id).uniq
-  end
-
-  test 'update silently drops legacy images URL already owned by another user' do
-    foreign_url = 'https://imagedelivery.net/mockhash/foreign-review/public'
-    users(:you).owned_images.create!(url: foreign_url)
-    review = reviews(:public_one)
-
-    stub_google_auth(users(:me)) do
-      stub_cloudflare_images do
-        put "/reviews/#{review.id}",
-            params: { images: [{ url: foreign_url }] },
-            headers: { 'Authorization': 'Bearer dummytoken' }
-      end
-    end
-
-    assert_response :success
-    # The foreign-owned URL is dropped, so the review ends up with no images.
-    assert_empty review.reload.images
-  end
 end

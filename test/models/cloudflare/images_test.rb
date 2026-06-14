@@ -27,22 +27,6 @@ class Cloudflare::ImagesTest < ActiveSupport::TestCase
                  Cloudflare::Images.variant_url(url, 'card')
   end
 
-  test 'variant_url_for_legacy_size maps legacy thumbnail sizes to configured variants' do
-    url = 'https://imagedelivery.net/mockhash/qoodish/8a5e2b1c/public'
-    assert_equal 'https://imagedelivery.net/mockhash/qoodish/8a5e2b1c/avatar',
-                 Cloudflare::Images.variant_url_for_legacy_size(url, '200x200')
-    assert_equal 'https://imagedelivery.net/mockhash/qoodish/8a5e2b1c/card',
-                 Cloudflare::Images.variant_url_for_legacy_size(url, '400x400')
-    assert_equal 'https://imagedelivery.net/mockhash/qoodish/8a5e2b1c/hero',
-                 Cloudflare::Images.variant_url_for_legacy_size(url, '800x800')
-  end
-
-  test 'variant_url_for_legacy_size falls back to public for unmapped sizes' do
-    url = 'https://imagedelivery.net/mockhash/qoodish/8a5e2b1c/public'
-    assert_equal 'https://imagedelivery.net/mockhash/qoodish/8a5e2b1c/public',
-                 Cloudflare::Images.variant_url_for_legacy_size(url, '9999x9999')
-  end
-
   test 'upload_from_url returns the canonical /public URL regardless of variants order' do
     body = {
       'success' => true,

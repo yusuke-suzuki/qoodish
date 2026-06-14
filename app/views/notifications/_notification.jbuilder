@@ -6,14 +6,12 @@ json.notifiable do
   json.type notification.notifiable_type.downcase
   json.image notification.notifiable.image_variants
   json.image_url notification.notifiable.image_url
-  json.thumbnail_url notification.notifiable.thumbnail_url
 end
 json.notifier do
   json.id notification.notifier_id
   json.name notification.notifier.name
   json.image notification.notifier.image_variants
   json.image_url notification.notifier.image_url
-  json.profile_image_url notification.notifier.thumbnail_url
 end
 json.read notification.read
 json.created_at notification.created_at

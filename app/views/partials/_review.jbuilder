@@ -7,7 +7,6 @@ json.author do
   json.name review.user.name
   json.image review.user.image_variants
   json.image_url review.user.image_url
-  json.profile_image_url review.user.thumbnail_url
 end
 json.comment review.comment
 json.comments review.comments do |comment|
@@ -18,7 +17,6 @@ json.comments review.comments do |comment|
     json.name comment.user.name
     json.image comment.user.image_variants
     json.image_url comment.user.image_url
-    json.profile_image_url comment.user.thumbnail_url
   end
   json.body comment.body
   json.created_at comment.created_at
@@ -27,9 +25,6 @@ json.images review.images do |image|
   variants = image.variants
   json.id image.id
   json.url image.url
-  json.thumbnail_url image.thumbnail_url
-  json.thumbnail_url_400 image.thumbnail_url('400x400')
-  json.thumbnail_url_800 image.thumbnail_url('800x800')
   json.avatar variants[:avatar]
   json.card variants[:card]
   json.hero variants[:hero]

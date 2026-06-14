@@ -10,15 +10,6 @@ module Cloudflare
     # ogp 1200x630); the backend just references the variant names.
     NAMED_VARIANTS = %i[avatar card hero ogp].freeze
 
-    # Map legacy `thumbnail_url(size)` arguments to the closest configured
-    # Cloudflare variant. Used by the legacy `thumbnail_url*` jbuilder
-    # fields until Phase 3 removes them.
-    LEGACY_SIZE_TO_VARIANT = {
-      '200x200' => 'avatar',
-      '400x400' => 'card',
-      '800x800' => 'hero'
-    }.freeze
-
     def create_direct_upload
       response = multipart_faraday.post(direct_upload_path) do |req|
         req.headers['Authorization'] = "Bearer #{api_token}"
@@ -74,13 +65,6 @@ module Cloudflare
     # name. The variant must be configured in the Cloudflare Images dashboard.
     def self.variant_url(url, variant)
       url.sub(%r{/[^/]+\z}, "/#{variant}")
-    end
-
-    # Legacy adapter: translates a `thumbnail_url(size)` size argument into a
-    # configured Cloudflare variant name. Falls back to `public` for unknown
-    # sizes so callers always get a working URL.
-    def self.variant_url_for_legacy_size(url, size)
-      variant_url(url, LEGACY_SIZE_TO_VARIANT.fetch(size, 'public'))
     end
 
     def self.extract_id(url)

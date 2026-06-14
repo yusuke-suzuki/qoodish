@@ -15,10 +15,6 @@ class Comment < ApplicationRecord
 
   after_create :create_notification, unless: :on_yourself?
 
-  def thumbnail_url
-    commentable.thumbnail_url
-  end
-
   def image_url
     commentable.image_url
   end

@@ -14,7 +14,7 @@ gem 'rails', '~> 7.2.2.1'
 gem 'bootsnap', require: false
 gem 'faraday'
 gem 'faraday-multipart', require: 'faraday/multipart'
-gem 'google-cloud-storage'
+gem 'googleauth'
 gem 'jbuilder'
 gem 'jwt'
 gem 'opentelemetry-exporter-otlp'

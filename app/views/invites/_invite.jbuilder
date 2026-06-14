@@ -4,7 +4,6 @@ json.invitable do
   json.type invite.invitable_name
   json.image invite.invitable.image_variants
   json.image_url invite.invitable.image_url
-  json.thumbnail_url invite.invitable.thumbnail_url
   json.name invite.invitable.name
   json.description invite.invitable.description
 end
@@ -13,7 +12,6 @@ json.sender do
   json.name invite.sender.name
   json.image invite.sender.image_variants
   json.image_url invite.sender.image_url
-  json.profile_image_url invite.sender.thumbnail_url
 end
 json.expired invite.expired
 json.created_at invite.created_at
