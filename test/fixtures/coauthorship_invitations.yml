@@ -1,0 +1,5 @@
+pending_you_to_me:
+  map: public_unfollowing
+  inviter: you
+  invitee: me
+  status: pending

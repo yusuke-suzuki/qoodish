@@ -4,6 +4,6 @@ json.biography user.biography
 json.image user.image_variants
 json.image_url user.image_url
 json.maps_count user.maps.count
-json.following_maps_count user.follow_count
+json.bookmarked_maps_count user.bookmark_count
 json.reviews_count user.reviews.count
 json.likes_count user.votes.count

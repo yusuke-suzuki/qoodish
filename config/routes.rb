@@ -10,8 +10,15 @@ Rails.application.routes.draw do
   resources :maps do
     scope module: :maps do
       resources :reviews, only: %i[index show create]
-      resources :collaborators, only: [:index]
-      resource :follow, only: %i[create destroy]
+      resources :coauthors, only: %i[index destroy]
+      resource :bookmark, only: %i[create destroy]
+      resources :coauthorship_invitations, only: [:create]
+    end
+  end
+  resources :coauthorship_invitations, only: [:index] do
+    member do
+      post :accept
+      post :decline
     end
   end
   resources :reviews, only: %i[index update destroy] do
@@ -39,7 +46,7 @@ Rails.application.routes.draw do
             resources :reviews, only: [:index]
           end
         end
-        resources :collaborators, only: [:index]
+        resources :coauthors, only: [:index]
       end
     end
     resources :reviews, only: %i[index show]

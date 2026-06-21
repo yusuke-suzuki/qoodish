@@ -32,4 +32,26 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal res['id'], maps(:private_following).id
   end
+
+  test 'coauthor cannot change the private flag' do
+    map = maps(:private_following) # author: you, coauthor: me
+
+    stub_google_auth(users(:me)) do
+      patch "/maps/#{map.id}", params: { private: false }, headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+    assert map.reload.private
+  end
+
+  test 'author can change the private flag' do
+    map = maps(:public_one) # author: me
+
+    stub_google_auth(users(:me)) do
+      patch "/maps/#{map.id}", params: { private: true }, headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+    assert map.reload.private
+  end
 end

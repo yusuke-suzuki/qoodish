@@ -1,5 +1,5 @@
 json.id map.id
-json.owner do
+json.author do
   json.id map.user.id
   json.name map.user.name
   json.image map.user.image_variants
@@ -9,12 +9,10 @@ json.name map.name
 json.description map.description
 json.latitude map.lat
 json.longitude map.lng
-json.following false
+json.bookmarking false
 json.editable false
-json.postable false
+json.bookmarkable false
 json.private map.private
-json.shared map.shared
-json.invitable map.invitable
 json.image map.image_variants
 json.image_url map.image_url
 json.created_at map.created_at

@@ -4,8 +4,20 @@ class User < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :recipient
   has_many :comments, dependent: :destroy
-  has_many :invites, as: :recipient
-  has_many :follows, as: :follower, dependent: :destroy
+  has_many :coauthorships, dependent: :destroy
+  has_many :coauthored_maps, through: :coauthorships, source: :map
+  has_many :bookmarks, dependent: :destroy
+  has_many :bookmarked_maps, through: :bookmarks, source: :map
+  has_many :sent_coauthorship_invitations,
+           class_name: 'CoauthorshipInvitation',
+           foreign_key: :inviter_id,
+           dependent: :destroy,
+           inverse_of: :inviter
+  has_many :received_coauthorship_invitations,
+           class_name: 'CoauthorshipInvitation',
+           foreign_key: :invitee_id,
+           dependent: :destroy,
+           inverse_of: :invitee
   has_many :votes, as: :voter, dependent: :destroy
   has_many :owned_images, class_name: 'Image', dependent: :destroy
   has_many :images, as: :imageable, dependent: :destroy
@@ -48,12 +60,16 @@ class User < ApplicationRecord
     post.user_id == id
   end
 
-  def map_owner?(map)
+  def map_author?(map)
     map.user_id == id
   end
 
-  def postable?(map)
-    map_owner?(map) || (following?(map) && map.shared)
+  def editable?(map)
+    map_author?(map) || map.coauthorships.exists?(user_id: id)
+  end
+
+  def bookmarkable?(map)
+    !map.private && !editable?(map)
   end
 
   def referenceable_maps
@@ -64,32 +80,28 @@ class User < ApplicationRecord
     Review.referenceable_by(self)
   end
 
-  def postable_maps
-    Map.postable_by(self)
+  def editable_maps
+    Map.editable_by(self)
   end
 
-  def invitable_maps
-    Map.invitable_by(self)
+  def related_maps
+    Map.related_to(self)
   end
 
-  def following_maps
-    Map.following_by(self)
+  def bookmarking?(map)
+    bookmarks.exists?(map: map)
   end
 
-  def following?(followable)
-    follows.exists?(followable: followable)
+  def bookmark_count
+    bookmarks.size
   end
 
-  def follow_count
-    follows.where(follower: self).size
+  def bookmark!(map)
+    bookmarks.create!(map: map)
   end
 
-  def follow!(followable)
-    follows.create!(followable: followable)
-  end
-
-  def unfollow!(followable)
-    follows.find_by!(followable: followable).destroy!
+  def unbookmark!(map)
+    bookmarks.find_by!(map: map).destroy!
   end
 
   def referenceable_vote?(vote)

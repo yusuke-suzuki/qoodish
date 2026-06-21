@@ -5,13 +5,13 @@ class MapsController < ApplicationController
     @maps = if params[:recommend]
               Map
                 .public_open
-                .unfollowing_by(current_user)
+                .not_bookmarked_by(current_user)
                 .preload(:images, user: :images)
                 .order(created_at: :desc)
                 .sample(10)
             else
               current_user
-                .following_maps
+                .related_maps
                 .preload(:images, user: :images)
                 .order(created_at: :desc)
             end
@@ -35,8 +35,11 @@ class MapsController < ApplicationController
   end
 
   def update
-    @map = current_user.maps.find_by!(id: params[:id])
-    @map.update!(map_params)
+    @map = current_user.editable_maps.find_by!(id: params[:id])
+
+    attributes = map_params
+    attributes.delete(:private) unless current_user.map_author?(@map)
+    @map.update!(attributes)
 
     ActiveRecord::Associations::Preloader.new(
       records: [@map],
@@ -51,6 +54,6 @@ class MapsController < ApplicationController
   private
 
   def map_params
-    params.permit(:name, :description, :private, :invitable, :shared, :latitude, :longitude, image_ids: [])
+    params.permit(:name, :description, :private, :latitude, :longitude, image_ids: [])
   end
 end

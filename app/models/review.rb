@@ -47,13 +47,12 @@ class Review < ApplicationRecord
       .where(maps: { private: false })
   }
 
-  scope :referenceable_by, lambda { |current_user|
-    following_by(current_user)
-      .or(public_open)
+  scope :referenceable_by, lambda { |user|
+    joins(:map).where(maps: { id: Map.referenceable_by(user) })
   }
 
-  scope :following_by, lambda { |user|
-    joins(:map).where(maps: { id: user.following_maps })
+  scope :feed_for, lambda { |user|
+    joins(:map).where(maps: { id: Map.related_to(user) })
   }
 
   scope :latest_feed, lambda {

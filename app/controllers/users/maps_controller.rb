@@ -6,7 +6,7 @@ module Users
       @maps = if params[:user_id] == current_user.uid
                 if params[:following]
                   current_user
-                    .following_maps
+                    .bookmarked_maps
                     .preload(:images, user: :images)
                     .order(created_at: :desc)
                 else
@@ -22,7 +22,7 @@ module Users
                   current_user
                     .referenceable_maps
                     .preload(:images, user: :images)
-                    .where(id: Map.following_by(user))
+                    .where(id: Map.bookmarked_by(user))
                     .order(created_at: :desc)
                 else
                   current_user

@@ -10,9 +10,42 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_06_14_104139) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_20_210612) do
+  create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "map_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["map_id", "user_id"], name: "index_bookmarks_on_map_id_and_user_id", unique: true
+    t.index ["map_id"], name: "index_bookmarks_on_map_id"
+    t.index ["user_id"], name: "index_bookmarks_on_user_id"
+  end
 
-  create_table "comments", charset: "utf8mb4", force: :cascade do |t|
+  create_table "coauthorship_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "map_id", null: false
+    t.bigint "inviter_id", null: false
+    t.bigint "invitee_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invitee_id", "status"], name: "index_coauthorship_invitations_on_invitee_id_and_status"
+    t.index ["invitee_id"], name: "index_coauthorship_invitations_on_invitee_id"
+    t.index ["inviter_id"], name: "index_coauthorship_invitations_on_inviter_id"
+    t.index ["map_id", "invitee_id"], name: "index_coauthorship_invitations_on_map_id_and_invitee_id"
+    t.index ["map_id"], name: "index_coauthorship_invitations_on_map_id"
+  end
+
+  create_table "coauthorships", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "map_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["map_id", "user_id"], name: "index_coauthorships_on_map_id_and_user_id", unique: true
+    t.index ["map_id"], name: "index_coauthorships_on_map_id"
+    t.index ["user_id"], name: "index_coauthorships_on_user_id"
+  end
+
+  create_table "comments", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "commentable_type", null: false
     t.bigint "commentable_id", null: false
     t.bigint "user_id", null: false
@@ -23,7 +56,7 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "devices", charset: "utf8mb4", force: :cascade do |t|
+  create_table "devices", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "registration_token", null: false
     t.datetime "created_at", null: false
@@ -33,7 +66,7 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["user_id"], name: "index_devices_on_user_id"
   end
 
-  create_table "follows", charset: "utf8mb4", force: :cascade do |t|
+  create_table "follows", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "followable_type", null: false
     t.bigint "followable_id", null: false
     t.string "follower_type", null: false
@@ -47,10 +80,10 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["follower_type", "follower_id"], name: "index_follows_on_follower_type_and_follower_id"
   end
 
-  create_table "images", charset: "utf8mb4", force: :cascade do |t|
+  create_table "images", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "url", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.string "imageable_type"
     t.bigint "imageable_id"
@@ -59,7 +92,7 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["user_id"], name: "index_images_on_user_id"
   end
 
-  create_table "inappropriate_contents", charset: "utf8mb4", force: :cascade do |t|
+  create_table "inappropriate_contents", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "content_id_val", null: false
     t.string "content_type", null: false
@@ -69,7 +102,7 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["user_id"], name: "index_inappropriate_contents_on_user_id"
   end
 
-  create_table "invites", charset: "utf8mb4", force: :cascade do |t|
+  create_table "invites", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "invitable_type"
     t.bigint "invitable_id"
     t.string "sender_type"
@@ -87,7 +120,7 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["sender_type", "sender_id"], name: "index_invites_on_sender_type_and_sender_id"
   end
 
-  create_table "maps", charset: "utf8mb4", force: :cascade do |t|
+  create_table "maps", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "name", null: false
     t.string "description", null: false
@@ -103,7 +136,7 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["user_id"], name: "index_maps_on_user_id"
   end
 
-  create_table "notifications", charset: "utf8mb4", force: :cascade do |t|
+  create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "notifiable_type"
     t.bigint "notifiable_id"
     t.string "notifier_type"
@@ -122,18 +155,19 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
-  create_table "push_notifications", charset: "utf8mb4", force: :cascade do |t|
+  create_table "push_notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.boolean "followed", default: false, null: false
     t.boolean "invited", default: false, null: false
     t.boolean "liked", default: false, null: false
     t.boolean "comment", default: false, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "coauthor_invited", default: false, null: false
     t.index ["user_id"], name: "index_push_notifications_on_user_id"
   end
 
-  create_table "reviews", charset: "utf8mb4", force: :cascade do |t|
+  create_table "reviews", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "map_id", null: false
     t.text "comment", null: false
@@ -147,7 +181,7 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
-  create_table "users", charset: "utf8mb4", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name"
     t.string "email"
     t.string "uid", null: false
@@ -157,7 +191,7 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
 
-  create_table "votes", charset: "utf8mb4", force: :cascade do |t|
+  create_table "votes", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "votable_type"
     t.bigint "votable_id"
     t.string "voter_type"
@@ -173,6 +207,13 @@ ActiveRecord::Schema.define(version: 2026_06_14_104139) do
     t.index ["voter_type", "voter_id"], name: "index_votes_on_voter_type_and_voter_id"
   end
 
+  add_foreign_key "bookmarks", "maps"
+  add_foreign_key "bookmarks", "users"
+  add_foreign_key "coauthorship_invitations", "maps"
+  add_foreign_key "coauthorship_invitations", "users", column: "invitee_id"
+  add_foreign_key "coauthorship_invitations", "users", column: "inviter_id"
+  add_foreign_key "coauthorships", "maps"
+  add_foreign_key "coauthorships", "users"
   add_foreign_key "images", "users"
   add_foreign_key "maps", "users"
   add_foreign_key "push_notifications", "users"

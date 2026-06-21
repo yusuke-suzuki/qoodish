@@ -45,14 +45,20 @@ en:
       map_name_exceed: "Map name is too long. (Max: 30)"
       map_description_required: Please enter a description of the map.
       map_description_exceed: "Description of the map is too long. (Max: 200)"
-      map_owner_not_specified: Please specify the owner of the map.
+      map_author_not_specified: Please specify the author of the map.
 
       comment_required: Comment is required.
       comment_exceeded: "Comment is too long. (Max: 500)"
       invalid_uri: Invalid URI.
       images_per_report_reached_limit: "The limit of images per report has been reached."
 
-      map_owner_cannot_removed: Map owner cannot be removed.
+      coauthor_already_author: The author cannot be a coauthor.
+      duplicate_coauthor: The user is already a coauthor.
+      bookmark_map_not_public: Only public maps can be bookmarked.
+      bookmark_map_editable: The author and coauthors cannot bookmark a map they can edit.
+      duplicate_bookmark: The map is already bookmarked.
+      invitation_invitee_already_author: The author cannot be invited as a coauthor.
+      duplicate_pending_invitation: A pending invitation already exists for this user.
 
       registration_token_is_required: Registration token is required.
       registration_token_is_duplicated: Registration token is duplicated.
