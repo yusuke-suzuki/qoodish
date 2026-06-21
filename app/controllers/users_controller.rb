@@ -1,5 +1,13 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!, only: %i[show update destroy]
+  before_action :authenticate_user!, only: %i[index show update destroy]
+
+  def index
+    @users = if params[:q].present?
+               User.search_by_name(params[:q]).preload(:images)
+             else
+               User.none
+             end
+  end
 
   def show
     @user = if params[:id] == current_user.uid
