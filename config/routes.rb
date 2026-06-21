@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :users, only: %i[show create update destroy] do
+  resources :users, only: %i[index show create update destroy] do
     scope module: :users do
       resources :maps, only: [:index]
       resources :reviews, only: [:index]

@@ -27,6 +27,30 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert res['push_notification'].blank?
   end
 
+  test 'search users by name should return matches' do
+    stub_google_auth(users(:me)) do
+      get '/users', params: { q: 'okayu' }, headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert(res.any? { |user| user['id'] == users(:you).id })
+  end
+
+  test 'search users without name should return empty' do
+    stub_google_auth(users(:me)) do
+      get '/users', headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_empty res
+  end
+
   test 'delete account should be success' do
     uid = users(:me).uid
 
