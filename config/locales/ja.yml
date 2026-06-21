@@ -14,14 +14,20 @@ ja:
       map_name_exceed: "マップ名が長すぎます。(最大: 30 文字)"
       map_description_required: マップの説明を入力してください。
       map_description_exceed: "マップの説明が長すぎます。(最大: 200 文字)"
-      map_owner_not_specified: マップのオーナーを指定してください。
+      map_author_not_specified: マップの著者を指定してください。
 
       comment_required: コメントを入力してください。
       comment_exceeded: "コメントが長すぎます。(最大: 500 文字)"
       invalid_uri: 不正な URL です。
       images_per_report_reached_limit: "レポートごとの画像数の上限に達しました。"
 
-      map_owner_cannot_removed: マップのオーナーはアンフォローできません。
+      coauthor_already_author: 著者を共著者にはできません。
+      duplicate_coauthor: 既に共著者として追加されています。
+      bookmark_map_not_public: ブックマークできるのは公開マップのみです。
+      bookmark_map_editable: 著者・共著者は自身が編集できるマップをブックマークできません。
+      duplicate_bookmark: 既にブックマーク済みです。
+      invitation_invitee_already_author: 著者を共著者として招待することはできません。
+      duplicate_pending_invitation: このユーザーへの招待は既に保留中です。
 
       registration_token_is_required: 登録トークンを入力してください。
       registration_token_is_duplicated: 既に登録されているトークンです。

@@ -48,7 +48,7 @@ class NotificationsControllerTest < ActionDispatch::IntegrationTest
       notifiable: map,
       notifier: users(:you),
       recipient: users(:me),
-      key: 'followed'
+      key: 'coauthor_invited'
     )
 
     stub_google_auth(users(:me)) do

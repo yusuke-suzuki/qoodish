@@ -2,9 +2,11 @@ class Map < ApplicationRecord
   belongs_to :user
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :notifiable
-  has_many :invites, as: :invitable, dependent: :destroy
-  has_many :follows, as: :followable, dependent: :destroy
-  has_many :followers, through: :follows, source: :follower, source_type: User.name
+  has_many :coauthorships, dependent: :destroy
+  has_many :coauthors, through: :coauthorships, source: :user
+  has_many :bookmarks, dependent: :destroy
+  has_many :bookmarking_users, through: :bookmarks, source: :user
+  has_many :coauthorship_invitations, dependent: :destroy
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :images, as: :imageable, dependent: :destroy
@@ -34,44 +36,40 @@ class Map < ApplicationRecord
             }
   validates :user_id,
             presence: {
-              message: I18n.t('messages.api.map_owner_not_specified')
+              message: I18n.t('messages.api.map_author_not_specified')
             }
   validates :images, length: { maximum: 1 }
 
   before_validation :remove_carriage_return
-  after_create :follow_by_owner
+  after_update :destroy_bookmarks_when_private, if: :saved_change_to_private?
 
   scope :public_open, lambda {
     where(private: false)
   }
 
   scope :referenceable_by, lambda { |user|
-    following_by(user)
-      .group('maps.id')
-      .or(unfollowing_by(user).public_open)
+    where(private: false)
+      .or(where(user_id: user.id))
+      .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
   }
 
-  scope :postable_by, lambda { |user|
-    following_by(user)
-      .where(maps: { shared: true })
-      .or(following_by(user).where(maps: { shared: false, user: user }))
+  scope :editable_by, lambda { |user|
+    where(user_id: user.id)
+      .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
   }
 
-  scope :invitable_by, lambda { |user|
-    joins(:follows)
-      .where(maps: { user: user })
-      .or(following_by(user).where(maps: { invitable: true }))
+  scope :bookmarked_by, lambda { |user|
+    where(id: Bookmark.where(user_id: user.id).select(:map_id))
   }
 
-  scope :following_by, lambda { |user|
-    joins(:follows)
-      .where(follows: { follower: user })
+  scope :related_to, lambda { |user|
+    where(user_id: user.id)
+      .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
+      .or(where(private: false, id: Bookmark.where(user_id: user.id).select(:map_id)))
   }
 
-  scope :unfollowing_by, lambda { |user|
-    joins(:follows)
-      .group('maps.id')
-      .having('count(follows.follower_id = ? or null) < 1', user.id)
+  scope :not_bookmarked_by, lambda { |user|
+    where.not(id: Bookmark.where(user_id: user.id).select(:map_id))
   }
 
   scope :active, lambda {
@@ -82,9 +80,9 @@ class Map < ApplicationRecord
   }
 
   scope :popular, lambda {
-    joins(:follows)
+    joins(:bookmarks)
       .group('maps.id')
-      .order('count(follows.id) desc')
+      .order('count(bookmarks.id) desc')
       .limit(10)
   }
 
@@ -122,7 +120,7 @@ class Map < ApplicationRecord
     description&.delete!("\r")
   end
 
-  def follow_by_owner
-    user.follow!(self)
+  def destroy_bookmarks_when_private
+    bookmarks.destroy_all if private?
   end
 end

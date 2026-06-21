@@ -3,7 +3,7 @@ class Notification < ApplicationRecord
   belongs_to :notifier, polymorphic: true
   belongs_to :recipient, polymorphic: true
 
-  KEYS = %w[followed invited liked comment].freeze
+  KEYS = %w[coauthor_invited liked comment].freeze
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
@@ -36,6 +36,8 @@ class Notification < ApplicationRecord
       "/maps/#{notifiable.id}"
     when 'invited'
       '/invites'
+    when 'coauthor_invited'
+      '/coauthorship_invitations'
     when 'comment'
       "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
     when 'liked'

@@ -1,0 +1,7 @@
+you_on_my_private:
+  map: private
+  user: you
+
+me_on_private_following:
+  map: private_following
+  user: me

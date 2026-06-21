@@ -20,7 +20,7 @@ module Maps
 
     def create
       current_user
-        .postable_maps
+        .editable_maps
         .find_by!(id: params[:map_id])
 
       @review = current_user.reviews.create!(review_params)

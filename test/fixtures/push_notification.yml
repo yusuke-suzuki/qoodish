@@ -1,11 +1,11 @@
 notifier:
   user: me
-  followed: true
+  coauthor_invited: true
   liked: true
   comment: true
 
 recipient:
   user: you
-  followed: true
+  coauthor_invited: true
   liked: true
   comment: true
