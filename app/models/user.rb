@@ -1,4 +1,9 @@
 class User < ApplicationRecord
+  # Tolerate the dropped legacy image_path column during the rollout window: an
+  # API instance that booted before the drop migration cached it and would
+  # otherwise emit it in INSERTs. Remove once all instances run the new schema.
+  self.ignored_columns += %w[image_path]
+
   has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
   has_many :reviews, dependent: :destroy

@@ -1,4 +1,9 @@
 class Map < ApplicationRecord
+  # Tolerate the dropped legacy image_url column during the rollout window: an
+  # API instance that booted before the drop migration cached it and would
+  # otherwise emit it in INSERTs. Remove once all instances run the new schema.
+  self.ignored_columns += %w[image_url]
+
   belongs_to :user
   has_many :reviews, dependent: :destroy
   has_many :notifications, as: :notifiable
