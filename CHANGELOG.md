@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/yusuke-suzuki/qoodish/compare/v2.0.0...v2.0.1) (2026-06-22)
+
+
+### Bug Fixes
+
+* ignore dropped legacy image columns ([de73ebd](https://github.com/yusuke-suzuki/qoodish/commit/de73ebd048ae681e16b01b501af27c349e843446))
+
 ## [2.0.0](https://github.com/yusuke-suzuki/qoodish/compare/v1.6.1...v2.0.0) (2026-06-22)
 
 
