@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.0.0](https://github.com/yusuke-suzuki/qoodish/compare/v1.6.1...v2.0.0) (2026-06-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* map JSON renames owner to author and following to bookmarking, drops shared/invitable/postable, and adds bookmarkable. Endpoints /maps/:id/collaborators and /maps/:id/follow become /maps/:id/coauthors and /maps/:id/bookmark, and coauthor invitations replace the old invite flow.
+* JSON responses no longer include thumbnail_url, thumbnail_url_400, thumbnail_url_800, or profile_image_url.
+
+### Features
+
+* add user search endpoint ([7df4603](https://github.com/yusuke-suzuki/qoodish/commit/7df460334b491735d6df3a3fe450e57ebf01c6a6))
+* redesign map access permissions ([833320d](https://github.com/yusuke-suzuki/qoodish/commit/833320d6d86afa1612603f741c7f2c997e12ebdc))
+
+
+### Code Refactoring
+
+* remove GCS legacy paths ([c0431b1](https://github.com/yusuke-suzuki/qoodish/commit/c0431b1fca40cbcd72c2c2058fd3cb649af306fd)), closes [#539](https://github.com/yusuke-suzuki/qoodish/issues/539)
+
 ## [1.6.1](https://github.com/yusuke-suzuki/qoodish/compare/v1.6.0...v1.6.1) (2026-05-31)
 
 
