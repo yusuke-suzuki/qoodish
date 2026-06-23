@@ -32,10 +32,6 @@ class Notification < ApplicationRecord
 
   def click_action
     case key
-    when 'followed'
-      "/maps/#{notifiable.id}"
-    when 'invited'
-      '/invites'
     when 'coauthor_invited'
       '/coauthorship_invitations'
     when 'comment'
