@@ -1,9 +1,4 @@
 class Image < ApplicationRecord
-  # Tolerate the dropped legacy review_id column during the rollout window: an
-  # API instance that booted before the drop migration cached it and would
-  # otherwise emit it in INSERTs. Remove once all instances run the new schema.
-  self.ignored_columns += %w[review_id]
-
   belongs_to :user
   belongs_to :imageable, polymorphic: true, optional: true
 

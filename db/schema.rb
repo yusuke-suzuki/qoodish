@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_20_210612) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_23_010032) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "map_id", null: false
     t.bigint "user_id", null: false
@@ -66,20 +66,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_20_210612) do
     t.index ["user_id"], name: "index_devices_on_user_id"
   end
 
-  create_table "follows", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "followable_type", null: false
-    t.bigint "followable_id", null: false
-    t.string "follower_type", null: false
-    t.bigint "follower_id", null: false
-    t.boolean "blocked", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["followable_id", "followable_type"], name: "fk_followables"
-    t.index ["followable_type", "followable_id"], name: "index_follows_on_followable_type_and_followable_id"
-    t.index ["follower_id", "follower_type"], name: "fk_follows"
-    t.index ["follower_type", "follower_id"], name: "index_follows_on_follower_type_and_follower_id"
-  end
-
   create_table "images", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "url", null: false
     t.datetime "created_at", null: false
@@ -100,24 +86,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_20_210612) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_inappropriate_contents_on_user_id"
-  end
-
-  create_table "invites", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "invitable_type"
-    t.bigint "invitable_id"
-    t.string "sender_type"
-    t.bigint "sender_id"
-    t.string "recipient_type"
-    t.bigint "recipient_id"
-    t.boolean "expired", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["invitable_id", "invitable_type"], name: "index_invites_on_invitable_id_and_invitable_type"
-    t.index ["invitable_type", "invitable_id"], name: "index_invites_on_invitable_type_and_invitable_id"
-    t.index ["recipient_id", "recipient_type"], name: "index_invites_on_recipient_id_and_recipient_type"
-    t.index ["recipient_type", "recipient_id"], name: "index_invites_on_recipient_type_and_recipient_id"
-    t.index ["sender_id", "sender_type"], name: "index_invites_on_sender_id_and_sender_type"
-    t.index ["sender_type", "sender_id"], name: "index_invites_on_sender_type_and_sender_id"
   end
 
   create_table "maps", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
