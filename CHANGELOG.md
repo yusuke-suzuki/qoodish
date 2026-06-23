@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/yusuke-suzuki/qoodish/compare/v2.0.1...v3.0.0) (2026-06-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop follows and invites tables
+
+### Miscellaneous Chores
+
+* drop follows and invites tables ([09edb33](https://github.com/yusuke-suzuki/qoodish/commit/09edb3316d129b32e2d24d8eade90b4e05695aab))
+
 ## [2.0.1](https://github.com/yusuke-suzuki/qoodish/compare/v2.0.0...v2.0.1) (2026-06-22)
 
 
