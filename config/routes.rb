@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     scope module: :users do
       resources :maps, only: [:index]
       resources :reviews, only: [:index]
+      resources :bookmarks, only: [:index]
       resource :push_notification, only: [:update]
     end
   end
@@ -54,6 +55,7 @@ Rails.application.routes.draw do
       scope module: :users do
         resources :maps, only: [:index]
         resources :reviews, only: [:index]
+        resources :bookmarks, only: [:index]
       end
     end
   end
