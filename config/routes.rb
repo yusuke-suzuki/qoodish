@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       resources :maps, only: [:index]
       resources :reviews, only: [:index]
       resources :bookmarks, only: [:index]
+      resources :chapters, only: [:index]
       resource :push_notification, only: [:update]
     end
   end
@@ -14,6 +15,8 @@ Rails.application.routes.draw do
       resources :coauthors, only: %i[index destroy]
       resource :bookmark, only: %i[create destroy]
       resources :coauthorship_invitations, only: [:create]
+      resources :journeys, only: [:create]
+      resources :chapters, only: [:create]
     end
   end
   resources :coauthorship_invitations, only: [:index] do
@@ -34,6 +37,20 @@ Rails.application.routes.draw do
       end
     end
   end
+  namespace :me do
+    resources :journeys, only: %i[index show destroy] do
+      member do
+        post :start
+        post :finish
+      end
+      scope module: :journeys do
+        resources :milestones, only: %i[create destroy]
+        resources :checkins, only: %i[create destroy]
+      end
+    end
+    resources :chapters, only: %i[index show update destroy]
+  end
+  resources :chapters, only: %i[index show]
   resources :inappropriate_contents, only: [:create]
   resources :notifications, only: %i[index update]
   resources :images, only: [:create]
@@ -51,11 +68,13 @@ Rails.application.routes.draw do
       end
     end
     resources :reviews, only: %i[index show]
+    resources :chapters, only: %i[index show]
     resources :users, only: %i[show] do
       scope module: :users do
         resources :maps, only: [:index]
         resources :reviews, only: [:index]
         resources :bookmarks, only: [:index]
+        resources :chapters, only: [:index]
       end
     end
   end

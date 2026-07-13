@@ -19,6 +19,8 @@ class User < ApplicationRecord
            dependent: :destroy,
            inverse_of: :invitee
   has_many :votes, as: :voter, dependent: :destroy
+  has_many :journeys, dependent: :destroy
+  has_many :chapters, dependent: :destroy
   has_many :owned_images, class_name: 'Image', dependent: :destroy
   has_many :images, as: :imageable, dependent: :destroy
   has_one :push_notification, dependent: :destroy

@@ -14,6 +14,8 @@ class Map < ApplicationRecord
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :images, as: :imageable, dependent: :destroy
+  has_many :journeys, dependent: :nullify
+  has_many :chapters, dependent: :nullify
 
   validates :name,
             presence: {

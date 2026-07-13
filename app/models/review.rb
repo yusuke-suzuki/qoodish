@@ -11,6 +11,8 @@ class Review < ApplicationRecord
   has_many :comments, as: :commentable
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
+  has_many :milestones, dependent: :nullify
+  has_many :journey_checkins, dependent: :nullify
 
   before_validation :remove_carriage_return
 

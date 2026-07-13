@@ -1,0 +1,94 @@
+my_draft:
+  user: me
+  map: public_one
+  journey: my_finished
+  title: My draft chapter
+  status: draft
+  content:
+    root:
+      type: root
+      version: 1
+      children:
+        - type: journey
+          version: 1
+          journey_id: null
+          encoded_path: "_p~iF~ps|U_ulLnnqC"
+        - type: spot
+          version: 1
+          review_id: 1
+          name: This is a name
+          latitude: 35.681382
+          longitude: 139.766084
+
+my_published:
+  user: me
+  map: public_one
+  title: My published chapter
+  status: published
+  created_at: 2026-06-05 12:00:00
+  content:
+    root:
+      type: root
+      version: 1
+      children:
+        - type: journey
+          version: 1
+          journey_id: null
+          encoded_path: "_p~iF~ps|U_ulLnnqC"
+        - type: spot
+          version: 1
+          review_id: 1
+          name: This is a name
+          latitude: 35.681382
+          longitude: 139.766084
+
+you_draft:
+  user: you
+  map: public_unfollowing
+  title: Your draft chapter
+  status: draft
+  content:
+    root:
+      type: root
+      version: 1
+      children: []
+
+you_published:
+  user: you
+  map: public_unfollowing
+  title: Your published chapter
+  status: published
+  content:
+    root:
+      type: root
+      version: 1
+      children:
+        - type: spot
+          version: 1
+          review_id: 1
+          name: This is a name
+          latitude: 35.681382
+          longitude: 139.766084
+
+you_private_published_unfollowing:
+  user: you
+  map: private_unfollowing
+  title: Your private chapter that me cannot reference
+  status: published
+  content:
+    root:
+      type: root
+      version: 1
+      children: []
+
+you_private_published_following:
+  user: you
+  map: private_following
+  title: Your private chapter that me coauthors
+  status: published
+  created_at: 2026-06-10 12:00:00
+  content:
+    root:
+      type: root
+      version: 1
+      children: []
