@@ -1,0 +1,15 @@
+my_in_progress_first:
+  journey: my_in_progress
+  review: private
+  position: 1
+  name: This is a name
+  latitude: 35.681382
+  longitude: 139.766084
+
+my_finished_first:
+  journey: my_finished
+  review: public_one
+  position: 1
+  name: This is a name
+  latitude: 35.681382
+  longitude: 139.766084

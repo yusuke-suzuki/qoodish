@@ -1,0 +1,26 @@
+my_unstarted:
+  user: me
+  map: public_one
+
+my_in_progress:
+  user: me
+  map: private
+  started_at: 2026-07-01 10:00:00
+  encoded_path: "_p~iF~ps|U_ulLnnqC_mqNvxq`@"
+
+my_finished:
+  user: me
+  map: public_one
+  started_at: 2026-06-01 10:00:00
+  finished_at: 2026-06-01 12:00:00
+
+you_finished:
+  user: you
+  map: public_one
+  started_at: 2026-06-02 10:00:00
+  finished_at: 2026-06-02 12:00:00
+
+you_in_progress:
+  user: you
+  map: public_unfollowing
+  started_at: 2026-07-01 10:00:00

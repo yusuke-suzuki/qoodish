@@ -62,3 +62,20 @@ en:
 
       registration_token_is_required: Registration token is required.
       registration_token_is_duplicated: Registration token is duplicated.
+
+      duplicate_unfinished_journey: An unfinished journey already exists on this map.
+      journey_already_started: The journey has already started.
+      journey_not_started: The journey has not started yet.
+      journey_already_finished: The journey has already finished.
+      journey_not_in_progress: The journey is not in progress.
+      journey_encoded_path_exceed: The journey path is too large.
+      duplicate_milestone: The pin is already added as a milestone.
+      duplicate_checkin: The journey has already checked in at this pin.
+      review_not_on_journey_map: The pin does not belong to the map of the journey.
+
+      chapter_title_required: Chapter title is required.
+      chapter_title_exceed: "Chapter title is too long. (Max: 100)"
+      chapter_content_invalid: Chapter content is not a valid document.
+      chapter_content_exceed: Chapter content is too large.
+      chapter_journey_mismatch: The journey does not belong to the author or the map of the chapter.
+      duplicate_chapter_for_journey: A chapter has already been created for this journey.

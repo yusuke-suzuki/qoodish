@@ -44,7 +44,9 @@ class UsersController < ApplicationController
 
   def destroy
     current_user.reviews.preload(:images, :votes).load
-    current_user.maps.preload(:images, :coauthorships, :bookmarks, :coauthorship_invitations, :votes, reviews: [:images, :votes]).load
+    current_user.maps.preload(:images, :coauthorships, :bookmarks, :coauthorship_invitations, :votes,
+                              reviews: [:images, :votes]).load
+    current_user.journeys.preload(:milestones, :checkins).load
     current_user.destroy!
   end
 

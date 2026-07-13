@@ -31,3 +31,20 @@ ja:
 
       registration_token_is_required: 登録トークンを入力してください。
       registration_token_is_duplicated: 既に登録されているトークンです。
+
+      duplicate_unfinished_journey: このマップには未完了の旅が既にあります。
+      journey_already_started: この旅は既に開始されています。
+      journey_not_started: この旅はまだ開始されていません。
+      journey_already_finished: この旅は既に終了しています。
+      journey_not_in_progress: 進行中の旅ではありません。
+      journey_encoded_path_exceed: 旅の経路データが大きすぎます。
+      duplicate_milestone: このピンは既にマイルストーンに追加されています。
+      duplicate_checkin: このピンには既にチェックイン済みです。
+      review_not_on_journey_map: このピンは旅のマップに属していません。
+
+      chapter_title_required: チャプターのタイトルを入力してください。
+      chapter_title_exceed: "チャプターのタイトルが長すぎます。(最大: 100 文字)"
+      chapter_content_invalid: チャプターの本文の形式が正しくありません。
+      chapter_content_exceed: チャプターの本文が大きすぎます。
+      chapter_journey_mismatch: 指定された旅はチャプターの著者またはマップに属していません。
+      duplicate_chapter_for_journey: この旅のチャプターは既に作成されています。

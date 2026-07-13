@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_23_010032) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_13_043049) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "map_id", null: false
     t.bigint "user_id", null: false
@@ -19,6 +19,20 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_010032) do
     t.index ["map_id", "user_id"], name: "index_bookmarks_on_map_id_and_user_id", unique: true
     t.index ["map_id"], name: "index_bookmarks_on_map_id"
     t.index ["user_id"], name: "index_bookmarks_on_user_id"
+  end
+
+  create_table "chapters", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "map_id"
+    t.bigint "journey_id"
+    t.string "title", null: false
+    t.string "status", default: "draft", null: false
+    t.json "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journey_id"], name: "index_chapters_on_journey_id", unique: true
+    t.index ["map_id"], name: "index_chapters_on_map_id"
+    t.index ["user_id", "status"], name: "index_chapters_on_user_id_and_status"
   end
 
   create_table "coauthorship_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -88,6 +102,30 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_010032) do
     t.index ["user_id"], name: "index_inappropriate_contents_on_user_id"
   end
 
+  create_table "journey_checkins", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "journey_id", null: false
+    t.bigint "review_id"
+    t.string "name", null: false
+    t.decimal "latitude", precision: 16, scale: 6, null: false
+    t.decimal "longitude", precision: 16, scale: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journey_id", "review_id"], name: "index_journey_checkins_on_journey_id_and_review_id", unique: true
+    t.index ["review_id"], name: "index_journey_checkins_on_review_id"
+  end
+
+  create_table "journeys", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "map_id"
+    t.datetime "started_at"
+    t.datetime "finished_at"
+    t.text "encoded_path", size: :medium
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["map_id"], name: "index_journeys_on_map_id"
+    t.index ["user_id", "map_id", "finished_at"], name: "index_journeys_on_user_id_and_map_id_and_finished_at"
+  end
+
   create_table "maps", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "name", null: false
@@ -102,6 +140,20 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_010032) do
     t.decimal "latitude", precision: 16, scale: 6, default: "0.0", null: false
     t.decimal "longitude", precision: 16, scale: 6, default: "0.0", null: false
     t.index ["user_id"], name: "index_maps_on_user_id"
+  end
+
+  create_table "milestones", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "journey_id", null: false
+    t.bigint "review_id"
+    t.integer "position", null: false
+    t.string "name", null: false
+    t.decimal "latitude", precision: 16, scale: 6, null: false
+    t.decimal "longitude", precision: 16, scale: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journey_id", "position"], name: "index_milestones_on_journey_id_and_position"
+    t.index ["journey_id", "review_id"], name: "index_milestones_on_journey_id_and_review_id", unique: true
+    t.index ["review_id"], name: "index_milestones_on_review_id"
   end
 
   create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -177,13 +229,22 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_010032) do
 
   add_foreign_key "bookmarks", "maps"
   add_foreign_key "bookmarks", "users"
+  add_foreign_key "chapters", "journeys"
+  add_foreign_key "chapters", "maps"
+  add_foreign_key "chapters", "users"
   add_foreign_key "coauthorship_invitations", "maps"
   add_foreign_key "coauthorship_invitations", "users", column: "invitee_id"
   add_foreign_key "coauthorship_invitations", "users", column: "inviter_id"
   add_foreign_key "coauthorships", "maps"
   add_foreign_key "coauthorships", "users"
   add_foreign_key "images", "users"
+  add_foreign_key "journey_checkins", "journeys"
+  add_foreign_key "journey_checkins", "reviews"
+  add_foreign_key "journeys", "maps"
+  add_foreign_key "journeys", "users"
   add_foreign_key "maps", "users"
+  add_foreign_key "milestones", "journeys"
+  add_foreign_key "milestones", "reviews"
   add_foreign_key "push_notifications", "users"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"
