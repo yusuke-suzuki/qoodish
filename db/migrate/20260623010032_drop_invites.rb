@@ -1,6 +1,6 @@
 class DropInvites < ActiveRecord::Migration[7.2]
   def change
-    drop_table :invites, force: :cascade do |t|
+    drop_table :invites, if_exists: true, force: :cascade do |t|
       t.string "invitable_type"
       t.bigint "invitable_id"
       t.string "sender_type"
