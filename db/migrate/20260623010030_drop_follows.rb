@@ -1,6 +1,6 @@
 class DropFollows < ActiveRecord::Migration[7.2]
   def change
-    drop_table :follows, force: :cascade do |t|
+    drop_table :follows, if_exists: true, force: :cascade do |t|
       t.string "followable_type", null: false
       t.bigint "followable_id", null: false
       t.string "follower_type", null: false
