@@ -2,6 +2,7 @@ me:
   name: watame
   email: watame@qoodish.com
   uid: 1234abcde
+  biography: This is a biography
 
 you:
   name: okayu

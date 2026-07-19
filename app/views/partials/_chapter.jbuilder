@@ -7,6 +7,7 @@ json.content chapter.content
 json.author do
   json.id chapter.user.id
   json.name chapter.user.name
+  json.biography chapter.user.biography
   json.image chapter.user.image_variants
   json.image_url chapter.user.image_url
 end
