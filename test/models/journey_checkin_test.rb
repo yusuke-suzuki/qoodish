@@ -19,6 +19,25 @@ class JourneyCheckinTest < ActiveSupport::TestCase
     assert_not checkin.valid?
   end
 
+  test 'checkin on a finished journey with a visit time in the period is created' do
+    checkin = journeys(:my_finished).checkins.create!(
+      review: reviews(:public_two),
+      checked_in_at: '2026-06-01 11:00:00'
+    )
+
+    assert_predicate checkin, :persisted?
+  end
+
+  test 'checkins are ordered by visit time' do
+    journey = journeys(:my_finished)
+    retroactive = journey.checkins.create!(
+      review: reviews(:public_two),
+      checked_in_at: '2026-06-01 11:00:00'
+    )
+
+    assert_equal retroactive.id, journey.checkins.reload.first.id
+  end
+
   test 'same review cannot be checked in twice on a journey' do
     checkin = journeys(:my_in_progress).checkins.build(review: reviews(:private))
 

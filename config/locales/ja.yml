@@ -43,6 +43,7 @@ ja:
       review_not_on_journey_map: このピンは旅のマップに属していません。
       images_per_checkin_reached_limit: "チェックインごとの画像数の上限に達しました。"
       checkin_note_exceeded: "メモが長すぎます。(最大: 500 文字)"
+      checkin_time_outside_journey_period: チェックイン時刻が旅の期間外です。
 
       chapter_title_required: チャプターのタイトルを入力してください。
       chapter_title_exceed: "チャプターのタイトルが長すぎます。(最大: 100 文字)"

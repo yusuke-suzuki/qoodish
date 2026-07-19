@@ -4,7 +4,7 @@ module Me
       before_action :authenticate_user!
 
       def create
-        journey = current_user.journeys.unfinished.find_by!(id: params[:journey_id])
+        journey = current_user.journeys.find_by!(id: params[:journey_id])
         review = current_user.referenceable_reviews.find_by!(id: params[:review_id])
 
         @checkin = journey.checkins.create!(checkin_params.merge(review: review))
@@ -18,7 +18,7 @@ module Me
       end
 
       def destroy
-        journey = current_user.journeys.unfinished.find_by!(id: params[:journey_id])
+        journey = current_user.journeys.find_by!(id: params[:journey_id])
 
         journey.checkins.find_by!(id: params[:id]).destroy!
       end
@@ -26,7 +26,7 @@ module Me
       private
 
       def checkin_params
-        params.permit(:note, image_ids: [])
+        params.permit(:note, :checked_in_at, image_ids: [])
       end
     end
   end
