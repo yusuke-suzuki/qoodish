@@ -5,6 +5,7 @@ json.spot do
   json.latitude journey_checkin.lat
   json.longitude journey_checkin.lng
 end
+json.note journey_checkin.note
 json.images journey_checkin.images do |image|
   variants = image.variants
   json.id image.id

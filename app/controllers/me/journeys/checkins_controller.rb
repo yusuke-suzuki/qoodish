@@ -26,7 +26,7 @@ module Me
       private
 
       def checkin_params
-        params.permit(image_ids: [])
+        params.permit(:note, image_ids: [])
       end
     end
   end
