@@ -25,6 +25,7 @@ class Guest::ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_equal chapters(:my_published).id, res['id']
     assert_not res.key?('editable')
     assert_equal chapters(:my_published).content['root'], res['content']['root']
+    assert_equal users(:me).biography, res['author']['biography']
   end
 
   test 'show a draft chapter should raise not found error' do
