@@ -45,7 +45,7 @@ Rails.application.routes.draw do
       end
       scope module: :journeys do
         resources :milestones, only: %i[create destroy]
-        resources :checkins, only: %i[create destroy]
+        resources :checkins, only: %i[create update destroy]
       end
     end
     resources :chapters, only: %i[index show update destroy]

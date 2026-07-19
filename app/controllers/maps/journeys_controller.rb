@@ -9,7 +9,7 @@ module Maps
 
       ActiveRecord::Associations::Preloader.new(
         records: [@journey],
-        associations: [:map, :milestones, :checkins, :chapter]
+        associations: [:map, :milestones, { checkins: :images }, :chapter]
       ).call
     end
   end
