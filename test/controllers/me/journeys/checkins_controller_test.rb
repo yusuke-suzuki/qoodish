@@ -49,14 +49,18 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test 'check in with image_ids attaches owned images' do
+  test 'check in with image_ids and note attaches them' do
     image = users(:me).owned_images.create!(
       url: 'https://imagedelivery.net/mockhash/checkin-create/public'
     )
 
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_in_progress).id}/checkins",
-           params: { review_id: reviews(:private_you).id, image_ids: [image.id] },
+           params: {
+             review_id: reviews(:private_you).id,
+             image_ids: [image.id],
+             note: 'First visit with friends'
+           },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -66,6 +70,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal [image.id], res['images'].map { |i| i['id'] }
     assert_equal [image.id], JourneyCheckin.find(res['id']).image_ids
+    assert_equal 'First visit with friends', res['note']
   end
 
   test 'check in with too many image_ids should raise unprocessable error' do
@@ -86,7 +91,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
-  test 'update with image_ids attaches images to a finished journey checkin' do
+  test 'update with image_ids and note edits a finished journey checkin' do
     image = users(:me).owned_images.create!(
       url: 'https://imagedelivery.net/mockhash/checkin-update/public'
     )
@@ -94,16 +99,30 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
 
     stub_google_auth(users(:me)) do
       put "/me/journeys/#{journeys(:my_finished).id}/checkins/#{checkin.id}",
-          params: { image_ids: [image.id] },
+          params: { image_ids: [image.id], note: "Great view\r\nfrom the terrace" },
           headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
     assert_response :success
     assert_equal [image.id], checkin.reload.image_ids
+    assert_equal "Great view\nfrom the terrace", checkin.note
 
     res = JSON.parse(@response.body)
 
     assert_equal [image.id], res['images'].map { |i| i['id'] }
+  end
+
+  test 'update with a too long note should raise unprocessable error' do
+    checkin = journey_checkins(:my_finished_public_one)
+
+    stub_google_auth(users(:me)) do
+      put "/me/journeys/#{journeys(:my_finished).id}/checkins/#{checkin.id}",
+          params: { note: 'a' * 501 },
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :unprocessable_content
+    assert_nil checkin.reload.note
   end
 
   test 'update with image_ids destroys removed images' do
