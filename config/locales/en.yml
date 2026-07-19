@@ -72,6 +72,7 @@ en:
       duplicate_milestone: The pin is already added as a milestone.
       duplicate_checkin: The journey has already checked in at this pin.
       review_not_on_journey_map: The pin does not belong to the map of the journey.
+      images_per_checkin_reached_limit: "The limit of images per checkin has been reached."
 
       chapter_title_required: Chapter title is required.
       chapter_title_exceed: "Chapter title is too long. (Max: 100)"

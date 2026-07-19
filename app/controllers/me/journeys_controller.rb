@@ -12,7 +12,7 @@ module Me
     def show
       @journey = current_user
                  .journeys
-                 .preload(:map, :milestones, :checkins, :chapter)
+                 .preload(:map, :milestones, { checkins: :images }, :chapter)
                  .find_by!(id: params[:id])
     end
 
@@ -39,7 +39,7 @@ module Me
     def preload_journey_for_serialization
       ActiveRecord::Associations::Preloader.new(
         records: [@journey],
-        associations: [:map, :milestones, :checkins, :chapter]
+        associations: [:map, :milestones, { checkins: :images }, :chapter]
       ).call
     end
   end
