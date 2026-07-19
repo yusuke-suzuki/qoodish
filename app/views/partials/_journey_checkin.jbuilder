@@ -15,4 +15,4 @@ json.images journey_checkin.images do |image|
   json.hero variants[:hero]
   json.ogp variants[:ogp]
 end
-json.checked_in_at journey_checkin.created_at
+json.checked_in_at journey_checkin.checked_in_at

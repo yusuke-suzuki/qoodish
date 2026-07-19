@@ -91,6 +91,76 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
+  test 'retroactive check in on a finished journey should be success' do
+    stub_google_auth(users(:me)) do
+      post "/me/journeys/#{journeys(:my_finished).id}/checkins",
+           params: { review_id: reviews(:public_two).id, checked_in_at: '2026-06-01 11:00:00' },
+           headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal Time.zone.parse('2026-06-01 11:00:00'), Time.zone.parse(res['checked_in_at'])
+  end
+
+  test 'check in on a finished journey without checked_in_at should raise unprocessable error' do
+    stub_google_auth(users(:me)) do
+      post "/me/journeys/#{journeys(:my_finished).id}/checkins",
+           params: { review_id: reviews(:public_two).id },
+           headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :unprocessable_content
+  end
+
+  test 'check in outside the journey period should raise unprocessable error' do
+    stub_google_auth(users(:me)) do
+      post "/me/journeys/#{journeys(:my_finished).id}/checkins",
+           params: { review_id: reviews(:public_two).id, checked_in_at: '2026-06-01 09:00:00' },
+           headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :unprocessable_content
+  end
+
+  test 'update checked_in_at within the journey period should be success' do
+    checkin = journey_checkins(:my_finished_public_one)
+
+    stub_google_auth(users(:me)) do
+      put "/me/journeys/#{journeys(:my_finished).id}/checkins/#{checkin.id}",
+          params: { checked_in_at: '2026-06-01 10:30:00' },
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+    assert_equal Time.zone.parse('2026-06-01 10:30:00'), checkin.reload.checked_in_at
+  end
+
+  test 'update checked_in_at outside the journey period should raise unprocessable error' do
+    checkin = journey_checkins(:my_finished_public_one)
+
+    stub_google_auth(users(:me)) do
+      put "/me/journeys/#{journeys(:my_finished).id}/checkins/#{checkin.id}",
+          params: { checked_in_at: '2026-06-01 13:00:00' },
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :unprocessable_content
+  end
+
+  test 'remove a checkin from a finished journey should be success' do
+    assert_difference 'JourneyCheckin.count', -1 do
+      stub_google_auth(users(:me)) do
+        delete "/me/journeys/#{journeys(:my_finished).id}/checkins/#{journey_checkins(:my_finished_public_one).id}",
+               headers: { 'Authorization': 'Bearer dummytoken' }
+      end
+    end
+
+    assert_response :success
+  end
+
   test 'update with image_ids and note edits a finished journey checkin' do
     image = users(:me).owned_images.create!(
       url: 'https://imagedelivery.net/mockhash/checkin-update/public'

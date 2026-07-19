@@ -12,6 +12,7 @@ class JourneyCheckin < ApplicationRecord
   delegate :user_id, to: :journey
 
   before_validation :remove_carriage_return
+  before_validation :set_default_checked_in_at, on: :create
 
   validates :review_id,
             uniqueness: {
@@ -28,7 +29,13 @@ class JourneyCheckin < ApplicationRecord
               maximum: MAX_IMAGE_COUNT_PER_CHECKIN,
               message: I18n.t('messages.api.images_per_checkin_reached_limit')
             }
-  validate :journey_must_be_in_progress, on: :create
+  validate :checked_in_at_must_be_within_journey_period, if: :checked_in_at_changed?
+
+  # Nil means the row predates the checked_in_at column, where creation time
+  # and visit time were the same thing.
+  def checked_in_at
+    super || created_at
+  end
 
   private
 
@@ -36,10 +43,21 @@ class JourneyCheckin < ApplicationRecord
     note.delete!("\r") if note.present?
   end
 
-  def journey_must_be_in_progress
-    return if journey.blank?
-    return if journey.in_progress?
+  def set_default_checked_in_at
+    self.checked_in_at ||= Time.current
+  end
 
-    errors.add(:base, I18n.t('messages.api.journey_not_in_progress'))
+  def checked_in_at_must_be_within_journey_period
+    return if journey.blank?
+
+    unless journey.started?
+      errors.add(:base, I18n.t('messages.api.journey_not_started'))
+      return
+    end
+
+    upper_bound = journey.finished_at || Time.current
+    return if checked_in_at.present? && checked_in_at.between?(journey.started_at, upper_bound)
+
+    errors.add(:checked_in_at, I18n.t('messages.api.checkin_time_outside_journey_period'))
   end
 end
