@@ -7,7 +7,7 @@ class Journey < ApplicationRecord
   belongs_to :map, optional: true
   has_many :milestones, -> { order(:position) }, dependent: :destroy, inverse_of: :journey
   has_many :checkins,
-           -> { order(Arel.sql('COALESCE(journey_checkins.checked_in_at, journey_checkins.created_at)'), :id) },
+           -> { order(:checked_in_at, :id) },
            class_name: 'JourneyCheckin',
            dependent: :destroy,
            inverse_of: :journey

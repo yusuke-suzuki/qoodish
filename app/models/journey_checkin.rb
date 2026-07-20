@@ -31,12 +31,6 @@ class JourneyCheckin < ApplicationRecord
             }
   validate :checked_in_at_must_be_within_journey_period, if: :checked_in_at_changed?
 
-  # Nil means the row predates the checked_in_at column, where creation time
-  # and visit time were the same thing.
-  def checked_in_at
-    super || created_at
-  end
-
   private
 
   def remove_carriage_return

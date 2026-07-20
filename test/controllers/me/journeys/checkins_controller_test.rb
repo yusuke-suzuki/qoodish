@@ -130,12 +130,12 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
 
     stub_google_auth(users(:me)) do
       put "/me/journeys/#{journeys(:my_finished).id}/checkins/#{checkin.id}",
-          params: { checked_in_at: '2026-06-01 10:30:00' },
+          params: { checked_in_at: '2026-06-01 11:15:00' },
           headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
     assert_response :success
-    assert_equal Time.zone.parse('2026-06-01 10:30:00'), checkin.reload.checked_in_at
+    assert_equal Time.zone.parse('2026-06-01 11:15:00'), checkin.reload.checked_in_at
   end
 
   test 'update checked_in_at outside the journey period should raise unprocessable error' do
