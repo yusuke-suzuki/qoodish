@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.1.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.0.0...v3.1.0) (2026-07-20)
+
+
+### Features
+
+* add bookmarks list endpoints ([7776409](https://github.com/yusuke-suzuki/qoodish/commit/777640943884a529b43b7a12aaf029a6cb186d04))
+* add journeys and chapters API ([927eabe](https://github.com/yusuke-suzuki/qoodish/commit/927eabe345e4e7905c69c90fc6ca88646e2a801d))
+* add note to journey checkins ([21bdaf6](https://github.com/yusuke-suzuki/qoodish/commit/21bdaf6502a4892e305d5b99e6faafd690778a01))
+* allow retroactive journey checkins ([bca2e94](https://github.com/yusuke-suzuki/qoodish/commit/bca2e94d880e49cbf022fdc2b58c39310b644867))
+* attach images to journey checkins ([8e45699](https://github.com/yusuke-suzuki/qoodish/commit/8e45699265f475feecd7d5b57cad9ae2705cd9ab))
+* enforce not null on checked_in_at ([aa22076](https://github.com/yusuke-suzuki/qoodish/commit/aa220762ede234846840e1b0c90f8b7555c786d1))
+
+
+### Bug Fixes
+
+* guard follows/invites drops with if_exists ([af993a9](https://github.com/yusuke-suzuki/qoodish/commit/af993a939c7024504701eef51f1ac9132c549091))
+* include author biography in chapter payload ([354d251](https://github.com/yusuke-suzuki/qoodish/commit/354d251fbc1f3e824b977fb566354137a00ea171))
+
 ## [3.0.0](https://github.com/yusuke-suzuki/qoodish/compare/v2.0.1...v3.0.0) (2026-06-23)
 
 
