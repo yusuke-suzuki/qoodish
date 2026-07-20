@@ -32,7 +32,7 @@ class JourneyCheckinTest < ActiveSupport::TestCase
     journey = journeys(:my_finished)
     retroactive = journey.checkins.create!(
       review: reviews(:public_two),
-      checked_in_at: '2026-06-01 11:00:00'
+      checked_in_at: '2026-06-01 10:15:00'
     )
 
     assert_equal retroactive.id, journey.checkins.reload.first.id
