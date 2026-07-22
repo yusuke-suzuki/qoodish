@@ -74,3 +74,13 @@ spec:
                     secretKeyRef:
                       name: QOODISH_API_DB_USER
                       key: latest
+                - name: AR_ENCRYPTION_PRIMARY_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: QOODISH_API_AR_ENCRYPTION_PRIMARY_KEY
+                      key: latest
+                - name: AR_ENCRYPTION_KEY_DERIVATION_SALT
+                  valueFrom:
+                    secretKeyRef:
+                      name: QOODISH_API_AR_ENCRYPTION_KEY_DERIVATION_SALT
+                      key: latest

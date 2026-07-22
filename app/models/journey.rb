@@ -13,6 +13,8 @@ class Journey < ApplicationRecord
            inverse_of: :journey
   has_one :chapter, dependent: :nullify
 
+  encrypts :encoded_path
+
   validates :user_id,
             presence: true
   validates :map,
