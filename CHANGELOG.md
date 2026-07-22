@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.1.0...v3.2.0) (2026-07-22)
+
+
+### Features
+
+* encrypt journey trajectory at rest ([d76f20e](https://github.com/yusuke-suzuki/qoodish/commit/d76f20e2344fe3c16073ca896c571d99858f5610))
+
 ## [3.1.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.0.0...v3.1.0) (2026-07-20)
 
 
