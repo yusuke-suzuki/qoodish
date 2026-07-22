@@ -62,6 +62,10 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 
+  config.active_record.encryption.primary_key = 'test_ar_encryption_primary_key_0'
+  config.active_record.encryption.key_derivation_salt = 'test_ar_encryption_key_derive_salt'
+  config.active_record.encryption.encrypt_fixtures = true
+
   config.after_initialize do
     Bullet.enable = true
     Bullet.bullet_logger = true
