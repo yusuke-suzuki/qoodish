@@ -5,7 +5,7 @@ module Me
     def index
       @chapters = Chapter
                   .where(user: current_user)
-                  .preload(:map, :votes, user: %i[images journal])
+                  .preload(:map, :votes, :images, user: %i[images journal])
                   .order(created_at: :desc)
     end
 
@@ -16,6 +16,11 @@ module Me
     def update
       @chapter = current_user.chapters.find_by!(id: params[:id])
       @chapter.update!(chapter_params)
+
+      ActiveRecord::Associations::Preloader.new(
+        records: [@chapter],
+        associations: :images
+      ).call
     end
 
     def destroy
@@ -25,7 +30,7 @@ module Me
     private
 
     def chapter_params
-      permitted = params.permit(:title, :status)
+      permitted = params.permit(:title, :status, image_ids: [])
       permitted[:content] = params[:content].permit!.to_h if params[:content].is_a?(ActionController::Parameters)
       permitted
     end
