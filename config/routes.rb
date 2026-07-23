@@ -3,8 +3,8 @@ Rails.application.routes.draw do
     scope module: :users do
       resources :maps, only: [:index]
       resources :reviews, only: [:index]
-      resources :bookmarks, only: [:index]
       resources :chapters, only: [:index]
+      resource :journal, only: [:show]
       resource :push_notification, only: [:update]
     end
   end
@@ -49,8 +49,21 @@ Rails.application.routes.draw do
       end
     end
     resources :chapters, only: %i[index show update destroy]
+    namespace :bookmarks do
+      resources :maps, only: [:index]
+      resources :journals, only: [:index]
+    end
   end
-  resources :chapters, only: %i[index show]
+  resources :chapters, only: %i[index show] do
+    scope module: :chapters do
+      resource :like, only: %i[create destroy]
+    end
+  end
+  resources :journals, only: %i[show update] do
+    scope module: :journals do
+      resource :bookmark, only: %i[create destroy]
+    end
+  end
   resources :inappropriate_contents, only: [:create]
   resources :notifications, only: %i[index update]
   resources :images, only: [:create]
@@ -73,7 +86,6 @@ Rails.application.routes.draw do
       scope module: :users do
         resources :maps, only: [:index]
         resources :reviews, only: [:index]
-        resources :bookmarks, only: [:index]
         resources :chapters, only: [:index]
       end
     end

@@ -5,7 +5,7 @@ module Me
     def index
       @chapters = Chapter
                   .where(user: current_user)
-                  .preload(:map, user: :images)
+                  .preload(:map, :votes, user: %i[images journal])
                   .order(created_at: :desc)
     end
 

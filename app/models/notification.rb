@@ -8,7 +8,7 @@ class Notification < ApplicationRecord
 
   validates :notifiable_type,
             inclusion: {
-              in: [Review.name, Map.name, Comment.name]
+              in: [Review.name, Map.name, Comment.name, Chapter.name]
             }
   validates :notifier_type,
             inclusion: {
@@ -44,6 +44,8 @@ class Notification < ApplicationRecord
         "/maps/#{notifiable.id}"
       when Comment.name
         "/maps/#{notifiable.commentable.map_id}/reports/#{notifiable.commentable.id}"
+      when Chapter.name
+        "/chapters/#{notifiable.id}"
       else
         ''
       end

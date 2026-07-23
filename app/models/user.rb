@@ -21,6 +21,9 @@ class User < ApplicationRecord
   has_many :votes, as: :voter, dependent: :destroy
   has_many :journeys, dependent: :destroy
   has_many :chapters, dependent: :destroy
+  has_one :journal, dependent: :destroy
+  has_many :journal_bookmarks, dependent: :destroy
+  has_many :bookmarked_journals, through: :journal_bookmarks, source: :journal
   has_many :owned_images, class_name: 'Image', dependent: :destroy
   has_many :images, as: :imageable, dependent: :destroy
   has_one :push_notification, dependent: :destroy
@@ -39,6 +42,7 @@ class User < ApplicationRecord
 
   before_destroy :delete_id_platform_account
   after_create :create_default_map
+  after_create :create_default_journal
 
   scope :search_by_name, lambda { |name|
     where('name LIKE ?', "%#{name}%")
@@ -122,7 +126,7 @@ class User < ApplicationRecord
   end
 
   def liked!(votable)
-    votes.create!(votable: votable)
+    votes.create_or_find_by!(votable: votable)
   end
 
   def unliked!(votable)
@@ -148,5 +152,9 @@ class User < ApplicationRecord
       name: "#{name}'s map",
       description: "#{name}'s map."
     )
+  end
+
+  def create_default_journal
+    create_journal!(title: "#{name}'s journal".truncate(50))
   end
 end

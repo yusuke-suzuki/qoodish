@@ -7,6 +7,8 @@ class Chapter < ApplicationRecord
   belongs_to :user
   belongs_to :map, optional: true
   belongs_to :journey, optional: true
+  has_many :votes, as: :votable, dependent: :destroy
+  has_many :voters, through: :votes, source: :voter, source_type: User.name
 
   enum :status, { draft: 'draft', published: 'published' }, validate: true
 
@@ -44,6 +46,10 @@ class Chapter < ApplicationRecord
     published.where(map_id: Map.public_open)
   }
 
+  scope :liked_by, lambda { |user|
+    where(id: Vote.where(voter: user, votable_type: name).select(:votable_id))
+  }
+
   scope :feed_for, lambda { |user|
     published.where(map_id: Map.related_to(user))
   }
@@ -61,6 +67,18 @@ class Chapter < ApplicationRecord
 
   def content=(value)
     super(value.is_a?(Hash) ? value.deep_stringify_keys : value)
+  end
+
+  def liked_by?(user)
+    votes.any? { |vote| vote.voter_id == user.id }
+  end
+
+  def image_url
+    map&.image_url.to_s
+  end
+
+  def image_variants
+    map&.image_variants
   end
 
   private

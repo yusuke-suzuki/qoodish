@@ -16,5 +16,13 @@ json.map do
   json.name chapter.map.name
   json.private chapter.map.private
 end
+if chapter.user.journal.present?
+  json.journal do
+    json.id chapter.user.journal.id
+    json.title chapter.user.journal.title
+  end
+else
+  json.journal nil
+end
 json.created_at chapter.created_at
 json.updated_at chapter.updated_at
