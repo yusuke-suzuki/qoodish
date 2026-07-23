@@ -47,7 +47,7 @@ class UsersController < ApplicationController
     current_user.maps.preload(:images, :coauthorships, :bookmarks, :coauthorship_invitations, :votes,
                               reviews: [:images, :votes]).load
     current_user.journeys.preload(:milestones, checkins: :images).load
-    current_user.chapters.preload(:votes).load
+    current_user.chapters.preload(:votes, :images).load
     current_user.destroy!
   end
 
