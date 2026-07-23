@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.2.0...v3.3.0) (2026-07-23)
+
+
+### Features
+
+* add chapter likes and per-user journals ([4d38e6c](https://github.com/yusuke-suzuki/qoodish/commit/4d38e6c34916250b4476b73a726dac4fe9aadcd2))
+
 ## [3.2.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.1.0...v3.2.0) (2026-07-22)
 
 
