@@ -9,3 +9,9 @@ public_two:
   votable: public_one
   voter_type: User
   voter: you
+
+chapter_one:
+  votable_type: Chapter
+  votable: my_published
+  voter_type: User
+  voter: you

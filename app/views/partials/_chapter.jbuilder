@@ -20,6 +20,16 @@ if chapter.map.present?
 else
   json.map nil
 end
+if chapter.user.journal.present?
+  json.journal do
+    json.id chapter.user.journal.id
+    json.title chapter.user.journal.title
+  end
+else
+  json.journal nil
+end
 json.editable current_user.author?(chapter)
+json.liked chapter.liked_by?(current_user)
+json.likes_count chapter.votes.size
 json.created_at chapter.created_at
 json.updated_at chapter.updated_at

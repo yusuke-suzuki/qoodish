@@ -4,7 +4,7 @@ class Vote < ApplicationRecord
 
   validates :votable_type,
             inclusion: {
-              in: [Review.name, Map.name, Comment.name]
+              in: [Review.name, Map.name, Comment.name, Chapter.name]
             }
   validates :voter_type,
             inclusion: {

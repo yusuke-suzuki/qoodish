@@ -1,0 +1,8 @@
+my_journal:
+  user: me
+  title: My adventure journal
+  description: Notes from my adventures.
+
+you_journal:
+  user: you
+  title: Your adventure journal

@@ -47,6 +47,7 @@ class ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_not res['editable']
     assert_equal chapters(:my_published).content['root'], res['content']['root']
     assert_equal users(:me).biography, res['author']['biography']
+    assert_equal journals(:my_journal).title, res['journal']['title']
   end
 
   test 'show a published chapter on a private map as a coauthor should be success' do

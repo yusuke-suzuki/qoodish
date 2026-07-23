@@ -79,6 +79,21 @@ class Maps::ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
+  test 'create a chapter should serialize the journal of the author' do
+    stub_google_auth(users(:me)) do
+      post "/maps/#{maps(:public_one).id}/chapters",
+           params: { title: 'A walk', content: LEXICAL_DOCUMENT },
+           headers: { 'Authorization': 'Bearer dummytoken' },
+           as: :json
+    end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal journals(:my_journal).id, res['journal']['id']
+  end
+
   test 'create a chapter on an unreferenceable private map should raise not found error' do
     stub_google_auth(users(:me)) do
       post "/maps/#{maps(:private_unfollowing).id}/chapters",

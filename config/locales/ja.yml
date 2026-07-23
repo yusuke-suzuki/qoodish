@@ -51,3 +51,9 @@ ja:
       chapter_content_exceed: チャプターの本文が大きすぎます。
       chapter_journey_mismatch: 指定された旅はチャプターの著者またはマップに属していません。
       duplicate_chapter_for_journey: この旅のチャプターは既に作成されています。
+
+      journal_title_required: 手帳のタイトルを入力してください。
+      journal_title_exceed: "手帳のタイトルが長すぎます。(最大: 50 文字)"
+      journal_description_exceed: "手帳の説明が長すぎます。(最大: 200 文字)"
+      journal_bookmark_own: 著者は自身の手帳をブックマークできません。
+      duplicate_journal_bookmark: 既にブックマーク済みです。

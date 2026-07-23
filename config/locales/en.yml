@@ -82,3 +82,9 @@ en:
       chapter_content_exceed: Chapter content is too large.
       chapter_journey_mismatch: The journey does not belong to the author or the map of the chapter.
       duplicate_chapter_for_journey: A chapter has already been created for this journey.
+
+      journal_title_required: Journal title is required.
+      journal_title_exceed: "Journal title is too long. (Max: 50)"
+      journal_description_exceed: "Journal description is too long. (Max: 200)"
+      journal_bookmark_own: The author cannot bookmark their own journal.
+      duplicate_journal_bookmark: The journal is already bookmarked.

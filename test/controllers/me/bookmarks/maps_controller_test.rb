@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class Users::BookmarksControllerTest < ActionDispatch::IntegrationTest
-  test 'index without authentication should be unauthorized' do
-    get "/users/#{users(:me).uid}/bookmarks"
+class Me::Bookmarks::MapsControllerTest < ActionDispatch::IntegrationTest
+  test 'index without authentication should raise unauthorized error' do
+    get '/me/bookmarks/maps'
 
     assert_response :unauthorized
   end
@@ -11,7 +11,7 @@ class Users::BookmarksControllerTest < ActionDispatch::IntegrationTest
     Bookmark.create!(map: maps(:public_unfollowing), user: users(:me))
 
     stub_google_auth(users(:me)) do
-      get "/users/#{users(:me).uid}/bookmarks",
+      get '/me/bookmarks/maps',
           headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -22,16 +22,15 @@ class Users::BookmarksControllerTest < ActionDispatch::IntegrationTest
     assert_equal [maps(:public_unfollowing).id], ids
   end
 
-  test 'index returns another user bookmarked maps' do
+  test 'index does not return bookmarks of other users' do
+    # Fixture you_on_public_one bookmarks public_one as :you; :me has none.
     stub_google_auth(users(:me)) do
-      get "/users/#{users(:you).id}/bookmarks",
+      get '/me/bookmarks/maps',
           headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
     assert_response :success
 
-    ids = JSON.parse(@response.body).map { |map| map['id'] }
-
-    assert_includes ids, maps(:public_one).id
+    assert_empty JSON.parse(@response.body)
   end
 end

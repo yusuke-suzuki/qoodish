@@ -42,6 +42,27 @@ class NotificationsControllerTest < ActionDispatch::IntegrationTest
     assert notification['notifiable'].key?('image')
   end
 
+  test 'index renders successfully when notifiable is a Chapter' do
+    chapter = chapters(:my_published)
+    Notification.create!(
+      notifiable: chapter,
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'liked'
+    )
+
+    stub_google_auth(users(:me)) do
+      get '/notifications', headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+    body = JSON.parse(@response.body)
+    notification = body.find { |n| n['notifiable']['id'] == chapter.id && n['notifiable']['type'] == 'chapter' }
+    assert notification
+    assert notification['notifiable'].key?('image')
+    assert_equal "/chapters/#{chapter.id}", notification['click_action']
+  end
+
   test 'index renders successfully when notifiable is a Map' do
     map = maps(:private)
     Notification.create!(

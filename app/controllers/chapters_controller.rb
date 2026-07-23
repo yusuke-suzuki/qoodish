@@ -6,19 +6,19 @@ class ChaptersController < ApplicationController
                   Chapter
                     .feed_for(current_user)
                     .feed_before(params[:next_timestamp])
-                    .preload(:map, user: :images)
+                    .preload(:map, :votes, user: %i[images journal])
                 else
                   Chapter
                     .feed_for(current_user)
                     .latest_feed
-                    .preload(:map, user: :images)
+                    .preload(:map, :votes, user: %i[images journal])
                 end
   end
 
   def show
     @chapter = Chapter
                .readable_by(current_user)
-               .preload(:map, user: :images)
+               .preload(:map, :votes, user: %i[images journal])
                .find_by!(id: params[:id])
   end
 end
