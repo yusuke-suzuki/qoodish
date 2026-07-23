@@ -9,6 +9,7 @@ class Chapter < ApplicationRecord
   belongs_to :journey, optional: true
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
+  has_many :images, as: :imageable, dependent: :destroy
 
   enum :status, { draft: 'draft', published: 'published' }, validate: true
 
@@ -31,6 +32,7 @@ class Chapter < ApplicationRecord
               allow_nil: true,
               message: I18n.t('messages.api.duplicate_chapter_for_journey')
             }
+  validates :images, length: { maximum: 1 }
   validate :content_must_be_lexical_document
   validate :journey_must_match_author_and_map
 
@@ -74,11 +76,16 @@ class Chapter < ApplicationRecord
   end
 
   def image_url
-    map&.image_url.to_s
+    images.first&.url.to_s
   end
 
   def image_variants
-    map&.image_variants
+    primary = images.first
+    return nil unless primary
+
+    Cloudflare::Images::NAMED_VARIANTS
+      .index_with { |variant| Cloudflare::Images.variant_url(primary.url, variant) }
+      .merge(url: primary.url)
   end
 
   private

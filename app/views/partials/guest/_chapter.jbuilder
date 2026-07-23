@@ -4,6 +4,8 @@ json.journey_id chapter.journey_id
 json.title chapter.title
 json.status chapter.status
 json.content chapter.content
+json.image chapter.image_variants
+json.image_url chapter.image_url
 json.author do
   json.id chapter.user.id
   json.name chapter.user.name
