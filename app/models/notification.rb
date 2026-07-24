@@ -4,10 +4,10 @@ class Notification < ApplicationRecord
   belongs_to :recipient, polymorphic: true
 
   KEYS = %w[coauthor_invited liked comment].freeze
-  # Keys retired with their feature, mapped to the current key that carries the
-  # same meaning. Existing rows keep the old value; resolving the alias on read
-  # lets them be served as their modern equivalent without rewriting data.
-  KEY_ALIASES = { 'invited' => 'coauthor_invited' }.freeze
+  # Keys the web client can render. Retired keys are resolved to their current
+  # equivalent on read (see #resolved_key) so historical rows keep displaying
+  # without any data rewrite.
+  RENDERABLE_KEYS = %w[coauthor_invited liked comment bookmarked].freeze
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
@@ -34,14 +34,30 @@ class Notification < ApplicationRecord
       .limit(10)
   }
 
+  # Map retired keys to the current key that carries the same meaning:
+  # 'invited' became 'coauthor_invited', and following a map became bookmarking
+  # it. Following a user has no current equivalent, so it stays unresolved.
   def resolved_key
-    KEY_ALIASES.fetch(key, key)
+    case key
+    when 'invited'
+      'coauthor_invited'
+    when 'followed'
+      notifiable_type == Map.name ? 'bookmarked' : key
+    else
+      key
+    end
+  end
+
+  def renderable?
+    RENDERABLE_KEYS.include?(resolved_key)
   end
 
   def click_action
     case resolved_key
     when 'coauthor_invited'
       '/coauthorship_invitations'
+    when 'bookmarked'
+      "/maps/#{notifiable.id}"
     when 'comment'
       "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
     when 'liked'

@@ -5,11 +5,12 @@ class NotificationsController < ApplicationController
     @notifications =
       current_user
       .notifications
-      .where(key: Notification::KEYS + Notification::KEY_ALIASES.keys)
       .recent
       .includes({ notifier: :images }, :notifiable)
       .reject do |notification|
-        notification.notifier.blank? || notification.notifiable.blank?
+        notification.notifier.blank? ||
+          notification.notifiable.blank? ||
+          !notification.renderable?
       end
 
     preload_notifiable_images(@notifications)
