@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.4.0...v3.5.0) (2026-07-24)
+
+
+### Features
+
+* give chapters their own GeoJSON map ([43a5bd2](https://github.com/yusuke-suzuki/qoodish/commit/43a5bd2faea8d516c058e92be704e169076b600d))
+
 ## [3.4.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.3.0...v3.4.0) (2026-07-24)
 
 
