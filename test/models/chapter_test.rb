@@ -31,6 +31,150 @@ class ChapterTest < ActiveSupport::TestCase
     assert_not chapter.valid?
   end
 
+  test 'map features default to an empty feature collection' do
+    chapter = Chapter.new(
+      user: users(:you),
+      map: maps(:public_unfollowing),
+      title: 'A walk',
+      content: LEXICAL_DOCUMENT
+    )
+
+    assert chapter.valid?
+    assert_equal Chapter::EMPTY_FEATURE_COLLECTION, chapter.map_features
+  end
+
+  test 'valid chapter with point map features' do
+    chapter = Chapter.new(
+      user: users(:you),
+      map: maps(:public_unfollowing),
+      title: 'A walk',
+      content: LEXICAL_DOCUMENT,
+      map_features: {
+        'type' => 'FeatureCollection',
+        'features' => [
+          {
+            'type' => 'Feature',
+            'geometry' => { 'type' => 'Point', 'coordinates' => [138.86, 35.1] },
+            'properties' => { 'title' => 'Numazu', 'description' => 'Tsukemen' }
+          }
+        ]
+      }
+    )
+
+    assert chapter.valid?
+  end
+
+  test 'map features keep unknown properties' do
+    chapter = Chapter.new(
+      user: users(:you),
+      map: maps(:public_unfollowing),
+      title: 'A walk',
+      content: LEXICAL_DOCUMENT,
+      map_features: {
+        'type' => 'FeatureCollection',
+        'features' => [
+          {
+            'type' => 'Feature',
+            'geometry' => { 'type' => 'Point', 'coordinates' => [138.86, 35.1] },
+            'properties' => { 'marker-color' => '#ff0000' }
+          }
+        ]
+      }
+    )
+
+    assert chapter.valid?
+  end
+
+  test 'map features title must be a string' do
+    chapter = Chapter.new(
+      user: users(:you),
+      map: maps(:public_unfollowing),
+      title: 'A walk',
+      content: LEXICAL_DOCUMENT,
+      map_features: {
+        'type' => 'FeatureCollection',
+        'features' => [
+          {
+            'type' => 'Feature',
+            'geometry' => { 'type' => 'Point', 'coordinates' => [138.86, 35.1] },
+            'properties' => { 'title' => 42 }
+          }
+        ]
+      }
+    )
+
+    assert_not chapter.valid?
+  end
+
+  test 'map features cannot be null' do
+    chapter = Chapter.new(
+      user: users(:you),
+      map: maps(:public_unfollowing),
+      title: 'A walk',
+      content: LEXICAL_DOCUMENT,
+      map_features: nil
+    )
+
+    assert_not chapter.valid?
+  end
+
+  test 'map features must be a feature collection' do
+    chapter = Chapter.new(
+      user: users(:you),
+      map: maps(:public_unfollowing),
+      title: 'A walk',
+      content: LEXICAL_DOCUMENT,
+      map_features: { 'foo' => 'bar' }
+    )
+
+    assert_not chapter.valid?
+  end
+
+  test 'map features geometry must be a point' do
+    chapter = Chapter.new(
+      user: users(:you),
+      map: maps(:public_unfollowing),
+      title: 'A walk',
+      content: LEXICAL_DOCUMENT,
+      map_features: {
+        'type' => 'FeatureCollection',
+        'features' => [
+          {
+            'type' => 'Feature',
+            'geometry' => {
+              'type' => 'LineString',
+              'coordinates' => [[138.86, 35.1], [138.87, 35.11]]
+            },
+            'properties' => {}
+          }
+        ]
+      }
+    )
+
+    assert_not chapter.valid?
+  end
+
+  test 'map features coordinates must be in range' do
+    chapter = Chapter.new(
+      user: users(:you),
+      map: maps(:public_unfollowing),
+      title: 'A walk',
+      content: LEXICAL_DOCUMENT,
+      map_features: {
+        'type' => 'FeatureCollection',
+        'features' => [
+          {
+            'type' => 'Feature',
+            'geometry' => { 'type' => 'Point', 'coordinates' => [35.1, 138.86] },
+            'properties' => {}
+          }
+        ]
+      }
+    )
+
+    assert_not chapter.valid?
+  end
+
   test 'journey of another user cannot be recorded' do
     chapter = Chapter.new(
       user: users(:you),
