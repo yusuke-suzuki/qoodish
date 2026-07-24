@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.4.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.3.0...v3.4.0) (2026-07-24)
+
+
+### Features
+
+* let chapters carry an explicit cover image ([0f44c88](https://github.com/yusuke-suzuki/qoodish/commit/0f44c8896fb6593d5d35f447e627962bdb5317c8))
+
+
+### Bug Fixes
+
+* align chapter image eager loading ([8717dee](https://github.com/yusuke-suzuki/qoodish/commit/8717deeea7bfab1eff40554b919e292674708e93))
+
 ## [3.3.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.2.0...v3.3.0) (2026-07-23)
 
 
