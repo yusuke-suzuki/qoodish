@@ -14,6 +14,7 @@ module Maps
     def chapter_params
       permitted = params.permit(:title)
       permitted[:content] = params[:content].permit!.to_h if params[:content].is_a?(ActionController::Parameters)
+      permitted[:map_features] = params[:map_features].permit!.to_h if params[:map_features].is_a?(ActionController::Parameters)
       permitted
     end
   end

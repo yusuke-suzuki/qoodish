@@ -49,6 +49,8 @@ ja:
       chapter_title_exceed: "チャプターのタイトルが長すぎます。(最大: 100 文字)"
       chapter_content_invalid: チャプターの本文の形式が正しくありません。
       chapter_content_exceed: チャプターの本文が大きすぎます。
+      chapter_map_features_invalid: チャプターの地図データの形式が正しくありません。
+      chapter_map_features_exceed: チャプターの地図データが大きすぎます。
       chapter_journey_mismatch: 指定された旅はチャプターの著者またはマップに属していません。
       duplicate_chapter_for_journey: この旅のチャプターは既に作成されています。
 

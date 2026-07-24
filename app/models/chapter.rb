@@ -1,9 +1,19 @@
 # frozen_string_literal: true
 
 MAX_CHAPTER_CONTENT_BYTESIZE = 1.megabyte
+MAX_CHAPTER_MAP_FEATURES_BYTESIZE = 100.kilobytes
 CHAPTER_FEED_PER_PAGE = 12
 
 class Chapter < ApplicationRecord
+  EMPTY_FEATURE_COLLECTION = { 'type' => 'FeatureCollection', 'features' => [] }.freeze
+
+  # Styling keys from the simplestyle spec (marker-color, marker-symbol) are
+  # deliberately absent until there is UI to set them; unknown keys pass so
+  # documents imported from other GeoJSON tools survive a round trip.
+  FEATURE_TEXT_PROPERTIES = %w[title description].freeze
+
+  attribute :map_features, default: -> { EMPTY_FEATURE_COLLECTION.deep_dup }
+
   belongs_to :user
   belongs_to :map, optional: true
   belongs_to :journey, optional: true
@@ -34,6 +44,7 @@ class Chapter < ApplicationRecord
             }
   validates :images, length: { maximum: 1 }
   validate :content_must_be_lexical_document
+  validate :map_features_must_be_geojson_features
   validate :journey_must_match_author_and_map
 
   scope :referenceable_by, lambda { |user|
@@ -68,6 +79,10 @@ class Chapter < ApplicationRecord
   }
 
   def content=(value)
+    super(value.is_a?(Hash) ? value.deep_stringify_keys : value)
+  end
+
+  def map_features=(value)
     super(value.is_a?(Hash) ? value.deep_stringify_keys : value)
   end
 
@@ -106,5 +121,51 @@ class Chapter < ApplicationRecord
     return if journey.user_id == user_id && journey.map_id == map_id
 
     errors.add(:journey_id, I18n.t('messages.api.chapter_journey_mismatch'))
+  end
+
+  def map_features_must_be_geojson_features
+    unless feature_collection?(map_features)
+      errors.add(:map_features, I18n.t('messages.api.chapter_map_features_invalid'))
+      return
+    end
+
+    return if map_features.to_json.bytesize <= MAX_CHAPTER_MAP_FEATURES_BYTESIZE
+
+    errors.add(:map_features, I18n.t('messages.api.chapter_map_features_exceed'))
+  end
+
+  def feature_collection?(document)
+    document.is_a?(Hash) &&
+      document['type'] == 'FeatureCollection' &&
+      document['features'].is_a?(Array) &&
+      document['features'].all? { |feature| point_feature?(feature) }
+  end
+
+  # Point is the only geometry served to readers so far; widening this check
+  # per geometry type is how LineString and Polygon get introduced.
+  def point_feature?(feature)
+    feature.is_a?(Hash) &&
+      feature['type'] == 'Feature' &&
+      feature_properties?(feature['properties']) &&
+      feature['geometry'].is_a?(Hash) &&
+      feature['geometry']['type'] == 'Point' &&
+      point_coordinates?(feature['geometry']['coordinates'])
+  end
+
+  def feature_properties?(properties)
+    return true if properties.nil?
+
+    properties.is_a?(Hash) &&
+      FEATURE_TEXT_PROPERTIES.all? do |key|
+        properties[key].nil? || properties[key].is_a?(String)
+      end
+  end
+
+  def point_coordinates?(coordinates)
+    coordinates.is_a?(Array) &&
+      coordinates.length == 2 &&
+      coordinates.all? { |value| value.is_a?(Numeric) } &&
+      coordinates[0].between?(-180, 180) &&
+      coordinates[1].between?(-90, 90)
   end
 end
