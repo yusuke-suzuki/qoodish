@@ -4,6 +4,10 @@ class Notification < ApplicationRecord
   belongs_to :recipient, polymorphic: true
 
   KEYS = %w[coauthor_invited liked comment].freeze
+  # Keys retired with their feature, mapped to the current key that carries the
+  # same meaning. Existing rows keep the old value; resolving the alias on read
+  # lets them be served as their modern equivalent without rewriting data.
+  KEY_ALIASES = { 'invited' => 'coauthor_invited' }.freeze
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
@@ -30,8 +34,12 @@ class Notification < ApplicationRecord
       .limit(10)
   }
 
+  def resolved_key
+    KEY_ALIASES.fetch(key, key)
+  end
+
   def click_action
-    case key
+    case resolved_key
     when 'coauthor_invited'
       '/coauthorship_invitations'
     when 'comment'
