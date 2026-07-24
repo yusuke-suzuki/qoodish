@@ -4,11 +4,6 @@ class Notification < ApplicationRecord
   belongs_to :recipient, polymorphic: true
 
   KEYS = %w[coauthor_invited liked comment].freeze
-  # Keys the web client can render. 'invited' is retired -- the old invite
-  # flow is gone -- but its notifications are still served with their
-  # historical wording. 'followed' is retired with nothing to render as:
-  # bookmarking, which replaced following, is deliberately silent.
-  RENDERABLE_KEYS = (KEYS + %w[invited]).freeze
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
@@ -35,18 +30,17 @@ class Notification < ApplicationRecord
       .limit(10)
   }
 
+  # Rows created before a feature was retired can carry keys outside KEYS
+  # ('followed', 'invited'); they reference concepts and data that no longer
+  # exist, so they are kept but never served.
   def renderable?
-    RENDERABLE_KEYS.include?(key)
+    KEYS.include?(key)
   end
 
   def click_action
     case key
     when 'coauthor_invited'
       '/coauthorship_invitations'
-    when 'invited'
-      # The old '/invites' page went away with the invite flow; the map the
-      # invitation was for is the only destination that still exists.
-      "/maps/#{notifiable.id}"
     when 'comment'
       "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
     when 'liked'
