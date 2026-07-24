@@ -28,12 +28,14 @@ class NotificationsController < ApplicationController
   private
 
   # Polymorphic preload: `includes(notifiable: :images)` cannot work because
-  # Comment has no :images association of its own (it serves images via its
-  # commentable). Group notifiables by type and preload appropriately.
+  # Comment and Journal have no :images association of their own (a comment
+  # serves images via its commentable, a journal via its owner). Group
+  # notifiables by type and preload appropriately.
   def preload_notifiable_images(notifications)
     notifiables = notifications.map(&:notifiable)
-    direct = notifiables.reject { |n| n.is_a?(Comment) }
+    direct = notifiables.reject { |n| n.is_a?(Comment) || n.is_a?(Journal) }
     comments = notifiables.select { |n| n.is_a?(Comment) }
+    journals = notifiables.select { |n| n.is_a?(Journal) }
 
     if direct.any?
       ActiveRecord::Associations::Preloader.new(records: direct, associations: :images).call
@@ -41,6 +43,10 @@ class NotificationsController < ApplicationController
 
     if comments.any?
       ActiveRecord::Associations::Preloader.new(records: comments, associations: { commentable: :images }).call
+    end
+
+    if journals.any?
+      ActiveRecord::Associations::Preloader.new(records: journals, associations: { user: :images }).call
     end
   end
 end

@@ -29,4 +29,14 @@ class Journal < ApplicationRecord
   def bookmarked_by?(user)
     bookmarks.any? { |bookmark| bookmark.user_id == user.id }
   end
+
+  # A journal has no images of its own; its visual identity is the author's
+  # avatar, which notifications render polymorphically via the notifiable.
+  def image_url
+    user.image_url
+  end
+
+  def image_variants
+    user.image_variants
+  end
 end

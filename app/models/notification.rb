@@ -8,7 +8,7 @@ class Notification < ApplicationRecord
 
   validates :notifiable_type,
             inclusion: {
-              in: [Review.name, Map.name, Comment.name, Chapter.name]
+              in: [Review.name, Map.name, Comment.name, Chapter.name, Journal.name]
             }
   validates :notifier_type,
             inclusion: {
@@ -55,7 +55,14 @@ class Notification < ApplicationRecord
     when 'coauthor_invited'
       '/coauthorship_invitations'
     when 'bookmarked'
-      "/maps/#{notifiable.id}"
+      case notifiable_type
+      when Map.name
+        "/maps/#{notifiable.id}"
+      when Journal.name
+        "/users/#{notifiable.user_id}"
+      else
+        ''
+      end
     when 'comment'
       "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
     when 'liked'
