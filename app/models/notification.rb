@@ -3,12 +3,17 @@ class Notification < ApplicationRecord
   belongs_to :notifier, polymorphic: true
   belongs_to :recipient, polymorphic: true
 
-  KEYS = %w[coauthor_invited liked comment bookmarked].freeze
+  KEYS = %w[coauthor_invited liked comment].freeze
+  # Keys the web client can render. 'invited' is retired -- the old invite
+  # flow is gone -- but its notifications are still served with their
+  # historical wording. 'followed' is retired with nothing to render as:
+  # bookmarking, which replaced following, is deliberately silent.
+  RENDERABLE_KEYS = (KEYS + %w[invited]).freeze
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
             inclusion: {
-              in: [Review.name, Map.name, Comment.name, Chapter.name, Journal.name]
+              in: [Review.name, Map.name, Comment.name, Chapter.name]
             }
   validates :notifier_type,
             inclusion: {
@@ -30,39 +35,18 @@ class Notification < ApplicationRecord
       .limit(10)
   }
 
-  # Resolve keys retired with their feature to the current key that carries the
-  # same meaning, on read, so historical rows keep displaying without rewriting
-  # data. 'invited' became 'coauthor_invited', and following a map became
-  # bookmarking it. Following a user has no equivalent, so it stays unresolved
-  # and unrenderable.
-  def resolved_key
-    case key
-    when 'invited'
-      'coauthor_invited'
-    when 'followed'
-      notifiable_type == Map.name ? 'bookmarked' : key
-    else
-      key
-    end
-  end
-
   def renderable?
-    KEYS.include?(resolved_key)
+    RENDERABLE_KEYS.include?(key)
   end
 
   def click_action
-    case resolved_key
+    case key
     when 'coauthor_invited'
       '/coauthorship_invitations'
-    when 'bookmarked'
-      case notifiable_type
-      when Map.name
-        "/maps/#{notifiable.id}"
-      when Journal.name
-        "/users/#{notifiable.user_id}"
-      else
-        ''
-      end
+    when 'invited'
+      # The old '/invites' page went away with the invite flow; the map the
+      # invitation was for is the only destination that still exists.
+      "/maps/#{notifiable.id}"
     when 'comment'
       "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
     when 'liked'

@@ -11,5 +11,4 @@ json.push_notification do
   json.coauthor_invited user.push_notification ? user.push_notification.coauthor_invited : false
   json.liked user.push_notification ? user.push_notification.liked : false
   json.comment user.push_notification ? user.push_notification.comment : false
-  json.bookmarked user.push_notification ? user.push_notification.bookmarked : false
 end

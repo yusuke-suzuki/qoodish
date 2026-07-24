@@ -10,18 +10,7 @@ class Bookmark < ApplicationRecord
   validate :map_must_be_public
   validate :user_cannot_bookmark_editable_map
 
-  after_create :create_notification
-
   private
-
-  def create_notification
-    Notification.create!(
-      notifiable: map,
-      notifier: user,
-      recipient: map.user,
-      key: 'bookmarked'
-    )
-  end
 
   def map_must_be_public
     return if map.blank?

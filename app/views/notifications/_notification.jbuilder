@@ -1,5 +1,5 @@
 json.id notification.id
-json.key notification.resolved_key
+json.key notification.key
 json.click_action notification.click_action
 json.notifiable do
   json.id notification.notifiable_id

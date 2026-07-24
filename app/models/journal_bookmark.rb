@@ -9,18 +9,7 @@ class JournalBookmark < ApplicationRecord
             }
   validate :user_cannot_bookmark_own_journal
 
-  after_create :create_notification
-
   private
-
-  def create_notification
-    Notification.create!(
-      notifiable: journal,
-      notifier: user,
-      recipient: journal.user,
-      key: 'bookmarked'
-    )
-  end
 
   def user_cannot_bookmark_own_journal
     return if journal.blank? || user_id.blank?

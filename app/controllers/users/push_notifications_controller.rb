@@ -12,7 +12,7 @@ module Users
 
     def push_notification_params
       params
-        .permit(:coauthor_invited, :liked, :comment, :bookmarked)
+        .permit(:coauthor_invited, :liked, :comment)
         .to_h
     end
   end
