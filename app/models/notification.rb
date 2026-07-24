@@ -30,6 +30,13 @@ class Notification < ApplicationRecord
       .limit(10)
   }
 
+  # Rows created before a feature was retired can carry keys outside KEYS
+  # ('followed', 'invited'); they reference concepts and data that no longer
+  # exist, so they are kept but never served.
+  def renderable?
+    KEYS.include?(key)
+  end
+
   def click_action
     case key
     when 'coauthor_invited'

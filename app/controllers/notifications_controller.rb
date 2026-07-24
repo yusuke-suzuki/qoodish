@@ -8,7 +8,9 @@ class NotificationsController < ApplicationController
       .recent
       .includes({ notifier: :images }, :notifiable)
       .reject do |notification|
-        notification.notifier.blank? || notification.notifiable.blank?
+        notification.notifier.blank? ||
+          notification.notifiable.blank? ||
+          !notification.renderable?
       end
 
     preload_notifiable_images(@notifications)
