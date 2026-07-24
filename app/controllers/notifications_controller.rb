@@ -5,6 +5,7 @@ class NotificationsController < ApplicationController
     @notifications =
       current_user
       .notifications
+      .where(key: Notification::KEYS)
       .recent
       .includes({ notifier: :images }, :notifiable)
       .reject do |notification|
