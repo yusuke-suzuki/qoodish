@@ -9,6 +9,52 @@ class Maps::ChaptersControllerTest < ActionDispatch::IntegrationTest
     }
   }.freeze
 
+  test 'index should return published chapters written from the map' do
+    stub_google_auth(users(:me)) do
+      get "/maps/#{maps(:public_one).id}/chapters",
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+    ids = res.map { |chapter| chapter['id'] }
+
+    assert_equal [chapters(:you_published_on_my_map).id, chapters(:my_published).id], ids
+    assert_not_includes ids, chapters(:my_draft).id
+    assert_not_includes ids, chapters(:you_draft_on_my_map).id
+    assert_not_includes ids, chapters(:you_published).id
+  end
+
+  test 'index on a private map as a coauthor should be success' do
+    stub_google_auth(users(:me)) do
+      get "/maps/#{maps(:private_following).id}/chapters",
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal [chapters(:you_private_published_following).id],
+                 res.map { |chapter| chapter['id'] }
+  end
+
+  test 'index on an unreferenceable private map should raise not found error' do
+    stub_google_auth(users(:me)) do
+      get "/maps/#{maps(:private_unfollowing).id}/chapters",
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :not_found
+  end
+
+  test 'index without authentication should raise unauthorized error' do
+    get "/maps/#{maps(:public_one).id}/chapters"
+
+    assert_response :unauthorized
+  end
+
   test 'create a chapter recording a journey should be success' do
     assert_difference 'Chapter.count', 1 do
       stub_google_auth(users(:me)) do
