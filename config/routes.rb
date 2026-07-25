@@ -16,7 +16,7 @@ Rails.application.routes.draw do
       resource :bookmark, only: %i[create destroy]
       resources :coauthorship_invitations, only: [:create]
       resources :journeys, only: [:create]
-      resources :chapters, only: [:create]
+      resources :chapters, only: %i[index create]
     end
   end
   resources :coauthorship_invitations, only: [:index] do
@@ -78,6 +78,7 @@ Rails.application.routes.draw do
           end
         end
         resources :coauthors, only: [:index]
+        resources :chapters, only: [:index]
       end
     end
     resources :reviews, only: %i[index show]

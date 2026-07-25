@@ -90,6 +90,35 @@ you_published:
     type: FeatureCollection
     features: []
 
+you_draft_on_my_map:
+  user: you
+  map: public_one
+  title: Your draft chapter on my map
+  status: draft
+  content:
+    root:
+      type: root
+      version: 1
+      children: []
+  map_features:
+    type: FeatureCollection
+    features: []
+
+you_published_on_my_map:
+  user: you
+  map: public_one
+  title: Your published chapter on my map
+  status: published
+  created_at: 2026-06-20 12:00:00
+  content:
+    root:
+      type: root
+      version: 1
+      children: []
+  map_features:
+    type: FeatureCollection
+    features: []
+
 you_private_published_unfollowing:
   user: you
   map: private_unfollowing
