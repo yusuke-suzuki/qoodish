@@ -4,7 +4,7 @@ class NotificationTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   test 'web push on create' do
-    assert_enqueued_with(job: BloadcastWebPushJob) do
+    assert_enqueued_with(job: BroadcastWebPushJob) do
       Notification.create!(
         notifiable: reviews(:public_you_one),
         notifier: users(:me),
