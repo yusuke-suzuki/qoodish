@@ -23,7 +23,7 @@ class Notification < ApplicationRecord
               in: KEYS
             }
 
-  after_create_commit :bloadcast_web_push_later
+  after_create_commit :broadcast_web_push_later
 
   scope :recent, lambda {
     order(created_at: :desc)
@@ -61,7 +61,7 @@ class Notification < ApplicationRecord
     end
   end
 
-  def bloadcast_web_push
+  def broadcast_web_push
     google_auth = GoogleAuth.new
     access_token = google_auth.fetch_access_token(FCM_SCOPE)
 
@@ -115,9 +115,9 @@ class Notification < ApplicationRecord
 
   private
 
-  def bloadcast_web_push_later
+  def broadcast_web_push_later
     return unless allowed_web_push?
 
-    BloadcastWebPushJob.perform_later(self)
+    BroadcastWebPushJob.perform_later(self)
   end
 end

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class BloadcastWebPushJobTest < ActiveJob::TestCase
+class BroadcastWebPushJobTest < ActiveJob::TestCase
   # test "the truth" do
   #   assert true
   # end
