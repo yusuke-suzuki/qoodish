@@ -7,7 +7,7 @@ class Review < ApplicationRecord
   belongs_to :user
   belongs_to :map
   has_many :images, as: :imageable, dependent: :destroy
-  has_many :notifications, as: :notifiable
+  has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :comments, as: :commentable
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name

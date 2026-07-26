@@ -5,7 +5,7 @@ class Map < ApplicationRecord
 
   belongs_to :user
   has_many :reviews, dependent: :destroy
-  has_many :notifications, as: :notifiable
+  has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :coauthorships, dependent: :destroy
   has_many :coauthors, through: :coauthorships, source: :user
   has_many :bookmarks, dependent: :destroy
