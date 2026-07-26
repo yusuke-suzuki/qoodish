@@ -254,4 +254,17 @@ class ChapterTest < ActiveSupport::TestCase
     assert_not_includes public_chapters, chapters(:my_draft)
   end
 
+  test 'destroying a chapter destroys its notifications' do
+    chapter = chapters(:you_published_on_my_map)
+    Notification.create!(
+      notifiable: chapter,
+      notifier: users(:me),
+      recipient: chapter.user,
+      key: 'liked'
+    )
+
+    assert_difference 'Notification.count', -1 do
+      chapter.destroy!
+    end
+  end
 end

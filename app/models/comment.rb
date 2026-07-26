@@ -3,6 +3,7 @@ class Comment < ApplicationRecord
   belongs_to :user
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   validates :body,
             presence: true,
