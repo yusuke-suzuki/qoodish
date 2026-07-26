@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.6.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.5.0...v3.6.0) (2026-07-26)
+
+
+### Features
+
+* list the chapters written from a map ([8a0c4db](https://github.com/yusuke-suzuki/qoodish/commit/8a0c4dbfa210d3652b026d837bd5d9ed09f787a7))
+
+
+### Bug Fixes
+
+* delete notifications with their notifiable ([87f8a1e](https://github.com/yusuke-suzuki/qoodish/commit/87f8a1e198e55687d27350069acd3ddf0a5b14a6))
+
 ## [3.5.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.4.0...v3.5.0) (2026-07-24)
 
 
