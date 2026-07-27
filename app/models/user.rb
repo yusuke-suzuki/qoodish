@@ -27,6 +27,10 @@ class User < ApplicationRecord
   has_many :owned_images, class_name: 'Image', dependent: :destroy
   has_many :images, as: :imageable, dependent: :destroy
   has_one :push_notification, dependent: :destroy
+  has_many :preferences,
+           class_name: 'UserPreference',
+           inverse_of: :user,
+           dependent: :destroy
 
   validates :uid,
             presence: true,
