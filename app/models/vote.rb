@@ -11,9 +11,13 @@ class Vote < ApplicationRecord
               in: [User.name]
             }
 
-  after_create :create_notification
+  after_create :create_notification, unless: :on_yourself?
 
   private
+
+  def on_yourself?
+    voter_id == votable.user_id
+  end
 
   def create_notification
     Notification.create!(
