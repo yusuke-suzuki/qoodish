@@ -8,7 +8,7 @@ json.maps_count user.maps.count
 json.bookmarked_maps_count user.bookmark_count
 json.reviews_count user.reviews.count
 json.push_notification do
-  json.coauthor_invited user.push_notification ? user.push_notification.coauthor_invited : false
-  json.liked user.push_notification ? user.push_notification.liked : false
-  json.comment user.push_notification ? user.push_notification.comment : false
+  user.web_push_preferences.each do |preference, enabled|
+    json.set! preference, enabled
+  end
 end

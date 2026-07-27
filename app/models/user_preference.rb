@@ -6,7 +6,7 @@ class UserPreference < ApplicationRecord
     'coauthor_invited' => true,
     'liked' => true,
     'comment' => true,
-    'chapter_published' => true
+    'published' => true
   }.freeze
 
   # Rows are never updated: each save appends a full snapshot of the

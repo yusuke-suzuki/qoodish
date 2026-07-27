@@ -3,7 +3,8 @@ class Notification < ApplicationRecord
   belongs_to :notifier, polymorphic: true
   belongs_to :recipient, polymorphic: true
 
-  KEYS = %w[coauthor_invited liked comment].freeze
+  KEYS = %w[coauthor_invited liked comment published].freeze
+
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   validates :notifiable_type,
@@ -56,6 +57,8 @@ class Notification < ApplicationRecord
       else
         ''
       end
+    when 'published'
+      notifiable_type == Chapter.name ? "/chapters/#{notifiable.id}" : ''
     else
       ''
     end
@@ -106,11 +109,7 @@ class Notification < ApplicationRecord
   end
 
   def allowed_web_push?
-    if recipient.push_notification.blank?
-      false
-    else
-      recipient.push_notification[key]
-    end
+    recipient.web_push_preferences[key]
   end
 
   private

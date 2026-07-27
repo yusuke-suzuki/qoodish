@@ -3,16 +3,14 @@ module Users
     before_action :authenticate_user!
 
     def update
-      push_notification = PushNotification.find_or_initialize_by(user: current_user)
-
-      push_notification.update!(push_notification_params)
+      current_user.update_web_push_preferences!(push_notification_params)
     end
 
     private
 
     def push_notification_params
       params
-        .permit(:coauthor_invited, :liked, :comment)
+        .permit(:coauthor_invited, :liked, :comment, :published)
         .to_h
     end
   end
