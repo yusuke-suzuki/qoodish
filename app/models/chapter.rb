@@ -24,6 +24,8 @@ class Chapter < ApplicationRecord
 
   enum :status, { draft: 'draft', published: 'published' }, validate: true
 
+  after_update :notify_map_author, if: :just_published?
+
   validates :title,
             presence: {
               message: I18n.t('messages.api.chapter_title_required')
@@ -105,6 +107,22 @@ class Chapter < ApplicationRecord
   end
 
   private
+
+  def just_published?
+    saved_change_to_status == %w[draft published]
+  end
+
+  def notify_map_author
+    return if map.blank? || map.user_id == user_id
+    return if notifications.exists?(key: 'published')
+
+    Notification.create!(
+      notifiable: self,
+      notifier: user,
+      recipient: map.user,
+      key: 'published'
+    )
+  end
 
   def content_must_be_lexical_document
     unless content.is_a?(Hash) && content['root'].is_a?(Hash)

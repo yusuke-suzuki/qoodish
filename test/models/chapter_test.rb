@@ -267,4 +267,67 @@ class ChapterTest < ActiveSupport::TestCase
       chapter.destroy!
     end
   end
+
+  test 'publishing a chapter notifies the map author' do
+    chapter = chapters(:you_draft_on_my_map)
+
+    assert_difference 'Notification.count', 1 do
+      chapter.update!(status: 'published')
+    end
+
+    notification = Notification.last
+
+    assert_equal 'published', notification.key
+    assert_equal chapter, notification.notifiable
+    assert_equal users(:you), notification.notifier
+    assert_equal users(:me), notification.recipient
+    assert_equal "/chapters/#{chapter.id}", notification.click_action
+  end
+
+  test 'publishing a chapter on own map notifies nobody' do
+    assert_no_difference 'Notification.count' do
+      chapters(:my_draft).update!(status: 'published')
+    end
+  end
+
+  test 'publishing again after reverting to draft notifies only once' do
+    chapter = chapters(:you_draft_on_my_map)
+
+    chapter.update!(status: 'published')
+    chapter.update!(status: 'draft')
+
+    assert_no_difference 'Notification.count' do
+      chapter.update!(status: 'published')
+    end
+  end
+
+  test 'editing a published chapter notifies nobody' do
+    assert_no_difference 'Notification.count' do
+      chapters(:you_published_on_my_map).update!(title: 'A new title')
+    end
+  end
+
+  test 'a failed notification rolls the publication back' do
+    chapter = chapters(:you_draft_on_my_map)
+    failing_create = lambda { |*|
+      raise ActiveRecord::RecordNotSaved.new('failed', Notification.new)
+    }
+
+    Notification.stub :create!, failing_create do
+      assert_raises(ActiveRecord::RecordNotSaved) do
+        chapter.update!(status: 'published')
+      end
+    end
+
+    assert_predicate chapter.reload, :draft?
+  end
+
+  test 'publishing a chapter whose map is gone notifies nobody' do
+    chapter = chapters(:you_draft_on_my_map)
+    chapter.map.destroy!
+
+    assert_no_difference 'Notification.count' do
+      chapter.reload.update!(status: 'published')
+    end
+  end
 end
