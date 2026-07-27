@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.7.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.6.0...v3.7.0) (2026-07-27)
+
+
+### Features
+
+* add the user_preferences model ([72d3612](https://github.com/yusuke-suzuki/qoodish/commit/72d36120e385288d56aff41ed8364ad61dc7787b))
+
 ## [3.6.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.5.0...v3.6.0) (2026-07-26)
 
 
