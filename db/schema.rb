@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_07_24_170000) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_26_144020) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "map_id", null: false
     t.bigint "user_id", null: false
@@ -223,6 +223,14 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_24_170000) do
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
+  create_table "user_preferences", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.json "web_push", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_preferences_on_user_id"
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -274,4 +282,5 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_24_170000) do
   add_foreign_key "push_notifications", "users"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"
+  add_foreign_key "user_preferences", "users"
 end
