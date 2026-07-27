@@ -11,7 +11,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     res = JSON.parse(@response.body)
 
     assert_equal res['uid'], users(:me).uid
-    assert res['push_notification'].present?
+    assert_equal %w[coauthor_invited liked comment published],
+                 res['push_notification'].keys
+    assert res['push_notification'].values.all?
   end
 
   test 'request to your profile should be success' do
