@@ -65,27 +65,4 @@ class UserPreferenceTest < ActiveSupport::TestCase
     assert_equal false, users(:me).web_push_preferences['liked']
   end
 
-  test 'a user without snapshots reads the legacy row' do
-    users(:me).push_notification.update!(liked: false)
-
-    assert_equal false, users(:me).web_push_preferences['liked']
-  end
-
-  test 'the first save carries the legacy choices forward' do
-    users(:me).push_notification.update!(liked: false)
-
-    users(:me).update_web_push_preferences!('comment' => false)
-
-    snapshot = users(:me).preferences.last.web_push
-
-    assert_equal false, snapshot['liked']
-    assert_equal false, snapshot['comment']
-  end
-
-  test 'a snapshot takes precedence over the legacy row' do
-    users(:me).push_notification.update!(liked: false)
-    users(:me).preferences.create!(web_push: UserPreference::WEB_PUSH_DEFAULTS)
-
-    assert_equal true, users(:me).web_push_preferences['liked']
-  end
 end

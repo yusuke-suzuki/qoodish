@@ -54,9 +54,7 @@ class User < ApplicationRecord
   }
 
   def web_push_preferences
-    UserPreference.effective_web_push(
-      preferences.last&.web_push || legacy_web_push
-    )
+    UserPreference.effective_web_push(preferences.last&.web_push)
   end
 
   # Composes the previous effective values with the keys it was sent,
@@ -155,20 +153,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  # Transitional read-through to push_notifications, which is unwritten
-  # from this release on; removed together with the table once the
-  # backfill has carried the remaining rows over.
-  def legacy_web_push
-    row = push_notification
-    return nil if row.blank?
-
-    {
-      'coauthor_invited' => row.coauthor_invited,
-      'liked' => row.liked,
-      'comment' => row.comment
-    }
-  end
 
   def delete_id_platform_account
     id_platform.delete_account(uid)
