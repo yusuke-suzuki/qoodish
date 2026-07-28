@@ -73,6 +73,9 @@ These rules cover database migrations, releases, and backward compatibility. Fol
 ### Release Flow
 
 - Releases are driven by `release-please`. Merging the release PR into `master` tags a new version, which builds the image and deploys the new application revision with traffic shifted to it.
+- A release PR is only opened when `master` has gained a releasable unit since the last release, which means a commit prefixed `feat`, `fix`, or `deps`. Merging a batch of `refactor`, `chore`, or `docs` commits produces no release; they wait for the next feature or fix to carry them.
+- When a change must land in a release of its own — a migration that cannot share one with the code it depends on, for example — do not rely on a later feature to trigger it. Put `Release-As: x.y.z` in the footer of that change's own commit, keeping the prefix that describes the change.
+- Do not use an empty commit to carry `Release-As:`. Rebase merge drops a commit with no changes, so the PR merges while `master` gains nothing and the footer never arrives.
 
 ### Dropping Columns
 
