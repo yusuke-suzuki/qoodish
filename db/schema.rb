@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_07_28_065006) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_28_160209) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "map_id", null: false
     t.bigint "user_id", null: false
@@ -195,18 +195,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_28_065006) do
     t.index ["notifier_type", "notifier_id"], name: "index_notifications_on_notifier_type_and_notifier_id"
     t.index ["recipient_id", "recipient_type"], name: "index_notifications_on_recipient_id_and_recipient_type"
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
-  end
-
-  create_table "push_notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.boolean "followed", default: false, null: false
-    t.boolean "invited", default: false, null: false
-    t.boolean "liked", default: false, null: false
-    t.boolean "comment", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "coauthor_invited", default: false, null: false
-    t.index ["user_id"], name: "index_push_notifications_on_user_id"
   end
 
   create_table "reviews", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
