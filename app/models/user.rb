@@ -26,7 +26,6 @@ class User < ApplicationRecord
   has_many :bookmarked_journals, through: :journal_bookmarks, source: :journal
   has_many :owned_images, class_name: 'Image', dependent: :destroy
   has_many :images, as: :imageable, dependent: :destroy
-  has_one :push_notification, dependent: :destroy
   has_many :preferences,
            class_name: 'UserPreference',
            inverse_of: :user,
