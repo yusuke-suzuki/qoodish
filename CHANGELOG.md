@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.9.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.8.0...v3.9.0) (2026-07-28)
+
+
+### Features
+
+* notify the map author of a new chapter ([ac5cfdb](https://github.com/yusuke-suzuki/qoodish/commit/ac5cfdb67fb38e6009a974058b2591d2e3daa014))
+
 ## [3.8.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.7.0...v3.8.0) (2026-07-28)
 
 
