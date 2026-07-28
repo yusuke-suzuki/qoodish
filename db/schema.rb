@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_07_26_144020) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_28_065006) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "map_id", null: false
     t.bigint "user_id", null: false
@@ -279,7 +279,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_26_144020) do
   add_foreign_key "maps", "users"
   add_foreign_key "milestones", "journeys"
   add_foreign_key "milestones", "reviews"
-  add_foreign_key "push_notifications", "users"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"
   add_foreign_key "user_preferences", "users"
