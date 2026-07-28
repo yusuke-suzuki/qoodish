@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.9.1](https://github.com/yusuke-suzuki/qoodish/compare/v3.9.0...v3.9.1) (2026-07-28)
+
+
+### Bug Fixes
+
+* notify only once when a like is repeated ([2b720d8](https://github.com/yusuke-suzuki/qoodish/commit/2b720d876f46eb960095051b2da830d389b374f3))
+
 ## [3.9.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.8.0...v3.9.0) (2026-07-28)
 
 
