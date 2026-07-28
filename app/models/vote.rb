@@ -20,6 +20,8 @@ class Vote < ApplicationRecord
   end
 
   def create_notification
+    return if votable.notifications.exists?(notifier: voter, key: 'liked')
+
     Notification.create!(
       notifiable: votable,
       notifier: voter,
