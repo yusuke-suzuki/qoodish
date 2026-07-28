@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.8.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.7.0...v3.8.0) (2026-07-28)
+
+
+### Features
+
+* rework web push preference storage ([1b41cab](https://github.com/yusuke-suzuki/qoodish/commit/1b41cab6b4abcd78b3ef6b9cbe3af98fbc915e15)), closes [#564](https://github.com/yusuke-suzuki/qoodish/issues/564)
+
+
+### Bug Fixes
+
+* stop notifying yourself of your own like ([2eb938c](https://github.com/yusuke-suzuki/qoodish/commit/2eb938c2b2eb1963fd072f19e3e046b80b69502f))
+
 ## [3.7.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.6.0...v3.7.0) (2026-07-27)
 
 
