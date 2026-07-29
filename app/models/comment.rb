@@ -5,6 +5,8 @@ class Comment < ApplicationRecord
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :notifications, as: :notifiable, dependent: :destroy
 
+  normalizes :body, with: ->(text) { text.delete("\r") }
+
   validates :body,
             presence: true,
             length: {
