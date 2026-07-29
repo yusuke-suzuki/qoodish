@@ -1,0 +1,1 @@
+json.web_push current_user.web_push_preferences

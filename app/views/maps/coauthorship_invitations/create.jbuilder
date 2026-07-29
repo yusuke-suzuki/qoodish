@@ -1,1 +1,1 @@
-json.partial! 'coauthorship_invitations/coauthorship_invitation', coauthorship_invitation: @invitation
+json.partial! 'partials/coauthorship_invitation', coauthorship_invitation: @invitation
