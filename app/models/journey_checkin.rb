@@ -11,7 +11,8 @@ class JourneyCheckin < ApplicationRecord
 
   delegate :user_id, to: :journey
 
-  before_validation :remove_carriage_return
+  normalizes :note, with: ->(text) { text.delete("\r") }
+
   before_validation :set_default_checked_in_at, on: :create
 
   validates :review_id,
@@ -32,10 +33,6 @@ class JourneyCheckin < ApplicationRecord
   validate :checked_in_at_must_be_within_journey_period, if: :checked_in_at_changed?
 
   private
-
-  def remove_carriage_return
-    note.delete!("\r") if note.present?
-  end
 
   def set_default_checked_in_at
     self.checked_in_at ||= Time.current

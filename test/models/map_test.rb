@@ -40,6 +40,16 @@ class MapTest < ActiveSupport::TestCase
     assert_not_includes Map.related_to(users(:you)).pluck(:id), map.id
   end
 
+  test 'name and description drop carriage returns on assignment' do
+    map = users(:me).maps.create!(
+      name: "Kyoto\r\ntrip",
+      description: "First\r\nvisit"
+    )
+
+    assert_equal "Kyoto\ntrip", map.reload.name
+    assert_equal "First\nvisit", map.description
+  end
+
   test 'making a map private destroys its bookmarks' do
     map = maps(:public_one) # bookmarked by you (you_on_public_one)
 
