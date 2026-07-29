@@ -1,0 +1,18 @@
+module Me
+  class DevicesController < ApplicationController
+    before_action :authenticate_user!
+
+    def update
+      current_user.devices.find_or_create_by(
+        registration_token: params[:id]
+      )
+    end
+
+    def destroy
+      device = current_user.devices.find_by(registration_token: params[:id])
+      return if device.blank?
+
+      device.destroy!
+    end
+  end
+end

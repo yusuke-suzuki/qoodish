@@ -38,6 +38,20 @@ Rails.application.routes.draw do
     end
   end
   namespace :me do
+    resource :profile, only: %i[show update]
+    resource :account, only: [:destroy]
+    resource :journal, only: %i[show update]
+    resource :preferences, only: [:update]
+    resources :maps, only: [:index]
+    resources :reviews, only: %i[index update destroy]
+    resources :devices, only: %i[update destroy]
+    resources :notifications, only: %i[index update]
+    resources :coauthorship_invitations, only: [:index] do
+      member do
+        post :accept
+        post :decline
+      end
+    end
     resources :journeys, only: %i[index show destroy] do
       member do
         post :start
