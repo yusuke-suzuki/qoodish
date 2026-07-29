@@ -17,6 +17,8 @@ class Map < ApplicationRecord
   has_many :journeys, dependent: :nullify
   has_many :chapters, dependent: :nullify
 
+  normalizes :name, :description, with: ->(text) { text.delete("\r") }
+
   validates :name,
             presence: {
               message: I18n.t('messages.api.map_name_required')
@@ -46,7 +48,6 @@ class Map < ApplicationRecord
             }
   validates :images, length: { maximum: 1 }
 
-  before_validation :remove_carriage_return
   after_update :destroy_bookmarks_when_private, if: :saved_change_to_private?
 
   scope :public_open, lambda {
@@ -120,11 +121,6 @@ class Map < ApplicationRecord
   end
 
   private
-
-  def remove_carriage_return
-    name&.delete!("\r")
-    description&.delete!("\r")
-  end
 
   def destroy_bookmarks_when_private
     bookmarks.destroy_all if private?

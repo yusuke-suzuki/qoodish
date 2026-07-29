@@ -14,7 +14,7 @@ class Review < ApplicationRecord
   has_many :milestones, dependent: :nullify
   has_many :journey_checkins, dependent: :nullify
 
-  before_validation :remove_carriage_return
+  normalizes :name, :comment, with: ->(text) { text.delete("\r") }
 
   validates :comment,
             presence: {
@@ -89,12 +89,5 @@ class Review < ApplicationRecord
 
   def lng
     longitude.to_f
-  end
-
-  private
-
-  def remove_carriage_return
-    name.delete!("\r") if name.present?
-    comment.delete!("\r") if comment.present?
   end
 end

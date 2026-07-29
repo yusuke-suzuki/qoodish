@@ -14,4 +14,17 @@ class ReviewTest < ActiveSupport::TestCase
 
     assert_nil review.image_variants
   end
+
+  test 'name and comment drop carriage returns on assignment' do
+    review = maps(:public_one).reviews.create!(
+      user: users(:me),
+      name: "Cafe\r\nBonjour",
+      comment: "Nice\r\nplace",
+      latitude: 35.681382,
+      longitude: 139.766084
+    )
+
+    assert_equal "Cafe\nBonjour", review.reload.name
+    assert_equal "Nice\nplace", review.comment
+  end
 end
