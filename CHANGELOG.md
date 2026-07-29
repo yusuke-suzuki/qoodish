@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.9.2](https://github.com/yusuke-suzuki/qoodish/compare/v3.9.1...v3.9.2) (2026-07-29)
+
+
+### Code Refactoring
+
+* drop the push_notifications table ([0f9ecbb](https://github.com/yusuke-suzuki/qoodish/commit/0f9ecbbc67ed78aac2a14195c381367c742a1dda))
+
 ## [3.9.1](https://github.com/yusuke-suzuki/qoodish/compare/v3.9.0...v3.9.1) (2026-07-28)
 
 
