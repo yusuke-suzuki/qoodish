@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.10.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.9.2...v3.10.0) (2026-08-01)
+
+
+### Features
+
+* add /me endpoints for own resources ([ca91bb9](https://github.com/yusuke-suzuki/qoodish/commit/ca91bb99afff7f716a8d8bfcc2f28d8986663bb3))
+
+
+### Bug Fixes
+
+* strip carriage returns from comment bodies ([a97b897](https://github.com/yusuke-suzuki/qoodish/commit/a97b897d3f077f162c9536b4edf31d8c76d39628))
+
 ## [3.9.2](https://github.com/yusuke-suzuki/qoodish/compare/v3.9.1...v3.9.2) (2026-07-29)
 
 
