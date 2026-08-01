@@ -7,7 +7,7 @@ module Users
 
       reviews = user
                 .reviews
-                .preload(:map, { user: :images }, :images, { comments: { user: :images } })
+                .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
                 .referenceable_by(current_user)
 
       @reviews = if params[:next_timestamp]
