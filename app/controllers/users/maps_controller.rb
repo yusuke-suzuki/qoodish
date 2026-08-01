@@ -3,20 +3,13 @@ module Users
     before_action :authenticate_user!
 
     def index
-      @maps = if params[:user_id] == current_user.uid
-                current_user
-                  .maps
-                  .preload(:images, user: :images)
-                  .order(created_at: :desc)
-              else
-                user = User.find_by!(id: params[:user_id])
+      user = User.find_by!(id: params[:user_id])
 
-                current_user
-                  .referenceable_maps
-                  .preload(:images, user: :images)
-                  .where(user_id: user.id)
-                  .order(created_at: :desc)
-              end
+      @maps = current_user
+              .referenceable_maps
+              .preload(:images, user: :images)
+              .where(user_id: user.id)
+              .order(created_at: :desc)
     end
   end
 end

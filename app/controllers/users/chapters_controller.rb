@@ -3,11 +3,7 @@ module Users
     before_action :authenticate_user!
 
     def index
-      user = if params[:user_id] == current_user.uid
-               current_user
-             else
-               User.find_by!(id: params[:user_id])
-             end
+      user = User.find_by!(id: params[:user_id])
 
       @chapters = Chapter
                   .referenceable_by(current_user)

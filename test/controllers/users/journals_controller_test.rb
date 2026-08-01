@@ -15,9 +15,9 @@ class Users::JournalsControllerTest < ActionDispatch::IntegrationTest
     assert_not res['editable']
   end
 
-  test 'show with own uid should return own journal' do
+  test 'show of own id should return own journal' do
     stub_google_auth(users(:me)) do
-      get "/users/#{users(:me).uid}/journal",
+      get "/users/#{users(:me).id}/journal",
           headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
