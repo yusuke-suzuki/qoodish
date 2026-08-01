@@ -53,6 +53,62 @@ class Me::ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'updated', reviews(:public_one).reload.name
   end
 
+  test 'update with image_ids attaches owned images' do
+    image_a = users(:me).owned_images.create!(
+      url: 'https://imagedelivery.net/mockhash/review-update-a/public'
+    )
+    image_b = users(:me).owned_images.create!(
+      url: 'https://imagedelivery.net/mockhash/review-update-b/public'
+    )
+
+    stub_google_auth(users(:me)) do
+      stub_cloudflare_images do
+        put "/me/reviews/#{reviews(:public_one).id}",
+            params: { name: 'updated', image_ids: [image_a.id, image_b.id] },
+            headers: { 'Authorization': 'Bearer dummytoken' }
+      end
+    end
+
+    assert_response :success
+    assert_equal [image_a.id, image_b.id].sort,
+                 reviews(:public_one).reload.image_ids.sort
+  end
+
+  test 'update with image_ids destroys removed images' do
+    review = reviews(:public_one)
+    removed = images(:two)
+
+    stub_google_auth(users(:me)) do
+      stub_cloudflare_images do
+        put "/me/reviews/#{review.id}",
+            params: { image_ids: [images(:one).id] },
+            headers: { 'Authorization': 'Bearer dummytoken' }
+      end
+    end
+
+    assert_response :success
+    assert_equal [images(:one).id], review.reload.image_ids
+    assert_nil Image.find_by(id: removed.id)
+  end
+
+  test 'update rejects image_ids that belong to another user' do
+    foreign_image = users(:you).owned_images.create!(
+      url: 'https://imagedelivery.net/mockhash/review-foreign/public'
+    )
+
+    stub_google_auth(users(:me)) do
+      stub_cloudflare_images do
+        put "/me/reviews/#{reviews(:public_one).id}",
+            params: { image_ids: [foreign_image.id] },
+            headers: { 'Authorization': 'Bearer dummytoken' }
+      end
+    end
+
+    assert_response :unprocessable_content
+    assert_equal [images(:one).id, images(:two).id].sort,
+                 reviews(:public_one).reload.image_ids.sort
+  end
+
   test 'update a review of another user should raise not found error' do
     stub_google_auth(users(:me)) do
       put "/me/reviews/#{reviews(:public_you_one).id}",

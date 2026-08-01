@@ -17,41 +17,6 @@ class JournalsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 4, res['chapters_count']
   end
 
-  test 'update own journal should be success' do
-    stub_google_auth(users(:me)) do
-      put "/journals/#{journals(:my_journal).id}",
-          params: { title: 'Renamed journal' },
-          headers: { 'Authorization': 'Bearer dummytoken' },
-          as: :json
-    end
-
-    assert_response :success
-
-    assert_equal 'Renamed journal', journals(:my_journal).reload.title
-  end
-
-  test 'update a journal without a title should raise unprocessable error' do
-    stub_google_auth(users(:me)) do
-      put "/journals/#{journals(:my_journal).id}",
-          params: { title: '' },
-          headers: { 'Authorization': 'Bearer dummytoken' },
-          as: :json
-    end
-
-    assert_response :unprocessable_content
-  end
-
-  test 'update a journal of another user should raise not found error' do
-    stub_google_auth(users(:me)) do
-      put "/journals/#{journals(:you_journal).id}",
-          params: { title: 'Hijacked' },
-          headers: { 'Authorization': 'Bearer dummytoken' },
-          as: :json
-    end
-
-    assert_response :not_found
-  end
-
   test 'show a journal without authentication should raise unauthorized error' do
     get "/journals/#{journals(:my_journal).id}"
 

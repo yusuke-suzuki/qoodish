@@ -1,14 +1,12 @@
 Rails.application.routes.draw do
-  resources :users, only: %i[index show create update destroy] do
+  resources :users, only: %i[index show create] do
     scope module: :users do
       resources :maps, only: [:index]
       resources :reviews, only: [:index]
       resources :chapters, only: [:index]
       resource :journal, only: [:show]
-      resource :push_notification, only: [:update]
     end
   end
-  resources :devices, only: %i[update destroy]
   resources :maps do
     scope module: :maps do
       resources :reviews, only: %i[index show create]
@@ -19,13 +17,7 @@ Rails.application.routes.draw do
       resources :chapters, only: %i[index create]
     end
   end
-  resources :coauthorship_invitations, only: [:index] do
-    member do
-      post :accept
-      post :decline
-    end
-  end
-  resources :reviews, only: %i[index update destroy] do
+  resources :reviews, only: [:index] do
     scope module: :reviews do
       resource :like, only: %i[create destroy]
       resources :likes, only: [:index]
@@ -73,13 +65,12 @@ Rails.application.routes.draw do
       resource :like, only: %i[create destroy]
     end
   end
-  resources :journals, only: %i[show update] do
+  resources :journals, only: [:show] do
     scope module: :journals do
       resource :bookmark, only: %i[create destroy]
     end
   end
   resources :inappropriate_contents, only: [:create]
-  resources :notifications, only: %i[index update]
   resources :images, only: [:create]
 
   namespace :guest do

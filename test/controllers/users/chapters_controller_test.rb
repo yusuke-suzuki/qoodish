@@ -18,9 +18,9 @@ class Users::ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes ids, chapters(:you_draft).id
   end
 
-  test 'index with own uid should return only published chapters' do
+  test 'index of own id should return only published chapters' do
     stub_google_auth(users(:me)) do
-      get "/users/#{users(:me).uid}/chapters",
+      get "/users/#{users(:me).id}/chapters",
           headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
