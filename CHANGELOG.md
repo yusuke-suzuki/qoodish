@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.0.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.10.0...v4.0.0) (2026-08-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* PUT and DELETE /users/:id, PUT /users/:user_id/push_notification, PUT and DELETE /devices/:id, GET and PUT /notifications, GET /coauthorship_invitations with its accept and decline members, PUT and DELETE /reviews/:id, and PUT /journals/:id are gone. Their /me equivalents replace them. GET /users/:id no longer accepts a uid and always responds with the public payload.
+
+### Features
+
+* remove endpoints replaced by /me ([5ac340e](https://github.com/yusuke-suzuki/qoodish/commit/5ac340e30a35343eff58bba2f17704b45dbd896c))
+
+
+### Performance Improvements
+
+* preload voters for the user reviews index ([5686bda](https://github.com/yusuke-suzuki/qoodish/commit/5686bda03a8d46eced07462e46e637c34f912565))
+
 ## [3.10.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.9.2...v3.10.0) (2026-08-01)
 
 
