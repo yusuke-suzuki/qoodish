@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.0.0...v4.1.0) (2026-08-11)
+
+
+### Features
+
+* add the featured map endpoint ([ce6c9b1](https://github.com/yusuke-suzuki/qoodish/commit/ce6c9b1a1dbbf0957b823728baf91a8732228efb))
+
 ## [4.0.0](https://github.com/yusuke-suzuki/qoodish/compare/v3.10.0...v4.0.0) (2026-08-03)
 
 
