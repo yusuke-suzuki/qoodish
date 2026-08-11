@@ -16,6 +16,7 @@ class Map < ApplicationRecord
   has_many :images, as: :imageable, dependent: :destroy
   has_many :journeys, dependent: :nullify
   has_many :chapters, dependent: :nullify
+  has_many :featured_maps, dependent: :destroy
 
   normalizes :name, :description, with: ->(text) { text.delete("\r") }
 
@@ -84,6 +85,14 @@ class Map < ApplicationRecord
       .group('maps.id')
       .order('max(reviews.created_at) desc')
       .limit(12)
+  }
+
+  # Featuring is recorded as an append-only log, so the current pick is the
+  # newest entry whose map is still public.
+  scope :featured, lambda {
+    public_open
+      .joins(:featured_maps)
+      .order('featured_maps.created_at desc, featured_maps.id desc')
   }
 
   scope :popular, lambda {

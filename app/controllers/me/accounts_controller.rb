@@ -8,7 +8,7 @@ module Me
         associations: [
           { reviews: %i[images votes notifications] },
           { maps: [:images, :coauthorships, :bookmarks, :coauthorship_invitations, :votes, :notifications,
-                   { reviews: %i[images votes notifications] }] },
+                   :featured_maps, { reviews: %i[images votes notifications] }] },
           { journeys: [:milestones, { checkins: :images }] },
           { chapters: %i[votes images notifications] }
         ]

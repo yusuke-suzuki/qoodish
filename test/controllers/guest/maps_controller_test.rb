@@ -17,6 +17,49 @@ class Guest::MapsControllerTest < ActionDispatch::IntegrationTest
     assert_equal res['id'], maps(:public_one).id
   end
 
+  test 'featured map should be the newest entry' do
+    get '/guest/maps/featured'
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal res['id'], maps(:public_one).id
+  end
+
+  test 'featured map should skip maps that went private' do
+    maps(:public_one).update!(private: true)
+
+    get '/guest/maps/featured'
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal res['id'], maps(:public_two).id
+  end
+
+  test 'featured map should be the last appended entry on equal timestamps' do
+    featured_at = featured_maps(:newer).created_at
+    latest = FeaturedMap.create!(map: maps(:public_two), created_at: featured_at)
+
+    get '/guest/maps/featured'
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal res['id'], latest.map_id
+  end
+
+  test 'featured map should raise not found error when nothing is featured' do
+    FeaturedMap.delete_all
+
+    get '/guest/maps/featured'
+
+    assert_response :not_found
+  end
+
   test 'request maps without params should raise bad request error' do
     get '/guest/maps'
 
