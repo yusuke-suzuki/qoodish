@@ -75,6 +75,8 @@ Rails.application.routes.draw do
 
   namespace :guest do
     resources :maps, only: %i[index show] do
+      get :featured, on: :collection
+
       scope module: :maps do
         resources :reviews, only: [:index]
         resources :spots, only: %i[index show] do

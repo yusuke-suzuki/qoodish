@@ -6,6 +6,13 @@ class Guest::MapsController < ApplicationController
            .find_by!(id: params[:id])
   end
 
+  def featured
+    @map = Map
+           .featured
+           .preload(:images, user: :images)
+           .first!
+  end
+
   def index
     @maps = if params[:input].present?
               Map

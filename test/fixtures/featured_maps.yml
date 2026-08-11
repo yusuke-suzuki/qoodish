@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+older:
+  map: public_two
+  created_at: <%= 2.days.ago.to_fs(:db) %>
+
+newer:
+  map: public_one
+  created_at: <%= 1.day.ago.to_fs(:db) %>
