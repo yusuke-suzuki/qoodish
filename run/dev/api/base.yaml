@@ -55,12 +55,6 @@ spec:
               value: 10.78.96.3
             - name: DB_PORT
               value: "3306"
-            - name: ALLOWED_ENDPOINTS
-              value: |
-                https://dev.qoodish.com
-                http://127.0.0.1:5000
-                http://localhost:5000
-                /\Ahttps:\/\/[a-zA-Z0-9-]+\.app\.github\.dev\z/
             - name: CLOUDFLARE_ACCOUNT_ID
               value: 9671c836ad132f87d892b12ccd1809e0
             - name: CLOUDFLARE_IMAGES_ACCOUNT_HASH
