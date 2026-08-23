@@ -39,13 +39,17 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
     assert_equal 2, review.reload.images.count
   end
 
-  test 'a dry run drops nothing' do
+  test 'a dry run reports what it would drop without dropping it' do
     attach_image(maps(:public_one), 'dry-first')
-    attach_image(maps(:public_one), 'dry-second')
+    dropped = attach_image(maps(:public_one), 'dry-second')
+    log = nil
 
     assert_no_difference 'Image.count' do
-      with_dry_run { stub_cloudflare_images { load TASK } }
+      log = capture_log { with_dry_run { stub_cloudflare_images { load TASK } } }
     end
+
+    assert_match "Map #{maps(:public_one).id}: would drop images #{dropped.id}", log
+    assert_match 'would remove 1 extra images', log
   end
 
   test 'a second run drops nothing more' do
@@ -60,6 +64,16 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
   end
 
   private
+
+  def capture_log
+    buffer = StringIO.new
+    original = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(buffer)
+    yield
+    buffer.string
+  ensure
+    Rails.logger = original
+  end
 
   def with_dry_run
     ENV['DRY_RUN'] = '1'
