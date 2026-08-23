@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.2.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.1.0...v4.2.0) (2026-08-23)
+
+
+### Features
+
+* add a dry run to the image dedup task ([96b37f9](https://github.com/yusuke-suzuki/qoodish/commit/96b37f935809a1c9a274b8a1a336d284950cc624))
+
+
+### Bug Fixes
+
+* keep maps with legacy extra images editable ([9a5603d](https://github.com/yusuke-suzuki/qoodish/commit/9a5603d792f6c11fdbd39e4d0f81b991c8647380))
+
 ## [4.1.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.0.0...v4.1.0) (2026-08-11)
 
 
