@@ -39,6 +39,15 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
     assert_equal 2, review.reload.images.count
   end
 
+  test 'a dry run drops nothing' do
+    attach_image(maps(:public_one), 'dry-first')
+    attach_image(maps(:public_one), 'dry-second')
+
+    assert_no_difference 'Image.count' do
+      with_dry_run { stub_cloudflare_images { load TASK } }
+    end
+  end
+
   test 'a second run drops nothing more' do
     attach_image(maps(:public_one), 'first')
     attach_image(maps(:public_one), 'second')
@@ -51,6 +60,13 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
   end
 
   private
+
+  def with_dry_run
+    ENV['DRY_RUN'] = '1'
+    yield
+  ensure
+    ENV.delete('DRY_RUN')
+  end
 
   def attach_image(imageable, suffix)
     users(:me).owned_images.create!(
