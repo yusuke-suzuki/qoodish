@@ -33,6 +33,25 @@ class Me::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'Renamed', users(:me).reload.name
   end
 
+  test 'update should succeed when the user already holds more images than the limit' do
+    2.times do |i|
+      users(:me).owned_images.create!(
+        imageable: users(:me),
+        url: "https://imagedelivery.net/mockhash/profile-legacy-#{i}/public"
+      )
+    end
+
+    stub_google_auth(users(:me)) do
+      put '/me/profile',
+          params: { name: 'Renamed' },
+          headers: { 'Authorization': 'Bearer dummytoken' },
+          as: :json
+    end
+
+    assert_response :success
+    assert_equal 'Renamed', users(:me).reload.name
+  end
+
   test 'show without a token should be unauthorized' do
     get '/me/profile'
 

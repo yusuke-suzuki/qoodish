@@ -47,7 +47,12 @@ class Map < ApplicationRecord
             presence: {
               message: I18n.t('messages.api.map_author_not_specified')
             }
-  validates :images, length: { maximum: 1 }
+  # Maps backfilled from the legacy image_url column can already hold more
+  # images than the limit allows. Checking the limit on every save would leave
+  # them impossible to edit at all, so only the images a save attaches count.
+  validates :images,
+            length: { maximum: 1 },
+            if: :images_assigned?
 
   after_update :destroy_bookmarks_when_private, if: :saved_change_to_private?
 
@@ -108,6 +113,16 @@ class Map < ApplicationRecord
     end
   }
 
+  def images=(records)
+    @images_assigned = true
+    super
+  end
+
+  def image_ids=(ids)
+    @images_assigned = true
+    super
+  end
+
   def image_url
     images.first&.url.to_s
   end
@@ -130,6 +145,10 @@ class Map < ApplicationRecord
   end
 
   private
+
+  def images_assigned?
+    @images_assigned.present?
+  end
 
   def destroy_bookmarks_when_private
     bookmarks.destroy_all if private?
