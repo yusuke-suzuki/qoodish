@@ -41,7 +41,12 @@ class User < ApplicationRecord
               allow_blank: true,
               maximum: 160
             }
-  validates :images, length: { maximum: 1 }
+  # Users backfilled from the legacy image_path column can already hold more
+  # images than the limit allows. Checking the limit on every save would leave
+  # them impossible to edit at all, so only the images a save attaches count.
+  validates :images,
+            length: { maximum: 1 },
+            if: :images_assigned?
 
   before_destroy :delete_id_platform_account
   after_create :create_default_map
@@ -61,6 +66,16 @@ class User < ApplicationRecord
   # omission.
   def update_web_push_preferences!(changes)
     preferences.create!(web_push: web_push_preferences.merge(changes))
+  end
+
+  def images=(records)
+    @images_assigned = true
+    super
+  end
+
+  def image_ids=(ids)
+    @images_assigned = true
+    super
   end
 
   def image_url
@@ -152,6 +167,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def images_assigned?
+    @images_assigned.present?
+  end
 
   def delete_id_platform_account
     id_platform.delete_account(uid)
