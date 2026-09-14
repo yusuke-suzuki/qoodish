@@ -15,6 +15,21 @@ class Guest::ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes ids, chapters(:my_draft).id
   end
 
+  test 'index should page with next_timestamp' do
+    newest = chapters(:you_published_on_my_map)
+
+    get '/guest/chapters', params: { next_timestamp: newest.created_at.iso8601 }
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+    ids = res.map { |chapter| chapter['id'] }
+
+    assert_not_includes ids, newest.id
+    assert_includes ids, chapters(:my_published).id
+    assert(res.all? { |chapter| Time.parse(chapter['created_at']) < newest.created_at })
+  end
+
   test 'show a published chapter returns the content verbatim' do
     get "/guest/chapters/#{chapters(:my_published).id}"
 

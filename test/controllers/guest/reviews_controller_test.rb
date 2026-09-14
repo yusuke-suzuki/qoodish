@@ -33,6 +33,33 @@ class Guest::ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert(res.all? { |review| review['map']['private'] == false })
   end
 
+  test 'feed of reviews should not include reviews on private maps' do
+    get '/guest/reviews?feed=true'
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_not res.empty?
+    assert(res.all? { |review| review['map']['private'] == false })
+  end
+
+  test 'feed of reviews should page with next_timestamp' do
+    get '/guest/reviews?feed=true'
+
+    first_page = JSON.parse(@response.body)
+    newest = first_page.first
+
+    get '/guest/reviews', params: { feed: true, next_timestamp: newest['created_at'] }
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_not_includes res.map { |review| review['id'] }, newest['id']
+    assert(res.all? { |review| Time.parse(review['created_at']) < Time.parse(newest['created_at']) })
+  end
+
   test 'list of popular reviews should not include reviews on private maps' do
     get '/guest/reviews?popular=true'
 
