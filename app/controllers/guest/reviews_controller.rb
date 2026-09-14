@@ -7,7 +7,9 @@ class Guest::ReviewsController < ApplicationController
   end
 
   def index
-    @reviews = if params[:recent]
+    @reviews = if params[:feed]
+                 feed
+               elsif params[:recent]
                  Review
                    .public_open
                    .limit(8)
@@ -21,5 +23,19 @@ class Guest::ReviewsController < ApplicationController
                else
                  raise Exceptions::BadRequest
                end
+  end
+
+  private
+
+  def feed
+    scope = Review
+            .public_open
+            .preload(:map, { user: :images }, :images, { comments: { user: :images } })
+
+    if params[:next_timestamp]
+      scope.feed_before(params[:next_timestamp])
+    else
+      scope.latest_feed
+    end
   end
 end
