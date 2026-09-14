@@ -6,7 +6,7 @@ class Guest::Users::ReviewsController < ApplicationController
           .public_open
           .where(user_id: params[:user_id])
           .preload(:map, { user: :images }, :images, { comments: { user: :images } })
-          .feed_before(params[:next_timestamp])
+          .feed_before(params[:next_timestamp], params[:next_id])
       else
         Review
           .public_open

@@ -3,7 +3,7 @@ class Guest::ChaptersController < ApplicationController
     @chapters = if params[:next_timestamp]
                   Chapter
                     .public_open
-                    .feed_before(params[:next_timestamp])
+                    .feed_before(params[:next_timestamp], params[:next_id])
                     .preload(:map, :images, user: %i[images journal])
                 else
                   Chapter

@@ -30,6 +30,12 @@ class Guest::ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert(res.all? { |chapter| Time.parse(chapter['created_at']) < newest.created_at })
   end
 
+  test 'index should reject a malformed cursor' do
+    get '/guest/chapters', params: { next_timestamp: 'not-a-time' }
+
+    assert_response :bad_request
+  end
+
   test 'show a published chapter returns the content verbatim' do
     get "/guest/chapters/#{chapters(:my_published).id}"
 

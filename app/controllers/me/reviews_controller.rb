@@ -7,7 +7,7 @@ module Me
                    current_user
                      .reviews
                      .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
-                     .feed_before(params[:next_timestamp])
+                     .feed_before(params[:next_timestamp], params[:next_id])
                  else
                    current_user
                      .reviews
