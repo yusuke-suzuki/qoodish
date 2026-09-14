@@ -14,7 +14,16 @@ module Me
         ]
       ).call
 
+      deleted = {
+        id: current_user.id,
+        map_ids: current_user.maps.map(&:id),
+        review_ids: current_user.reviews.map(&:id),
+        chapter_ids: current_user.chapters.map(&:id)
+      }
+
       current_user.destroy!
+
+      render json: deleted
     end
   end
 end
