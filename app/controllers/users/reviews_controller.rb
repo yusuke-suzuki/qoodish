@@ -11,7 +11,7 @@ module Users
                 .referenceable_by(current_user)
 
       @reviews = if params[:next_timestamp]
-                   reviews.feed_before(params[:next_timestamp])
+                   reviews.feed_before(params[:next_timestamp], params[:next_id])
                  else
                    reviews.latest_feed
                  end

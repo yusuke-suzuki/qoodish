@@ -5,7 +5,7 @@ class ChaptersController < ApplicationController
     @chapters = if params[:next_timestamp]
                   Chapter
                     .feed_for(current_user)
-                    .feed_before(params[:next_timestamp])
+                    .feed_before(params[:next_timestamp], params[:next_id])
                     .preload(:map, :votes, user: %i[images journal])
                 else
                   Chapter

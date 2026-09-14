@@ -60,6 +60,29 @@ class Guest::ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert(res.all? { |review| Time.parse(review['created_at']) < Time.parse(newest['created_at']) })
   end
 
+  test 'feed of reviews should continue past rows sharing a timestamp' do
+    get '/guest/reviews?feed=true'
+
+    first_page = JSON.parse(@response.body)
+    newest = first_page.first
+
+    get '/guest/reviews', params: { feed: true, next_timestamp: newest['created_at'], next_id: newest['id'] }
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+    ids = res.map { |review| review['id'] }
+
+    assert_not_includes ids, newest['id']
+    assert_equal first_page.drop(1).map { |review| review['id'] }.first(res.size), ids.first(res.size)
+  end
+
+  test 'feed of reviews should reject a malformed cursor' do
+    get '/guest/reviews', params: { feed: true, next_timestamp: 'not-a-time' }
+
+    assert_response :bad_request
+  end
+
   test 'list of popular reviews should not include reviews on private maps' do
     get '/guest/reviews?popular=true'
 

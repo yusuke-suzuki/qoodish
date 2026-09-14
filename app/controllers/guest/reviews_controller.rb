@@ -33,7 +33,7 @@ class Guest::ReviewsController < ApplicationController
             .preload(:map, { user: :images }, :images, { comments: { user: :images } })
 
     if params[:next_timestamp]
-      scope.feed_before(params[:next_timestamp])
+      scope.feed_before(params[:next_timestamp], params[:next_id])
     else
       scope.latest_feed
     end

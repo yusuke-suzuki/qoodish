@@ -5,7 +5,7 @@ class ReviewsController < ApplicationController
     @reviews = if params[:next_timestamp]
                  Review
                    .feed_for(current_user)
-                   .feed_before(params[:next_timestamp])
+                   .feed_before(params[:next_timestamp], params[:next_id])
                    .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
                else
                  Review
