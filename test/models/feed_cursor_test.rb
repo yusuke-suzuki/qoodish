@@ -9,6 +9,12 @@ class FeedCursorTest < ActiveSupport::TestCase
     assert_equal ['reviews.created_at < ?', cursor.created_at], cursor.condition('reviews')
   end
 
+  test 'keeps the microseconds a serialized timestamp carries' do
+    time = Time.zone.parse('2026-06-08T00:00:00.123456Z')
+
+    assert_equal time, FeedCursor.new(time.as_json).created_at
+  end
+
   test 'carries the id into a composite boundary' do
     cursor = FeedCursor.new('2026-06-08T00:00:00Z', '42')
 
