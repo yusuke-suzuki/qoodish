@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.3.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.2.0...v4.3.0) (2026-09-14)
+
+
+### Features
+
+* page the guest chapter and review feeds ([f2ec0bf](https://github.com/yusuke-suzuki/qoodish/commit/f2ec0bf3b10ebcf42e2f7862b8eb1481eea1555c))
+
+
+### Bug Fixes
+
+* harden the feed cursor ([df213ae](https://github.com/yusuke-suzuki/qoodish/commit/df213aead3563ddfdf5c210fa2e3aed65eeb74b5))
+* serialize timestamps at the column's precision ([5bdf3ff](https://github.com/yusuke-suzuki/qoodish/commit/5bdf3ffc8c0ae72763dcf72f5c30fea848233bb8))
+
 ## [4.2.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.1.0...v4.2.0) (2026-08-23)
 
 
