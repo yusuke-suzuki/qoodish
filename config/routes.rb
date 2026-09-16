@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   end
   resources :maps do
     scope module: :maps do
-      resources :reviews, only: %i[index show create]
+      resources :reviews, only: %i[index create]
       resources :coauthors, only: %i[index destroy]
       resource :bookmark, only: %i[create destroy]
       resources :coauthorship_invitations, only: [:create]
