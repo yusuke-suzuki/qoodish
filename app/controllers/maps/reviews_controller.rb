@@ -10,14 +10,6 @@ module Maps
                  .order(created_at: :desc)
     end
 
-    def show
-      @review =
-        current_user
-        .referenceable_reviews
-        .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
-        .find_by!(id: params[:id])
-    end
-
     def create
       current_user
         .editable_maps
