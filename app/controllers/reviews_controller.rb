@@ -14,4 +14,12 @@ class ReviewsController < ApplicationController
                    .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
                end
   end
+
+  def show
+    @review =
+      current_user
+      .referenceable_reviews
+      .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
+      .find_by!(id: params[:id])
+  end
 end

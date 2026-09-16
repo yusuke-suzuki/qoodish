@@ -17,7 +17,7 @@ Rails.application.routes.draw do
       resources :chapters, only: %i[index create]
     end
   end
-  resources :reviews, only: [:index] do
+  resources :reviews, only: %i[index show] do
     scope module: :reviews do
       resource :like, only: %i[create destroy]
       resources :likes, only: [:index]
