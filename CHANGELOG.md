@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.3.0...v4.4.0) (2026-09-16)
+
+
+### Features
+
+* add show endpoint for a single review ([78043b0](https://github.com/yusuke-suzuki/qoodish/commit/78043b0f7e2b3e0323493835e641f9933a9d0679))
+
 ## [4.3.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.2.0...v4.3.0) (2026-09-14)
 
 
