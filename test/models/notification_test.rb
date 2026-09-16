@@ -48,6 +48,39 @@ class NotificationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'a liked pin links to the pin' do
+    notification = Notification.new(
+      notifiable: reviews(:public_you_one),
+      notifier: users(:me),
+      recipient: users(:you),
+      key: 'liked'
+    )
+
+    assert_equal "/pins/#{reviews(:public_you_one).id}", notification.click_action
+  end
+
+  test 'a comment links to the commented pin' do
+    notification = Notification.new(
+      notifiable: reviews(:public_one),
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'comment'
+    )
+
+    assert_equal "/pins/#{reviews(:public_one).id}", notification.click_action
+  end
+
+  test 'a liked comment links to its pin' do
+    notification = Notification.new(
+      notifiable: comments(:one),
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'liked'
+    )
+
+    assert_equal "/pins/#{reviews(:public_one).id}", notification.click_action
+  end
+
   test 'every key is gated by a preference of the same name' do
     assert_empty Notification::KEYS - UserPreference::WEB_PUSH_DEFAULTS.keys
   end

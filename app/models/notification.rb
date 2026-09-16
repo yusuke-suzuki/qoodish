@@ -43,15 +43,15 @@ class Notification < ApplicationRecord
     when 'coauthor_invited'
       '/coauthorship_invitations'
     when 'comment'
-      "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
+      "/pins/#{notifiable.id}"
     when 'liked'
       case notifiable_type
       when Review.name
-        "/maps/#{notifiable.map_id}/reports/#{notifiable.id}"
+        "/pins/#{notifiable.id}"
       when Map.name
         "/maps/#{notifiable.id}"
       when Comment.name
-        "/maps/#{notifiable.commentable.map_id}/reports/#{notifiable.commentable.id}"
+        "/pins/#{notifiable.commentable.id}"
       when Chapter.name
         "/chapters/#{notifiable.id}"
       else
