@@ -6,6 +6,7 @@ class Pin < ApplicationRecord
   include Revisable
   include RevisableStatus
   include RevisableImages
+  include Moderatable
 
   self.revision_attributes = %i[name comment latitude longitude]
 
@@ -19,7 +20,7 @@ class Pin < ApplicationRecord
            inverse_of: :pin
   has_many :images, through: :current_revision
   has_many :notifications, as: :notifiable, dependent: :destroy
-  has_many :comments, -> { not_deleted }, as: :commentable, inverse_of: :commentable
+  has_many :comments, -> { not_deleted.visible }, as: :commentable, inverse_of: :commentable
   has_many :all_comments, class_name: 'Comment', as: :commentable, dependent: :destroy, inverse_of: :commentable
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
@@ -56,18 +57,21 @@ class Pin < ApplicationRecord
 
   scope :public_open, lambda {
     published
+      .visible
       .joins(:map)
       .where(maps: { id: Map.public_open })
   }
 
   scope :referenceable_by, lambda { |user|
     published
+      .visible
       .joins(:map)
       .where(maps: { id: Map.referenceable_by(user) })
   }
 
   scope :feed_for, lambda { |user|
     published
+      .visible
       .joins(:map)
       .where(maps: { id: Map.related_to(user) })
   }

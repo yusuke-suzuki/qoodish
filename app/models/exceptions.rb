@@ -42,6 +42,12 @@ module Exceptions
     end
   end
 
+  class TooManyRequests < ApplicationError
+    def initialize(message = I18n.t('messages.api.error_429'))
+      super(429, message)
+    end
+  end
+
   class UnprocessableContent < ApplicationError
     def initialize(message = I18n.t('messages.api.error_422'))
       super(422, message)

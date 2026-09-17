@@ -104,6 +104,15 @@ spec:
                 secretKeyRef:
                   name: QOODISH_API_AR_ENCRYPTION_PRIMARY_KEY
                   key: latest
+            - name: MAIL_FROM
+              value: noreply@qoodish.com
+            - name: REPORT_NOTIFICATION_EMAIL
+              value: support@qoodish.com
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: QOODISH_API_SMTP_PASSWORD
+                  key: latest
             - name: AR_ENCRYPTION_KEY_DERIVATION_SALT
               valueFrom:
                 secretKeyRef:

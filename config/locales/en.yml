@@ -38,6 +38,7 @@ en:
       error_404: Resource not found.
       error_409: A conflict has occurred for the requested resource.
       error_422: The request is invalid or malformed.
+      error_429: Too many requests. Please try again later.
       error_500: The request has failed due to some unknown error.
 
       duplicate_map_name: Map name is duplicated.
@@ -90,3 +91,11 @@ en:
       journal_description_exceed: "Journal description is too long. (Max: 200)"
       journal_bookmark_own: The author cannot bookmark their own journal.
       duplicate_journal_bookmark: The journal is already bookmarked.
+
+      report_type_not_supported: This content cannot be reported.
+      report_details_required: Please describe the problem.
+      report_details_exceed: "The description is too long. (Max: 2000)"
+      report_email_required: An email address is required to report without signing in so we can reply.
+      report_email_invalid: The email address is invalid.
+      report_own_content: You cannot report your own content.
+      duplicate_report: You have already reported this content.

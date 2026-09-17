@@ -7,12 +7,14 @@ module Me
                 current_user
                   .pins
                   .published
+                  .visible
                   .preloaded_with_votes
                   .feed_before(params[:next_timestamp], params[:next_id])
               else
                 current_user
                   .pins
                   .published
+                  .visible
                   .preloaded_with_votes
                   .latest_feed
               end

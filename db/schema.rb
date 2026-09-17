@@ -59,6 +59,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
     t.index ["current_revision_id"], name: "index_chapters_on_current_revision_id"
     t.index ["journey_id"], name: "index_chapters_on_journey_id", unique: true
     t.index ["map_id"], name: "index_chapters_on_map_id"
+    t.index ["status", "created_at"], name: "index_chapters_on_status_and_created_at"
     t.index ["user_id", "status"], name: "index_chapters_on_user_id_and_status"
   end
 
@@ -286,12 +287,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
     t.decimal "latitude", precision: 16, scale: 6, null: false
     t.decimal "longitude", precision: 16, scale: 6, null: false
     t.string "name", null: false
-    t.integer "position", null: false
     t.bigint "pin_id"
+    t.integer "position", null: false
     t.datetime "updated_at", null: false
     t.index ["journey_id", "pin_id"], name: "index_milestones_on_journey_id_and_pin_id", unique: true
     t.index ["journey_id", "position"], name: "index_milestones_on_journey_id_and_position"
     t.index ["pin_id"], name: "index_milestones_on_pin_id"
+  end
+
+  create_table "moderation_decisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "author_id"
+    t.text "content_snapshot"
+    t.datetime "created_at", null: false
+    t.bigint "moderatable_id", null: false
+    t.string "moderatable_type", null: false
+    t.bigint "moderator_id"
+    t.string "outcome", null: false
+    t.text "reason", null: false
+    t.bigint "reviewed_revision_id"
+    t.index ["author_id"], name: "index_moderation_decisions_on_author_id"
+    t.index ["moderatable_type", "moderatable_id", "created_at"], name: "index_moderation_decisions_on_moderatable_and_time"
+    t.index ["moderator_id"], name: "index_moderation_decisions_on_moderator_id"
   end
 
   create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -350,10 +366,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
     t.string "status", default: "published", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["created_at"], name: "index_pins_on_created_at"
     t.index ["current_revision_id"], name: "index_pins_on_current_revision_id"
     t.index ["map_id"], name: "index_pins_on_map_id"
     t.index ["status", "created_at"], name: "index_pins_on_status_and_created_at"
     t.index ["user_id"], name: "index_pins_on_user_id"
+  end
+
+  create_table "reports", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "category", null: false
+    t.text "content_snapshot"
+    t.datetime "created_at", null: false
+    t.text "details"
+    t.text "evidence_url"
+    t.string "locale", null: false
+    t.bigint "moderatable_id", null: false
+    t.string "moderatable_type", null: false
+    t.bigint "reported_revision_id"
+    t.string "reporter_email"
+    t.bigint "reporter_id"
+    t.index ["moderatable_type", "moderatable_id"], name: "index_reports_on_moderatable"
+    t.index ["reporter_email", "moderatable_type", "moderatable_id"], name: "index_reports_on_reporter_email_and_moderatable", unique: true
+    t.index ["reporter_id", "moderatable_type", "moderatable_id"], name: "index_reports_on_reporter_and_moderatable", unique: true
+    t.index ["reporter_id"], name: "index_reports_on_reporter_id"
   end
 
   create_table "user_preferences", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -380,6 +415,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
     t.bigint "current_revision_id"
     t.string "email"
     t.bigint "image_id"
+    t.string "locale"
     t.string "name"
     t.string "uid", null: false
     t.datetime "updated_at", null: false
@@ -448,6 +484,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
   add_foreign_key "maps", "users"
   add_foreign_key "milestones", "journeys"
   add_foreign_key "milestones", "pins"
+  add_foreign_key "moderation_decisions", "users", column: "author_id"
+  add_foreign_key "moderation_decisions", "users", column: "moderator_id"
   add_foreign_key "pin_revision_images", "images"
   add_foreign_key "pin_revision_images", "pin_revisions"
   add_foreign_key "pin_revisions", "pins"
@@ -455,6 +493,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
   add_foreign_key "pins", "maps"
   add_foreign_key "pins", "pin_revisions", column: "current_revision_id"
   add_foreign_key "pins", "users"
+  add_foreign_key "reports", "users", column: "reporter_id"
   add_foreign_key "user_preferences", "users"
   add_foreign_key "user_revisions", "users"
   add_foreign_key "users", "images", on_delete: :nullify

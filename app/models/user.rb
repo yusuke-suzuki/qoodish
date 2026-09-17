@@ -42,6 +42,19 @@ class User < ApplicationRecord
            class_name: 'UserPreference',
            inverse_of: :user,
            dependent: :destroy
+  has_many :reports,
+           foreign_key: :reporter_id,
+           inverse_of: :reporter,
+           dependent: :nullify
+  has_many :moderation_decisions,
+           foreign_key: :author_id,
+           inverse_of: :author,
+           dependent: :nullify
+  has_many :made_moderation_decisions,
+           class_name: 'ModerationDecision',
+           foreign_key: :moderator_id,
+           inverse_of: :moderator,
+           dependent: :nullify
 
   validates :uid,
             presence: true,
@@ -68,6 +81,10 @@ class User < ApplicationRecord
   def self.record!(**content)
     account = new
     account.revise!(user: account, **content)
+  end
+
+  def notification_locale
+    locale.presence || I18n.default_locale
   end
 
   def web_push_preferences
