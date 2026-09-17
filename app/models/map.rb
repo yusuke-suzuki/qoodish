@@ -2,6 +2,7 @@ class Map < ApplicationRecord
   include Revisable
   include RevisableStatus
   include RevisableImages
+  include Moderatable
 
   # Shield running instances from the legacy columns the follow-up migration
   # drops, so in-flight INSERTs do not reference a column that is gone.
@@ -66,7 +67,7 @@ class Map < ApplicationRecord
   after_update :destroy_bookmarks_when_private, if: :saved_change_to_private?
 
   scope :public_open, lambda {
-    published.where(private: false)
+    published.visible.where(private: false)
   }
 
   scope :referenceable_by, lambda { |user|
@@ -74,16 +75,18 @@ class Map < ApplicationRecord
       .or(where(user_id: user.id))
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
       .published
+      .visible
   }
 
   scope :editable_by, lambda { |user|
     where(user_id: user.id)
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
       .published
+      .visible
   }
 
   scope :bookmarked_by, lambda { |user|
-    published.where(id: Bookmark.where(user_id: user.id).select(:map_id))
+    published.visible.where(id: Bookmark.where(user_id: user.id).select(:map_id))
   }
 
   scope :related_to, lambda { |user|
@@ -91,14 +94,16 @@ class Map < ApplicationRecord
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
       .or(where(private: false, id: Bookmark.where(user_id: user.id).select(:map_id)))
       .published
+      .visible
   }
 
   scope :not_bookmarked_by, lambda { |user|
-    where.not(id: Bookmark.where(user_id: user.id).select(:map_id))
+    visible.where.not(id: Bookmark.where(user_id: user.id).select(:map_id))
   }
 
   scope :active, lambda {
-    left_joins(:published_pins)
+    visible
+      .left_joins(:published_pins)
       .group('maps.id')
       .order('max(pins.created_at) desc')
       .limit(12)
@@ -113,14 +118,15 @@ class Map < ApplicationRecord
   }
 
   scope :popular, lambda {
-    joins(:bookmarks)
+    visible
+      .joins(:bookmarks)
       .group('maps.id')
       .order('count(bookmarks.id) desc')
       .limit(10)
   }
 
   scope :search_by_words, lambda { |words|
-    all.tap do |q|
+    visible.tap do |q|
       words.each { |word| q.where!('name LIKE :word', word: "%#{sanitize_sql_like(word)}%") }
     end
   }

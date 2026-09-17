@@ -72,6 +72,7 @@ Rails.application.routes.draw do
     end
   end
   resources :inappropriate_contents, only: [:create]
+  resources :reports, only: [:create]
   resources :images, only: [:create]
 
   namespace :guest do

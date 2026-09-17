@@ -66,13 +66,27 @@ Rails.application.configure do
   # config.active_job.queue_adapter = :resque
   # config.active_job.queue_name_prefix = "qoodish_production"
 
+  # The async adapter keeps jobs in a thread pool that is killed when the
+  # process exits, so a Cloud Run Job that enqueues one and returns would drop
+  # it. The Job sets this; the always-on service does not.
+  config.active_job.queue_adapter = ENV['RUN_JOBS_INLINE'].present? ? :inline : :async
+
   # Disable caching for Action Mailer templates even if Action Controller
   # caching is enabled.
   config.action_mailer.perform_caching = false
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Cloudflare Email Service only accepts submissions over implicit TLS on 465
+  # and offers no STARTTLS endpoint, so :tls replaces the usual :enable_starttls.
+  config.action_mailer.perform_deliveries = ENV['SMTP_PASSWORD'].present?
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch('SMTP_ADDRESS', 'smtp.mx.cloudflare.net'),
+    port: ENV.fetch('SMTP_PORT', 465).to_i,
+    user_name: ENV.fetch('SMTP_USER_NAME', 'api_token'),
+    password: ENV['SMTP_PASSWORD'],
+    authentication: :plain,
+    tls: true
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

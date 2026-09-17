@@ -1,0 +1,26 @@
+en:
+  moderation:
+    categories:
+      spam: Spam or misleading advertising
+      harassment: Harassment or bullying
+      hate: Hate speech
+      sexual: Sexual or explicit content
+      violence: Violence or dangerous acts
+      illegal: Illegal goods or acts
+      privacy: Privacy violation
+      copyright: Copyright or trademark infringement
+      impersonation: Impersonation
+      other: Other
+    outcomes:
+      kept: No removal or other measure was taken.
+      removed: It was removed.
+      unavailable: It was no longer available when we reviewed it.
+  moderation_mailer:
+    report_received:
+      subject: "[Qoodish] New report #%{id}"
+    report_acknowledged:
+      subject: "[Qoodish] We received your report (#%{id})"
+    decision_notified:
+      subject: "[Qoodish] The outcome of your report (#%{id})"
+    content_removed:
+      subject: "[Qoodish] Your content has been removed"

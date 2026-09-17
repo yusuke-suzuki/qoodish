@@ -1,0 +1,26 @@
+ja:
+  moderation:
+    categories:
+      spam: スパム・誇大広告
+      harassment: 嫌がらせ・いじめ
+      hate: ヘイトスピーチ
+      sexual: 性的・露骨な表現
+      violence: 暴力・危険行為
+      illegal: 違法な物品・行為
+      privacy: プライバシーの侵害
+      copyright: 著作権・商標権の侵害
+      impersonation: なりすまし
+      other: その他
+    outcomes:
+      kept: 削除その他の措置は行いませんでした。
+      removed: 削除しました。
+      unavailable: 確認した時点で、対象はすでに削除されていました。
+  moderation_mailer:
+    report_received:
+      subject: "[Qoodish] 新しい報告 #%{id}"
+    report_acknowledged:
+      subject: "[Qoodish] 報告を受け付けました (#%{id})"
+    decision_notified:
+      subject: "[Qoodish] 報告への対応が完了しました (#%{id})"
+    content_removed:
+      subject: "[Qoodish] 投稿を削除しました"
