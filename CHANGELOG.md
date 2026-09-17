@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.4.0...v4.5.0) (2026-09-17)
+
+
+### Features
+
+* point notifications at the pin URL ([637a14e](https://github.com/yusuke-suzuki/qoodish/commit/637a14e15ff7fa8097fd89fbd9aa8e5e4c9563a2))
+
 ## [4.4.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.3.0...v4.4.0) (2026-09-16)
 
 
