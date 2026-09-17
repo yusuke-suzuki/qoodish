@@ -5,6 +5,8 @@ MAX_CHAPTER_MAP_FEATURES_BYTESIZE = 100.kilobytes
 CHAPTER_FEED_PER_PAGE = 12
 
 class Chapter < ApplicationRecord
+  include Moderatable
+
   EMPTY_FEATURE_COLLECTION = { 'type' => 'FeatureCollection', 'features' => [] }.freeze
 
   # Styling keys from the simplestyle spec (marker-color, marker-symbol) are
@@ -51,23 +53,23 @@ class Chapter < ApplicationRecord
   validate :journey_must_match_author_and_map
 
   scope :referenceable_by, lambda { |user|
-    published.where(map_id: Map.referenceable_by(user))
+    published.visible.where(map_id: Map.referenceable_by(user))
   }
 
   scope :readable_by, lambda { |user|
-    referenceable_by(user).or(where(user_id: user.id))
+    referenceable_by(user).or(visible.where(user_id: user.id))
   }
 
   scope :public_open, lambda {
-    published.where(map_id: Map.public_open)
+    published.visible.where(map_id: Map.public_open)
   }
 
   scope :liked_by, lambda { |user|
-    where(id: Vote.where(voter: user, votable_type: name).select(:votable_id))
+    visible.where(id: Vote.where(voter: user, votable_type: name).select(:votable_id))
   }
 
   scope :feed_for, lambda { |user|
-    published.where(map_id: Map.related_to(user))
+    published.visible.where(map_id: Map.related_to(user))
   }
 
   scope :latest_feed, lambda {

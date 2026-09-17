@@ -7,6 +7,7 @@ ja:
       error_404: リソースが見つかりませんでした。
       error_409: リクエストの内容が競合しています。
       error_422: リクエストの内容が不正です。
+      error_429: リクエストが多すぎます。しばらくしてからやり直してください。
       error_500: サーバー内部エラーが発生しました。
 
       duplicate_map_name: 既に存在するマップ名です。
@@ -59,3 +60,11 @@ ja:
       journal_description_exceed: "手帳の説明が長すぎます。(最大: 200 文字)"
       journal_bookmark_own: 著者は自身の手帳をブックマークできません。
       duplicate_journal_bookmark: 既にブックマーク済みです。
+
+      report_type_not_supported: このコンテンツは報告できません。
+      report_details_required: 問題の内容を入力してください。
+      report_details_exceed: "問題の内容が長すぎます。(最大: 2000 文字)"
+      report_email_required: ログインせずに報告する場合は、ご連絡のためメールアドレスが必要です。
+      report_email_invalid: メールアドレスの形式が正しくありません。
+      report_own_content: 自身の投稿は報告できません。
+      duplicate_report: このコンテンツは既に報告済みです。

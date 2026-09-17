@@ -5,6 +5,7 @@ module Me
     def index
       @maps = current_user
               .maps
+              .visible
               .preload(:images, user: :images)
               .order(created_at: :desc)
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_19_090200) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -33,6 +33,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
     t.bigint "user_id", null: false
     t.index ["journey_id"], name: "index_chapters_on_journey_id", unique: true
     t.index ["map_id"], name: "index_chapters_on_map_id"
+    t.index ["status", "created_at"], name: "index_chapters_on_status_and_created_at"
     t.index ["user_id", "status"], name: "index_chapters_on_user_id_and_status"
   end
 
@@ -186,6 +187,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
     t.index ["review_id"], name: "index_milestones_on_review_id"
   end
 
+  create_table "moderation_decisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "author_id"
+    t.text "content_snapshot"
+    t.datetime "created_at", null: false
+    t.bigint "moderatable_id", null: false
+    t.string "moderatable_type", null: false
+    t.bigint "moderator_id"
+    t.string "outcome", null: false
+    t.text "reason", null: false
+    t.index ["author_id"], name: "index_moderation_decisions_on_author_id"
+    t.index ["moderatable_type", "moderatable_id", "created_at"], name: "index_moderation_decisions_on_moderatable_and_time"
+    t.index ["moderator_id"], name: "index_moderation_decisions_on_moderator_id"
+  end
+
   create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -205,6 +220,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
+  create_table "reports", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "category", null: false
+    t.text "content_snapshot"
+    t.datetime "created_at", null: false
+    t.text "details"
+    t.text "evidence_url"
+    t.string "locale", null: false
+    t.bigint "moderatable_id", null: false
+    t.string "moderatable_type", null: false
+    t.string "reporter_email"
+    t.bigint "reporter_id"
+    t.index ["moderatable_type", "moderatable_id"], name: "index_reports_on_moderatable"
+    t.index ["reporter_email", "moderatable_type", "moderatable_id"], name: "index_reports_on_reporter_email_and_moderatable", unique: true
+    t.index ["reporter_id", "moderatable_type", "moderatable_id"], name: "index_reports_on_reporter_and_moderatable", unique: true
+    t.index ["reporter_id"], name: "index_reports_on_reporter_id"
+  end
+
   create_table "reviews", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.text "comment", null: false
     t.datetime "created_at", null: false
@@ -215,6 +247,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
     t.bigint "spot_id"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["created_at"], name: "index_reviews_on_created_at"
     t.index ["map_id"], name: "index_reviews_on_map_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
@@ -231,6 +264,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
     t.string "biography"
     t.datetime "created_at", null: false
     t.string "email"
+    t.string "locale"
     t.string "name"
     t.string "uid", null: false
     t.datetime "updated_at", null: false
@@ -276,6 +310,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
   add_foreign_key "maps", "users"
   add_foreign_key "milestones", "journeys"
   add_foreign_key "milestones", "reviews"
+  add_foreign_key "moderation_decisions", "users", column: "author_id"
+  add_foreign_key "moderation_decisions", "users", column: "moderator_id"
+  add_foreign_key "reports", "users", column: "reporter_id"
   add_foreign_key "reviews", "maps"
   add_foreign_key "reviews", "users"
   add_foreign_key "user_preferences", "users"

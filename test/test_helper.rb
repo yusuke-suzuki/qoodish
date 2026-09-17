@@ -8,9 +8,18 @@ require 'minitest/autorun'
 ENV['CLOUDFLARE_ACCOUNT_ID'] ||= 'test-account'
 ENV['CLOUDFLARE_IMAGES_ACCOUNT_HASH'] ||= 'mockhash'
 ENV['CLOUDFLARE_IMAGES_API_TOKEN'] ||= 'test-token'
+ENV['REPORT_NOTIFICATION_EMAIL'] ||= 'operator@example.com'
 
 class ActiveSupport::TestCase
   fixtures :all
+
+  # The middleware assigns I18n.locale per request and never restores it, so a
+  # test that sends Accept-Language would otherwise set the language for every
+  # test that runs after it.
+  teardown do
+    RequestContext.reset
+    I18n.locale = I18n.default_locale
+  end
 
   def stub_google_auth(current_user, &block)
     GoogleAuth.stub :new, GoogleAuthMock.new(current_user), &block
@@ -32,7 +41,8 @@ class ActiveSupport::TestCase
     def verify_jwt(_jwt)
       {
         'sub' => @current_user.uid,
-        'name' => @current_user.name
+        'name' => @current_user.name,
+        'email' => @current_user.email
       }
     end
 
