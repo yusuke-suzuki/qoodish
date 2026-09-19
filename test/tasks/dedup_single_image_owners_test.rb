@@ -30,13 +30,13 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
   end
 
   test 'leaves owners allowed to hold several images untouched' do
-    review = reviews(:public_one)
+    pin = pins(:public_one)
 
-    assert_equal 2, review.images.count
+    assert_equal 2, pin.images.count
 
     stub_cloudflare_images { load TASK }
 
-    assert_equal 2, review.reload.images.count
+    assert_equal 2, pin.reload.images.count
   end
 
   test 'a dry run reports what it would drop without dropping it' do

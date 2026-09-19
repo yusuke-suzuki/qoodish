@@ -6,17 +6,17 @@ class NotificationTest < ActiveSupport::TestCase
   test 'web push on create' do
     assert_enqueued_with(job: BroadcastWebPushJob) do
       Notification.create!(
-        notifiable: reviews(:public_you_one),
+        notifiable: pins(:public_you_one),
         notifier: users(:me),
-        recipient: reviews(:public_you_one).user,
+        recipient: pins(:public_you_one).user,
         key: 'liked'
       )
     end
 
     notification = Notification.last
-    assert_equal notification.notifiable, reviews(:public_you_one)
+    assert_equal notification.notifiable, pins(:public_you_one)
     assert_equal notification.notifier, users(:me)
-    assert_equal notification.recipient, reviews(:public_you_one).user
+    assert_equal notification.recipient, pins(:public_you_one).user
     assert_equal notification.key, 'liked'
 
     perform_enqueued_jobs
@@ -27,7 +27,7 @@ class NotificationTest < ActiveSupport::TestCase
 
     assert_enqueued_with(job: BroadcastWebPushJob) do
       Notification.create!(
-        notifiable: reviews(:public_you_one),
+        notifiable: pins(:public_you_one),
         notifier: users(:me),
         recipient: users(:you),
         key: 'liked'
@@ -40,7 +40,7 @@ class NotificationTest < ActiveSupport::TestCase
 
     assert_no_enqueued_jobs do
       Notification.create!(
-        notifiable: reviews(:public_you_one),
+        notifiable: pins(:public_you_one),
         notifier: users(:me),
         recipient: users(:you),
         key: 'liked'
@@ -50,24 +50,24 @@ class NotificationTest < ActiveSupport::TestCase
 
   test 'a liked pin links to the pin' do
     notification = Notification.new(
-      notifiable: reviews(:public_you_one),
+      notifiable: pins(:public_you_one),
       notifier: users(:me),
       recipient: users(:you),
       key: 'liked'
     )
 
-    assert_equal "/pins/#{reviews(:public_you_one).id}", notification.click_action
+    assert_equal "/pins/#{pins(:public_you_one).id}", notification.click_action
   end
 
   test 'a comment links to the commented pin' do
     notification = Notification.new(
-      notifiable: reviews(:public_one),
+      notifiable: pins(:public_one),
       notifier: users(:you),
       recipient: users(:me),
       key: 'comment'
     )
 
-    assert_equal "/pins/#{reviews(:public_one).id}", notification.click_action
+    assert_equal "/pins/#{pins(:public_one).id}", notification.click_action
   end
 
   test 'a liked comment links to its pin' do
@@ -78,7 +78,44 @@ class NotificationTest < ActiveSupport::TestCase
       key: 'liked'
     )
 
-    assert_equal "/pins/#{reviews(:public_one).id}", notification.click_action
+    assert_equal "/pins/#{pins(:public_one).id}", notification.click_action
+  end
+
+  test 'a pin is still named review for the clients that expect it' do
+    notification = Notification.new(
+      notifiable: pins(:public_one),
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'liked'
+    )
+
+    assert_equal 'review', notification.client_notifiable_type
+  end
+
+  test 'every other subject keeps its own name' do
+    notification = Notification.new(
+      notifiable: chapters(:you_published_on_my_map),
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'published'
+    )
+
+    assert_equal 'chapter', notification.client_notifiable_type
+  end
+
+  test 'a notification of a deleted pin is not renderable' do
+    notification = Notification.create!(
+      notifiable: pins(:public_one),
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'liked'
+    )
+
+    assert_predicate notification, :renderable?
+
+    pins(:public_one).delete!(user: users(:me))
+
+    assert_not notification.reload.renderable?
   end
 
   test 'every key is gated by a preference of the same name' do

@@ -1,11 +1,11 @@
 one:
-  commentable_type: Review
+  commentable_type: Pin
   commentable: public_one
   user: me
   body: This is a comment
 
 two:
-  commentable_type: Review
+  commentable_type: Pin
   commentable: public_one
   user: you
   body: This is another comment

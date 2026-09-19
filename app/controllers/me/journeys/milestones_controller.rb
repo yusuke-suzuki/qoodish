@@ -5,9 +5,9 @@ module Me
 
       def create
         journey = current_user.journeys.unfinished.find_by!(id: params[:journey_id])
-        review = current_user.referenceable_reviews.find_by!(id: params[:review_id])
+        pin = current_user.referenceable_pins.find_by!(id: params[:pin_id] || params[:review_id])
 
-        @milestone = journey.milestones.create!(review: review)
+        @milestone = journey.milestones.create!(pin: pin)
       end
 
       def destroy

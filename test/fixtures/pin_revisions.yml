@@ -1,0 +1,87 @@
+private:
+  pin: private
+  user: me
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+private_you:
+  pin: private_you
+  user: you
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+private_following:
+  pin: private_following
+  user: me
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+private_unfollowing:
+  pin: private_unfollowing
+  user: me
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+private_unfollowing_you:
+  pin: private_unfollowing_you
+  user: you
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+public_unfollowing:
+  pin: public_unfollowing
+  user: me
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+public_unfollowing_you:
+  pin: public_unfollowing_you
+  user: you
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+public_one:
+  pin: public_one
+  user: me
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+public_you_one:
+  pin: public_you_one
+  user: you
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+public_you_two:
+  pin: public_you_two
+  user: you
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084
+
+public_two:
+  pin: public_two
+  user: me
+  name: This is a name
+  comment: This is a comment
+  latitude: 35.681382
+  longitude: 139.766084

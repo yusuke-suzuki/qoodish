@@ -18,12 +18,12 @@ class ImageTest < ActiveSupport::TestCase
     assert_includes image.errors[:user], I18n.t('errors.messages.invalid')
   end
 
-  test 'rejects attaching an image to a Review owned by another user' do
+  test 'rejects attaching an image to a Pin owned by another user' do
     image = users(:me).owned_images.create!(
-      url: 'https://imagedelivery.net/mockhash/foreign-review-image/public'
+      url: 'https://imagedelivery.net/mockhash/foreign-pin-image/public'
     )
 
-    refute image.update(imageable: reviews(:private_you))
+    refute image.update(imageable: pins(:private_you))
     assert_includes image.errors[:user], I18n.t('errors.messages.invalid')
   end
 

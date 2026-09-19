@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_19_000004) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -138,10 +138,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
     t.decimal "longitude", precision: 16, scale: 6, null: false
     t.string "name", null: false
     t.text "note"
-    t.bigint "review_id"
+    t.bigint "pin_id"
     t.datetime "updated_at", null: false
-    t.index ["journey_id", "review_id"], name: "index_journey_checkins_on_journey_id_and_review_id", unique: true
-    t.index ["review_id"], name: "index_journey_checkins_on_review_id"
+    t.index ["journey_id", "pin_id"], name: "index_journey_checkins_on_journey_id_and_pin_id", unique: true
+    t.index ["pin_id"], name: "index_journey_checkins_on_pin_id"
   end
 
   create_table "journeys", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -179,11 +179,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
     t.decimal "longitude", precision: 16, scale: 6, null: false
     t.string "name", null: false
     t.integer "position", null: false
-    t.bigint "review_id"
+    t.bigint "pin_id"
     t.datetime "updated_at", null: false
+    t.index ["journey_id", "pin_id"], name: "index_milestones_on_journey_id_and_pin_id", unique: true
     t.index ["journey_id", "position"], name: "index_milestones_on_journey_id_and_position"
-    t.index ["journey_id", "review_id"], name: "index_milestones_on_journey_id_and_review_id", unique: true
-    t.index ["review_id"], name: "index_milestones_on_review_id"
+    t.index ["pin_id"], name: "index_milestones_on_pin_id"
   end
 
   create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -205,18 +205,47 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient_type_and_recipient_id"
   end
 
-  create_table "reviews", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "pin_revision_images", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "image_id", null: false
+    t.bigint "pin_revision_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["image_id"], name: "index_pin_revision_images_on_image_id"
+    t.index ["pin_revision_id", "image_id"], name: "index_pin_revision_images_on_pin_revision_id_and_image_id", unique: true
+    t.index ["pin_revision_id"], name: "index_pin_revision_images_on_pin_revision_id"
+  end
+
+  create_table "pin_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.text "comment", null: false
     t.datetime "created_at", null: false
+    t.decimal "latitude", precision: 16, scale: 6, null: false
+    t.decimal "longitude", precision: 16, scale: 6, null: false
+    t.text "name", null: false
+    t.bigint "pin_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["pin_id", "id"], name: "index_pin_revisions_on_pin_id_and_id"
+    t.index ["pin_id"], name: "index_pin_revisions_on_pin_id"
+    t.index ["user_id"], name: "index_pin_revisions_on_user_id"
+  end
+
+  create_table "pins", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.text "comment", null: false
+    t.datetime "created_at", null: false
+    t.bigint "current_revision_id"
     t.decimal "latitude", precision: 16, scale: 6, null: false
     t.decimal "longitude", precision: 16, scale: 6, null: false
     t.bigint "map_id", null: false
     t.text "name", null: false
     t.bigint "spot_id"
+    t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index ["map_id"], name: "index_reviews_on_map_id"
-    t.index ["user_id"], name: "index_reviews_on_user_id"
+    t.index ["current_revision_id"], name: "index_pins_on_current_revision_id"
+    t.index ["map_id"], name: "index_pins_on_map_id"
+    t.index ["status", "created_at"], name: "index_pins_on_status_and_created_at"
+    t.index ["user_id"], name: "index_pins_on_user_id"
   end
 
   create_table "user_preferences", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -270,13 +299,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_032237) do
   add_foreign_key "journal_bookmarks", "users"
   add_foreign_key "journals", "users"
   add_foreign_key "journey_checkins", "journeys"
-  add_foreign_key "journey_checkins", "reviews"
+  add_foreign_key "journey_checkins", "pins"
   add_foreign_key "journeys", "maps"
   add_foreign_key "journeys", "users"
   add_foreign_key "maps", "users"
   add_foreign_key "milestones", "journeys"
-  add_foreign_key "milestones", "reviews"
-  add_foreign_key "reviews", "maps"
-  add_foreign_key "reviews", "users"
+  add_foreign_key "milestones", "pins"
+  add_foreign_key "pin_revision_images", "images"
+  add_foreign_key "pin_revision_images", "pin_revisions"
+  add_foreign_key "pin_revisions", "pins"
+  add_foreign_key "pin_revisions", "users"
+  add_foreign_key "pins", "maps"
+  add_foreign_key "pins", "pin_revisions", column: "current_revision_id"
+  add_foreign_key "pins", "users"
   add_foreign_key "user_preferences", "users"
 end

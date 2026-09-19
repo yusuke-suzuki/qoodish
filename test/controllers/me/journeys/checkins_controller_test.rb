@@ -5,7 +5,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
     assert_difference 'JourneyCheckin.count', 1 do
       stub_google_auth(users(:me)) do
         post "/me/journeys/#{journeys(:my_in_progress).id}/checkins",
-             params: { review_id: reviews(:private_you).id },
+             params: { pin_id: pins(:private_you).id },
              headers: { 'Authorization': 'Bearer dummytoken' }
       end
     end
@@ -14,15 +14,15 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
 
     res = JSON.parse(@response.body)
 
-    assert_equal reviews(:private_you).id, res['review_id']
-    assert_equal reviews(:private_you).name, res['spot']['name']
+    assert_equal pins(:private_you).id, res['pin_id']
+    assert_equal pins(:private_you).name, res['spot']['name']
     assert_predicate res['checked_in_at'], :present?
   end
 
   test 'check in on an unstarted journey should raise unprocessable error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_unstarted).id}/checkins",
-           params: { review_id: reviews(:public_one).id },
+           params: { pin_id: pins(:public_one).id },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -32,7 +32,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
   test 'check in at the same pin twice should raise unprocessable error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_in_progress).id}/checkins",
-           params: { review_id: reviews(:private).id },
+           params: { pin_id: pins(:private).id },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -42,7 +42,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
   test 'check in on a journey of another user should raise not found error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:you_in_progress).id}/checkins",
-           params: { review_id: reviews(:public_unfollowing).id },
+           params: { pin_id: pins(:public_unfollowing).id },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -57,7 +57,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_in_progress).id}/checkins",
            params: {
-             review_id: reviews(:private_you).id,
+             pin_id: pins(:private_you).id,
              image_ids: [image.id],
              note: 'First visit with friends'
            },
@@ -83,7 +83,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference 'JourneyCheckin.count' do
       stub_google_auth(users(:me)) do
         post "/me/journeys/#{journeys(:my_in_progress).id}/checkins",
-             params: { review_id: reviews(:private_you).id, image_ids: image_ids },
+             params: { pin_id: pins(:private_you).id, image_ids: image_ids },
              headers: { 'Authorization': 'Bearer dummytoken' }
       end
     end
@@ -94,7 +94,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
   test 'retroactive check in on a finished journey should be success' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_finished).id}/checkins",
-           params: { review_id: reviews(:public_two).id, checked_in_at: '2026-06-01 11:00:00' },
+           params: { pin_id: pins(:public_two).id, checked_in_at: '2026-06-01 11:00:00' },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -108,7 +108,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
   test 'check in on a finished journey without checked_in_at should raise unprocessable error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_finished).id}/checkins",
-           params: { review_id: reviews(:public_two).id },
+           params: { pin_id: pins(:public_two).id },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -118,7 +118,7 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
   test 'check in outside the journey period should raise unprocessable error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_finished).id}/checkins",
-           params: { review_id: reviews(:public_two).id, checked_in_at: '2026-06-01 09:00:00' },
+           params: { pin_id: pins(:public_two).id, checked_in_at: '2026-06-01 09:00:00' },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
