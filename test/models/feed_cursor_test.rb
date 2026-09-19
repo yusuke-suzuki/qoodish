@@ -6,7 +6,7 @@ class FeedCursorTest < ActiveSupport::TestCase
 
     assert_equal Time.zone.parse('2026-06-08T00:00:00Z'), cursor.created_at
     assert_nil cursor.id
-    assert_equal ['reviews.created_at < ?', cursor.created_at], cursor.condition('reviews')
+    assert_equal ['pins.created_at < ?', cursor.created_at], cursor.condition('pins')
   end
 
   test 'keeps the microseconds a serialized timestamp carries' do

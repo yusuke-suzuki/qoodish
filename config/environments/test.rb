@@ -70,5 +70,11 @@ Rails.application.configure do
     Bullet.enable = true
     Bullet.bullet_logger = true
     Bullet.raise = true
+
+    # A pin reaches its images through pin_revision_images, so preloading them
+    # loads the join rows too. Nothing reads those on their own, which is what
+    # Bullet reports; not preloading them is not an option, since that is the
+    # N+1 the preload exists to avoid.
+    Bullet.add_safelist(type: :unused_eager_loading, class_name: 'PinRevision', association: :pin_revision_images)
   end
 end

@@ -5,15 +5,15 @@ module Me
 
       def create
         journey = current_user.journeys.find_by!(id: params[:journey_id])
-        review = current_user.referenceable_reviews.find_by!(id: params[:review_id])
+        pin = current_user.referenceable_pins.find_by!(id: params[:pin_id] || params[:review_id])
 
-        @checkin = journey.checkins.create!(checkin_params.merge(review: review))
+        @checkin = journey.checkins.create!(checkin_params.merge(pin: pin))
       end
 
       def update
         journey = current_user.journeys.find_by!(id: params[:journey_id])
 
-        @checkin = journey.checkins.find_by!(id: params[:id])
+        @checkin = journey.checkins.preload(images: :pin_revision_images).find_by!(id: params[:id])
         @checkin.update!(checkin_params)
       end
 

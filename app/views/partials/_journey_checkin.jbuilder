@@ -1,5 +1,6 @@
 json.id journey_checkin.id
-json.review_id journey_checkin.review_id
+json.pin_id journey_checkin.pin_id
+json.review_id journey_checkin.pin_id
 json.spot do
   json.name journey_checkin.name
   json.latitude journey_checkin.lat

@@ -1,11 +1,11 @@
 public_one:
-  votable_type: Review
+  votable_type: Pin
   votable: public_one
   voter_type: User
   voter: me
 
 public_two:
-  votable_type: Review
+  votable_type: Pin
   votable: public_one
   voter_type: User
   voter: you

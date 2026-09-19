@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
-  has_many :reviews, dependent: :destroy
+  has_many :pins, dependent: :destroy
   has_many :notifications, as: :recipient
   has_many :comments, dependent: :destroy
   has_many :coauthorships, dependent: :destroy
@@ -111,8 +111,8 @@ class User < ApplicationRecord
     Map.referenceable_by(self)
   end
 
-  def referenceable_reviews
-    Review.referenceable_by(self)
+  def referenceable_pins
+    Pin.referenceable_by(self)
   end
 
   def editable_maps
@@ -145,8 +145,8 @@ class User < ApplicationRecord
     case vote.votable_type
     when Comment.name
       false
-    when Review.name
-      referenceable_reviews.exists?(vote.votable.id)
+    when Pin.name
+      referenceable_pins.exists?(vote.votable.id)
     when Map.name
       referenceable_maps.exists?(vote.votable.id)
     else

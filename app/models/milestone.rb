@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 class Milestone < ApplicationRecord
-  include ReviewSnapshot
+  include PinSnapshot
 
   belongs_to :journey
 
   before_validation :assign_position, on: :create
 
-  validates :review_id,
+  validates :pin_id,
             uniqueness: {
               scope: :journey_id,
               message: I18n.t('messages.api.duplicate_milestone')

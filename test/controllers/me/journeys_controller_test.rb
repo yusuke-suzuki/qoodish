@@ -31,8 +31,8 @@ class Me::JourneysControllerTest < ActionDispatch::IntegrationTest
     res = JSON.parse(@response.body)
 
     assert_equal journeys(:my_in_progress).id, res['id']
-    assert_equal [reviews(:private).id], res['milestones'].map { |milestone| milestone['review_id'] }
-    assert_equal [reviews(:private).id], res['checkins'].map { |checkin| checkin['review_id'] }
+    assert_equal [pins(:private).id], res['milestones'].map { |milestone| milestone['pin_id'] }
+    assert_equal [pins(:private).id], res['checkins'].map { |checkin| checkin['pin_id'] }
     assert_equal journeys(:my_in_progress).encoded_path, res['encoded_path']
     assert_equal maps(:private).name, res['map']['name']
   end

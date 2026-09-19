@@ -1,0 +1,7 @@
+public_one_first:
+  pin_revision: public_one
+  image: one
+
+public_one_second:
+  pin_revision: public_one
+  image: two

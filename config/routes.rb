@@ -2,14 +2,14 @@ Rails.application.routes.draw do
   resources :users, only: %i[index show create] do
     scope module: :users do
       resources :maps, only: [:index]
-      resources :reviews, only: [:index]
+      resources :pins, only: [:index]
       resources :chapters, only: [:index]
       resource :journal, only: [:show]
     end
   end
   resources :maps do
     scope module: :maps do
-      resources :reviews, only: %i[index create]
+      resources :pins, only: %i[index create]
       resources :coauthors, only: %i[index destroy]
       resource :bookmark, only: %i[create destroy]
       resources :coauthorship_invitations, only: [:create]
@@ -17,8 +17,8 @@ Rails.application.routes.draw do
       resources :chapters, only: %i[index create]
     end
   end
-  resources :reviews, only: %i[index show] do
-    scope module: :reviews do
+  resources :pins, only: %i[index show] do
+    scope module: :pins do
       resource :like, only: %i[create destroy]
       resources :likes, only: [:index]
       resources :comments, only: %i[create destroy] do
@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     resource :journal, only: %i[show update]
     resource :preferences, only: [:update]
     resources :maps, only: [:index]
-    resources :reviews, only: %i[index update destroy]
+    resources :pins, only: %i[index update destroy]
     resources :devices, only: %i[update destroy]
     resources :notifications, only: %i[index update]
     resources :coauthorship_invitations, only: [:index] do
@@ -78,24 +78,53 @@ Rails.application.routes.draw do
       get :featured, on: :collection
 
       scope module: :maps do
-        resources :reviews, only: [:index]
-        resources :spots, only: %i[index show] do
-          scope module: :spots do
-            resources :reviews, only: [:index]
-          end
-        end
+        resources :pins, only: [:index]
         resources :coauthors, only: [:index]
         resources :chapters, only: [:index]
       end
     end
-    resources :reviews, only: %i[index show]
+    resources :pins, only: %i[index show]
     resources :chapters, only: %i[index show]
     resources :users, only: %i[show] do
       scope module: :users do
         resources :maps, only: [:index]
-        resources :reviews, only: [:index]
+        resources :pins, only: [:index]
         resources :chapters, only: [:index]
       end
+    end
+  end
+
+  # Clients released before the rename still address pins as reviews. These
+  # aliases keep them working until that version is out of service.
+  resources :reviews, only: %i[index show], controller: 'pins'
+  scope path: 'reviews/:pin_id', as: :review do
+    scope module: :pins do
+      resource :like, only: %i[create destroy], controller: 'likes'
+      resources :likes, only: [:index]
+      resources :comments, only: %i[create destroy] do
+        scope module: :comments do
+          resource :like, only: %i[create destroy], controller: 'likes'
+          resources :likes, only: [:index]
+        end
+      end
+    end
+  end
+  scope path: 'maps/:map_id', as: :map do
+    resources :reviews, only: %i[index create], controller: 'maps/pins'
+  end
+  namespace :me do
+    resources :reviews, only: %i[index update destroy], controller: 'pins'
+  end
+  scope path: 'users/:user_id', as: :user do
+    resources :reviews, only: [:index], controller: 'users/pins'
+  end
+  namespace :guest do
+    resources :reviews, only: %i[index show], controller: 'pins'
+    scope path: 'maps/:map_id', as: :map do
+      resources :reviews, only: [:index], controller: 'maps/pins'
+    end
+    scope path: 'users/:user_id', as: :user do
+      resources :reviews, only: [:index], controller: 'users/pins'
     end
   end
 

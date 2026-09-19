@@ -5,7 +5,7 @@ class Me::Journeys::MilestonesControllerTest < ActionDispatch::IntegrationTest
     assert_difference 'Milestone.count', 1 do
       stub_google_auth(users(:me)) do
         post "/me/journeys/#{journeys(:my_unstarted).id}/milestones",
-             params: { review_id: reviews(:public_one).id },
+             params: { pin_id: pins(:public_one).id },
              headers: { 'Authorization': 'Bearer dummytoken' }
       end
     end
@@ -14,15 +14,15 @@ class Me::Journeys::MilestonesControllerTest < ActionDispatch::IntegrationTest
 
     res = JSON.parse(@response.body)
 
-    assert_equal reviews(:public_one).id, res['review_id']
-    assert_equal reviews(:public_one).name, res['name']
+    assert_equal pins(:public_one).id, res['pin_id']
+    assert_equal pins(:public_one).name, res['name']
   end
 
   test 'add a milestone to an in-progress journey should be success' do
     assert_difference 'Milestone.count', 1 do
       stub_google_auth(users(:me)) do
         post "/me/journeys/#{journeys(:my_in_progress).id}/milestones",
-             params: { review_id: reviews(:private_you).id },
+             params: { pin_id: pins(:private_you).id },
              headers: { 'Authorization': 'Bearer dummytoken' }
       end
     end
@@ -30,20 +30,20 @@ class Me::Journeys::MilestonesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test 'add the same review twice should raise unprocessable error' do
+  test 'add the same pin twice should raise unprocessable error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_in_progress).id}/milestones",
-           params: { review_id: reviews(:private).id },
+           params: { pin_id: pins(:private).id },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
     assert_response :unprocessable_content
   end
 
-  test 'add a review on another map should raise unprocessable error' do
+  test 'add a pin on another map should raise unprocessable error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_unstarted).id}/milestones",
-           params: { review_id: reviews(:private).id },
+           params: { pin_id: pins(:private).id },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -53,7 +53,7 @@ class Me::Journeys::MilestonesControllerTest < ActionDispatch::IntegrationTest
   test 'add a milestone to a finished journey should raise not found error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:my_finished).id}/milestones",
-           params: { review_id: reviews(:public_two).id },
+           params: { pin_id: pins(:public_two).id },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
@@ -63,7 +63,7 @@ class Me::Journeys::MilestonesControllerTest < ActionDispatch::IntegrationTest
   test 'add a milestone to a journey of another user should raise not found error' do
     stub_google_auth(users(:me)) do
       post "/me/journeys/#{journeys(:you_in_progress).id}/milestones",
-           params: { review_id: reviews(:public_unfollowing).id },
+           params: { pin_id: pins(:public_unfollowing).id },
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
