@@ -79,6 +79,14 @@ class PinTest < ActiveSupport::TestCase
     assert_not_includes Pin.published, pin
   end
 
+  test 'a written revision becomes the current one' do
+    pin = pins(:public_two)
+
+    revision = record_revision(pin, [])
+
+    assert_equal revision, pin.reload.current_revision
+  end
+
   test 'a revision records more images than a caller may submit' do
     pin = pins(:public_two)
 
@@ -89,7 +97,7 @@ class PinTest < ActiveSupport::TestCase
 
   test 'a pin holding more images than the limit can still be revised' do
     pin = pins(:public_two)
-    pin.update_columns(current_revision_id: record_revision(pin, legacy_images(5)).id)
+    record_revision(pin, legacy_images(5))
 
     pin.reload.revise!(user: users(:me), name: 'renamed')
 

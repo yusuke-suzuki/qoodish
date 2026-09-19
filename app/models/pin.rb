@@ -130,7 +130,7 @@ class Pin < ApplicationRecord
   private
 
   def append_revision
-    revision = revisions.create!(
+    revision = revisions.build(
       user: revised_by,
       status: status,
       name: name,
@@ -141,7 +141,10 @@ class Pin < ApplicationRecord
       image_ids: submitted_image_ids || current_revision&.image_ids || []
     )
 
-    update!(current_revision: revision, revised_by: nil, submitted_image_ids: nil)
+    self.revised_by = nil
+    self.submitted_image_ids = nil
+
+    revision.save!
   end
 
   def detach_current_revision
