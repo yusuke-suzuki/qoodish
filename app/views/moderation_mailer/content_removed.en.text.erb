@@ -1,0 +1,14 @@
+We removed one of your posts because it violates our Terms of Service.
+
+Removed at: <%= @decision.created_at.utc.iso8601 %>
+
+Reason:
+<%= @decision.reason %>
+
+The content at the time of removal:
+<%= @decision.content_snapshot.presence || '(none)' %>
+
+If you believe this measure is wrong, you may object by writing to support@qoodish.com. We will examine your objection and reconsider the measure where we find it necessary.
+
+Qoodish
+https://qoodish.com

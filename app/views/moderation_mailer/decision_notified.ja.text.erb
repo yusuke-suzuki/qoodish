@@ -1,0 +1,16 @@
+ご報告いただいた内容の確認が完了しました。
+
+報告番号: #<%= @report.id %>
+区分:     <%= t("moderation.categories.#{@report.category}") %>
+受付日時: <%= @report.created_at.utc.iso8601 %>
+判断日時: <%= @decision.created_at.utc.iso8601 %>
+
+対応結果: <%= t("moderation.outcomes.#{@decision.outcome}") %>
+
+理由:
+<%= @decision.reason %>
+
+この判断に誤りがあるとお考えの場合は、support@qoodish.com までご連絡ください。
+
+Qoodish
+https://qoodish.com

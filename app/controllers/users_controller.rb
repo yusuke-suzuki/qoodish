@@ -14,17 +14,12 @@ class UsersController < ApplicationController
   end
 
   def create
-    if current_user
-      @user = current_user
-      return
-    end
-
     payload = RequestContext.jwt_payload
     raise Exceptions::Unauthorized if payload.blank?
 
-    @user = User.create!(
-      uid: payload['sub'],
-      name: payload['name']
-    )
+    @user = current_user || User.new(uid: payload['sub'], name: payload['name'])
+
+    @user.assign_attributes({ email: payload['email'], locale: RequestContext.locale }.compact_blank)
+    @user.save!
   end
 end

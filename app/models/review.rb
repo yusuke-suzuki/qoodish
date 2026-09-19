@@ -4,11 +4,13 @@ FEED_PER_PAGE = 12
 MAX_IMAGE_COUNT_PER_REVIEW = 4
 
 class Review < ApplicationRecord
+  include Moderatable
+
   belongs_to :user
   belongs_to :map
   has_many :images, as: :imageable, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
-  has_many :comments, as: :commentable
+  has_many :comments, -> { visible }, as: :commentable
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :milestones, dependent: :nullify
@@ -45,16 +47,15 @@ class Review < ApplicationRecord
   }
 
   scope :public_open, lambda {
-    joins(:map)
-      .where(maps: { private: false })
+    visible.where(map_id: Map.public_open)
   }
 
   scope :referenceable_by, lambda { |user|
-    joins(:map).where(maps: { id: Map.referenceable_by(user) })
+    visible.where(map_id: Map.referenceable_by(user))
   }
 
   scope :feed_for, lambda { |user|
-    joins(:map).where(maps: { id: Map.related_to(user) })
+    visible.where(map_id: Map.related_to(user))
   }
 
   scope :latest_feed, lambda {

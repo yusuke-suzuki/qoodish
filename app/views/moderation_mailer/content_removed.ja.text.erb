@@ -1,0 +1,14 @@
+利用規約に違反するため、お客様の投稿を削除しました。
+
+削除日時: <%= @decision.created_at.utc.iso8601 %>
+
+理由:
+<%= @decision.reason %>
+
+削除時点の投稿内容:
+<%= @decision.content_snapshot.presence || '(none)' %>
+
+この措置に誤りがあるとお考えの場合は、support@qoodish.com まで異議を申し出ることができます。異議の内容を確認し、必要と認めるときは措置を見直します。
+
+Qoodish
+https://qoodish.com

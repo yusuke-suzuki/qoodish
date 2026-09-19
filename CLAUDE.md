@@ -40,7 +40,7 @@ This document provides essential context for Claude Code to understand the Qoodi
 - Business logic should primarily reside in models. For logic tied to a database table, use an ActiveRecord model. For logic not directly tied to a table, create a plain Ruby model (a class that does not inherit from `ApplicationRecord`).
 - All new API endpoints must be defined in `config/routes.rb`.
 - Ensure new features are covered by tests in the `test/` directory.
-- Write all text committed to the repository — PR descriptions, issue bodies, code comments, commit messages — in English.
+- Write all text committed to the repository — PR descriptions, issue bodies, code comments, commit messages — in English. This rule covers developer-facing text only. User-facing copy is localized and Japanese belongs in it: `config/locales/*.ja.yml` and the `*.ja.*` mailer templates under `app/views` are deliberately Japanese, and a new user-facing string needs both an English and a Japanese version rather than one bilingual string.
 
 ## 5. Commit Message Generation Rules
 

@@ -47,6 +47,32 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert(res.any? { |user| user['id'] == users(:you).id })
   end
 
+  test 'signing up records the email and the locale from the request' do
+    newcomer = User.new(uid: 'newcomer1234', name: 'newcomer', email: 'newcomer@qoodish.com')
+
+    stub_google_auth(newcomer) do
+      post '/users', headers: { 'Authorization': 'Bearer dummytoken', 'Accept-Language': 'ja' }
+    end
+
+    assert_response :success
+
+    created = User.find_by!(uid: 'newcomer1234')
+
+    assert_equal 'newcomer@qoodish.com', created.email
+    assert_equal 'ja', created.locale
+  end
+
+  test 'signing in again follows the language the user switched to' do
+    users(:me).update!(locale: 'en')
+
+    stub_google_auth(users(:me)) do
+      post '/users', headers: { 'Authorization': 'Bearer dummytoken', 'Accept-Language': 'ja' }
+    end
+
+    assert_response :success
+    assert_equal 'ja', users(:me).reload.locale
+  end
+
   test 'search users without name should return empty' do
     stub_google_auth(users(:me)) do
       get '/users', headers: { 'Authorization': 'Bearer dummytoken' }

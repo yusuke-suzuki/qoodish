@@ -1,4 +1,6 @@
 class Map < ApplicationRecord
+  include Moderatable
+
   # Shield running instances from the legacy columns the follow-up migration
   # drops, so in-flight INSERTs do not reference a column that is gone.
   self.ignored_columns += %w[shared invitable]
@@ -57,36 +59,40 @@ class Map < ApplicationRecord
   after_update :destroy_bookmarks_when_private, if: :saved_change_to_private?
 
   scope :public_open, lambda {
-    where(private: false)
+    visible.where(private: false)
   }
 
   scope :referenceable_by, lambda { |user|
     where(private: false)
       .or(where(user_id: user.id))
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
+      .visible
   }
 
   scope :editable_by, lambda { |user|
     where(user_id: user.id)
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
+      .visible
   }
 
   scope :bookmarked_by, lambda { |user|
-    where(id: Bookmark.where(user_id: user.id).select(:map_id))
+    visible.where(id: Bookmark.where(user_id: user.id).select(:map_id))
   }
 
   scope :related_to, lambda { |user|
     where(user_id: user.id)
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
       .or(where(private: false, id: Bookmark.where(user_id: user.id).select(:map_id)))
+      .visible
   }
 
   scope :not_bookmarked_by, lambda { |user|
-    where.not(id: Bookmark.where(user_id: user.id).select(:map_id))
+    visible.where.not(id: Bookmark.where(user_id: user.id).select(:map_id))
   }
 
   scope :active, lambda {
-    left_joins(:reviews)
+    visible
+      .left_joins(:reviews)
       .group('maps.id')
       .order('max(reviews.created_at) desc')
       .limit(12)
@@ -101,14 +107,15 @@ class Map < ApplicationRecord
   }
 
   scope :popular, lambda {
-    joins(:bookmarks)
+    visible
+      .joins(:bookmarks)
       .group('maps.id')
       .order('count(bookmarks.id) desc')
       .limit(10)
   }
 
   scope :search_by_words, lambda { |words|
-    all.tap do |q|
+    visible.tap do |q|
       words.each { |word| q.where!('name LIKE :word', word: "%#{sanitize_sql_like(word)}%") }
     end
   }

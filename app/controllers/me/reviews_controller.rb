@@ -6,11 +6,13 @@ module Me
       @reviews = if params[:next_timestamp]
                    current_user
                      .reviews
+                     .visible
                      .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
                      .feed_before(params[:next_timestamp], params[:next_id])
                  else
                    current_user
                      .reviews
+                     .visible
                      .preload(:map, { user: :images }, :images, { comments: { user: :images } }, :voters, :votes)
                      .latest_feed
                  end
