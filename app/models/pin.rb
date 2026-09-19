@@ -109,6 +109,7 @@ class Pin < ApplicationRecord
         comment: comment,
         latitude: latitude,
         longitude: longitude,
+        images_submitted: !image_ids.nil?,
         image_ids: image_ids.nil? ? (current_revision&.image_ids || []) : image_ids
       )
 

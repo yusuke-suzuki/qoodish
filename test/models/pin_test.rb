@@ -79,6 +79,32 @@ class PinTest < ActiveSupport::TestCase
     assert_not_includes Pin.published, pin
   end
 
+  test 'a revision records more images than a caller may submit' do
+    pin = pins(:public_two)
+
+    revision = record_revision(pin, legacy_images(5))
+
+    assert_equal 5, revision.images.count
+  end
+
+  test 'a pin holding more images than the limit can still be revised' do
+    pin = pins(:public_two)
+    pin.update_columns(current_revision_id: record_revision(pin, legacy_images(5)).id)
+
+    pin.reload.revise!(user: users(:me), name: 'renamed')
+
+    assert_equal 'renamed', pin.reload.name
+    assert_equal 5, pin.images.count
+  end
+
+  test 'submitting more images than the limit is rejected' do
+    pin = pins(:public_two)
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      pin.revise!(user: users(:me), image_ids: legacy_images(5).map(&:id))
+    end
+  end
+
   test 'a revision keeps the images it was written with' do
     revision = pins(:public_one).current_revision
 
@@ -104,6 +130,28 @@ class PinTest < ActiveSupport::TestCase
   end
 
   private
+
+  def legacy_images(count)
+    Array.new(count) do |index|
+      users(:me).owned_images.create!(
+        url: "https://imagedelivery.net/mockhash/legacy-#{index}/public"
+      )
+    end
+  end
+
+  # Records a revision the way the backfill does, without a caller submitting
+  # the images.
+  def record_revision(pin, images)
+    pin.revisions.create!(
+      user_id: pin.user_id,
+      status: pin.status,
+      name: pin.name,
+      comment: pin.comment,
+      latitude: pin.latitude,
+      longitude: pin.longitude,
+      image_ids: images.map(&:id)
+    )
+  end
 
   def publish(**content)
     Pin.publish!(
