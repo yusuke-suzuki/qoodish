@@ -20,11 +20,17 @@ class PinRevision < ApplicationRecord
             presence: true
   validates :longitude,
             presence: true
-  validates :images, length: {
-    maximum: MAX_IMAGE_COUNT_PER_PIN,
-    message: I18n.t('messages.api.images_per_report_reached_limit')
-  }
-  validate :images_must_belong_to_author
+  # Both of these judge what a caller may submit, not what a revision may
+  # record. A pin backfilled from the legacy imageable column can already hold
+  # more images than the limit allows, or images someone else uploaded, and its
+  # history has to stay recordable and its later revisions possible.
+  validates :images,
+            length: {
+              maximum: MAX_IMAGE_COUNT_PER_PIN,
+              message: I18n.t('messages.api.images_per_report_reached_limit')
+            },
+            if: :images_submitted?
+  validate :images_must_belong_to_author, if: :images_submitted?
 
   # attr_readonly covers the columns, but the images are reached through an
   # association Rails leaves writable, so a written revision would still be
@@ -39,7 +45,13 @@ class PinRevision < ApplicationRecord
     super
   end
 
+  attr_writer :images_submitted
+
   private
+
+  def images_submitted?
+    @images_submitted.present?
+  end
 
   def reject_change_after_writing
     return unless persisted?
