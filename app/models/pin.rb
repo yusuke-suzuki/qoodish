@@ -13,7 +13,7 @@ class Pin < ApplicationRecord
            inverse_of: :pin
   has_many :images, through: :current_revision
   has_many :notifications, as: :notifiable, dependent: :destroy
-  has_many :comments, as: :commentable
+  has_many :comments, as: :commentable, dependent: :destroy
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :milestones, dependent: :nullify

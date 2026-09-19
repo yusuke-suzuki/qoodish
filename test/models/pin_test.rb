@@ -79,6 +79,22 @@ class PinTest < ActiveSupport::TestCase
     assert_not_includes Pin.published, pin
   end
 
+  test 'a revision keeps the images it was written with' do
+    revision = pins(:public_one).current_revision
+
+    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.images = [] }
+    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.image_ids = [] }
+    assert_equal 2, revision.reload.images.count
+  end
+
+  test 'destroying a pin takes its comments with it' do
+    pin = pins(:public_one)
+
+    assert_difference 'Comment.count', -pin.comments.count do
+      pin.destroy!
+    end
+  end
+
   test 'delete! keeps the images the revisions reference' do
     pin = pins(:public_one)
 
