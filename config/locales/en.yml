@@ -71,7 +71,7 @@ en:
       journey_encoded_path_exceed: The journey path is too large.
       duplicate_milestone: The pin is already added as a milestone.
       duplicate_checkin: The journey has already checked in at this pin.
-      review_not_on_journey_map: The pin does not belong to the map of the journey.
+      pin_not_on_journey_map: The pin does not belong to the map of the journey.
       images_per_checkin_reached_limit: "The limit of images per checkin has been reached."
       checkin_note_exceeded: "The note is too long. (Max: 500)"
       checkin_time_outside_journey_period: The checkin time is outside the journey period.

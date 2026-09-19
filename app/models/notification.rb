@@ -7,9 +7,14 @@ class Notification < ApplicationRecord
 
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
+  # Clients released before the rename look their message up by the name the
+  # subject had then, so a pin keeps arriving as a review until they are out
+  # of service.
+  RENAMED_NOTIFIABLE_TYPES = { 'Pin' => 'review' }.freeze
+
   validates :notifiable_type,
             inclusion: {
-              in: [Review.name, Map.name, Comment.name, Chapter.name]
+              in: [Pin.name, Map.name, Comment.name, Chapter.name]
             }
   validates :notifier_type,
             inclusion: {
@@ -38,6 +43,19 @@ class Notification < ApplicationRecord
     where(key: KEYS)
   }
 
+  def client_notifiable_type
+    RENAMED_NOTIFIABLE_TYPES.fetch(notifiable_type, notifiable_type.downcase)
+  end
+
+  def renderable?
+    return false if notifier.blank?
+
+    case notifiable
+    when Comment then visible?(notifiable.commentable)
+    else visible?(notifiable)
+    end
+  end
+
   def click_action
     case key
     when 'coauthor_invited'
@@ -46,7 +64,7 @@ class Notification < ApplicationRecord
       "/pins/#{notifiable.id}"
     when 'liked'
       case notifiable_type
-      when Review.name
+      when Pin.name
         "/pins/#{notifiable.id}"
       when Map.name
         "/maps/#{notifiable.id}"
@@ -82,7 +100,7 @@ class Notification < ApplicationRecord
       notifier_id: notifier_id.to_s,
       notifier_name: notifier.name,
       notifiable_id: notifiable_id.to_s,
-      notifiable_type: notifiable_type.downcase
+      notifiable_type: client_notifiable_type
     }
 
     recipient.devices.each do |device|
@@ -113,6 +131,12 @@ class Notification < ApplicationRecord
   end
 
   private
+
+  def visible?(record)
+    return false if record.blank?
+
+    !record.is_a?(Pin) || record.published?
+  end
 
   def broadcast_web_push_later
     return unless allowed_web_push?

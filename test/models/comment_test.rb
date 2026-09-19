@@ -7,7 +7,7 @@ class CommentTest < ActiveSupport::TestCase
   end
 
   test 'body drops carriage returns on assignment' do
-    comment = reviews(:public_one).comments.create!(
+    comment = pins(:public_one).comments.create!(
       user: users(:me),
       body: "First\r\nline"
     )

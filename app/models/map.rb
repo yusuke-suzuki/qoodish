@@ -4,7 +4,8 @@ class Map < ApplicationRecord
   self.ignored_columns += %w[shared invitable]
 
   belongs_to :user
-  has_many :reviews, dependent: :destroy
+  has_many :pins, dependent: :destroy
+  has_many :published_pins, -> { published }, class_name: 'Pin', inverse_of: :map, dependent: nil
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :coauthorships, dependent: :destroy
   has_many :coauthors, through: :coauthorships, source: :user
@@ -86,9 +87,9 @@ class Map < ApplicationRecord
   }
 
   scope :active, lambda {
-    left_joins(:reviews)
+    left_joins(:published_pins)
       .group('maps.id')
-      .order('max(reviews.created_at) desc')
+      .order('max(pins.created_at) desc')
       .limit(12)
   }
 

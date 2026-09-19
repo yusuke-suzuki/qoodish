@@ -6,11 +6,13 @@ module Me
       ActiveRecord::Associations::Preloader.new(
         records: [current_user],
         associations: [
-          { reviews: %i[images votes notifications] },
+          { pins: [:revisions, :votes, :notifications, { comments: %i[votes notifications] }] },
           { maps: [:images, :coauthorships, :bookmarks, :coauthorship_invitations, :votes, :notifications,
-                   :featured_maps, { reviews: %i[images votes notifications] }] },
+                   :featured_maps,
+                   { pins: [:revisions, :votes, :notifications, { comments: %i[votes notifications] }] }] },
           { journeys: [:milestones, { checkins: :images }] },
-          { chapters: %i[votes images notifications] }
+          { chapters: %i[votes images notifications] },
+          { owned_images: :pin_revision_images }
         ]
       ).call
 

@@ -1,6 +1,6 @@
 my_in_progress_private:
   journey: my_in_progress
-  review: private
+  pin: private
   name: This is a name
   latitude: 35.681382
   longitude: 139.766084
@@ -8,7 +8,7 @@ my_in_progress_private:
 
 my_finished_public_one:
   journey: my_finished
-  review: public_one
+  pin: public_one
   name: This is a name
   latitude: 35.681382
   longitude: 139.766084

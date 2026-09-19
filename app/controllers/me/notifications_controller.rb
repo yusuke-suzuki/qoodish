@@ -9,9 +9,7 @@ module Me
         .renderable
         .recent
         .includes({ notifier: :images }, :notifiable)
-        .reject do |notification|
-          notification.notifier.blank? || notification.notifiable.blank?
-        end
+        .select(&:renderable?)
 
       preload_notifiable_images(@notifications)
     end
@@ -24,7 +22,7 @@ module Me
 
       # The serialized payload needs both associations, so a notification
       # orphaned by their deletion is treated as missing, like in index.
-      raise ActiveRecord::RecordNotFound if @notification.notifier.blank? || @notification.notifiable.blank?
+      raise ActiveRecord::RecordNotFound unless @notification.renderable?
 
       @notification.update!(read: true)
     end
