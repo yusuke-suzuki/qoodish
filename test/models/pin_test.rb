@@ -87,6 +87,15 @@ class PinTest < ActiveSupport::TestCase
     assert_equal revision, pin.reload.current_revision
   end
 
+  test 'a backfilled revision leaves the pin last updated when it was' do
+    pin = pins(:public_two)
+    updated_at = pin.updated_at
+
+    record_revision(pin, [])
+
+    assert_equal updated_at, pin.reload.updated_at
+  end
+
   test 'a revision records more images than a caller may submit' do
     pin = pins(:public_two)
 

@@ -52,7 +52,8 @@ class PinRevision < ApplicationRecord
   private
 
   def become_current
-    pin.update!(current_revision: self)
+    pin.current_revision = self
+    pin.update_column(:current_revision_id, id)
   end
 
   def images_submitted?
