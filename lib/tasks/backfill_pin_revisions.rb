@@ -34,8 +34,6 @@ class BackfillPinRevisions
         updated_at: pin.updated_at
       )
 
-      pin.update_columns(current_revision_id: revision.id)
-
       puts "[Backfill] Pin #{pin.id}: revision #{revision.id} with #{image_ids.size} images"
     end
   end

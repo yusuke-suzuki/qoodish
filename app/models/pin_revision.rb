@@ -12,6 +12,8 @@ class PinRevision < ApplicationRecord
 
   enum :status, { published: 0, deleted: 1 }
 
+  after_create :become_current
+
   validates :name,
             presence: true
   validates :comment,
@@ -48,6 +50,10 @@ class PinRevision < ApplicationRecord
   attr_writer :images_submitted
 
   private
+
+  def become_current
+    pin.update!(current_revision: self)
+  end
 
   def images_submitted?
     @images_submitted.present?
