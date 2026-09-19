@@ -21,6 +21,9 @@ class Pin < ApplicationRecord
 
   enum :status, { published: 0, deleted: 1 }
 
+  attr_accessor :revised_by, :submitted_image_ids
+
+  after_save :append_revision, if: :revised_by
   before_destroy :detach_current_revision, prepend: true
 
   normalizes :name, :comment, with: ->(text) { text.delete("\r") }
@@ -98,23 +101,8 @@ class Pin < ApplicationRecord
   end
 
   def revise!(user:, image_ids: nil, **content)
-    transaction do
-      assign_attributes(content)
-      save!
-
-      revision = revisions.create!(
-        user: user,
-        status: status,
-        name: name,
-        comment: comment,
-        latitude: latitude,
-        longitude: longitude,
-        images_submitted: !image_ids.nil?,
-        image_ids: image_ids.nil? ? (current_revision&.image_ids || []) : image_ids
-      )
-
-      update!(current_revision: revision)
-    end
+    assign_attributes(**content, revised_by: user, submitted_image_ids: image_ids)
+    save!
 
     self
   end
@@ -140,6 +128,21 @@ class Pin < ApplicationRecord
   end
 
   private
+
+  def append_revision
+    revision = revisions.create!(
+      user: revised_by,
+      status: status,
+      name: name,
+      comment: comment,
+      latitude: latitude,
+      longitude: longitude,
+      images_submitted: !submitted_image_ids.nil?,
+      image_ids: submitted_image_ids || current_revision&.image_ids || []
+    )
+
+    update!(current_revision: revision, revised_by: nil, submitted_image_ids: nil)
+  end
 
   def detach_current_revision
     update_columns(current_revision_id: nil) if current_revision_id
