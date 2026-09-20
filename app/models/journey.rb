@@ -7,7 +7,10 @@ class Journey < ApplicationRecord
   belongs_to :map, optional: true
   has_many :milestones, -> { order(:position) }, dependent: :destroy, inverse_of: :journey
   has_many :checkins,
-           -> { order(:checked_in_at, :id) },
+           -> { not_deleted.order(:checked_in_at, :id) },
+           class_name: 'JourneyCheckin',
+           inverse_of: :journey
+  has_many :all_checkins,
            class_name: 'JourneyCheckin',
            dependent: :destroy,
            inverse_of: :journey

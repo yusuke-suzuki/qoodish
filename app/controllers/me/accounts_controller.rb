@@ -10,9 +10,10 @@ module Me
           { maps: [:revisions, :coauthorships, :bookmarks, :coauthorship_invitations, :votes, :notifications,
                    :featured_maps,
                    { pins: [:revisions, :votes, :notifications, { comments: %i[votes notifications] }] }] },
-          { journeys: [:milestones, { checkins: :images }] },
+          { journeys: [:milestones, { all_checkins: :revisions }] },
           { chapters: %i[votes revisions notifications] },
-          { owned_images: %i[pin_revision_images map_revision_images chapter_revision_images] }
+          { owned_images: %i[pin_revision_images map_revision_images chapter_revision_images
+                             journey_checkin_revision_images] }
         ]
       ).call
 

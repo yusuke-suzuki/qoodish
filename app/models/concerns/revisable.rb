@@ -15,8 +15,10 @@ module Revisable
 
   class_methods do
     def record!(user:, **content)
-      new(user: user).revise!(user: user, **content)
+      new(**authored_by(user)).revise!(user: user, **content)
     end
+
+    def authored_by(user) = { user: user }
   end
 
   def revise!(user:, image_ids: nil, **content)

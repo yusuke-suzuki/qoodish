@@ -151,14 +151,18 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'remove a checkin from a finished journey should be success' do
-    assert_difference 'JourneyCheckin.count', -1 do
+    checkin = journey_checkins(:my_finished_public_one)
+
+    assert_no_difference 'JourneyCheckin.count' do
       stub_google_auth(users(:me)) do
-        delete "/me/journeys/#{journeys(:my_finished).id}/checkins/#{journey_checkins(:my_finished_public_one).id}",
+        delete "/me/journeys/#{journeys(:my_finished).id}/checkins/#{checkin.id}",
                headers: { 'Authorization': 'Bearer dummytoken' }
       end
     end
 
     assert_response :success
+    assert_predicate checkin.reload, :deleted?
+    assert_not_includes journeys(:my_finished).checkins.reload, checkin
   end
 
   test 'update with image_ids and note edits a finished journey checkin' do
@@ -192,19 +196,19 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_content
-    assert_nil checkin.reload.note
+    assert_equal 'A fine spot', checkin.reload.note
   end
 
-  test 'update with image_ids destroys removed images' do
+  test 'update with image_ids keeps the images the earlier revision references' do
     checkin = journey_checkins(:my_finished_public_one)
-    kept = checkin.images.create!(
-      user: users(:me),
+    kept = users(:me).owned_images.create!(
       url: 'https://imagedelivery.net/mockhash/checkin-kept/public'
     )
-    removed = checkin.images.create!(
-      user: users(:me),
+    removed = users(:me).owned_images.create!(
       url: 'https://imagedelivery.net/mockhash/checkin-removed/public'
     )
+    checkin.revise!(user: users(:me), image_ids: [kept.id, removed.id])
+    previous = checkin.current_revision
 
     stub_google_auth(users(:me)) do
       stub_cloudflare_images do
@@ -216,7 +220,8 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal [kept.id], checkin.reload.image_ids
-    assert_nil Image.find_by(id: removed.id)
+    assert_includes previous.image_ids, removed.id
+    assert Image.exists?(removed.id)
   end
 
   test 'update rejects image_ids that belong to another user' do
@@ -246,13 +251,16 @@ class Me::Journeys::CheckinsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'remove a checkin from an unfinished journey should be success' do
-    assert_difference 'JourneyCheckin.count', -1 do
+    checkin = journey_checkins(:my_in_progress_private)
+
+    assert_no_difference 'JourneyCheckin.count' do
       stub_google_auth(users(:me)) do
-        delete "/me/journeys/#{journeys(:my_in_progress).id}/checkins/#{journey_checkins(:my_in_progress_private).id}",
+        delete "/me/journeys/#{journeys(:my_in_progress).id}/checkins/#{checkin.id}",
                headers: { 'Authorization': 'Bearer dummytoken' }
       end
     end
 
     assert_response :success
+    assert_predicate checkin.reload, :deleted?
   end
 end
