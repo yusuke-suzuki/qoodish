@@ -7,7 +7,7 @@ class CreatePinRevisions < ActiveRecord::Migration[8.1]
       t.text :comment, null: false
       t.decimal :latitude, precision: 16, scale: 6, null: false
       t.decimal :longitude, precision: 16, scale: 6, null: false
-      t.integer :status, null: false, default: 0
+      t.string :status, null: false, default: 'published'
 
       t.timestamps
 

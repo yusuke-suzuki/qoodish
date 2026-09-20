@@ -19,7 +19,7 @@ class Pin < ApplicationRecord
   has_many :milestones, dependent: :nullify
   has_many :journey_checkins, dependent: :nullify
 
-  enum :status, { published: 0, deleted: 1 }
+  enum :status, { published: 'published', deleted: 'deleted' }, validate: true
 
   attr_accessor :revised_by, :submitted_image_ids
 
