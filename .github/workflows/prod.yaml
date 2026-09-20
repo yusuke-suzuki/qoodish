@@ -86,9 +86,34 @@ jobs:
             --project=$PROJECT_ID \
             --region=$REGION
 
+  migrate:
+    needs:
+      - deploy-runner
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Run db:migrate on the Job carrying this image
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+        run: |
+          gcloud run jobs execute $JOB_NAME \
+            --args=bin/rails,db:migrate \
+            --wait \
+            --project=$PROJECT_ID \
+            --region=$REGION
+
   deploy-api:
     needs:
-      - build-and-push-image
+      - migrate
     permissions:
       contents: read
       id-token: write

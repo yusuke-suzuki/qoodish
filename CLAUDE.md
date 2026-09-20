@@ -68,11 +68,14 @@ These rules cover database migrations, releases, and backward compatibility. Fol
 
 ### Running Tasks in Production
 
-- `db:migrate` and `rails runner` are executed on demand through the `qoodish-runner` Cloud Run Job, not automatically during deployment. Run schema migrations and data-migration Rake tasks by invoking this Job at the appropriate time.
+- `db:migrate` runs as part of the release, through the `qoodish-runner` Cloud Run Job. Do not plan a release around applying migrations by hand.
+- Data-migration Rake tasks are executed on demand by invoking the same Job with `bin/rails runner <task>`. The Job carries the released image, so a task is only available once the release carrying it is out.
 
 ### Release Flow
 
-- Releases are driven by `release-please`. Merging the release PR into `master` tags a new version, which builds the image and deploys the new application revision with traffic shifted to it.
+- Releases are driven by `release-please`. Merging the release PR into `master` tags a new version, which builds the image, deploys it to the `qoodish-runner` Job, runs `db:migrate` through that Job, and only then deploys the new application revision with traffic shifted to it.
+- A migration therefore applies before any instance serves the code that reads it. It also applies while the previous version is still serving, so a migration must leave that version working: add and backfill in one release, and read the result in the same release or a later one, but never remove or rename what the running version still reads.
+- A release cannot apply a migration before its own image exists. Nothing in a release procedure can run `db:migrate` earlier than the release itself.
 
 ### Dropping Columns
 
