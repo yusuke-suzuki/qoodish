@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.10.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.9.0...v4.10.0) (2026-09-20)
+
+
+### Features
+
+* point a user at their avatar instead of owning it ([25a7dff](https://github.com/yusuke-suzuki/qoodish/commit/25a7dffa148f7a8f45d8a3e55b63ba0e90ad3bae))
+
+
+### Bug Fixes
+
+* let the backfill lose to a chosen avatar ([1771b6d](https://github.com/yusuke-suzuki/qoodish/commit/1771b6dfc68f90ced02eead8e13ea5615a4de274))
+* refuse an avatar the database would refuse ([f0e2a76](https://github.com/yusuke-suzuki/qoodish/commit/f0e2a76cda32d2f8503c27dceb1f3e814a9dadd1))
+
 ## [4.9.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.8.0...v4.9.0) (2026-09-20)
 
 
