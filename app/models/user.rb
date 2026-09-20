@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
+  has_many :map_revisions, dependent: :nullify
   has_many :pins, dependent: :destroy
   has_many :notifications, as: :recipient
   has_many :comments, dependent: :destroy
@@ -128,7 +129,7 @@ class User < ApplicationRecord
   end
 
   def bookmark_count
-    bookmarks.size
+    bookmarks.joins(:map).merge(Map.published).count
   end
 
   def bookmark!(map)

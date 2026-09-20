@@ -6,6 +6,7 @@ class PinRevision < ApplicationRecord
   include Revision
 
   belongs_to :pin
+  belongs_to :user
   has_many :pin_revision_images, dependent: :destroy
   has_many :images, -> { order(:id) }, through: :pin_revision_images
 

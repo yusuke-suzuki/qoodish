@@ -49,13 +49,22 @@ module Revisable
       user: revised_by,
       status: status,
       images_submitted: !submitted_image_ids.nil?,
-      image_ids: submitted_image_ids || current_revision&.image_ids || []
+      image_ids: submitted_image_ids || carried_image_ids
     )
 
     self.revised_by = nil
     self.submitted_image_ids = nil
 
     revision.save!
+  end
+
+  # An edit that lands before the backfill reaches this record would otherwise
+  # write an empty revision and take the record out of the backfill's reach,
+  # losing the images the legacy column still holds.
+  def carried_image_ids
+    return current_revision.image_ids if current_revision
+
+    Image.where(imageable: self).order(:id).ids
   end
 
   def detach_current_revision

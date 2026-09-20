@@ -53,6 +53,16 @@ class BackfillMapRevisionsTest < ActiveSupport::TestCase
     assert_equal updated_at, map.current_revision.created_at
   end
 
+  test 'records an unset visibility as private' do
+    map = detach_revision(maps(:public_one))
+    map.update_column(:private, nil)
+
+    run_task
+
+    assert_predicate map.reload, :private
+    assert_predicate map.current_revision, :private
+  end
+
   test 'a second run appends nothing' do
     detach_revision(maps(:public_one))
 

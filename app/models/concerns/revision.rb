@@ -4,8 +4,6 @@ module Revision
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :user
-
     enum :status, { published: 'published', deleted: 'deleted' }, validate: true
 
     after_create :become_current

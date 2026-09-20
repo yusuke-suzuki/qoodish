@@ -12,6 +12,10 @@ class BackfillMapRevisions
 
       next if map.current_revision_id
 
+      # maps.private is nullable and a revision has to say what it recorded.
+      # An unset visibility means the column default, which is private.
+      map.update_column(:private, true) if map.private.nil?
+
       image_ids = Image
                   .where(imageable_type: Map.name, imageable_id: map.id)
                   .order(:id)
