@@ -3,6 +3,10 @@
 PIN_FEED_PER_PAGE = 12
 
 class Pin < ApplicationRecord
+  include Revisable
+
+  self.revision_attributes = %i[name comment latitude longitude]
+
   belongs_to :user
   belongs_to :map
   belongs_to :current_revision, class_name: 'PinRevision', optional: true
@@ -18,13 +22,6 @@ class Pin < ApplicationRecord
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :milestones, dependent: :nullify
   has_many :journey_checkins, dependent: :nullify
-
-  enum :status, { published: 'published', deleted: 'deleted' }, validate: true
-
-  attr_accessor :revised_by, :submitted_image_ids
-
-  after_save :append_revision, if: :revised_by
-  before_destroy :detach_current_revision, prepend: true
 
   normalizes :name, :comment, with: ->(text) { text.delete("\r") }
 
@@ -55,7 +52,7 @@ class Pin < ApplicationRecord
   scope :public_open, lambda {
     published
       .joins(:map)
-      .where(maps: { private: false })
+      .where(maps: { id: Map.public_open })
   }
 
   scope :referenceable_by, lambda { |user|
@@ -96,21 +93,6 @@ class Pin < ApplicationRecord
     preloaded.preload(:voters, :votes)
   }
 
-  def self.publish!(user:, map_id:, **content)
-    new(user: user, map_id: map_id).revise!(user: user, **content)
-  end
-
-  def revise!(user:, image_ids: nil, **content)
-    assign_attributes(**content, revised_by: user, submitted_image_ids: image_ids)
-    save!
-
-    self
-  end
-
-  def delete!(user:)
-    revise!(user: user, status: :deleted)
-  end
-
   def image_url
     images.first&.url.to_s
   end
@@ -125,29 +107,5 @@ class Pin < ApplicationRecord
 
   def lng
     longitude.to_f
-  end
-
-  private
-
-  def append_revision
-    revision = revisions.build(
-      user: revised_by,
-      status: status,
-      name: name,
-      comment: comment,
-      latitude: latitude,
-      longitude: longitude,
-      images_submitted: !submitted_image_ids.nil?,
-      image_ids: submitted_image_ids || current_revision&.image_ids || []
-    )
-
-    self.revised_by = nil
-    self.submitted_image_ids = nil
-
-    revision.save!
-  end
-
-  def detach_current_revision
-    update_columns(current_revision_id: nil) if current_revision_id
   end
 end

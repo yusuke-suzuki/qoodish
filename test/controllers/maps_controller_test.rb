@@ -47,12 +47,22 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
   test 'update should succeed when the map already holds more images than the limit' do
     map = maps(:public_one) # author: me
 
-    2.times do |i|
+    images = Array.new(2) do |i|
       users(:me).owned_images.create!(
-        imageable: map,
         url: "https://imagedelivery.net/mockhash/map-legacy-#{i}/public"
       )
     end
+    # Record them the way the backfill does, without a caller submitting them.
+    map.revisions.create!(
+      user_id: map.user_id,
+      status: map.status,
+      name: map.name,
+      description: map.description,
+      latitude: map.latitude,
+      longitude: map.longitude,
+      private: map.private,
+      image_ids: images.map(&:id)
+    )
 
     stub_google_auth(users(:me)) do
       patch "/maps/#{map.id}", params: { name: 'Renamed' }, headers: { 'Authorization': 'Bearer dummytoken' }

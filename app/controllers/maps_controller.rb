@@ -26,7 +26,7 @@ class MapsController < ApplicationController
   end
 
   def create
-    @map = current_user.maps.create!(map_params)
+    @map = Map.publish!(user: current_user, **map_params)
 
     ActiveRecord::Associations::Preloader.new(
       records: [@map],
@@ -39,7 +39,7 @@ class MapsController < ApplicationController
 
     attributes = map_params
     attributes.delete(:private) unless current_user.map_author?(@map)
-    @map.update!(attributes)
+    @map.revise!(user: current_user, **attributes)
 
     ActiveRecord::Associations::Preloader.new(
       records: [@map],
@@ -48,12 +48,15 @@ class MapsController < ApplicationController
   end
 
   def destroy
-    current_user.maps.find_by!(id: params[:id]).destroy!
+    current_user.maps.published.find_by!(id: params[:id]).delete!(user: current_user)
   end
 
   private
 
   def map_params
-    params.permit(:name, :description, :private, :latitude, :longitude, image_ids: [])
+    params
+      .permit(:name, :description, :private, :latitude, :longitude, image_ids: [])
+      .to_h
+      .symbolize_keys
   end
 end

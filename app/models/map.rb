@@ -1,9 +1,19 @@
 class Map < ApplicationRecord
+  include Revisable
+
   # Shield running instances from the legacy columns the follow-up migration
   # drops, so in-flight INSERTs do not reference a column that is gone.
   self.ignored_columns += %w[shared invitable]
 
+  self.revision_attributes = %i[name description latitude longitude private]
+
   belongs_to :user
+  belongs_to :current_revision, class_name: 'MapRevision', optional: true
+  has_many :revisions,
+           -> { order(:id) },
+           class_name: 'MapRevision',
+           dependent: :destroy,
+           inverse_of: :map
   has_many :pins, dependent: :destroy
   has_many :published_pins, -> { published }, class_name: 'Pin', inverse_of: :map, dependent: nil
   has_many :notifications, as: :notifiable, dependent: :destroy
@@ -14,7 +24,7 @@ class Map < ApplicationRecord
   has_many :coauthorship_invitations, dependent: :destroy
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
-  has_many :images, as: :imageable, dependent: :destroy
+  has_many :images, through: :current_revision
   has_many :journeys, dependent: :nullify
   has_many :chapters, dependent: :nullify
   has_many :featured_maps, dependent: :destroy
@@ -48,38 +58,35 @@ class Map < ApplicationRecord
             presence: {
               message: I18n.t('messages.api.map_author_not_specified')
             }
-  # Maps backfilled from the legacy image_url column can already hold more
-  # images than the limit allows. Checking the limit on every save would leave
-  # them impossible to edit at all, so only the images a save attaches count.
-  validates :images,
-            length: { maximum: 1 },
-            if: :images_assigned?
 
   after_update :destroy_bookmarks_when_private, if: :saved_change_to_private?
 
   scope :public_open, lambda {
-    where(private: false)
+    published.where(private: false)
   }
 
   scope :referenceable_by, lambda { |user|
     where(private: false)
       .or(where(user_id: user.id))
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
+      .published
   }
 
   scope :editable_by, lambda { |user|
     where(user_id: user.id)
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
+      .published
   }
 
   scope :bookmarked_by, lambda { |user|
-    where(id: Bookmark.where(user_id: user.id).select(:map_id))
+    published.where(id: Bookmark.where(user_id: user.id).select(:map_id))
   }
 
   scope :related_to, lambda { |user|
     where(user_id: user.id)
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
       .or(where(private: false, id: Bookmark.where(user_id: user.id).select(:map_id)))
+      .published
   }
 
   scope :not_bookmarked_by, lambda { |user|
@@ -114,16 +121,6 @@ class Map < ApplicationRecord
     end
   }
 
-  def images=(records)
-    @images_assigned = true
-    super
-  end
-
-  def image_ids=(ids)
-    @images_assigned = true
-    super
-  end
-
   def image_url
     images.first&.url.to_s
   end
@@ -146,10 +143,6 @@ class Map < ApplicationRecord
   end
 
   private
-
-  def images_assigned?
-    @images_assigned.present?
-  end
 
   def destroy_bookmarks_when_private
     bookmarks.destroy_all if private?

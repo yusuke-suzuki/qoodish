@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_19_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_000003) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -156,10 +156,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_000004) do
     t.index ["user_id", "map_id", "finished_at"], name: "index_journeys_on_user_id_and_map_id_and_finished_at"
   end
 
+  create_table "map_revision_images", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "image_id", null: false
+    t.bigint "map_revision_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["image_id"], name: "index_map_revision_images_on_image_id"
+    t.index ["map_revision_id", "image_id"], name: "index_map_revision_images_on_map_revision_id_and_image_id", unique: true
+    t.index ["map_revision_id"], name: "index_map_revision_images_on_map_revision_id"
+  end
+
+  create_table "map_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "description", null: false
+    t.decimal "latitude", precision: 16, scale: 6, null: false
+    t.decimal "longitude", precision: 16, scale: 6, null: false
+    t.bigint "map_id", null: false
+    t.string "name", null: false
+    t.boolean "private", default: true, null: false
+    t.string "status", default: "published", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["map_id", "id"], name: "index_map_revisions_on_map_id_and_id"
+    t.index ["map_id"], name: "index_map_revisions_on_map_id"
+    t.index ["user_id"], name: "index_map_revisions_on_user_id"
+  end
+
   create_table "maps", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "base_id_val"
     t.string "base_name"
     t.datetime "created_at", null: false
+    t.bigint "current_revision_id"
     t.string "description", null: false
     t.boolean "invitable", default: false
     t.decimal "latitude", precision: 16, scale: 6, default: "0.0", null: false
@@ -167,8 +194,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_000004) do
     t.string "name", null: false
     t.boolean "private", default: true
     t.boolean "shared", default: false
+    t.string "status", default: "published", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["current_revision_id"], name: "index_maps_on_current_revision_id"
+    t.index ["status", "created_at"], name: "index_maps_on_status_and_created_at"
     t.index ["user_id"], name: "index_maps_on_user_id"
   end
 
@@ -302,6 +332,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_000004) do
   add_foreign_key "journey_checkins", "pins"
   add_foreign_key "journeys", "maps"
   add_foreign_key "journeys", "users"
+  add_foreign_key "map_revision_images", "images"
+  add_foreign_key "map_revision_images", "map_revisions"
+  add_foreign_key "map_revisions", "maps"
+  add_foreign_key "map_revisions", "users"
+  add_foreign_key "maps", "map_revisions", column: "current_revision_id"
   add_foreign_key "maps", "users"
   add_foreign_key "milestones", "journeys"
   add_foreign_key "milestones", "pins"

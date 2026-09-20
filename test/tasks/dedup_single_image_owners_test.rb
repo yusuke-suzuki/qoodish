@@ -8,7 +8,7 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
 
     stub_cloudflare_images { load TASK }
 
-    assert_equal [kept.id], maps(:public_one).reload.image_ids
+    assert_equal [kept.id], attached_image_ids(maps(:public_one))
     dropped.each { |image| assert_not Image.exists?(image.id) }
   end
 
@@ -26,7 +26,7 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
 
     stub_cloudflare_images { load TASK }
 
-    assert_equal [image.id], maps(:public_two).reload.image_ids
+    assert_equal [image.id], attached_image_ids(maps(:public_two))
   end
 
   test 'leaves owners allowed to hold several images untouched' do
@@ -80,6 +80,10 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
     yield
   ensure
     ENV.delete('DRY_RUN')
+  end
+
+  def attached_image_ids(imageable)
+    Image.where(imageable: imageable).order(:id).pluck(:id)
   end
 
   def attach_image(imageable, suffix)
