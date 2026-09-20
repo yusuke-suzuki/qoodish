@@ -6,7 +6,7 @@ module Me
       @maps = current_user
               .maps
               .published
-              .preload(:images, user: :images)
+              .preload(:images, user: :image)
               .order(created_at: :desc)
     end
   end

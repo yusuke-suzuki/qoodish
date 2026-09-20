@@ -9,7 +9,7 @@ module Me
         @maps = Map
                 .public_open
                 .bookmarked_by(current_user)
-                .preload(:images, user: :images)
+                .preload(:images, user: :image)
                 .order(created_at: :desc)
       end
     end

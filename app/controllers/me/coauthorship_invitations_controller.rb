@@ -7,7 +7,7 @@ module Me
         current_user
         .received_coauthorship_invitations
         .pending
-        .includes({ map: :images }, { inviter: :images })
+        .includes({ map: :images }, { inviter: :image })
         .order(created_at: :desc)
     end
 

@@ -6,7 +6,7 @@ module Users
       user = User.find_by!(id: params[:user_id])
 
       @journal = Journal
-                 .preload(:bookmarks, user: :images)
+                 .preload(:bookmarks, user: :image)
                  .find_by!(user: user)
     end
   end

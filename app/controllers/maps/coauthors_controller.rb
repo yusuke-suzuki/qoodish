@@ -3,8 +3,8 @@ module Maps
     before_action :authenticate_user!
 
     def index
-      @map = current_user.referenceable_maps.preload(user: :images).find_by(id: params[:map_id])
-      @coauthors = @map ? [@map.user] + @map.coauthors.preload(:images).to_a : []
+      @map = current_user.referenceable_maps.preload(user: :image).find_by(id: params[:map_id])
+      @coauthors = @map ? [@map.user] + @map.coauthors.preload(:image).to_a : []
     end
 
     def destroy

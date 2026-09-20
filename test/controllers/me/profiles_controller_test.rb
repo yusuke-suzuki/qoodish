@@ -33,13 +33,38 @@ class Me::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'Renamed', users(:me).reload.name
   end
 
-  test 'update should succeed when the user already holds more images than the limit' do
-    2.times do |i|
-      users(:me).owned_images.create!(
-        imageable: users(:me),
-        url: "https://imagedelivery.net/mockhash/profile-legacy-#{i}/public"
-      )
+  test 'update should set the avatar from a one-element image_ids' do
+    stub_google_auth(users(:me)) do
+      put '/me/profile',
+          params: { image_ids: [images(:one).id] },
+          headers: { 'Authorization': 'Bearer dummytoken' },
+          as: :json
     end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal images(:one).url, res['image_url']
+    assert_equal images(:one), users(:me).reload.image
+  end
+
+  test 'update should clear the avatar when image_ids is empty' do
+    users(:me).update!(image: images(:one))
+
+    stub_google_auth(users(:me)) do
+      put '/me/profile',
+          params: { image_ids: [] },
+          headers: { 'Authorization': 'Bearer dummytoken' },
+          as: :json
+    end
+
+    assert_response :success
+    assert_nil users(:me).reload.image_id
+  end
+
+  test 'update should leave the avatar alone when image_ids is not sent' do
+    users(:me).update!(image: images(:one))
 
     stub_google_auth(users(:me)) do
       put '/me/profile',
@@ -49,7 +74,23 @@ class Me::ProfilesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_equal 'Renamed', users(:me).reload.name
+    assert_equal images(:one), users(:me).reload.image
+  end
+
+  test 'update should reject an image another user uploaded' do
+    foreign_image = users(:you).owned_images.create!(
+      url: 'https://imagedelivery.net/mockhash/profile-foreign/public'
+    )
+
+    stub_google_auth(users(:me)) do
+      put '/me/profile',
+          params: { image_ids: [foreign_image.id] },
+          headers: { 'Authorization': 'Bearer dummytoken' },
+          as: :json
+    end
+
+    assert_response :unprocessable_content
+    assert_nil users(:me).reload.image_id
   end
 
   test 'show without a token should be unauthorized' do

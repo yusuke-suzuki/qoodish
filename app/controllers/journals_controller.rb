@@ -3,7 +3,7 @@ class JournalsController < ApplicationController
 
   def show
     @journal = Journal
-               .preload(:bookmarks, user: :images)
+               .preload(:bookmarks, user: :image)
                .find_by!(id: params[:id])
   end
 end

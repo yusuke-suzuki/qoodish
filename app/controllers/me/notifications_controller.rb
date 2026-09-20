@@ -8,7 +8,7 @@ module Me
         .notifications
         .renderable
         .recent
-        .includes({ notifier: :images }, :notifiable)
+        .includes({ notifier: :image }, :notifiable)
         .select(&:renderable?)
 
       preload_notifiable_images(@notifications)

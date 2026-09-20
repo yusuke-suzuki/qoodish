@@ -6,7 +6,7 @@ module Me
       def index
         @journals = Journal
                     .bookmarked_by(current_user)
-                    .preload(:bookmarks, user: :images)
+                    .preload(:bookmarks, user: :image)
                     .order(created_at: :desc)
       end
     end

@@ -3,7 +3,7 @@ class Guest::Users::ChaptersController < ApplicationController
     @chapters = Chapter
                 .public_open
                 .where(user_id: params[:user_id])
-                .preload(:map, :images, user: %i[images journal])
+                .preload(:map, :images, user: %i[image journal])
                 .order(created_at: :desc)
   end
 end

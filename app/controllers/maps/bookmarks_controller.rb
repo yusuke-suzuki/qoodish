@@ -25,7 +25,7 @@ module Maps
     def preload_map_for_serialization
       ActiveRecord::Associations::Preloader.new(
         records: [@map],
-        associations: [:images, { user: :images }]
+        associations: [:images, { user: :image }]
       ).call
     end
   end

@@ -4,7 +4,7 @@ module Me
 
     def show
       @journal = Journal
-                 .preload(:bookmarks, user: :images)
+                 .preload(:bookmarks, user: :image)
                  .find_by!(user: current_user)
     end
 

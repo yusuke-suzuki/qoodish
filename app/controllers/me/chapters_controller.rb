@@ -6,7 +6,7 @@ module Me
       @chapters = Chapter
                   .where(user: current_user)
                   .not_deleted
-                  .preload(:map, :votes, :images, user: %i[images journal])
+                  .preload(:map, :votes, :images, user: %i[image journal])
                   .order(created_at: :desc)
     end
 

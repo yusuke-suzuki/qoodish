@@ -6,13 +6,13 @@ class MapsController < ApplicationController
               Map
                 .public_open
                 .not_bookmarked_by(current_user)
-                .preload(:images, user: :images)
+                .preload(:images, user: :image)
                 .order(created_at: :desc)
                 .sample(10)
             else
               current_user
                 .related_maps
-                .preload(:images, user: :images)
+                .preload(:images, user: :image)
                 .order(created_at: :desc)
             end
   end
@@ -21,7 +21,7 @@ class MapsController < ApplicationController
     @map =
       current_user
       .referenceable_maps
-      .preload(:images, user: :images)
+      .preload(:images, user: :image)
       .find_by!(id: params[:id])
   end
 
