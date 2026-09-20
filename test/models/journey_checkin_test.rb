@@ -2,7 +2,7 @@ require 'test_helper'
 
 class JourneyCheckinTest < ActiveSupport::TestCase
   test 'checkin on an in-progress journey is created' do
-    checkin = journeys(:my_in_progress).checkins.create!(pin: pins(:private_you))
+    checkin = journeys(:my_in_progress).checkins.record!(user: users(:me), pin: pins(:private_you))
 
     assert_predicate checkin, :persisted?
   end
@@ -20,7 +20,8 @@ class JourneyCheckinTest < ActiveSupport::TestCase
   end
 
   test 'checkin on a finished journey with a visit time in the period is created' do
-    checkin = journeys(:my_finished).checkins.create!(
+    checkin = journeys(:my_finished).checkins.record!(
+      user: users(:me),
       pin: pins(:public_two),
       checked_in_at: '2026-06-01 11:00:00'
     )
@@ -30,7 +31,8 @@ class JourneyCheckinTest < ActiveSupport::TestCase
 
   test 'checkins are ordered by visit time' do
     journey = journeys(:my_finished)
-    retroactive = journey.checkins.create!(
+    retroactive = journey.checkins.record!(
+      user: users(:me),
       pin: pins(:public_two),
       checked_in_at: '2026-06-01 10:15:00'
     )
@@ -62,6 +64,13 @@ class JourneyCheckinTest < ActiveSupport::TestCase
     assert_equal checkin.revisions.last, checkin.current_revision
     assert_predicate checkin, :recorded?
     assert_equal 'A short stop', checkin.current_revision.note
+  end
+
+  test 'a checkin cannot be created outside a revision' do
+    checkin = journeys(:my_in_progress).checkins.build(pin: pins(:private_you))
+
+    assert_not checkin.valid?
+    assert_raises(ActiveRecord::RecordInvalid) { checkin.save! }
   end
 
   test 'the journey owner authors the revision of a checkin' do

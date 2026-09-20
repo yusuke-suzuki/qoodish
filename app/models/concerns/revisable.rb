@@ -8,6 +8,8 @@ module Revisable
 
     attr_accessor :revised_by, :submitted_image_ids
 
+    validates :revised_by, presence: true, on: :create
+
     before_save :reject_change_outside_a_revision, if: :persisted?
     after_save :append_revision, if: :revised_by
     before_destroy :detach_current_revision, prepend: true
