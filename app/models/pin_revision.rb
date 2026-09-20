@@ -10,7 +10,7 @@ class PinRevision < ApplicationRecord
 
   attr_readonly :pin_id, :user_id, :name, :comment, :latitude, :longitude, :status
 
-  enum :status, { published: 0, deleted: 1 }
+  enum :status, { published: 'published', deleted: 'deleted' }, validate: true
 
   after_create :become_current
 

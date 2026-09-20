@@ -222,7 +222,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_000004) do
     t.decimal "longitude", precision: 16, scale: 6, null: false
     t.text "name", null: false
     t.bigint "pin_id", null: false
-    t.integer "status", default: 0, null: false
+    t.string "status", default: "published", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["pin_id", "id"], name: "index_pin_revisions_on_pin_id_and_id"
@@ -239,7 +239,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_000004) do
     t.bigint "map_id", null: false
     t.text "name", null: false
     t.bigint "spot_id"
-    t.integer "status", default: 0, null: false
+    t.string "status", default: "published", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["current_revision_id"], name: "index_pins_on_current_revision_id"
