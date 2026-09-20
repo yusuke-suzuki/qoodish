@@ -28,7 +28,7 @@ class Guest::MapsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'featured map should skip maps that went private' do
-    maps(:public_one).update!(private: true)
+    maps(:public_one).revise!(user: users(:me), private: true)
 
     get '/guest/maps/featured'
 

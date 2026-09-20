@@ -55,9 +55,16 @@ class MapTest < ActiveSupport::TestCase
 
     assert map.bookmarks.exists?
 
-    map.update!(private: true)
+    map.revise!(user: users(:me), private: true)
 
     assert_not map.bookmarks.exists?
+  end
+
+  test 'content cannot be changed outside a revision' do
+    map = maps(:public_one)
+
+    assert_raises(ActiveRecord::ReadOnlyRecord) { map.update!(name: 'Renamed') }
+    assert_equal 'Public map', map.reload.name
   end
 
   test 'publish! records the first revision and points the map at it' do
