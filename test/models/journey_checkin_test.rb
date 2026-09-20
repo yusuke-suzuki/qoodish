@@ -69,8 +69,8 @@ class JourneyCheckinTest < ActiveSupport::TestCase
   test 'a checkin cannot be created outside a revision' do
     checkin = journeys(:my_in_progress).checkins.build(pin: pins(:private_you))
 
-    assert_not checkin.valid?
-    assert_raises(ActiveRecord::RecordInvalid) { checkin.save! }
+    assert_predicate checkin, :valid?
+    assert_raises(ActiveRecord::ReadOnlyRecord) { checkin.save! }
   end
 
   test 'the journey owner authors the revision of a checkin' do

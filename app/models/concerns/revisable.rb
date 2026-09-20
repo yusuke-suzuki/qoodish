@@ -8,8 +8,7 @@ module Revisable
 
     attr_accessor :revised_by, :submitted_image_ids
 
-    validates :revised_by, presence: true, on: :create
-
+    before_create :reject_creation_outside_a_revision
     before_save :reject_change_outside_a_revision, if: :persisted?
     after_save :append_revision, if: :revised_by
     before_destroy :detach_current_revision, prepend: true
@@ -35,6 +34,15 @@ module Revisable
   end
 
   private
+
+  # A record created without a revision would keep current_revision_id nil,
+  # which is the state the guard below lets through, so it could be edited
+  # forever without the log ever knowing.
+  def reject_creation_outside_a_revision
+    return if revised_by
+
+    raise ActiveRecord::ReadOnlyRecord, "#{self.class.name} is recorded through record!"
+  end
 
   # A record that has never been revised is a state the backfill exists to
   # resolve, so only a record already pointing at a revision is held to this.
