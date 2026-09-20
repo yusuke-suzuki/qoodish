@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_000011) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_000010) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -192,7 +192,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000011) do
     t.string "status", default: "recorded", null: false
     t.datetime "updated_at", null: false
     t.index ["current_revision_id"], name: "index_journey_checkins_on_current_revision_id"
-    t.index ["journey_id", "pin_id"], name: "index_journey_checkins_on_journey_id_and_pin_id"
+    t.index ["journey_id", "pin_id"], name: "index_journey_checkins_on_journey_id_and_pin_id", unique: true
     t.index ["pin_id"], name: "index_journey_checkins_on_pin_id"
   end
 
