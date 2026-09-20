@@ -88,7 +88,7 @@ class Pin < ApplicationRecord
   }
 
   scope :preloaded, lambda {
-    preload(:map, { user: :images }, :images, { comments: { user: :images } })
+    preload(:map, { user: :image }, :images, { comments: { user: :image } })
   }
 
   scope :preloaded_with_votes, lambda {

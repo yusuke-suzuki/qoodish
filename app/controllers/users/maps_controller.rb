@@ -7,7 +7,7 @@ module Users
 
       @maps = current_user
               .referenceable_maps
-              .preload(:images, user: :images)
+              .preload(:images, user: :image)
               .where(user_id: user.id)
               .order(created_at: :desc)
     end

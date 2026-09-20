@@ -25,8 +25,8 @@ class User < ApplicationRecord
   has_one :journal, dependent: :destroy
   has_many :journal_bookmarks, dependent: :destroy
   has_many :bookmarked_journals, through: :journal_bookmarks, source: :journal
+  belongs_to :image, optional: true
   has_many :owned_images, class_name: 'Image', dependent: :destroy
-  has_many :images, as: :imageable, dependent: :destroy
   has_many :preferences,
            class_name: 'UserPreference',
            inverse_of: :user,
@@ -42,13 +42,9 @@ class User < ApplicationRecord
               allow_blank: true,
               maximum: 160
             }
-  # Users backfilled from the legacy image_path column can already hold more
-  # images than the limit allows. Checking the limit on every save would leave
-  # them impossible to edit at all, so only the images a save attaches count.
-  validates :images,
-            length: { maximum: 1 },
-            if: :images_assigned?
+  validate :image_must_be_owned, if: :image_id_changed?
 
+  before_destroy :detach_image, prepend: true
   before_destroy :delete_id_platform_account
   after_create :create_default_map
   after_create :create_default_journal
@@ -69,27 +65,12 @@ class User < ApplicationRecord
     preferences.create!(web_push: web_push_preferences.merge(changes))
   end
 
-  def images=(records)
-    @images_assigned = true
-    super
-  end
-
-  def image_ids=(ids)
-    @images_assigned = true
-    super
-  end
-
   def image_url
-    images.first&.url.to_s
+    image&.url.to_s
   end
 
   def image_variants
-    primary = images.first
-    return nil unless primary
-
-    Cloudflare::Images::NAMED_VARIANTS
-      .index_with { |variant| Cloudflare::Images.variant_url(primary.url, variant) }
-      .merge(url: primary.url)
+    image&.variants
   end
 
   def author?(post)
@@ -169,8 +150,14 @@ class User < ApplicationRecord
 
   private
 
-  def images_assigned?
-    @images_assigned.present?
+  def image_must_be_owned
+    return if image.blank? || image.user_id == id
+
+    errors.add(:image, :invalid)
+  end
+
+  def detach_image
+    update_column(:image_id, nil) if image_id
   end
 
   def delete_id_platform_account

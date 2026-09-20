@@ -17,7 +17,7 @@ class DedupSingleImageOwnersTest < ActiveSupport::TestCase
 
     stub_cloudflare_images { load TASK }
 
-    assert_equal [kept.id], users(:me).reload.image_ids
+    assert_equal [kept.id], attached_image_ids(users(:me))
     assert_not Image.exists?(dropped.id)
   end
 

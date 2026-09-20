@@ -2,14 +2,14 @@ class Guest::MapsController < ApplicationController
   def show
     @map = Map
            .public_open
-           .preload(:images, user: :images)
+           .preload(:images, user: :image)
            .find_by!(id: params[:id])
   end
 
   def featured
     @map = Map
            .featured
-           .preload(:images, user: :images)
+           .preload(:images, user: :image)
            .first!
   end
 
@@ -17,30 +17,30 @@ class Guest::MapsController < ApplicationController
     @maps = if params[:input].present?
               Map
                 .public_open
-                .preload(:images, user: :images)
+                .preload(:images, user: :image)
                 .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
                 .order(created_at: :desc)
                 .limit(20)
             elsif params[:recent].present?
               Map
                 .public_open
-                .preload(:images, user: :images)
+                .preload(:images, user: :image)
                 .order(created_at: :desc)
                 .limit(12)
             elsif params[:active]
               Map
                 .public_open
-                .preload(:images, user: :images)
+                .preload(:images, user: :image)
                 .active
             elsif params[:popular]
               Map
                 .public_open
-                .preload(:images, user: :images)
+                .preload(:images, user: :image)
                 .popular
             elsif params[:recommend]
               Map
                 .public_open
-                .preload(:images, user: :images)
+                .preload(:images, user: :image)
                 .order(created_at: :desc)
                 .sample(10)
             else

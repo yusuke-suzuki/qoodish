@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_000010) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_000011) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -342,9 +342,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000010) do
     t.string "biography"
     t.datetime "created_at", null: false
     t.string "email"
+    t.bigint "image_id"
     t.string "name"
     t.string "uid", null: false
     t.datetime "updated_at", null: false
+    t.index ["image_id"], name: "index_users_on_image_id"
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
 
@@ -410,4 +412,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000010) do
   add_foreign_key "pins", "pin_revisions", column: "current_revision_id"
   add_foreign_key "pins", "users"
   add_foreign_key "user_preferences", "users"
+  add_foreign_key "users", "images"
 end

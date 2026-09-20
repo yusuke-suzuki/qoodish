@@ -5,7 +5,7 @@ class Guest::Maps::ChaptersController < ApplicationController
     @chapters = Chapter
                 .public_open
                 .where(map_id: map.id)
-                .preload(:map, :images, user: %i[images journal])
+                .preload(:map, :images, user: %i[image journal])
                 .order(created_at: :desc)
   end
 end

@@ -3,7 +3,7 @@ class UsersController < ApplicationController
 
   def index
     @users = if params[:q].present?
-               User.search_by_name(params[:q]).preload(:images)
+               User.search_by_name(params[:q]).preload(:image)
              else
                User.none
              end
