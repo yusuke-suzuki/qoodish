@@ -24,11 +24,12 @@ class JourneyCheckin < ApplicationRecord
   normalizes :note, with: ->(text) { text.delete("\r") }
 
   before_validation :set_default_checked_in_at, on: :create
+  before_save :release_pin, if: :deleted?
 
   validates :pin_id,
             uniqueness: {
+              allow_nil: true,
               scope: :journey_id,
-              conditions: -> { not_deleted },
               message: I18n.t('messages.api.duplicate_checkin')
             }
   validates :note,
@@ -41,6 +42,10 @@ class JourneyCheckin < ApplicationRecord
   def self.authored_by(_user) = {}
 
   private
+
+  def release_pin
+    self.pin_id = nil
+  end
 
   def set_default_checked_in_at
     self.checked_in_at ||= Time.current

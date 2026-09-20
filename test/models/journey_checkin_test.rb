@@ -115,6 +115,8 @@ class JourneyCheckinTest < ActiveSupport::TestCase
 
     checkin.discard!(user: users(:me))
 
+    assert_nil checkin.reload.pin_id
+
     checked_in_again = journeys(:my_in_progress).checkins.record!(
       user: users(:me),
       pin: pins(:private)
@@ -122,6 +124,25 @@ class JourneyCheckinTest < ActiveSupport::TestCase
 
     assert_predicate checked_in_again, :persisted?
     assert_not_equal checkin.id, checked_in_again.id
+  end
+
+  test 'a discarded checkin keeps the spot it snapshotted' do
+    checkin = journey_checkins(:my_in_progress_private)
+
+    checkin.discard!(user: users(:me))
+
+    assert_equal 'This is a name', checkin.reload.name
+    assert_in_delta 35.681382, checkin.lat
+    assert_in_delta 139.766084, checkin.lng
+  end
+
+  test 'a journey can discard two checkins at the same pin' do
+    journey = journeys(:my_in_progress)
+    journey_checkins(:my_in_progress_private).discard!(user: users(:me))
+    journey.checkins.record!(user: users(:me), pin: pins(:private)).discard!(user: users(:me))
+
+    assert_empty journey.checkins.reload
+    assert_equal 2, journey.all_checkins.count
   end
 
   test 'destroying the journey destroys the checkins it discarded' do
