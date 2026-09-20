@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.7.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.6.0...v4.7.0) (2026-09-20)
+
+
+### Features
+
+* make maps an append-only revision log ([59631a1](https://github.com/yusuke-suzuki/qoodish/commit/59631a1dbf4beffb9b963aebfb88d8c95cd88ce8))
+
+
+### Bug Fixes
+
+* close the gaps a logical map delete opens ([c8ad917](https://github.com/yusuke-suzuki/qoodish/commit/c8ad9179a71a67cf3fc7818c945c0801c6890e5f))
+* keep the cache in step with the revision log ([9e84a5e](https://github.com/yusuke-suzuki/qoodish/commit/9e84a5e92fdabe58e2ddfde1f76a7b5a886b84ba))
+
 ## [4.6.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.5.0...v4.6.0) (2026-09-20)
 
 
