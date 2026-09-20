@@ -6,6 +6,9 @@ class MapRevision < ApplicationRecord
   include Revision
 
   belongs_to :map
+  # A coauthor may revise a map they do not own, so erasing their account has
+  # to leave the revision standing with nobody named.
+  belongs_to :user, optional: true
   has_many :map_revision_images, dependent: :destroy
   has_many :images, -> { order(:id) }, through: :map_revision_images
 

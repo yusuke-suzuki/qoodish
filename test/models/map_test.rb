@@ -60,6 +60,31 @@ class MapTest < ActiveSupport::TestCase
     assert_not map.bookmarks.exists?
   end
 
+  test 'erasing a coauthor leaves the revisions they wrote standing' do
+    map = maps(:private_following) # author: you, coauthor: me
+    map.revise!(user: users(:me), name: 'Renamed by the coauthor')
+    revision = map.current_revision
+
+    stub_identity_platform { stub_cloudflare_images { users(:me).destroy! } }
+
+    assert_nil revision.reload.user_id
+    assert_equal 'Renamed by the coauthor', revision.name
+  end
+
+  test 'revising before the backfill keeps the images the legacy column holds' do
+    map = maps(:public_two)
+    map.update_column(:current_revision_id, nil)
+    map.revisions.destroy_all
+    image = users(:me).owned_images.create!(
+      imageable: map,
+      url: 'https://imagedelivery.net/mockhash/map-pre-backfill/public'
+    )
+
+    map.reload.revise!(user: users(:me), name: 'Renamed')
+
+    assert_equal [image.id], map.reload.images.ids
+  end
+
   test 'content cannot be changed outside a revision' do
     map = maps(:public_one)
 

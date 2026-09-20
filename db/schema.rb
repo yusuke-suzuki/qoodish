@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_000004) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -176,7 +176,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000003) do
     t.boolean "private", default: true, null: false
     t.string "status", default: "published", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
     t.index ["map_id", "id"], name: "index_map_revisions_on_map_id_and_id"
     t.index ["map_id"], name: "index_map_revisions_on_map_id"
     t.index ["user_id"], name: "index_map_revisions_on_user_id"
