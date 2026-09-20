@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.9.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.8.0...v4.9.0) (2026-09-20)
+
+
+### Features
+
+* make checkins an append-only revision log ([38be807](https://github.com/yusuke-suzuki/qoodish/commit/38be807ef289dcf6ce45c7c4a5d2c9e17dc13867))
+
+
+### Bug Fixes
+
+* keep one checkin per pin enforced by the index ([30c94e6](https://github.com/yusuke-suzuki/qoodish/commit/30c94e6c986e9c3d6b0252b2854486f1522b620e))
+* refuse a record created outside a revision ([83fb652](https://github.com/yusuke-suzuki/qoodish/commit/83fb65257e5c7ea34a66adcc59185fe4ce0f3963))
+* reject creation without failing validation ([a2713bd](https://github.com/yusuke-suzuki/qoodish/commit/a2713bd718b8e4931c95d3e7d04689996634c808))
+
 ## [4.8.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.7.0...v4.8.0) (2026-09-20)
 
 
