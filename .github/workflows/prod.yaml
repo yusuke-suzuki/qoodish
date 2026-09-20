@@ -111,6 +111,18 @@ jobs:
             --project=$PROJECT_ID \
             --region=$REGION
 
+          FAILED=$(gcloud run jobs executions list \
+            --job=$JOB_NAME \
+            --limit=1 \
+            --format='value(status.failedCount)' \
+            --project=$PROJECT_ID \
+            --region=$REGION)
+
+          if [ -n "$FAILED" ] && [ "$FAILED" != "0" ]; then
+            echo "The migration execution reported $FAILED failed task(s)"
+            exit 1
+          fi
+
   deploy-api:
     needs:
       - migrate
