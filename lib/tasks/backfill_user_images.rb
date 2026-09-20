@@ -17,7 +17,11 @@ class BackfillUserImages
 
     return if image_id.nil?
 
-    user.update_column(:image_id, image_id)
+    # The second run happens while the released version is serving, so an
+    # avatar can be chosen between the select above and this write.
+    claimed = User.where(id: user.id, image_id: nil).update_all(image_id: image_id)
+
+    return if claimed.zero?
 
     puts "[Backfill] User #{user.id}: image #{image_id}"
   end
