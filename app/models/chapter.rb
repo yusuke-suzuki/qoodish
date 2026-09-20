@@ -5,7 +5,11 @@ MAX_CHAPTER_MAP_FEATURES_BYTESIZE = 100.kilobytes
 CHAPTER_FEED_PER_PAGE = 12
 
 class Chapter < ApplicationRecord
+  include Revisable
+
   EMPTY_FEATURE_COLLECTION = { 'type' => 'FeatureCollection', 'features' => [] }.freeze
+
+  self.revision_attributes = %i[title content map_features]
 
   # Styling keys from the simplestyle spec (marker-color, marker-symbol) are
   # deliberately absent until there is UI to set them; unknown keys pass so
@@ -17,13 +21,20 @@ class Chapter < ApplicationRecord
   belongs_to :user
   belongs_to :map, optional: true
   belongs_to :journey, optional: true
+  belongs_to :current_revision, class_name: 'ChapterRevision', optional: true
+  has_many :revisions,
+           -> { order(:id) },
+           class_name: 'ChapterRevision',
+           dependent: :destroy,
+           inverse_of: :chapter
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
-  has_many :images, as: :imageable, dependent: :destroy
+  has_many :images, through: :current_revision
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  enum :status, { draft: 'draft', published: 'published' }, validate: true
+  enum :status, { draft: 'draft', published: 'published', deleted: 'deleted' }, validate: true
 
+  before_save :release_journey, if: :deleted?
   after_update :notify_map_author, if: :just_published?
 
   validates :title,
@@ -45,7 +56,6 @@ class Chapter < ApplicationRecord
               allow_nil: true,
               message: I18n.t('messages.api.duplicate_chapter_for_journey')
             }
-  validates :images, length: { maximum: 1 }
   validate :content_must_be_lexical_document
   validate :map_features_must_be_geojson_features
   validate :journey_must_match_author_and_map
@@ -55,7 +65,9 @@ class Chapter < ApplicationRecord
   }
 
   scope :readable_by, lambda { |user|
-    referenceable_by(user).or(where(user_id: user.id))
+    referenceable_by(user)
+      .or(where(user_id: user.id))
+      .not_deleted
   }
 
   scope :public_open, lambda {
@@ -107,6 +119,10 @@ class Chapter < ApplicationRecord
   end
 
   private
+
+  def release_journey
+    self.journey_id = nil
+  end
 
   def just_published?
     saved_change_to_status == %w[draft published]

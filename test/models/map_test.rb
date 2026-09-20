@@ -92,7 +92,7 @@ class MapTest < ActiveSupport::TestCase
     assert_equal 'Public map', map.reload.name
   end
 
-  test 'publish! records the first revision and points the map at it' do
+  test 'record! writes the first revision and points the map at it' do
     map = publish(name: 'Kyoto trip')
 
     assert_equal 1, map.revisions.count
@@ -134,11 +134,11 @@ class MapTest < ActiveSupport::TestCase
     assert_equal 1, revision.reload.images.count
   end
 
-  test 'delete! records the removal as a revision instead of dropping the row' do
+  test 'discard! records the removal as a revision instead of dropping the row' do
     map = maps(:public_one)
 
     assert_difference -> { map.revisions.count }, 1 do
-      map.delete!(user: users(:me))
+      map.discard!(user: users(:me))
     end
 
     assert_predicate map.reload, :deleted?
@@ -154,7 +154,7 @@ class MapTest < ActiveSupport::TestCase
 
     assert_includes Pin.public_open, pin
 
-    map.delete!(user: users(:me))
+    map.discard!(user: users(:me))
 
     assert_not_includes Pin.public_open, pin
     assert_predicate pin.reload, :published?
@@ -221,7 +221,7 @@ class MapTest < ActiveSupport::TestCase
   end
 
   def publish(**content)
-    Map.publish!(
+    Map.record!(
       user: users(:me),
       **{
         name: 'This is a name',

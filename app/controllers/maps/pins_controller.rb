@@ -15,7 +15,7 @@ module Maps
             .editable_maps
             .find_by!(id: params[:map_id])
 
-      @pin = Pin.publish!(user: current_user, map_id: map.id, **pin_params)
+      @pin = Pin.record!(user: current_user, map_id: map.id, **pin_params)
     end
 
     private

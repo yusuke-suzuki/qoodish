@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_000007) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -21,9 +21,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000004) do
     t.index ["user_id"], name: "index_bookmarks_on_user_id"
   end
 
+  create_table "chapter_revision_images", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "chapter_revision_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "image_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chapter_revision_id", "image_id"], name: "idx_on_chapter_revision_id_image_id_9e3b64d6f1", unique: true
+    t.index ["chapter_revision_id"], name: "index_chapter_revision_images_on_chapter_revision_id"
+    t.index ["image_id"], name: "index_chapter_revision_images_on_image_id"
+  end
+
+  create_table "chapter_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "chapter_id", null: false
+    t.json "content", null: false
+    t.datetime "created_at", null: false
+    t.json "map_features", null: false
+    t.string "status", default: "draft", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["chapter_id", "id"], name: "index_chapter_revisions_on_chapter_id_and_id"
+    t.index ["chapter_id"], name: "index_chapter_revisions_on_chapter_id"
+    t.index ["user_id"], name: "index_chapter_revisions_on_user_id"
+  end
+
   create_table "chapters", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.json "content", null: false
     t.datetime "created_at", null: false
+    t.bigint "current_revision_id"
     t.bigint "journey_id"
     t.json "map_features", null: false
     t.bigint "map_id"
@@ -31,6 +56,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000004) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["current_revision_id"], name: "index_chapters_on_current_revision_id"
     t.index ["journey_id"], name: "index_chapters_on_journey_id", unique: true
     t.index ["map_id"], name: "index_chapters_on_map_id"
     t.index ["user_id", "status"], name: "index_chapters_on_user_id_and_status"
@@ -315,6 +341,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000004) do
 
   add_foreign_key "bookmarks", "maps"
   add_foreign_key "bookmarks", "users"
+  add_foreign_key "chapter_revision_images", "chapter_revisions"
+  add_foreign_key "chapter_revision_images", "images"
+  add_foreign_key "chapter_revisions", "chapters"
+  add_foreign_key "chapter_revisions", "users"
+  add_foreign_key "chapters", "chapter_revisions", column: "current_revision_id"
   add_foreign_key "chapters", "journeys"
   add_foreign_key "chapters", "maps"
   add_foreign_key "chapters", "users"

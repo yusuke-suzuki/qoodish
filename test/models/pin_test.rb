@@ -15,7 +15,7 @@ class PinTest < ActiveSupport::TestCase
     assert_nil pin.image_variants
   end
 
-  test 'publish! records the first revision and points the pin at it' do
+  test 'record! writes the first revision and points the pin at it' do
     pin = publish(name: 'Cafe Bonjour')
 
     assert_equal 1, pin.revisions.count
@@ -67,11 +67,11 @@ class PinTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::ReadonlyAttributeError) { revision.update!(name: 'rewritten') }
   end
 
-  test 'delete! records the removal as a revision instead of dropping the row' do
+  test 'discard! records the removal as a revision instead of dropping the row' do
     pin = pins(:public_one)
 
     assert_difference -> { pin.revisions.count }, 1 do
-      pin.delete!(user: users(:me))
+      pin.discard!(user: users(:me))
     end
 
     assert_predicate pin.reload, :deleted?
@@ -138,10 +138,10 @@ class PinTest < ActiveSupport::TestCase
     end
   end
 
-  test 'delete! keeps the images the revisions reference' do
+  test 'discard! keeps the images the revisions reference' do
     pin = pins(:public_one)
 
-    pin.delete!(user: users(:me))
+    pin.discard!(user: users(:me))
 
     assert_equal 2, Image.where(id: [images(:one).id, images(:two).id]).count
   end
@@ -171,7 +171,7 @@ class PinTest < ActiveSupport::TestCase
   end
 
   def publish(**content)
-    Pin.publish!(
+    Pin.record!(
       user: users(:me),
       map_id: maps(:public_one).id,
       **{

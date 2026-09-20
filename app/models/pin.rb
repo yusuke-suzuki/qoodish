@@ -23,6 +23,8 @@ class Pin < ApplicationRecord
   has_many :milestones, dependent: :nullify
   has_many :journey_checkins, dependent: :nullify
 
+  enum :status, { published: 'published', deleted: 'deleted' }, validate: true
+
   normalizes :name, :comment, with: ->(text) { text.delete("\r") }
 
   validates :comment,

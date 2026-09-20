@@ -11,8 +11,8 @@ module Me
                    :featured_maps,
                    { pins: [:revisions, :votes, :notifications, { comments: %i[votes notifications] }] }] },
           { journeys: [:milestones, { checkins: :images }] },
-          { chapters: %i[votes images notifications] },
-          { owned_images: %i[pin_revision_images map_revision_images] }
+          { chapters: %i[votes revisions notifications] },
+          { owned_images: %i[pin_revision_images map_revision_images chapter_revision_images] }
         ]
       ).call
 

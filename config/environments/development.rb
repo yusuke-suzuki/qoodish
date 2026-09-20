@@ -96,6 +96,7 @@ Rails.application.configure do
     # N+1 the preload exists to avoid.
     Bullet.add_safelist(type: :unused_eager_loading, class_name: 'PinRevision', association: :pin_revision_images)
     Bullet.add_safelist(type: :unused_eager_loading, class_name: 'MapRevision', association: :map_revision_images)
+    Bullet.add_safelist(type: :unused_eager_loading, class_name: 'ChapterRevision', association: :chapter_revision_images)
   end
 
   config.hosts << 'host.docker.internal'

@@ -1,8 +1,6 @@
 my_draft:
-  current_revision: my_draft
+  chapter: my_draft
   user: me
-  map: public_one
-  journey: my_finished
   title: My draft chapter
   status: draft
   content:
@@ -25,12 +23,10 @@ my_draft:
     features: []
 
 my_published:
-  current_revision: my_published
+  chapter: my_published
   user: me
-  map: public_one
   title: My published chapter
   status: published
-  created_at: 2026-06-05 12:00:00
   content:
     root:
       type: root
@@ -59,9 +55,8 @@ my_published:
           title: This is a name
 
 you_draft:
-  current_revision: you_draft
+  chapter: you_draft
   user: you
-  map: public_unfollowing
   title: Your draft chapter
   status: draft
   content:
@@ -74,9 +69,8 @@ you_draft:
     features: []
 
 you_published:
-  current_revision: you_published
+  chapter: you_published
   user: you
-  map: public_unfollowing
   title: Your published chapter
   status: published
   content:
@@ -95,9 +89,8 @@ you_published:
     features: []
 
 you_draft_on_my_map:
-  current_revision: you_draft_on_my_map
+  chapter: you_draft_on_my_map
   user: you
-  map: public_one
   title: Your draft chapter on my map
   status: draft
   content:
@@ -110,12 +103,10 @@ you_draft_on_my_map:
     features: []
 
 you_published_on_my_map:
-  current_revision: you_published_on_my_map
+  chapter: you_published_on_my_map
   user: you
-  map: public_one
   title: Your published chapter on my map
   status: published
-  created_at: 2026-06-20 12:00:00
   content:
     root:
       type: root
@@ -126,9 +117,8 @@ you_published_on_my_map:
     features: []
 
 you_private_published_unfollowing:
-  current_revision: you_private_published_unfollowing
+  chapter: you_private_published_unfollowing
   user: you
-  map: private_unfollowing
   title: Your private chapter that me cannot reference
   status: published
   content:
@@ -141,12 +131,10 @@ you_private_published_unfollowing:
     features: []
 
 you_private_published_following:
-  current_revision: you_private_published_following
+  chapter: you_private_published_following
   user: you
-  map: private_following
   title: Your private chapter that me coauthors
   status: published
-  created_at: 2026-06-10 12:00:00
   content:
     root:
       type: root

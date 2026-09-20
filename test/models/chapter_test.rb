@@ -219,6 +219,102 @@ class ChapterTest < ActiveSupport::TestCase
     assert_nil chapter.reload.map_id
   end
 
+  test 'record! writes the first revision and points the chapter at it' do
+    chapter = Chapter.record!(
+      user: users(:me),
+      map: maps(:public_one),
+      title: 'A new chapter',
+      content: LEXICAL_DOCUMENT
+    )
+
+    assert_equal 1, chapter.revisions.count
+    assert_equal chapter.revisions.last, chapter.current_revision
+    assert_predicate chapter, :draft?
+    assert_predicate chapter.current_revision, :draft?
+  end
+
+  test 'revise! appends a revision and leaves the previous one untouched' do
+    chapter = chapters(:my_draft)
+    previous = chapter.current_revision
+
+    chapter.revise!(user: users(:me), title: 'Renamed')
+
+    assert_equal 'Renamed', chapter.reload.title
+    assert_equal 2, chapter.revisions.count
+    assert_equal 'My draft chapter', previous.reload.title
+  end
+
+  test 'publishing is recorded as a revision' do
+    chapter = chapters(:my_draft)
+
+    chapter.revise!(user: users(:me), status: 'published')
+
+    assert_predicate chapter.reload, :published?
+    assert_predicate chapter.current_revision, :published?
+  end
+
+  test 'a revision cannot be rewritten' do
+    revision = chapters(:my_draft).current_revision
+
+    assert_raises(ActiveRecord::ReadonlyAttributeError) { revision.update!(title: 'rewritten') }
+  end
+
+  test 'content cannot be changed outside a revision' do
+    chapter = chapters(:my_draft)
+
+    assert_raises(ActiveRecord::ReadOnlyRecord) { chapter.update!(title: 'Renamed') }
+    assert_equal 'My draft chapter', chapter.reload.title
+  end
+
+  test 'discard! records the removal as a revision instead of dropping the row' do
+    chapter = chapters(:my_published)
+
+    assert_difference -> { chapter.revisions.count }, 1 do
+      chapter.discard!(user: users(:me))
+    end
+
+    assert_predicate chapter.reload, :deleted?
+    assert_predicate chapter.current_revision, :deleted?
+    assert_not_includes Chapter.readable_by(users(:me)), chapter
+    assert_not_includes Chapter.public_open, chapter
+  end
+
+  test 'discarding a chapter frees its journey to be written up again' do
+    chapter = chapters(:my_draft)
+    journey = chapter.journey
+
+    chapter.discard!(user: users(:me))
+
+    assert_nil chapter.reload.journey_id
+    assert_nil journey.reload.chapter
+
+    rewritten = Chapter.record!(
+      user: users(:me),
+      map: maps(:public_one),
+      journey: journey,
+      title: 'A second attempt',
+      content: LEXICAL_DOCUMENT
+    )
+
+    assert_equal journey, rewritten.journey
+  end
+
+  test 'a deleted chapter is no longer notified about' do
+    chapter = chapters(:you_published_on_my_map)
+    notification = Notification.create!(
+      notifiable: chapter,
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'published'
+    )
+
+    assert_predicate notification, :renderable?
+
+    chapter.discard!(user: users(:you))
+
+    assert_not_predicate notification.reload, :renderable?
+  end
+
   test 'readable_by includes published chapters on referenceable maps' do
     readable = Chapter.readable_by(users(:me))
 
@@ -272,7 +368,7 @@ class ChapterTest < ActiveSupport::TestCase
     chapter = chapters(:you_draft_on_my_map)
 
     assert_difference 'Notification.count', 1 do
-      chapter.update!(status: 'published')
+      chapter.revise!(user: users(:you), status: 'published')
     end
 
     notification = Notification.last
@@ -286,24 +382,24 @@ class ChapterTest < ActiveSupport::TestCase
 
   test 'publishing a chapter on own map notifies nobody' do
     assert_no_difference 'Notification.count' do
-      chapters(:my_draft).update!(status: 'published')
+      chapters(:my_draft).revise!(user: users(:me), status: 'published')
     end
   end
 
   test 'publishing again after reverting to draft notifies only once' do
     chapter = chapters(:you_draft_on_my_map)
 
-    chapter.update!(status: 'published')
-    chapter.update!(status: 'draft')
+    chapter.revise!(user: users(:you), status: 'published')
+    chapter.revise!(user: users(:you), status: 'draft')
 
     assert_no_difference 'Notification.count' do
-      chapter.update!(status: 'published')
+      chapter.revise!(user: users(:you), status: 'published')
     end
   end
 
   test 'editing a published chapter notifies nobody' do
     assert_no_difference 'Notification.count' do
-      chapters(:you_published_on_my_map).update!(title: 'A new title')
+      chapters(:you_published_on_my_map).revise!(user: users(:you), title: 'A new title')
     end
   end
 
@@ -315,7 +411,7 @@ class ChapterTest < ActiveSupport::TestCase
 
     Notification.stub :create!, failing_create do
       assert_raises(ActiveRecord::RecordNotSaved) do
-        chapter.update!(status: 'published')
+        chapter.revise!(user: users(:you), status: 'published')
       end
     end
 
@@ -327,7 +423,7 @@ class ChapterTest < ActiveSupport::TestCase
     chapter.map.destroy!
 
     assert_no_difference 'Notification.count' do
-      chapter.reload.update!(status: 'published')
+      chapter.reload.revise!(user: users(:you), status: 'published')
     end
   end
 end

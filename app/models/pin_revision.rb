@@ -12,6 +12,8 @@ class PinRevision < ApplicationRecord
 
   alias_method :revisable, :pin
 
+  enum :status, { published: 'published', deleted: 'deleted' }, validate: true
+
   attr_readonly :pin_id, :user_id, :name, :comment, :latitude, :longitude, :status
 
   validates :name,

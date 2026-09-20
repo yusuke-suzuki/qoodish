@@ -113,9 +113,23 @@ class NotificationTest < ActiveSupport::TestCase
 
     assert_predicate notification, :renderable?
 
-    pins(:public_one).delete!(user: users(:me))
+    pins(:public_one).discard!(user: users(:me))
 
     assert_not notification.reload.renderable?
+  end
+
+  test 'a notification of a chapter reverted to draft is still renderable' do
+    chapter = chapters(:you_published_on_my_map)
+    notification = Notification.create!(
+      notifiable: chapter,
+      notifier: users(:me),
+      recipient: users(:you),
+      key: 'liked'
+    )
+
+    chapter.revise!(user: users(:you), status: 'draft')
+
+    assert_predicate notification.reload, :renderable?
   end
 
   test 'every key is gated by a preference of the same name' do

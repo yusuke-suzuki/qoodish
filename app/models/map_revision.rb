@@ -14,6 +14,8 @@ class MapRevision < ApplicationRecord
 
   alias_method :revisable, :map
 
+  enum :status, { published: 'published', deleted: 'deleted' }, validate: true
+
   attr_readonly :map_id, :user_id, :name, :description, :latitude, :longitude, :private, :status
 
   validates :name,
