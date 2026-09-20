@@ -35,9 +35,6 @@ module Revisable
 
   private
 
-  # A record created without a revision would keep current_revision_id nil,
-  # which is the state the guard below lets through, so it could be edited
-  # forever without the log ever knowing.
   def reject_creation_outside_a_revision
     return if revised_by
 
