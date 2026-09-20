@@ -26,7 +26,7 @@ class MapsController < ApplicationController
   end
 
   def create
-    @map = Map.publish!(user: current_user, **map_params)
+    @map = Map.record!(user: current_user, **map_params)
 
     ActiveRecord::Associations::Preloader.new(
       records: [@map],
@@ -48,7 +48,7 @@ class MapsController < ApplicationController
   end
 
   def destroy
-    current_user.maps.published.find_by!(id: params[:id]).delete!(user: current_user)
+    current_user.maps.published.find_by!(id: params[:id]).discard!(user: current_user)
   end
 
   private

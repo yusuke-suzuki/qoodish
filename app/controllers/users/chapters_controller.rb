@@ -8,7 +8,7 @@ module Users
       @chapters = Chapter
                   .referenceable_by(current_user)
                   .where(user: user)
-                  .preload(:map, :votes, user: %i[images journal])
+                  .preload(:map, :votes, :images, user: %i[images journal])
                   .order(created_at: :desc)
     end
   end

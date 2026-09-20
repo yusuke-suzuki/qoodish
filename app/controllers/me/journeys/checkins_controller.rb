@@ -15,7 +15,7 @@ module Me
 
         @checkin = journey
                    .checkins
-                   .preload(images: %i[pin_revision_images map_revision_images])
+                   .preload(images: %i[pin_revision_images map_revision_images chapter_revision_images])
                    .find_by!(id: params[:id])
         @checkin.update!(checkin_params)
       end

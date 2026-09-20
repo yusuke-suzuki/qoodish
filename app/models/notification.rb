@@ -135,7 +135,7 @@ class Notification < ApplicationRecord
   def visible?(record)
     return false if record.blank?
 
-    !record.is_a?(Revisable) || record.published?
+    !record.is_a?(Revisable) || !record.deleted?
   end
 
   def broadcast_web_push_later

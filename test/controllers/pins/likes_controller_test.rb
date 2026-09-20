@@ -46,7 +46,7 @@ class Pins::LikesControllerTest < ActionDispatch::IntegrationTest
 
   test 'create on a deleted pin raises not found error' do
     pin = pins(:public_two)
-    pin.delete!(user: users(:me))
+    pin.discard!(user: users(:me))
 
     stub_google_auth(users(:me)) do
       post "/pins/#{pin.id}/like", headers: { 'Authorization': 'Bearer dummytoken' }

@@ -29,6 +29,8 @@ class Map < ApplicationRecord
   has_many :chapters, dependent: :nullify
   has_many :featured_maps, dependent: :destroy
 
+  enum :status, { published: 'published', deleted: 'deleted' }, validate: true
+
   normalizes :name, :description, with: ->(text) { text.delete("\r") }
 
   validates :name,

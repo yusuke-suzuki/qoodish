@@ -4,8 +4,6 @@ module Revision
   extend ActiveSupport::Concern
 
   included do
-    enum :status, { published: 'published', deleted: 'deleted' }, validate: true
-
     after_create :become_current
 
     validate :images_must_belong_to_author, if: :images_submitted?

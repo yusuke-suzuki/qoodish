@@ -29,7 +29,7 @@ module Me
     end
 
     def destroy
-      current_user.pins.published.find_by!(id: params[:id]).delete!(user: current_user)
+      current_user.pins.published.find_by!(id: params[:id]).discard!(user: current_user)
     end
 
     private

@@ -33,7 +33,7 @@ class Me::NotificationsControllerTest < ActionDispatch::IntegrationTest
         key: 'liked'
       )
     end
-    pin.delete!(user: users(:me))
+    pin.discard!(user: users(:me))
 
     stub_google_auth(users(:me)) do
       get '/me/notifications', headers: { 'Authorization': 'Bearer dummytoken' }

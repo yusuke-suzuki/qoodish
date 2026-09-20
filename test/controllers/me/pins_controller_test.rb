@@ -136,7 +136,7 @@ class Me::PinsControllerTest < ActionDispatch::IntegrationTest
 
   test 'a deleted pin can no longer be read or revised' do
     pin = pins(:public_one)
-    pin.delete!(user: users(:me))
+    pin.discard!(user: users(:me))
 
     stub_google_auth(users(:me)) do
       put "/me/pins/#{pin.id}",

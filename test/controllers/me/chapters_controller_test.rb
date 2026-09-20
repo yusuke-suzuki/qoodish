@@ -117,14 +117,18 @@ class Me::ChaptersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'destroy own chapter should be success' do
-    assert_difference 'Chapter.count', -1 do
+    chapter = chapters(:my_draft)
+
+    assert_no_difference 'Chapter.count' do
       stub_google_auth(users(:me)) do
-        delete "/me/chapters/#{chapters(:my_draft).id}",
+        delete "/me/chapters/#{chapter.id}",
                headers: { 'Authorization': 'Bearer dummytoken' }
       end
     end
 
     assert_response :success
+    assert_predicate chapter.reload, :deleted?
+    assert_not_includes Chapter.readable_by(users(:me)), chapter
   end
 
   test 'destroy a chapter of another user should raise not found error' do

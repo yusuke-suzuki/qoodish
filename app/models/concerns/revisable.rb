@@ -6,8 +6,6 @@ module Revisable
   included do
     class_attribute :revision_attributes, instance_writer: false, default: []
 
-    enum :status, { published: 'published', deleted: 'deleted' }, validate: true
-
     attr_accessor :revised_by, :submitted_image_ids
 
     before_save :reject_change_outside_a_revision, if: :persisted?
@@ -16,7 +14,7 @@ module Revisable
   end
 
   class_methods do
-    def publish!(user:, **content)
+    def record!(user:, **content)
       new(user: user).revise!(user: user, **content)
     end
   end
@@ -28,7 +26,7 @@ module Revisable
     self
   end
 
-  def delete!(user:)
+  def discard!(user:)
     revise!(user: user, status: :deleted)
   end
 
