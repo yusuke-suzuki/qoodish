@@ -64,12 +64,12 @@ These rules cover database migrations, releases, and backward compatibility. Fol
 ### Migrations and Data Migration
 
 - Migration files in `db/migrate` must contain schema changes only. Do not write data-manipulation Ruby (model updates, backfills, record rewrites) inside a migration.
-- Perform all data migration through Rake tasks in `lib/tasks`, kept separate from schema migrations.
+- Perform all data migration through scripts in `lib/tasks`, kept separate from schema migrations. These are plain Ruby scripts loaded by `bin/rails runner`, not Rake tasks, so they are invoked by path.
 
 ### Running Tasks in Production
 
 - `db:migrate` runs as part of the release, through the `qoodish-runner` Cloud Run Job. Do not plan a release around applying migrations by hand.
-- Data-migration Rake tasks are executed on demand by invoking the same Job with `bin/rails runner <task>`. The Job carries the released image, so a task is only available once the release carrying it is out.
+- Data-migration scripts are executed on demand by invoking the same Job with `bin/rails runner lib/tasks/<script>.rb`. The Job carries the released image, so a script is only available once the release carrying it is out.
 
 ### Release Flow
 

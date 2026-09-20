@@ -105,22 +105,25 @@ jobs:
         env:
           CLOUDSDK_CORE_DISABLE_PROMPTS: 1
         run: |
-          gcloud run jobs execute $JOB_NAME \
+          EXECUTION=$(gcloud run jobs execute $JOB_NAME \
             --args=bin/rails,db:migrate \
             --wait \
-            --project=$PROJECT_ID \
-            --region=$REGION
-
-          FAILED=$(gcloud run jobs executions list \
-            --job=$JOB_NAME \
-            --limit=1 \
-            --format='value(status.failedCount)' \
+            --format='value(metadata.name)' \
             --project=$PROJECT_ID \
             --region=$REGION)
 
-          if [ -n "$FAILED" ] && [ "$FAILED" != "0" ]; then
-            echo "The migration execution reported $FAILED failed task(s)"
-            exit 1
+          echo "Migration execution: ${EXECUTION:-unknown}"
+
+          if [ -n "$EXECUTION" ]; then
+            FAILED=$(gcloud run jobs executions describe $EXECUTION \
+              --format='value(status.failedCount)' \
+              --project=$PROJECT_ID \
+              --region=$REGION)
+
+            if [ -n "$FAILED" ] && [ "$FAILED" != "0" ]; then
+              echo "The migration execution reported $FAILED failed task(s)"
+              exit 1
+            fi
           fi
 
   deploy-api:
