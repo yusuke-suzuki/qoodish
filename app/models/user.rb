@@ -4,7 +4,8 @@ class User < ApplicationRecord
   has_many :map_revisions, dependent: :nullify
   has_many :pins, dependent: :destroy
   has_many :notifications, as: :recipient
-  has_many :comments, dependent: :destroy
+  has_many :comments, -> { not_deleted }, inverse_of: :user
+  has_many :all_comments, class_name: 'Comment', dependent: :destroy, inverse_of: :user
   has_many :coauthorships, dependent: :destroy
   has_many :coauthored_maps, through: :coauthorships, source: :map
   has_many :bookmarks, dependent: :destroy

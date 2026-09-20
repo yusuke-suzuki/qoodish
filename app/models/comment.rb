@@ -5,6 +5,8 @@ class Comment < ApplicationRecord
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :notifications, as: :notifiable, dependent: :destroy
 
+  enum :status, { published: 'published', deleted: 'deleted' }, validate: true
+
   normalizes :body, with: ->(text) { text.delete("\r") }
 
   validates :body,
@@ -17,6 +19,10 @@ class Comment < ApplicationRecord
             presence: true
 
   after_create :create_notification, unless: :on_yourself?
+
+  def discard!
+    update!(status: :deleted)
+  end
 
   def image_url
     commentable.image_url
