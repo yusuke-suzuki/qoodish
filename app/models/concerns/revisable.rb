@@ -10,6 +10,7 @@ module Revisable
 
     attr_accessor :revised_by, :submitted_image_ids
 
+    before_save :reject_change_outside_a_revision, if: :persisted?
     after_save :append_revision, if: :revised_by
     before_destroy :detach_current_revision, prepend: true
   end
@@ -32,6 +33,15 @@ module Revisable
   end
 
   private
+
+  # A record that has never been revised is a state the backfill exists to
+  # resolve, so only a record already pointing at a revision is held to this.
+  def reject_change_outside_a_revision
+    return if revised_by || current_revision_id.nil?
+    return if (changed.map(&:to_sym) & (revision_attributes + [:status])).empty?
+
+    raise ActiveRecord::ReadOnlyRecord, "#{self.class.name} content changes through revise!"
+  end
 
   def append_revision
     revision = revisions.build(
