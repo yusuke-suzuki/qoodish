@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.7.0...v4.8.0) (2026-09-20)
+
+
+### Features
+
+* make chapters an append-only revision log ([bf83c11](https://github.com/yusuke-suzuki/qoodish/commit/bf83c11f952f1ad8c30bdd1d7904132a3f30f82a))
+
 ## [4.7.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.6.0...v4.7.0) (2026-09-20)
 
 
