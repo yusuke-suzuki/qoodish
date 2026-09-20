@@ -1,4 +1,5 @@
 my_in_progress_private:
+  current_revision: my_in_progress_private
   journey: my_in_progress
   pin: private
   name: This is a name
@@ -7,9 +8,11 @@ my_in_progress_private:
   checked_in_at: 2026-07-01 11:00:00
 
 my_finished_public_one:
+  current_revision: my_finished_public_one
   journey: my_finished
   pin: public_one
   name: This is a name
   latitude: 35.681382
   longitude: 139.766084
+  note: A fine spot
   checked_in_at: 2026-06-01 10:30:00

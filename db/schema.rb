@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_000007) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_000011) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -156,17 +156,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000007) do
     t.index ["user_id"], name: "index_journals_on_user_id", unique: true
   end
 
+  create_table "journey_checkin_revision_images", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "image_id", null: false
+    t.bigint "journey_checkin_revision_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["image_id"], name: "index_journey_checkin_revision_images_on_image_id"
+    t.index ["journey_checkin_revision_id", "image_id"], name: "index_checkin_revision_images_on_revision_id_and_image_id", unique: true
+    t.index ["journey_checkin_revision_id"], name: "idx_on_journey_checkin_revision_id_79ea77d6c2"
+  end
+
+  create_table "journey_checkin_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "checked_in_at", null: false
+    t.datetime "created_at", null: false
+    t.bigint "journey_checkin_id", null: false
+    t.text "note"
+    t.string "status", default: "recorded", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["journey_checkin_id", "id"], name: "index_journey_checkin_revisions_on_journey_checkin_id_and_id"
+    t.index ["journey_checkin_id"], name: "index_journey_checkin_revisions_on_journey_checkin_id"
+    t.index ["user_id"], name: "index_journey_checkin_revisions_on_user_id"
+  end
+
   create_table "journey_checkins", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "checked_in_at", null: false
     t.datetime "created_at", null: false
+    t.bigint "current_revision_id"
     t.bigint "journey_id", null: false
     t.decimal "latitude", precision: 16, scale: 6, null: false
     t.decimal "longitude", precision: 16, scale: 6, null: false
     t.string "name", null: false
     t.text "note"
     t.bigint "pin_id"
+    t.string "status", default: "recorded", null: false
     t.datetime "updated_at", null: false
-    t.index ["journey_id", "pin_id"], name: "index_journey_checkins_on_journey_id_and_pin_id", unique: true
+    t.index ["current_revision_id"], name: "index_journey_checkins_on_current_revision_id"
+    t.index ["journey_id", "pin_id"], name: "index_journey_checkins_on_journey_id_and_pin_id"
     t.index ["pin_id"], name: "index_journey_checkins_on_pin_id"
   end
 
@@ -359,6 +385,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000007) do
   add_foreign_key "journal_bookmarks", "journals"
   add_foreign_key "journal_bookmarks", "users"
   add_foreign_key "journals", "users"
+  add_foreign_key "journey_checkin_revision_images", "images"
+  add_foreign_key "journey_checkin_revision_images", "journey_checkin_revisions"
+  add_foreign_key "journey_checkin_revisions", "journey_checkins"
+  add_foreign_key "journey_checkin_revisions", "users"
+  add_foreign_key "journey_checkins", "journey_checkin_revisions", column: "current_revision_id"
   add_foreign_key "journey_checkins", "journeys"
   add_foreign_key "journey_checkins", "pins"
   add_foreign_key "journeys", "maps"

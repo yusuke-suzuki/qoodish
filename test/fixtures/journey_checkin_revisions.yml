@@ -1,0 +1,12 @@
+my_in_progress_private:
+  journey_checkin: my_in_progress_private
+  user: me
+  status: recorded
+  checked_in_at: 2026-07-01 11:00:00
+
+my_finished_public_one:
+  journey_checkin: my_finished_public_one
+  user: me
+  status: recorded
+  note: A fine spot
+  checked_in_at: 2026-06-01 10:30:00

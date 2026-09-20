@@ -4,6 +4,7 @@ class Image < ApplicationRecord
   has_many :pin_revision_images, dependent: :destroy
   has_many :map_revision_images, dependent: :destroy
   has_many :chapter_revision_images, dependent: :destroy
+  has_many :journey_checkin_revision_images, dependent: :destroy
 
   validates :url,
             presence: true,

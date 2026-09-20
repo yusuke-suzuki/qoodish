@@ -97,6 +97,8 @@ Rails.application.configure do
     Bullet.add_safelist(type: :unused_eager_loading, class_name: 'PinRevision', association: :pin_revision_images)
     Bullet.add_safelist(type: :unused_eager_loading, class_name: 'MapRevision', association: :map_revision_images)
     Bullet.add_safelist(type: :unused_eager_loading, class_name: 'ChapterRevision', association: :chapter_revision_images)
+    Bullet.add_safelist(type: :unused_eager_loading, class_name: 'JourneyCheckinRevision',
+                        association: :journey_checkin_revision_images)
   end
 
   config.hosts << 'host.docker.internal'

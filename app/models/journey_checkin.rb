@@ -1,13 +1,23 @@
 # frozen_string_literal: true
 
-MAX_IMAGE_COUNT_PER_CHECKIN = 4
 MAX_CHECKIN_NOTE_LENGTH = 500
 
 class JourneyCheckin < ApplicationRecord
   include PinSnapshot
+  include Revisable
+
+  self.revision_attributes = %i[note checked_in_at]
 
   belongs_to :journey
-  has_many :images, as: :imageable, dependent: :destroy
+  belongs_to :current_revision, class_name: 'JourneyCheckinRevision', optional: true
+  has_many :revisions,
+           -> { order(:id) },
+           class_name: 'JourneyCheckinRevision',
+           dependent: :destroy,
+           inverse_of: :journey_checkin
+  has_many :images, through: :current_revision
+
+  enum :status, { recorded: 'recorded', deleted: 'deleted' }, validate: true
 
   delegate :user_id, to: :journey
 
@@ -18,6 +28,7 @@ class JourneyCheckin < ApplicationRecord
   validates :pin_id,
             uniqueness: {
               scope: :journey_id,
+              conditions: -> { not_deleted },
               message: I18n.t('messages.api.duplicate_checkin')
             }
   validates :note,
@@ -25,12 +36,9 @@ class JourneyCheckin < ApplicationRecord
               maximum: MAX_CHECKIN_NOTE_LENGTH,
               message: I18n.t('messages.api.checkin_note_exceeded')
             }
-  validates :images,
-            length: {
-              maximum: MAX_IMAGE_COUNT_PER_CHECKIN,
-              message: I18n.t('messages.api.images_per_checkin_reached_limit')
-            }
   validate :checked_in_at_must_be_within_journey_period, if: :checked_in_at_changed?
+
+  def self.authored_by(_user) = {}
 
   private
 
