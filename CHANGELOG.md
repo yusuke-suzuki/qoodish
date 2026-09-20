@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.6.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.5.0...v4.6.0) (2026-09-20)
+
+
+### Features
+
+* make pins an append-only revision log ([9e09fc7](https://github.com/yusuke-suzuki/qoodish/commit/9e09fc78042bf616d7247d31d764e125c16d310b))
+
+
+### Bug Fixes
+
+* harden the pin backfill and revision writes ([bd91671](https://github.com/yusuke-suzuki/qoodish/commit/bd91671b072a6addc1cb6918c71eb98d92fb5f08))
+* keep a pin last updated when it was ([874e5d2](https://github.com/yusuke-suzuki/qoodish/commit/874e5d27ab14e367a3a0ba1d75f03fd29a360181))
+* let a revision record over-limit legacy images ([5efa340](https://github.com/yusuke-suzuki/qoodish/commit/5efa340c8b96763ec824c5c3cd83b1b940b406b1))
+
 ## [4.5.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.4.0...v4.5.0) (2026-09-17)
 
 
