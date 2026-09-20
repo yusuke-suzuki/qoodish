@@ -77,6 +77,18 @@ class Me::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_equal images(:one), users(:me).reload.image
   end
 
+  test 'update should reject an image that does not exist' do
+    stub_google_auth(users(:me)) do
+      put '/me/profile',
+          params: { image_ids: [Image.maximum(:id).to_i + 1] },
+          headers: { 'Authorization': 'Bearer dummytoken' },
+          as: :json
+    end
+
+    assert_response :unprocessable_content
+    assert_nil users(:me).reload.image_id
+  end
+
   test 'update should reject an image another user uploaded' do
     foreign_image = users(:you).owned_images.create!(
       url: 'https://imagedelivery.net/mockhash/profile-foreign/public'
