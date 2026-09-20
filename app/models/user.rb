@@ -151,7 +151,8 @@ class User < ApplicationRecord
   private
 
   def image_must_be_owned
-    return if image.blank? || image.user_id == id
+    return if image_id.blank?
+    return if image&.user_id == id
 
     errors.add(:image, :invalid)
   end

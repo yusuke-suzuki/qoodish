@@ -51,6 +51,15 @@ class UserTest < ActiveSupport::TestCase
     assert_includes user.owned_images, images(:one)
   end
 
+  test 'destroying the image an avatar points at releases the pointer' do
+    user = users(:me)
+    user.update!(image: images(:one))
+
+    stub_cloudflare_images { images(:one).destroy! }
+
+    assert_nil user.reload.image_id
+  end
+
   test 'erasing an account takes the avatar with it' do
     user = users(:you)
     avatar = user.owned_images.create!(
