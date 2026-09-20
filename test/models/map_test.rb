@@ -41,7 +41,8 @@ class MapTest < ActiveSupport::TestCase
   end
 
   test 'name and description drop carriage returns on assignment' do
-    map = users(:me).maps.create!(
+    map = users(:me).maps.record!(
+      user: users(:me),
       name: "Kyoto\r\ntrip",
       description: "First\r\nvisit"
     )
