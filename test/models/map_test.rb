@@ -59,4 +59,144 @@ class MapTest < ActiveSupport::TestCase
 
     assert_not map.bookmarks.exists?
   end
+
+  test 'publish! records the first revision and points the map at it' do
+    map = publish(name: 'Kyoto trip')
+
+    assert_equal 1, map.revisions.count
+    assert_equal map.revisions.last, map.current_revision
+    assert_predicate map, :published?
+  end
+
+  test 'revise! appends a revision and leaves the previous one untouched' do
+    map = maps(:public_one)
+    previous = map.current_revision
+
+    map.revise!(user: users(:me), name: 'Renamed')
+
+    assert_equal 'Renamed', map.reload.name
+    assert_equal 2, map.revisions.count
+    assert_not_equal previous, map.current_revision
+    assert_equal 'Public map', previous.reload.name
+  end
+
+  test 'revise! records the visibility it was given' do
+    map = maps(:public_one)
+
+    map.revise!(user: users(:me), private: true)
+
+    assert_predicate map.current_revision, :private
+  end
+
+  test 'a revision cannot be rewritten' do
+    revision = maps(:public_one).current_revision
+
+    assert_raises(ActiveRecord::ReadonlyAttributeError) { revision.update!(name: 'rewritten') }
+  end
+
+  test 'a revision keeps the images it was written with' do
+    revision = record_revision(maps(:public_two), [images(:one)])
+
+    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.images = [] }
+    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.image_ids = [] }
+    assert_equal 1, revision.reload.images.count
+  end
+
+  test 'delete! records the removal as a revision instead of dropping the row' do
+    map = maps(:public_one)
+
+    assert_difference -> { map.revisions.count }, 1 do
+      map.delete!(user: users(:me))
+    end
+
+    assert_predicate map.reload, :deleted?
+    assert_predicate map.current_revision, :deleted?
+    assert_not_includes Map.public_open, map
+    assert_not_includes Map.referenceable_by(users(:me)), map
+    assert_not_includes Map.editable_by(users(:me)), map
+  end
+
+  test 'deleting a map hides its pins' do
+    map = maps(:public_one)
+    pin = pins(:public_one)
+
+    assert_includes Pin.public_open, pin
+
+    map.delete!(user: users(:me))
+
+    assert_not_includes Pin.public_open, pin
+    assert_predicate pin.reload, :published?
+  end
+
+  test 'a written revision becomes the current one' do
+    map = maps(:public_two)
+
+    revision = record_revision(map, [])
+
+    assert_equal revision, map.reload.current_revision
+  end
+
+  test 'a backfilled revision leaves the map last updated when it was' do
+    map = maps(:public_two)
+    updated_at = map.updated_at
+
+    record_revision(map, [])
+
+    assert_equal updated_at, map.reload.updated_at
+  end
+
+  test 'a map holding more images than the limit can still be revised' do
+    map = maps(:public_two)
+    record_revision(map, legacy_images(2))
+
+    map.reload.revise!(user: users(:me), name: 'Renamed')
+
+    assert_equal 'Renamed', map.reload.name
+    assert_equal 2, map.images.count
+  end
+
+  test 'submitting more images than the limit is rejected' do
+    map = maps(:public_two)
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      map.revise!(user: users(:me), image_ids: legacy_images(2).map(&:id))
+    end
+  end
+
+  private
+
+  def legacy_images(count)
+    Array.new(count) do |index|
+      users(:me).owned_images.create!(
+        url: "https://imagedelivery.net/mockhash/map-legacy-#{index}/public"
+      )
+    end
+  end
+
+  # Records a revision the way the backfill does, without a caller submitting
+  # the images.
+  def record_revision(map, images)
+    map.revisions.create!(
+      user_id: map.user_id,
+      status: map.status,
+      name: map.name,
+      description: map.description,
+      latitude: map.latitude,
+      longitude: map.longitude,
+      private: map.private,
+      image_ids: images.map(&:id)
+    )
+  end
+
+  def publish(**content)
+    Map.publish!(
+      user: users(:me),
+      **{
+        name: 'This is a name',
+        description: 'This is a description',
+        latitude: 35.681382,
+        longitude: 139.766084
+      }.merge(content)
+    )
+  end
 end

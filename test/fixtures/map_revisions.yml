@@ -1,6 +1,6 @@
 private:
+  map: private
   user: me
-  current_revision: private
   name: Private map
   description: This is a private map.
   private: true
@@ -8,8 +8,8 @@ private:
   longitude: 139.766084
 
 private_unfollowing:
+  map: private_unfollowing
   user: you
-  current_revision: private_unfollowing
   name: Private map
   description: This is a private map.
   private: true
@@ -17,8 +17,8 @@ private_unfollowing:
   longitude: 139.766084
 
 private_following:
+  map: private_following
   user: you
-  current_revision: private_following
   name: Private map
   description: This is a private map.
   private: true
@@ -26,8 +26,8 @@ private_following:
   longitude: 139.766084
 
 public_one:
+  map: public_one
   user: me
-  current_revision: public_one
   name: Public map
   description: This is a public map.
   private: false
@@ -35,8 +35,8 @@ public_one:
   longitude: 139.766084
 
 public_two:
+  map: public_two
   user: me
-  current_revision: public_two
   name: Public map two
   description: This is a public map.
   private: false
@@ -44,8 +44,8 @@ public_two:
   longitude: 139.766084
 
 public_unfollowing:
+  map: public_unfollowing
   user: you
-  current_revision: public_unfollowing
   name: Public map
   description: This is a public map.
   private: false

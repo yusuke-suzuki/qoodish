@@ -181,7 +181,8 @@ class User < ApplicationRecord
   end
 
   def create_default_map
-    maps.create!(
+    Map.publish!(
+      user: self,
       name: "#{name}'s map",
       description: "#{name}'s map."
     )

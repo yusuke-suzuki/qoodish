@@ -90,11 +90,12 @@ Rails.application.configure do
     Bullet.bullet_logger = true
     Bullet.raise = false
 
-    # A pin reaches its images through pin_revision_images, so preloading them
+    # A revision reaches its images through a join table, so preloading them
     # loads the join rows too. Nothing reads those on their own, which is what
     # Bullet reports; not preloading them is not an option, since that is the
     # N+1 the preload exists to avoid.
     Bullet.add_safelist(type: :unused_eager_loading, class_name: 'PinRevision', association: :pin_revision_images)
+    Bullet.add_safelist(type: :unused_eager_loading, class_name: 'MapRevision', association: :map_revision_images)
   end
 
   config.hosts << 'host.docker.internal'

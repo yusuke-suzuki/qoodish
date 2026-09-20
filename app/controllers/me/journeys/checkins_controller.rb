@@ -13,7 +13,10 @@ module Me
       def update
         journey = current_user.journeys.find_by!(id: params[:journey_id])
 
-        @checkin = journey.checkins.preload(images: :pin_revision_images).find_by!(id: params[:id])
+        @checkin = journey
+                   .checkins
+                   .preload(images: %i[pin_revision_images map_revision_images])
+                   .find_by!(id: params[:id])
         @checkin.update!(checkin_params)
       end
 

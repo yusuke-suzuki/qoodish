@@ -2,6 +2,7 @@ class Image < ApplicationRecord
   belongs_to :user
   belongs_to :imageable, polymorphic: true, optional: true
   has_many :pin_revision_images, dependent: :destroy
+  has_many :map_revision_images, dependent: :destroy
 
   validates :url,
             presence: true,

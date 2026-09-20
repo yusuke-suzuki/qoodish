@@ -7,12 +7,12 @@ module Me
         records: [current_user],
         associations: [
           { pins: [:revisions, :votes, :notifications, { comments: %i[votes notifications] }] },
-          { maps: [:images, :coauthorships, :bookmarks, :coauthorship_invitations, :votes, :notifications,
+          { maps: [:revisions, :coauthorships, :bookmarks, :coauthorship_invitations, :votes, :notifications,
                    :featured_maps,
                    { pins: [:revisions, :votes, :notifications, { comments: %i[votes notifications] }] }] },
           { journeys: [:milestones, { checkins: :images }] },
           { chapters: %i[votes images notifications] },
-          { owned_images: :pin_revision_images }
+          { owned_images: %i[pin_revision_images map_revision_images] }
         ]
       ).call
 
