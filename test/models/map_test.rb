@@ -86,6 +86,21 @@ class MapTest < ActiveSupport::TestCase
     assert_equal [image.id], map.reload.images.ids
   end
 
+  test 'clearing the images before the backfill is recorded' do
+    map = maps(:public_two)
+    map.update_column(:current_revision_id, nil)
+    map.revisions.destroy_all
+    users(:me).owned_images.create!(
+      imageable: map,
+      url: 'https://imagedelivery.net/mockhash/map-pre-backfill-cleared/public'
+    )
+
+    map.reload.revise!(user: users(:me), image_ids: [])
+
+    assert_equal 1, map.reload.revisions.count
+    assert_empty map.images.ids
+  end
+
   test 'content cannot be changed outside a revision' do
     map = maps(:public_one)
 
