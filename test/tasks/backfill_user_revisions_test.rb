@@ -25,6 +25,17 @@ class BackfillUserRevisionsTest < ActiveSupport::TestCase
     assert_equal updated_at, user.current_revision.created_at
   end
 
+  test 'an account left without a name does not stop the run' do
+    nameless = detach_revision(users(:me))
+    nameless.update_column(:name, nil)
+    later = detach_revision(users(:you))
+
+    run_task
+
+    assert_nil nameless.reload.current_revision.name
+    assert_equal later.name, later.reload.current_revision.name
+  end
+
   test 'a second run appends nothing' do
     detach_revision(users(:me))
 

@@ -27,6 +27,39 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert res['push_notification'].blank?
   end
 
+  test 'signing up should record the name the account starts with' do
+    newcomer = User.new(uid: 'newcomer-uid', name: 'Newcomer')
+
+    assert_difference 'User.count', 1 do
+      stub_google_auth(newcomer) do
+        post '/users', headers: { 'Authorization': 'Bearer dummytoken' }
+      end
+    end
+
+    assert_response :success
+
+    created = User.find_by!(uid: 'newcomer-uid')
+
+    assert_equal 'Newcomer', created.name
+    assert_equal 1, created.revisions.count
+    assert_equal created.revisions.last, created.current_revision
+    assert_equal 'Newcomer', created.current_revision.name
+  end
+
+  test 'signing up again should return the existing account' do
+    assert_no_difference 'User.count' do
+      stub_google_auth(users(:me)) do
+        post '/users', headers: { 'Authorization': 'Bearer dummytoken' }
+      end
+    end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal users(:me).id, res['id']
+  end
+
   test 'request with a uid should raise not found error' do
     stub_google_auth(users(:me)) do
       get "/users/#{users(:me).uid}", headers: { 'Authorization': 'Bearer dummytoken' }

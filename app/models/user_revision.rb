@@ -8,7 +8,4 @@ class UserRevision < ApplicationRecord
   alias_method :revisable, :user
 
   attr_readonly :user_id, :name, :biography
-
-  validates :name,
-            presence: true
 end

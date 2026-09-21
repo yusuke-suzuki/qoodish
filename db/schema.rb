@@ -370,7 +370,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
   create_table "user_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "biography"
     t.datetime "created_at", null: false
-    t.string "name", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id", "id"], name: "index_user_revisions_on_user_id_and_id"
