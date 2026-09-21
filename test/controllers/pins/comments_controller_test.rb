@@ -62,6 +62,24 @@ class Pins::CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_includes res['comments'].map { |comment| comment['body'] }, 'Second thoughts'
   end
 
+  test 'an edited comment is told apart from an untouched one in the payload' do
+    travel 1.hour do
+      stub_google_auth(users(:me)) do
+        patch "/pins/#{pins(:public_one).id}/comments/#{comments(:one).id}",
+              params: { comment: 'Second thoughts' },
+              headers: { 'Authorization': 'Bearer dummytoken' }
+      end
+    end
+
+    payload = JSON.parse(@response.body)['comments'].index_by { |comment| comment['id'] }
+
+    edited = payload[comments(:one).id]
+    untouched = payload[comments(:two).id]
+
+    assert_not_equal edited['created_at'], edited['updated_at']
+    assert_equal untouched['created_at'], untouched['updated_at']
+  end
+
   test 'update a comment of another user raises not found error' do
     stub_google_auth(users(:me)) do
       patch "/pins/#{pins(:public_one).id}/comments/#{comments(:two).id}",
