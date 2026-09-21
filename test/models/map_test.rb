@@ -72,33 +72,31 @@ class MapTest < ActiveSupport::TestCase
     assert_equal 'Renamed by the coauthor', revision.name
   end
 
-  test 'revising before the backfill keeps the images the legacy column holds' do
+  test 'a revision carries the images the one before it held' do
     map = maps(:public_two)
-    map.update_column(:current_revision_id, nil)
-    map.revisions.destroy_all
     image = users(:me).owned_images.create!(
-      imageable: map,
-      url: 'https://imagedelivery.net/mockhash/map-pre-backfill/public'
+      url: 'https://imagedelivery.net/mockhash/map-carried/public'
     )
+    map.revise!(user: users(:me), image_ids: [image.id])
 
-    map.reload.revise!(user: users(:me), name: 'Renamed')
+    map.revise!(user: users(:me), name: 'Renamed')
 
     assert_equal [image.id], map.reload.images.ids
   end
 
-  test 'clearing the images before the backfill is recorded' do
+  test 'clearing the images is recorded' do
     map = maps(:public_two)
-    map.update_column(:current_revision_id, nil)
-    map.revisions.destroy_all
-    users(:me).owned_images.create!(
-      imageable: map,
-      url: 'https://imagedelivery.net/mockhash/map-pre-backfill-cleared/public'
+    image = users(:me).owned_images.create!(
+      url: 'https://imagedelivery.net/mockhash/map-cleared/public'
     )
+    map.revise!(user: users(:me), image_ids: [image.id])
 
-    map.reload.revise!(user: users(:me), image_ids: [])
+    assert_difference -> { map.revisions.count }, 1 do
+      map.revise!(user: users(:me), image_ids: [])
+    end
 
-    assert_equal 1, map.reload.revisions.count
-    assert_empty map.images.ids
+    assert_empty map.reload.images.ids
+    assert_equal [image.id], map.revisions.order(:id).last(2).first.image_ids
   end
 
   test 'content cannot be changed outside a revision' do
@@ -228,6 +226,16 @@ class MapTest < ActiveSupport::TestCase
 
     assert_equal 'Renamed', map.reload.name
     assert_equal 2, map.images.count
+  end
+
+  test 'submitting an image another user uploaded is rejected' do
+    foreign_image = users(:you).owned_images.create!(
+      url: 'https://imagedelivery.net/mockhash/map-foreign/public'
+    )
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      maps(:public_two).revise!(user: users(:me), image_ids: [foreign_image.id])
+    end
   end
 
   test 'submitting more images than the limit is rejected' do

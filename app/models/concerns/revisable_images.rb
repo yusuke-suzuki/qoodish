@@ -40,12 +40,7 @@ module RevisableImages
     self.submitted_image_ids = nil
   end
 
-  # An edit that lands before the backfill reaches this record would otherwise
-  # write an empty revision and take the record out of the backfill's reach,
-  # losing the images the legacy column still holds.
   def carried_image_ids
-    return current_revision.image_ids if current_revision
-
-    Image.where(imageable: self).order(:id).ids
+    current_revision&.image_ids || []
   end
 end

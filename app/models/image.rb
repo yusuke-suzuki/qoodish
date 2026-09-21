@@ -1,6 +1,7 @@
 class Image < ApplicationRecord
+  self.ignored_columns += %w[imageable_id imageable_type]
+
   belongs_to :user
-  belongs_to :imageable, polymorphic: true, optional: true
   has_many :pin_revision_images, dependent: :destroy
   has_many :map_revision_images, dependent: :destroy
   has_many :chapter_revision_images, dependent: :destroy
@@ -14,9 +15,6 @@ class Image < ApplicationRecord
               with: /\A#{URI::DEFAULT_PARSER.make_regexp(%w[http https])}\z/,
               message: I18n.t('messages.api.invalid_uri')
             }
-  validate :uploader_matches_imageable_owner,
-           if: -> { imageable && (imageable_id_changed? || imageable_type_changed?) }
-
   before_destroy :delete_cloudflare_image
 
   def variants
@@ -26,11 +24,6 @@ class Image < ApplicationRecord
   end
 
   private
-
-  def uploader_matches_imageable_owner
-    expected_user_id = imageable.is_a?(User) ? imageable.id : imageable.user_id
-    errors.add(:user, :invalid) unless user_id == expected_user_id
-  end
 
   def delete_cloudflare_image
     image_id = Cloudflare::Images.extract_id(url)

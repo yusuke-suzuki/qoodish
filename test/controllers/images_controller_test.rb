@@ -21,7 +21,6 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
 
     image = Image.find(res['id'])
     assert_equal users(:me).id, image.user_id
-    assert_nil image.imageable_id
     assert_equal 'https://imagedelivery.net/mockhash/qoodish/test/mock-cf-id/public', image.url
   end
 end
