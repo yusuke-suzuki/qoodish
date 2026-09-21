@@ -6,7 +6,7 @@ module Revisable
   included do
     class_attribute :revision_attributes, instance_writer: false, default: []
 
-    attr_accessor :revised_by, :submitted_image_ids
+    attr_accessor :revised_by
 
     before_create :reject_creation_outside_a_revision
     before_save :reject_change_outside_a_revision, if: :persisted?
@@ -22,8 +22,8 @@ module Revisable
     def authored_by(user) = { user: user }
   end
 
-  def revise!(user:, image_ids: nil, **content)
-    assign_attributes(**content, revised_by: user, submitted_image_ids: image_ids)
+  def revise!(user:, **content)
+    assign_attributes(**content, revised_by: user)
     save!
 
     self
@@ -51,27 +51,23 @@ module Revisable
   end
 
   def append_revision
-    revision = revisions.build(
-      **slice(*revision_attributes).symbolize_keys,
-      user: revised_by,
-      status: status,
-      images_submitted: !submitted_image_ids.nil?,
-      image_ids: submitted_image_ids || carried_image_ids
-    )
+    revision = revisions.build(**revision_content)
 
-    self.revised_by = nil
-    self.submitted_image_ids = nil
+    forget_submission
 
     revision.save!
   end
 
-  # An edit that lands before the backfill reaches this record would otherwise
-  # write an empty revision and take the record out of the backfill's reach,
-  # losing the images the legacy column still holds.
-  def carried_image_ids
-    return current_revision.image_ids if current_revision
+  def revision_content
+    {
+      **slice(*revision_attributes).symbolize_keys,
+      user: revised_by,
+      status: status
+    }
+  end
 
-    Image.where(imageable: self).order(:id).ids
+  def forget_submission
+    self.revised_by = nil
   end
 
   def detach_current_revision

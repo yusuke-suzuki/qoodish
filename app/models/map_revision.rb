@@ -4,6 +4,7 @@ MAX_IMAGE_COUNT_PER_MAP = 1
 
 class MapRevision < ApplicationRecord
   include Revision
+  include RevisionImages
 
   belongs_to :map
   # A coauthor may revise a map they do not own, so erasing their account has
