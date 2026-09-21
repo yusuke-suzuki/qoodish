@@ -72,6 +72,29 @@ class MapTest < ActiveSupport::TestCase
     assert_equal 'Renamed by the coauthor', revision.name
   end
 
+  test 'revising before the backfill keeps the images the legacy column holds' do
+    map = maps(:public_two)
+    map.update_column(:current_revision_id, nil)
+    map.revisions.destroy_all
+    image = attach_legacy_image(map, 'map-pre-backfill')
+
+    map.reload.revise!(user: users(:me), name: 'Renamed')
+
+    assert_equal [image.id], map.reload.images.ids
+  end
+
+  test 'clearing the images before the backfill is recorded' do
+    map = maps(:public_two)
+    map.update_column(:current_revision_id, nil)
+    map.revisions.destroy_all
+    attach_legacy_image(map, 'map-pre-backfill-cleared')
+
+    map.reload.revise!(user: users(:me), image_ids: [])
+
+    assert_equal 1, map.reload.revisions.count
+    assert_empty map.images.ids
+  end
+
   test 'a revision carries the images the one before it held' do
     map = maps(:public_two)
     image = users(:me).owned_images.create!(
@@ -247,6 +270,18 @@ class MapTest < ActiveSupport::TestCase
   end
 
   private
+
+  # Image ignores the legacy columns, so the state the fallback exists for can
+  # only be written past it.
+  def attach_legacy_image(map, slug)
+    image = users(:me).owned_images.create!(
+      url: "https://imagedelivery.net/mockhash/#{slug}/public"
+    )
+    Image.connection.execute(
+      "UPDATE images SET imageable_type = 'Map', imageable_id = #{map.id} WHERE id = #{image.id}"
+    )
+    image
+  end
 
   def legacy_images(count)
     Array.new(count) do |index|
