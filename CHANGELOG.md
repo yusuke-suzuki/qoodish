@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.13.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.12.0...v4.13.0) (2026-09-21)
+
+
+### Features
+
+* keep what a journal said before an edit ([51c7463](https://github.com/yusuke-suzuki/qoodish/commit/51c7463ea9097525b465b1dc4467e5a9560b72c7))
+
+
+### Bug Fixes
+
+* append a revision only when something changed ([f7e2943](https://github.com/yusuke-suzuki/qoodish/commit/f7e2943457e4880fab2c9a2ec7e2c29509cdc049))
+* compare images against what a record shows ([07a9fd5](https://github.com/yusuke-suzuki/qoodish/commit/07a9fd5329ac88bb92f157f25bdb96c9ecffea1c))
+
 ## [4.12.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.11.0...v4.12.0) (2026-09-21)
 
 
