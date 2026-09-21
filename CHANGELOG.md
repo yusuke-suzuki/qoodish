@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.12.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.11.0...v4.12.0) (2026-09-21)
+
+
+### Features
+
+* let people comment on a chapter ([81525ac](https://github.com/yusuke-suzuki/qoodish/commit/81525acd164e5fd1c97133d8241e2fc56d926e56))
+
+
+### Bug Fixes
+
+* answer with the comment count everywhere ([71b4800](https://github.com/yusuke-suzuki/qoodish/commit/71b4800b7660941ac8a227d9b44c897005422f21))
+
 ## [4.11.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.10.0...v4.11.0) (2026-09-21)
 
 
