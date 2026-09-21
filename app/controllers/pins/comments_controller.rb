@@ -19,7 +19,7 @@ module Pins
       current_user
         .comments
         .find_by!(id: params[:id], commentable: pin)
-        .destroy!
+        .discard!
 
       @pin = current_user.referenceable_pins.preloaded.find(pin.id)
     end

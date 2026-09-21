@@ -118,6 +118,21 @@ class NotificationTest < ActiveSupport::TestCase
     assert_not notification.reload.renderable?
   end
 
+  test 'a notification of a deleted comment is not renderable' do
+    notification = Notification.create!(
+      notifiable: comments(:one),
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'liked'
+    )
+
+    assert_predicate notification, :renderable?
+
+    comments(:one).discard!
+
+    assert_not notification.reload.renderable?
+  end
+
   test 'a notification of a chapter reverted to draft is still renderable' do
     chapter = chapters(:you_published_on_my_map)
     notification = Notification.create!(

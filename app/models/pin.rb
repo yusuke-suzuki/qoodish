@@ -18,7 +18,8 @@ class Pin < ApplicationRecord
            inverse_of: :pin
   has_many :images, through: :current_revision
   has_many :notifications, as: :notifiable, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
+  has_many :comments, -> { not_deleted }, as: :commentable, inverse_of: :commentable
+  has_many :all_comments, class_name: 'Comment', as: :commentable, dependent: :destroy, inverse_of: :commentable
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :milestones, dependent: :nullify

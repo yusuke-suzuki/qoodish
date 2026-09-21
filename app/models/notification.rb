@@ -51,7 +51,7 @@ class Notification < ApplicationRecord
     return false if notifier.blank?
 
     case notifiable
-    when Comment then visible?(notifiable.commentable)
+    when Comment then visible?(notifiable) && visible?(notifiable.commentable)
     else visible?(notifiable)
     end
   end
@@ -135,7 +135,7 @@ class Notification < ApplicationRecord
   def visible?(record)
     return false if record.blank?
 
-    !record.is_a?(Revisable) || !record.deleted?
+    !record.respond_to?(:deleted?) || !record.deleted?
   end
 
   def broadcast_web_push_later

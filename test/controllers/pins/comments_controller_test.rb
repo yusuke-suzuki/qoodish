@@ -34,7 +34,7 @@ class Pins::CommentsControllerTest < ActionDispatch::IntegrationTest
   test 'destroy removes own comment' do
     pin = pins(:public_one)
 
-    assert_difference 'Comment.count', -1 do
+    assert_no_difference 'Comment.count' do
       stub_google_auth(users(:me)) do
         delete "/pins/#{pin.id}/comments/#{comments(:one).id}",
                headers: { 'Authorization': 'Bearer dummytoken' }
@@ -42,10 +42,22 @@ class Pins::CommentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
+    assert_predicate comments(:one).reload, :deleted?
 
     res = JSON.parse(@response.body)
 
     assert_not_includes res['comments'].map { |comment| comment['id'] }, comments(:one).id
+  end
+
+  test 'destroy a comment already removed raises not found error' do
+    comments(:one).discard!
+
+    stub_google_auth(users(:me)) do
+      delete "/pins/#{pins(:public_one).id}/comments/#{comments(:one).id}",
+             headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :not_found
   end
 
   test 'destroy a comment of another user raises not found error' do
