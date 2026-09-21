@@ -10,13 +10,13 @@ module Me
 
     def update
       @journal = Journal.find_by!(user: current_user)
-      @journal.update!(journal_params)
+      @journal.revise!(user: current_user, **journal_params)
     end
 
     private
 
     def journal_params
-      params.permit(:title, :description)
+      params.permit(:title, :description).to_h.symbolize_keys
     end
   end
 end

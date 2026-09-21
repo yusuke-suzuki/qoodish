@@ -8,7 +8,7 @@
 created = 0
 
 User.where.missing(:journal).find_each do |user|
-  user.create_journal!(title: "#{user.name}'s journal".truncate(50))
+  Journal.record!(user: user, title: "#{user.name}'s journal".truncate(50))
   created += 1
 end
 

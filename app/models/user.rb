@@ -179,6 +179,6 @@ class User < ApplicationRecord
   end
 
   def create_default_journal
-    create_journal!(title: "#{name}'s journal".truncate(50))
+    Journal.record!(user: self, title: "#{name}'s journal".truncate(50))
   end
 end

@@ -1,7 +1,17 @@
 class Journal < ApplicationRecord
+  include Revisable
+
+  self.revision_attributes = %i[title description]
+
   belongs_to :user
+  belongs_to :current_revision, class_name: 'JournalRevision', optional: true
   has_many :chapters, through: :user
   has_many :bookmarks, class_name: 'JournalBookmark', dependent: :destroy
+  has_many :revisions,
+           -> { order(:id) },
+           class_name: 'JournalRevision',
+           dependent: :destroy,
+           inverse_of: :journal
 
   validates :title,
             presence: {
