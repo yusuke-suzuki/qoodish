@@ -6,19 +6,20 @@
 #
 # Two counts must both read 0 before the drop migration ships:
 #
-#   - a revisable record with no current revision still answers for its images
-#     through the legacy column, so it would come back holding none.
-#   - a legacy attachment no revision carries, and that is no account's avatar,
-#     is an image the record shows today and would stop showing.
+#   - a record with no current revision still answers for its images through
+#     the legacy column, so it would come back holding none.
+#   - a legacy attachment no revision carries is an image the record shows
+#     today and would stop showing.
+#
+# Only the four models whose revisions carry images are counted. An avatar is
+# not: it moved to users.image_id, and the attachment a replaced one leaves
+# behind points at an image nothing renders.
 class AuditLegacyImageAttachments
   REVISABLE_TABLES = %w[
     chapters
-    comments
-    journals
     journey_checkins
     maps
     pins
-    users
   ].freeze
 
   REVISION_IMAGE_TABLES = %w[
@@ -51,8 +52,8 @@ class AuditLegacyImageAttachments
     count_of(<<~SQL.squish)
       SELECT COUNT(*) FROM images
       WHERE imageable_id IS NOT NULL
+        AND imageable_type <> 'User'
         AND id NOT IN (#{carried})
-        AND id NOT IN (SELECT image_id FROM users WHERE image_id IS NOT NULL)
     SQL
   end
 
