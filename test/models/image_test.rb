@@ -1,39 +1,13 @@
 require 'test_helper'
 
 class ImageTest < ActiveSupport::TestCase
-  test 'allows attaching an image to a Map owned by the uploader' do
+  test 'an image no longer answers for what it is attached to' do
     image = users(:me).owned_images.create!(
-      url: 'https://imagedelivery.net/mockhash/own-map-image/public'
+      url: 'https://imagedelivery.net/mockhash/retired-attachment/public'
     )
 
-    assert image.update(imageable: maps(:private))
-  end
-
-  test 'rejects attaching an image to a Map owned by another user' do
-    image = users(:me).owned_images.create!(
-      url: 'https://imagedelivery.net/mockhash/foreign-map-image/public'
-    )
-
-    refute image.update(imageable: maps(:private_unfollowing))
-    assert_includes image.errors[:user], I18n.t('errors.messages.invalid')
-  end
-
-  test 'rejects attaching an image to a Pin owned by another user' do
-    image = users(:me).owned_images.create!(
-      url: 'https://imagedelivery.net/mockhash/foreign-pin-image/public'
-    )
-
-    refute image.update(imageable: pins(:private_you))
-    assert_includes image.errors[:user], I18n.t('errors.messages.invalid')
-  end
-
-  test 'rejects attaching an image to a different User as imageable' do
-    image = users(:me).owned_images.create!(
-      url: 'https://imagedelivery.net/mockhash/foreign-user-image/public'
-    )
-
-    refute image.update(imageable: users(:you))
-    assert_includes image.errors[:user], I18n.t('errors.messages.invalid')
+    assert_not_respond_to image, :imageable
+    assert_not_includes image.attributes.keys, 'imageable_id'
   end
 
   test 'variants returns named variant URLs alongside the base url for a Cloudflare image' do
