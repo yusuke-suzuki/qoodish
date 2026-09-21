@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.14.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.13.0...v4.14.0) (2026-09-21)
+
+
+### Features
+
+* keep what a profile said before an edit ([aa0f139](https://github.com/yusuke-suzuki/qoodish/commit/aa0f139bd8075e6b5d7579d5442fe8137d88996d))
+
+
+### Bug Fixes
+
+* keep the legacy fallback until the drop ([6f30693](https://github.com/yusuke-suzuki/qoodish/commit/6f30693f48482e39e2f00e7354f6354c45c4b783))
+* let the log hold a name an account never had ([427e759](https://github.com/yusuke-suzuki/qoodish/commit/427e7596d9f8d438beeef9bd9bb6241fd426e0cf))
+
 ## [4.13.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.12.0...v4.13.0) (2026-09-21)
 
 
