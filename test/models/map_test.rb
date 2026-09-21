@@ -127,6 +127,15 @@ class MapTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::ReadonlyAttributeError) { revision.update!(name: 'rewritten') }
   end
 
+  test 'revising with what the map already says appends nothing' do
+    map = maps(:public_one)
+
+    assert_no_difference -> { map.revisions.count } do
+      map.revise!(user: users(:me), name: map.name, description: map.description)
+      map.revise!(user: users(:me), image_ids: map.images.ids)
+    end
+  end
+
   test 'a revision keeps the images it was written with' do
     revision = record_revision(maps(:public_two), [images(:one)])
 

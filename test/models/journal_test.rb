@@ -76,6 +76,15 @@ class JournalTest < ActiveSupport::TestCase
     assert_equal 'Notes from my adventures.', journal.revisions.first.description
   end
 
+  test 'revising with what the journal already says appends nothing' do
+    journal = journals(:my_journal)
+
+    assert_no_difference -> { journal.revisions.count } do
+      journal.revise!(user: users(:me), title: journal.title, description: journal.description)
+      journal.revise!(user: users(:me))
+    end
+  end
+
   test 'a revision cannot be rewritten' do
     revision = journals(:my_journal).current_revision
 
