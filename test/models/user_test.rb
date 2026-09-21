@@ -60,6 +60,84 @@ class UserTest < ActiveSupport::TestCase
     assert_nil user.reload.image_id
   end
 
+  test 'record! writes the first revision and points the account at it' do
+    user = User.record!(uid: 'record-uid', name: 'Recorded')
+
+    assert_equal 1, user.revisions.count
+    assert_equal user.revisions.last, user.current_revision
+    assert_equal 'Recorded', user.current_revision.name
+  end
+
+  test 'revise! appends a revision and leaves the previous one untouched' do
+    user = users(:me)
+    previous = user.current_revision
+
+    user.revise!(user: user, name: 'Renamed', biography: 'Rewritten')
+
+    assert_equal 'Renamed', user.reload.name
+    assert_equal 2, user.revisions.count
+    assert_equal user.revisions.last, user.current_revision
+    assert_equal 'watame', previous.reload.name
+    assert_equal 'This is a biography', previous.biography
+  end
+
+  test 'the log keeps a biography that was cleared' do
+    user = users(:me)
+
+    user.revise!(user: user, biography: '')
+
+    assert_equal '', user.reload.biography
+    assert_equal 'This is a biography', user.revisions.first.biography
+  end
+
+  test 'revising with what the account already says appends nothing' do
+    user = users(:me)
+
+    assert_no_difference -> { user.revisions.count } do
+      user.revise!(user: user, name: user.name, biography: user.biography)
+      user.revise!(user: user)
+    end
+  end
+
+  test 'changing the avatar alone appends nothing' do
+    user = users(:me)
+
+    assert_no_difference -> { user.revisions.count } do
+      user.revise!(user: user, image_id: images(:one).id)
+    end
+
+    assert_equal images(:one), user.reload.image
+  end
+
+  test 'a revision cannot be rewritten' do
+    revision = users(:me).current_revision
+
+    assert_raises(ActiveRecord::ReadonlyAttributeError) { revision.update!(name: 'rewritten') }
+  end
+
+  test 'the name cannot be changed outside a revision' do
+    user = users(:me)
+
+    assert_raises(ActiveRecord::ReadOnlyRecord) { user.update!(name: 'Renamed') }
+    assert_equal 'watame', user.reload.name
+  end
+
+  test 'an account cannot be created outside a revision' do
+    assert_raises(ActiveRecord::ReadOnlyRecord) do
+      User.create!(uid: 'sneaked-in-uid', name: 'Sneaked in')
+    end
+  end
+
+  test 'an account is not handed discard!' do
+    assert_not_respond_to users(:me), :discard!
+  end
+
+  test 'erasing an account destroys the revisions it wrote' do
+    assert_difference 'UserRevision.count', -1 do
+      stub_identity_platform { users(:you).destroy! }
+    end
+  end
+
   test 'erasing an account takes the avatar with it' do
     user = users(:you)
     avatar = user.owned_images.create!(

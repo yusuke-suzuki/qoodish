@@ -3,8 +3,10 @@ me:
   email: watame@qoodish.com
   uid: 1234abcde
   biography: This is a biography
+  current_revision: me
 
 you:
   name: okayu
   email: okayu@qoodish.com
   uid: 5678fghij
+  current_revision: you

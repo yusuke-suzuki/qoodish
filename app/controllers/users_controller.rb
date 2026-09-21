@@ -22,7 +22,7 @@ class UsersController < ApplicationController
     payload = RequestContext.jwt_payload
     raise Exceptions::Unauthorized if payload.blank?
 
-    @user = User.create!(
+    @user = User.record!(
       uid: payload['sub'],
       name: payload['name']
     )
