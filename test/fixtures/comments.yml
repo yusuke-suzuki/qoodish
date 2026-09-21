@@ -11,3 +11,10 @@ two:
   user: you
   body: This is another comment
   current_revision: two
+
+on_my_published_chapter:
+  commentable_type: Chapter
+  commentable: my_published
+  user: you
+  body: This is a comment on a chapter
+  current_revision: on_my_published_chapter

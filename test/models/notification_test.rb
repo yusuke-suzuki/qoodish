@@ -81,6 +81,28 @@ class NotificationTest < ActiveSupport::TestCase
     assert_equal "/pins/#{pins(:public_one).id}", notification.click_action
   end
 
+  test 'a liked comment on a chapter links to that chapter' do
+    notification = Notification.new(
+      notifiable: comments(:on_my_published_chapter),
+      notifier: users(:me),
+      recipient: users(:you),
+      key: 'liked'
+    )
+
+    assert_equal "/chapters/#{chapters(:my_published).id}", notification.click_action
+  end
+
+  test 'a comment on a chapter links to that chapter' do
+    notification = Notification.new(
+      notifiable: chapters(:my_published),
+      notifier: users(:you),
+      recipient: users(:me),
+      key: 'comment'
+    )
+
+    assert_equal "/chapters/#{chapters(:my_published).id}", notification.click_action
+  end
+
   test 'a pin is still named review for the clients that expect it' do
     notification = Notification.new(
       notifiable: pins(:public_one),

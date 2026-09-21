@@ -9,3 +9,9 @@ two:
   user: you
   body: This is another comment
   status: published
+
+on_my_published_chapter:
+  comment: on_my_published_chapter
+  user: you
+  body: This is a comment on a chapter
+  status: published

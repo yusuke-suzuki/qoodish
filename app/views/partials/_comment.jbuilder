@@ -1,0 +1,10 @@
+json.id comment.id
+json.author do
+  json.id comment.user.id
+  json.name comment.user.name
+  json.image comment.user.image_variants
+  json.image_url comment.user.image_url
+end
+json.body comment.body
+json.created_at comment.created_at
+json.updated_at comment.updated_at
