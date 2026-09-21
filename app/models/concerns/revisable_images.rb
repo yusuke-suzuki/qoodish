@@ -3,6 +3,8 @@
 module RevisableImages
   extend ActiveSupport::Concern
 
+  include Revisable
+
   included do
     attr_accessor :submitted_image_ids
   end
