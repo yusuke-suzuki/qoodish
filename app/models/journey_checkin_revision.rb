@@ -9,7 +9,7 @@ class JourneyCheckinRevision < ApplicationRecord
   belongs_to :journey_checkin
   belongs_to :user
   has_many :journey_checkin_revision_images, dependent: :destroy
-  has_many :images, -> { order(:id) }, through: :journey_checkin_revision_images
+  has_many :images, -> { order(:id) }, through: :journey_checkin_revision_images, extend: RevisionImages::WrittenOnce
 
   alias_method :revisable, :journey_checkin
 

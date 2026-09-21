@@ -11,7 +11,7 @@ class MapRevision < ApplicationRecord
   # to leave the revision standing with nobody named.
   belongs_to :user, optional: true
   has_many :map_revision_images, dependent: :destroy
-  has_many :images, -> { order(:id) }, through: :map_revision_images
+  has_many :images, -> { order(:id) }, through: :map_revision_images, extend: RevisionImages::WrittenOnce
 
   alias_method :revisable, :map
 

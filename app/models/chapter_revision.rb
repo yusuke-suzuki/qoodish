@@ -9,7 +9,7 @@ class ChapterRevision < ApplicationRecord
   belongs_to :chapter
   belongs_to :user
   has_many :chapter_revision_images, dependent: :destroy
-  has_many :images, -> { order(:id) }, through: :chapter_revision_images
+  has_many :images, -> { order(:id) }, through: :chapter_revision_images, extend: RevisionImages::WrittenOnce
 
   alias_method :revisable, :chapter
 
