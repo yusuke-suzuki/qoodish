@@ -50,6 +50,26 @@ class ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_equal journals(:my_journal).title, res['journal']['title']
   end
 
+  test 'show counts the comments left on the chapter' do
+    stub_google_auth(users(:you)) do
+      get "/chapters/#{chapters(:my_published).id}",
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_equal 1, JSON.parse(@response.body)['comments_count']
+  end
+
+  test 'show does not count a comment that was taken down' do
+    comments(:on_my_published_chapter).discard!(user: users(:you))
+
+    stub_google_auth(users(:you)) do
+      get "/chapters/#{chapters(:my_published).id}",
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_equal 0, JSON.parse(@response.body)['comments_count']
+  end
+
   test 'show a published chapter on a private map as a coauthor should be success' do
     stub_google_auth(users(:me)) do
       get "/chapters/#{chapters(:you_private_published_following).id}",

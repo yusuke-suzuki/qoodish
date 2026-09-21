@@ -12,7 +12,8 @@ module Me
                    { pins: [:revisions, :votes, :notifications,
                             { all_comments: %i[revisions votes notifications] }] }] },
           { journeys: [:milestones, { all_checkins: :revisions }] },
-          { chapters: %i[votes revisions notifications] },
+          { chapters: [:votes, :revisions, :notifications,
+                       { all_comments: %i[revisions votes notifications] }] },
           { owned_images: %i[pin_revision_images map_revision_images chapter_revision_images
                              journey_checkin_revision_images] }
         ]

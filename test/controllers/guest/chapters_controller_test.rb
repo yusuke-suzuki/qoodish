@@ -49,6 +49,12 @@ class Guest::ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_equal users(:me).biography, res['author']['biography']
   end
 
+  test 'show counts the comments left on the chapter' do
+    get "/guest/chapters/#{chapters(:my_published).id}"
+
+    assert_equal 1, JSON.parse(@response.body)['comments_count']
+  end
+
   test 'show a draft chapter should raise not found error' do
     get "/guest/chapters/#{chapters(:my_draft).id}"
 

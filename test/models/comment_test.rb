@@ -86,8 +86,18 @@ class CommentTest < ActiveSupport::TestCase
   test 'erasing an account destroys the comments it discarded' do
     comments(:two).discard!(user: users(:you))
 
-    assert_difference 'Comment.count', -1 do
+    assert_difference 'Comment.count', -users(:you).all_comments.count do
       stub_identity_platform { users(:you).destroy! }
+    end
+
+    assert_not Comment.exists?(comments(:two).id)
+  end
+
+  test 'destroying a chapter destroys the comments left on it' do
+    comments(:on_my_published_chapter).discard!(user: users(:you))
+
+    assert_difference 'Comment.count', -1 do
+      chapters(:my_published).destroy!
     end
   end
 

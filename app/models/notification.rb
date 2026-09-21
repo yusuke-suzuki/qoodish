@@ -61,20 +61,9 @@ class Notification < ApplicationRecord
     when 'coauthor_invited'
       '/coauthorship_invitations'
     when 'comment'
-      "/pins/#{notifiable.id}"
+      path_to(notifiable)
     when 'liked'
-      case notifiable_type
-      when Pin.name
-        "/pins/#{notifiable.id}"
-      when Map.name
-        "/maps/#{notifiable.id}"
-      when Comment.name
-        "/pins/#{notifiable.commentable.id}"
-      when Chapter.name
-        "/chapters/#{notifiable.id}"
-      else
-        ''
-      end
+      notifiable_type == Comment.name ? path_to(notifiable.commentable) : path_to(notifiable)
     when 'published'
       notifiable_type == Chapter.name ? "/chapters/#{notifiable.id}" : ''
     else
@@ -131,6 +120,15 @@ class Notification < ApplicationRecord
   end
 
   private
+
+  def path_to(record)
+    case record
+    when Pin then "/pins/#{record.id}"
+    when Map then "/maps/#{record.id}"
+    when Chapter then "/chapters/#{record.id}"
+    else ''
+    end
+  end
 
   def visible?(record)
     return false if record.blank?
