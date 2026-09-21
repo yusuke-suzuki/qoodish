@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.11.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.10.0...v4.11.0) (2026-09-21)
+
+
+### Features
+
+* keep what a comment said before an edit ([53f6c2d](https://github.com/yusuke-suzuki/qoodish/commit/53f6c2d351d7d2655bea39e0e52d40d98f526fdb))
+* remove a comment without dropping its row ([b9ff516](https://github.com/yusuke-suzuki/qoodish/commit/b9ff516a8e5b44354aaa429c9228af24fb1101f7))
+* say when a comment was last written ([73d182d](https://github.com/yusuke-suzuki/qoodish/commit/73d182d8c7af81f80a022580aea771bc9ae19cfd))
+
+
+### Bug Fixes
+
+* close every way into a written revision ([8141105](https://github.com/yusuke-suzuki/qoodish/commit/8141105dffd2a1870fd4fe3a377a0b8d9fb63360))
+
 ## [4.10.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.9.0...v4.10.0) (2026-09-20)
 
 
