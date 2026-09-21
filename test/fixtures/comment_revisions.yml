@@ -1,0 +1,11 @@
+one:
+  comment: one
+  user: me
+  body: This is a comment
+  status: published
+
+two:
+  comment: two
+  user: you
+  body: This is another comment
+  status: published

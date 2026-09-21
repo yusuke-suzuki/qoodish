@@ -21,7 +21,7 @@ Rails.application.routes.draw do
     scope module: :pins do
       resource :like, only: %i[create destroy]
       resources :likes, only: [:index]
-      resources :comments, only: %i[create destroy] do
+      resources :comments, only: %i[create update destroy] do
         scope module: :comments do
           resource :like, only: %i[create destroy]
           resources :likes, only: [:index]
