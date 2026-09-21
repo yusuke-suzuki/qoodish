@@ -57,6 +57,15 @@ class Me::ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_empty res['content']['root']['children']
   end
 
+  test 'show counts the comments left on the chapter' do
+    stub_google_auth(users(:me)) do
+      get "/me/chapters/#{chapters(:my_published).id}",
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_equal 1, JSON.parse(@response.body)['comments_count']
+  end
+
   test 'publish a draft chapter should be success' do
     stub_google_auth(users(:me)) do
       put "/me/chapters/#{chapters(:my_draft).id}",

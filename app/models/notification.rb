@@ -65,7 +65,7 @@ class Notification < ApplicationRecord
     when 'liked'
       notifiable_type == Comment.name ? path_to(notifiable.commentable) : path_to(notifiable)
     when 'published'
-      notifiable_type == Chapter.name ? "/chapters/#{notifiable.id}" : ''
+      path_to(notifiable)
     else
       ''
     end

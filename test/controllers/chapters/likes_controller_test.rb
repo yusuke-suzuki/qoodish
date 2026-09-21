@@ -26,6 +26,16 @@ class Chapters::LikesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'liked', notification.key
   end
 
+  test 'liking a chapter answers with the comments left on it' do
+    stub_google_auth(users(:you)) do
+      post "/chapters/#{chapters(:my_published).id}/like",
+           headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+    assert_equal 1, JSON.parse(@response.body)['comments_count']
+  end
+
   test 'liking a chapter twice is idempotent' do
     chapter = chapters(:you_published)
 
