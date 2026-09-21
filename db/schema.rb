@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_000012) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_000002) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -86,15 +86,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000012) do
     t.index ["user_id"], name: "index_coauthorships_on_user_id"
   end
 
+  create_table "comment_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.text "body", null: false
+    t.bigint "comment_id", null: false
+    t.datetime "created_at", null: false
+    t.string "status", default: "published", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["comment_id", "id"], name: "index_comment_revisions_on_comment_id_and_id"
+    t.index ["comment_id"], name: "index_comment_revisions_on_comment_id"
+    t.index ["user_id"], name: "index_comment_revisions_on_user_id"
+  end
+
   create_table "comments", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.text "body", null: false
     t.bigint "commentable_id", null: false
     t.string "commentable_type", null: false
     t.datetime "created_at", null: false
+    t.bigint "current_revision_id"
     t.string "status", default: "published", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
+    t.index ["current_revision_id"], name: "index_comments_on_current_revision_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
@@ -383,6 +397,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_000012) do
   add_foreign_key "coauthorship_invitations", "users", column: "inviter_id"
   add_foreign_key "coauthorships", "maps"
   add_foreign_key "coauthorships", "users"
+  add_foreign_key "comment_revisions", "comments"
+  add_foreign_key "comment_revisions", "users"
+  add_foreign_key "comments", "comment_revisions", column: "current_revision_id"
   add_foreign_key "featured_maps", "maps"
   add_foreign_key "images", "users"
   add_foreign_key "journal_bookmarks", "journals"

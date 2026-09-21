@@ -1,6 +1,18 @@
+# frozen_string_literal: true
+
 class Comment < ApplicationRecord
+  include Revisable
+
+  self.revision_attributes = %i[body]
+
   belongs_to :commentable, polymorphic: true
   belongs_to :user
+  belongs_to :current_revision, class_name: 'CommentRevision', optional: true
+  has_many :revisions,
+           -> { order(:id) },
+           class_name: 'CommentRevision',
+           dependent: :destroy,
+           inverse_of: :comment
   has_many :votes, as: :votable, dependent: :destroy
   has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :notifications, as: :notifiable, dependent: :destroy
@@ -19,10 +31,6 @@ class Comment < ApplicationRecord
             presence: true
 
   after_create :create_notification, unless: :on_yourself?
-
-  def discard!
-    update!(status: :deleted)
-  end
 
   def image_url
     commentable.image_url

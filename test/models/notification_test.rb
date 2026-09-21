@@ -128,7 +128,7 @@ class NotificationTest < ActiveSupport::TestCase
 
     assert_predicate notification, :renderable?
 
-    comments(:one).discard!
+    comments(:one).discard!(user: users(:me))
 
     assert_not notification.reload.renderable?
   end

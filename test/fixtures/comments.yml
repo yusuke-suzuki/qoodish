@@ -3,9 +3,11 @@ one:
   commentable: public_one
   user: me
   body: This is a comment
+  current_revision: one
 
 two:
   commentable_type: Pin
   commentable: public_one
   user: you
   body: This is another comment
+  current_revision: two
