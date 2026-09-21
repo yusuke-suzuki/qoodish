@@ -24,7 +24,7 @@ module RevisableImages
   def submitted_images_differ?
     return false if submitted_image_ids.nil?
 
-    submitted_image_ids.map(&:to_i).sort != (current_revision&.image_ids || []).sort
+    submitted_image_ids.map(&:to_i).sort != carried_image_ids.sort
   end
 
   def revision_content
