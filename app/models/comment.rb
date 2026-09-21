@@ -2,6 +2,7 @@
 
 class Comment < ApplicationRecord
   include Revisable
+  include RevisableStatus
 
   self.revision_attributes = %i[body]
 

@@ -5,6 +5,7 @@ MAX_CHECKIN_NOTE_LENGTH = 500
 class JourneyCheckin < ApplicationRecord
   include PinSnapshot
   include Revisable
+  include RevisableStatus
   include RevisableImages
 
   self.revision_attributes = %i[note checked_in_at]
