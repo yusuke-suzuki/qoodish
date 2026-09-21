@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_21_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_000004) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -162,12 +162,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000002) do
     t.index ["user_id"], name: "index_journal_bookmarks_on_user_id"
   end
 
+  create_table "journal_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.bigint "journal_id", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["journal_id", "id"], name: "index_journal_revisions_on_journal_id_and_id"
+    t.index ["journal_id"], name: "index_journal_revisions_on_journal_id"
+    t.index ["user_id"], name: "index_journal_revisions_on_user_id"
+  end
+
   create_table "journals", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.bigint "current_revision_id"
     t.string "description"
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["current_revision_id"], name: "index_journals_on_current_revision_id"
     t.index ["user_id"], name: "index_journals_on_user_id", unique: true
   end
 
@@ -404,6 +418,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000002) do
   add_foreign_key "images", "users"
   add_foreign_key "journal_bookmarks", "journals"
   add_foreign_key "journal_bookmarks", "users"
+  add_foreign_key "journal_revisions", "journals"
+  add_foreign_key "journal_revisions", "users"
+  add_foreign_key "journals", "journal_revisions", column: "current_revision_id"
   add_foreign_key "journals", "users"
   add_foreign_key "journey_checkin_revision_images", "images"
   add_foreign_key "journey_checkin_revision_images", "journey_checkin_revisions"

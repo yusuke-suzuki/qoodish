@@ -1,10 +1,10 @@
 my_journal:
+  journal: my_journal
   user: me
   title: My adventure journal
   description: Notes from my adventures.
-  current_revision: my_journal
 
 you_journal:
+  journal: you_journal
   user: you
   title: Your adventure journal
-  current_revision: you_journal
