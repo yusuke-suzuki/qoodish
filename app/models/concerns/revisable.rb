@@ -51,11 +51,18 @@ module Revisable
   end
 
   def append_revision
-    revision = revisions.build(**revision_content)
+    revision = revisions.build(**revision_content) if revised_anything?
 
     forget_submission
 
-    revision.save!
+    revision&.save!
+  end
+
+  # A request that submits what the record already says is not an edit, and a
+  # log that grows on every such request stops being a record of what changed.
+  def revised_anything?
+    id_previously_changed? ||
+      saved_changes.keys.map(&:to_sym).intersect?(guarded_attributes)
   end
 
   def revision_content

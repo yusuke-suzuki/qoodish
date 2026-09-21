@@ -17,6 +17,16 @@ module RevisableImages
 
   private
 
+  def revised_anything?
+    super || submitted_images_differ?
+  end
+
+  def submitted_images_differ?
+    return false if submitted_image_ids.nil?
+
+    submitted_image_ids.map(&:to_i).sort != (current_revision&.image_ids || []).sort
+  end
+
   def revision_content
     super.merge(
       images_submitted: !submitted_image_ids.nil?,
