@@ -4,6 +4,7 @@ MAX_IMAGE_COUNT_PER_CHAPTER = 1
 
 class ChapterRevision < ApplicationRecord
   include Revision
+  include RevisionImages
 
   belongs_to :chapter
   belongs_to :user

@@ -4,6 +4,7 @@ MAX_IMAGE_COUNT_PER_PIN = 4
 
 class PinRevision < ApplicationRecord
   include Revision
+  include RevisionImages
 
   belongs_to :pin
   belongs_to :user

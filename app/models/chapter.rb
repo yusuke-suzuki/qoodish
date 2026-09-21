@@ -6,6 +6,7 @@ CHAPTER_FEED_PER_PAGE = 12
 
 class Chapter < ApplicationRecord
   include Revisable
+  include RevisableImages
 
   EMPTY_FEATURE_COLLECTION = { 'type' => 'FeatureCollection', 'features' => [] }.freeze
 

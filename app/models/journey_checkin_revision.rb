@@ -4,6 +4,7 @@ MAX_IMAGE_COUNT_PER_CHECKIN = 4
 
 class JourneyCheckinRevision < ApplicationRecord
   include Revision
+  include RevisionImages
 
   belongs_to :journey_checkin
   belongs_to :user

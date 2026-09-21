@@ -1,5 +1,6 @@
 class Map < ApplicationRecord
   include Revisable
+  include RevisableImages
 
   # Shield running instances from the legacy columns the follow-up migration
   # drops, so in-flight INSERTs do not reference a column that is gone.
