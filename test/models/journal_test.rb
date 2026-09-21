@@ -37,7 +37,7 @@ class JournalTest < ActiveSupport::TestCase
 
   test 'a new user gets a default journal' do
     stub_identity_platform do
-      user = User.create!(uid: 'journal-test-uid', name: 'Journal Tester')
+      user = User.record!(uid: 'journal-test-uid', name: 'Journal Tester')
 
       assert_equal "Journal Tester's journal", user.journal.title
     end
@@ -45,7 +45,7 @@ class JournalTest < ActiveSupport::TestCase
 
   test 'the default journal starts with a revision of its own' do
     stub_identity_platform do
-      user = User.create!(uid: 'journal-revision-uid', name: 'Journal Tester')
+      user = User.record!(uid: 'journal-revision-uid', name: 'Journal Tester')
       journal = user.journal
 
       assert_equal 1, journal.revisions.count
@@ -100,7 +100,7 @@ class JournalTest < ActiveSupport::TestCase
 
   test 'a journal cannot be created outside a revision' do
     stub_identity_platform do
-      user = User.create!(uid: 'journal-guard-uid', name: 'Journal Tester')
+      user = User.record!(uid: 'journal-guard-uid', name: 'Journal Tester')
       user.journal.destroy!
 
       assert_raises(ActiveRecord::ReadOnlyRecord) do

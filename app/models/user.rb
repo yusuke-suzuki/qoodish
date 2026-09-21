@@ -1,4 +1,8 @@
 class User < ApplicationRecord
+  include Revisable
+
+  self.revision_attributes = %i[name biography]
+
   has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
   has_many :map_revisions, dependent: :nullify
@@ -27,6 +31,12 @@ class User < ApplicationRecord
   has_many :journal_bookmarks, dependent: :destroy
   has_many :bookmarked_journals, through: :journal_bookmarks, source: :journal
   belongs_to :image, optional: true
+  belongs_to :current_revision, class_name: 'UserRevision', optional: true
+  has_many :revisions,
+           -> { order(:id) },
+           class_name: 'UserRevision',
+           dependent: :destroy,
+           inverse_of: :user
   has_many :owned_images, class_name: 'Image', dependent: :destroy
   has_many :preferences,
            class_name: 'UserPreference',
@@ -54,6 +64,11 @@ class User < ApplicationRecord
     where('name LIKE ?', "%#{name}%")
       .limit(20)
   }
+
+  def self.record!(**content)
+    account = new
+    account.revise!(user: account, **content)
+  end
 
   def web_push_preferences
     UserPreference.effective_web_push(preferences.last&.web_push)

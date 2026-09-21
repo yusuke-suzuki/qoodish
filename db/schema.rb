@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_21_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -367,14 +367,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000004) do
     t.index ["user_id"], name: "index_user_preferences_on_user_id"
   end
 
+  create_table "user_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "biography"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "id"], name: "index_user_revisions_on_user_id_and_id"
+    t.index ["user_id"], name: "index_user_revisions_on_user_id"
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "biography"
     t.datetime "created_at", null: false
+    t.bigint "current_revision_id"
     t.string "email"
     t.bigint "image_id"
     t.string "name"
     t.string "uid", null: false
     t.datetime "updated_at", null: false
+    t.index ["current_revision_id"], name: "index_users_on_current_revision_id"
     t.index ["image_id"], name: "index_users_on_image_id"
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
@@ -447,5 +459,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000004) do
   add_foreign_key "pins", "pin_revisions", column: "current_revision_id"
   add_foreign_key "pins", "users"
   add_foreign_key "user_preferences", "users"
+  add_foreign_key "user_revisions", "users"
   add_foreign_key "users", "images", on_delete: :nullify
+  add_foreign_key "users", "user_revisions", column: "current_revision_id"
 end

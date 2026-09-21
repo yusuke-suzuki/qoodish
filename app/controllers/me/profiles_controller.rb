@@ -7,7 +7,7 @@ module Me
     end
 
     def update
-      current_user.update!(profile_params)
+      current_user.revise!(user: current_user, **profile_params)
       @user = current_user
     end
 

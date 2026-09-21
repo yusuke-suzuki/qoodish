@@ -33,6 +33,20 @@ class Me::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'Renamed', users(:me).reload.name
   end
 
+  test 'update should record what the profile said before the edit' do
+    assert_difference -> { users(:me).revisions.count }, 1 do
+      stub_google_auth(users(:me)) do
+        put '/me/profile',
+            params: { name: 'Renamed' },
+            headers: { 'Authorization': 'Bearer dummytoken' },
+            as: :json
+      end
+    end
+
+    assert_equal 'watame', users(:me).revisions.first.name
+    assert_equal 'Renamed', users(:me).reload.current_revision.name
+  end
+
   test 'update should set the avatar from a one-element image_ids' do
     stub_google_auth(users(:me)) do
       put '/me/profile',
