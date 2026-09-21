@@ -144,9 +144,49 @@ jobs:
             --project=$PROJECT_ID \
             --region=$REGION
 
+  migrate:
+    needs:
+      - deploy-runner
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Run db:migrate on the Job carrying this image
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+        run: |
+          EXECUTION=$(gcloud run jobs execute $JOB_NAME \
+            --args=bin/rails,db:migrate \
+            --wait \
+            --format='value(metadata.name)' \
+            --project=$PROJECT_ID \
+            --region=$REGION)
+
+          echo "Migration execution: ${EXECUTION:-unknown}"
+
+          if [ -n "$EXECUTION" ]; then
+            FAILED=$(gcloud run jobs executions describe $EXECUTION \
+              --format='value(status.failedCount)' \
+              --project=$PROJECT_ID \
+              --region=$REGION)
+
+            if [ -n "$FAILED" ] && [ "$FAILED" != "0" ]; then
+              echo "The migration execution reported $FAILED failed task(s)"
+              exit 1
+            fi
+          fi
+
   deploy-api:
     needs:
-      - build-and-push-image
+      - migrate
     permissions:
       contents: read
       id-token: write
