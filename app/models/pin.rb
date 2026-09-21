@@ -4,6 +4,7 @@ PIN_FEED_PER_PAGE = 12
 
 class Pin < ApplicationRecord
   include Revisable
+  include RevisableStatus
   include RevisableImages
 
   self.revision_attributes = %i[name comment latitude longitude]

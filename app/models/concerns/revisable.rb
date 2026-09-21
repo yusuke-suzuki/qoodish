@@ -29,10 +29,6 @@ module Revisable
     self
   end
 
-  def discard!(user:)
-    revise!(user: user, status: :deleted)
-  end
-
   private
 
   def reject_creation_outside_a_revision
@@ -45,9 +41,13 @@ module Revisable
   # resolve, so only a record already pointing at a revision is held to this.
   def reject_change_outside_a_revision
     return if revised_by || current_revision_id.nil?
-    return if (changed.map(&:to_sym) & (revision_attributes + [:status])).empty?
+    return if (changed.map(&:to_sym) & guarded_attributes).empty?
 
     raise ActiveRecord::ReadOnlyRecord, "#{self.class.name} content changes through revise!"
+  end
+
+  def guarded_attributes
+    revision_attributes
   end
 
   def append_revision
@@ -61,8 +61,7 @@ module Revisable
   def revision_content
     {
       **slice(*revision_attributes).symbolize_keys,
-      user: revised_by,
-      status: status
+      user: revised_by
     }
   end
 

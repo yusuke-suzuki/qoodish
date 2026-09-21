@@ -1,5 +1,6 @@
 class Map < ApplicationRecord
   include Revisable
+  include RevisableStatus
   include RevisableImages
 
   # Shield running instances from the legacy columns the follow-up migration
