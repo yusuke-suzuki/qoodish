@@ -24,7 +24,7 @@ module Me
 
       ActiveRecord::Associations::Preloader.new(
         records: [@pin],
-        associations: [:map, :images, { comments: { user: :image } }, :voters, :votes]
+        associations: [:map, :images, { comments: [{ user: :image }, :votes] }, :voters, :votes]
       ).call
     end
 

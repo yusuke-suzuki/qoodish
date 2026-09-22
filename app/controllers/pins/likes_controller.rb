@@ -13,7 +13,7 @@ module Pins
 
       current_user.liked!(pin)
 
-      @pin = current_user.referenceable_pins.preloaded.find(pin.id)
+      @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
     end
 
     def destroy
@@ -21,7 +21,7 @@ module Pins
 
       current_user.unliked!(pin)
 
-      @pin = current_user.referenceable_pins.preloaded.find(pin.id)
+      @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
     end
   end
 end

@@ -33,6 +33,10 @@ class Comment < ApplicationRecord
 
   after_create :create_notification, unless: :on_yourself?
 
+  def liked_by?(user)
+    votes.any? { |vote| vote.voter_id == user.id }
+  end
+
   def image_url
     commentable.image_url
   end

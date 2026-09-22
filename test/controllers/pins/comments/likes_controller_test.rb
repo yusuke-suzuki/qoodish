@@ -14,6 +14,11 @@ class Pins::Comments::LikesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal comments(:two), Vote.last.votable
     assert_equal users(:me), Vote.last.voter
+
+    liked = JSON.parse(@response.body)['comments'].find { |it| it['id'] == comments(:two).id }
+
+    assert_equal 1, liked['likes_count']
+    assert liked['liked']
   end
 
   test 'destroy unlikes the comment' do

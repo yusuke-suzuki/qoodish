@@ -20,6 +20,8 @@ json.comments pin.comments do |comment|
     json.image_url comment.user.image_url
   end
   json.body comment.body
+  json.liked comment.liked_by?(current_user)
+  json.likes_count comment.votes.size
   json.created_at comment.created_at
   json.updated_at comment.updated_at
 end
