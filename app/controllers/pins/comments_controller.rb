@@ -11,7 +11,7 @@ module Pins
         body: params[:comment]
       )
 
-      @pin = current_user.referenceable_pins.preloaded.find(pin.id)
+      @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
     end
 
     def update
@@ -19,7 +19,7 @@ module Pins
 
       own_comment_on(pin).revise!(user: current_user, body: params[:comment])
 
-      @pin = current_user.referenceable_pins.preloaded.find(pin.id)
+      @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
     end
 
     def destroy
@@ -27,7 +27,7 @@ module Pins
 
       own_comment_on(pin).discard!(user: current_user)
 
-      @pin = current_user.referenceable_pins.preloaded.find(pin.id)
+      @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
     end
 
     private

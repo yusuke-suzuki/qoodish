@@ -99,7 +99,7 @@ class Pin < ApplicationRecord
   }
 
   scope :preloaded_with_votes, lambda {
-    preloaded.preload(:voters, :votes)
+    preloaded.preload(:voters, :votes, comments: :votes)
   }
 
   def image_url

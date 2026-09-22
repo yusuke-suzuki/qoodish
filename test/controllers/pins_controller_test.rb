@@ -16,6 +16,39 @@ class PinsControllerTest < ActionDispatch::IntegrationTest
                end)
   end
 
+  test 'a pin says how many likes each of its comments holds' do
+    users(:me).liked!(comments(:two))
+
+    stub_google_auth(users(:me)) do
+      get "/pins/#{pins(:public_one).id}", headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    served = JSON.parse(@response.body)['comments'].index_by { |comment| comment['id'] }
+
+    assert_equal 1, served[comments(:two).id]['likes_count']
+    assert served[comments(:two).id]['liked']
+
+    assert_equal 0, served[comments(:one).id]['likes_count']
+    assert_not served[comments(:one).id]['liked']
+  end
+
+  test 'a comment liked by someone else is not liked by the reader' do
+    users(:you).liked!(comments(:one))
+
+    stub_google_auth(users(:me)) do
+      get "/pins/#{pins(:public_one).id}", headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    comment = JSON.parse(@response.body)['comments'].find { |it| it['id'] == comments(:one).id }
+
+    assert_equal 1, comment['likes_count']
+    assert_not comment['liked']
+  end
+
   test 'request to single pin on unfollowing private map should raise not found error' do
     stub_google_auth(users(:me)) do
       get "/pins/#{pins(:private_unfollowing).id}", headers: { 'Authorization': 'Bearer dummytoken' }
