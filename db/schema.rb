@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -33,9 +33,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
 
   create_table "chapter_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "chapter_id", null: false
-    t.json "content", null: false
+    t.text "content", size: :long, null: false, collation: "utf8mb4_bin"
     t.datetime "created_at", null: false
-    t.json "map_features", null: false
+    t.text "map_features", size: :long, null: false, collation: "utf8mb4_bin"
     t.string "status", default: "draft", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
@@ -43,14 +43,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
     t.index ["chapter_id", "id"], name: "index_chapter_revisions_on_chapter_id_and_id"
     t.index ["chapter_id"], name: "index_chapter_revisions_on_chapter_id"
     t.index ["user_id"], name: "index_chapter_revisions_on_user_id"
+    t.check_constraint "json_valid(`content`)", name: "content"
+    t.check_constraint "json_valid(`map_features`)", name: "map_features"
   end
 
   create_table "chapters", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.json "content", null: false
+    t.text "content", size: :long, null: false, collation: "utf8mb4_bin"
     t.datetime "created_at", null: false
     t.bigint "current_revision_id"
     t.bigint "journey_id"
-    t.json "map_features", null: false
+    t.text "map_features", size: :long, null: false, collation: "utf8mb4_bin"
     t.bigint "map_id"
     t.string "status", default: "draft", null: false
     t.string "title", null: false
@@ -60,6 +62,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
     t.index ["journey_id"], name: "index_chapters_on_journey_id", unique: true
     t.index ["map_id"], name: "index_chapters_on_map_id"
     t.index ["user_id", "status"], name: "index_chapters_on_user_id_and_status"
+    t.check_constraint "json_valid(`content`)", name: "content"
+    t.check_constraint "json_valid(`map_features`)", name: "map_features"
   end
 
   create_table "coauthorship_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -132,12 +136,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
 
   create_table "images", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "imageable_id"
-    t.string "imageable_type"
     t.datetime "updated_at", null: false
     t.string "url", null: false
     t.bigint "user_id", null: false
-    t.index ["imageable_type", "imageable_id"], name: "index_images_on_imageable"
     t.index ["url"], name: "index_images_on_url", unique: true
     t.index ["user_id"], name: "index_images_on_user_id"
   end
@@ -289,8 +290,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
     t.decimal "latitude", precision: 16, scale: 6, null: false
     t.decimal "longitude", precision: 16, scale: 6, null: false
     t.string "name", null: false
-    t.integer "position", null: false
     t.bigint "pin_id"
+    t.integer "position", null: false
     t.datetime "updated_at", null: false
     t.index ["journey_id", "pin_id"], name: "index_milestones_on_journey_id_and_pin_id", unique: true
     t.index ["journey_id", "position"], name: "index_milestones_on_journey_id_and_position"
@@ -363,8 +364,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_000006) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.json "web_push", null: false
+    t.text "web_push", size: :long, null: false, collation: "utf8mb4_bin"
     t.index ["user_id"], name: "index_user_preferences_on_user_id"
+    t.check_constraint "json_valid(`web_push`)", name: "web_push"
   end
 
   create_table "user_revisions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|

@@ -26,8 +26,8 @@ class PinRevision < ApplicationRecord
   validates :longitude,
             presence: true
   # The limit judges what a caller may submit, not what a revision may record.
-  # A pin backfilled from the legacy imageable column can already hold more
-  # images than it allows, and its history has to stay recordable and its later
+  # A pin whose first revision was backfilled can already hold more images
+  # than it allows, and its history has to stay recordable and its later
   # revisions possible.
   validates :images,
             length: {
