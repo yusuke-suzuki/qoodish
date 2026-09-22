@@ -20,8 +20,8 @@ class ChapterRevision < ApplicationRecord
   validates :title,
             presence: true
   # The limit judges what a caller may submit, not what a revision may record.
-  # A chapter backfilled from the legacy imageable column can already hold more
-  # images than it allows, and its history has to stay recordable and its later
+  # A chapter whose first revision was backfilled can already hold more images
+  # than it allows, and its history has to stay recordable and its later
   # revisions possible.
   validates :images,
             length: { maximum: MAX_IMAGE_COUNT_PER_CHAPTER },

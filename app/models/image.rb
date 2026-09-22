@@ -1,6 +1,4 @@
 class Image < ApplicationRecord
-  self.ignored_columns += %w[imageable_id imageable_type]
-
   belongs_to :user
   has_many :pin_revision_images, dependent: :destroy
   has_many :map_revision_images, dependent: :destroy
