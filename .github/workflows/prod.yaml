@@ -82,7 +82,7 @@ jobs:
           kustomize build .
           echo "----------------------------"
 
-          kustomize build . | gcloud beta run jobs replace - \
+          kustomize build . | gcloud run jobs replace - \
             --project=$PROJECT_ID \
             --region=$REGION
 
@@ -161,14 +161,14 @@ jobs:
           kustomize build .
           echo "----------------------------------"
 
-          kustomize build . | gcloud beta run services replace - \
+          kustomize build . | gcloud run services replace - \
             --project=$PROJECT_ID \
             --region=$REGION
       - name: Update traffic tag to the new revision
         env:
           CLOUDSDK_CORE_DISABLE_PROMPTS: 1
         run: |
-          gcloud beta run services update-traffic ${{ env.SERVICE_NAME }} \
+          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
             --update-tags=${{ steps.normalize.outputs.tag }}=LATEST \
             --project=$PROJECT_ID \
             --region=$REGION
