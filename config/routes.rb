@@ -75,7 +75,6 @@ Rails.application.routes.draw do
       resource :bookmark, only: %i[create destroy]
     end
   end
-  resources :inappropriate_contents, only: [:create]
   resources :reports, only: [:create]
   resources :images, only: [:create]
 
