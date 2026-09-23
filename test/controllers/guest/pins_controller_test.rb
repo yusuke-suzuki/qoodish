@@ -18,12 +18,17 @@ class Guest::PinsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'show tells a guest how many likes the pin holds' do
-    users(:me).liked!(pins(:public_one))
+    pin = pins(:public_two)
 
-    get "/guest/pins/#{pins(:public_one).id}"
+    get "/guest/pins/#{pin.id}"
 
-    assert_equal pins(:public_one).votes.count,
-                 JSON.parse(@response.body)['likes_count']
+    assert_equal pin.votes.count, JSON.parse(@response.body)['likes_count']
+
+    users(:me).liked!(pin)
+
+    get "/guest/pins/#{pin.id}"
+
+    assert_equal pin.votes.count, JSON.parse(@response.body)['likes_count']
   end
 
   test 'show does not tell a guest whether the pin was liked' do

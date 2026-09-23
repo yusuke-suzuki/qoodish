@@ -9,6 +9,7 @@ class Chapter < ApplicationRecord
   include RevisableStatus
   include RevisableImages
   include Moderatable
+  include Votable
 
   EMPTY_FEATURE_COLLECTION = { 'type' => 'FeatureCollection', 'features' => [] }.freeze
 
@@ -30,8 +31,6 @@ class Chapter < ApplicationRecord
            class_name: 'ChapterRevision',
            dependent: :destroy,
            inverse_of: :chapter
-  has_many :votes, as: :votable, dependent: :destroy
-  has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :images, through: :current_revision
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :comments, -> { not_deleted }, as: :commentable, inverse_of: :commentable
@@ -105,10 +104,6 @@ class Chapter < ApplicationRecord
 
   def map_features=(value)
     super(value.is_a?(Hash) ? value.deep_stringify_keys : value)
-  end
-
-  def liked_by?(user)
-    votes.any? { |vote| vote.voter_id == user.id }
   end
 
   def image_url
