@@ -63,7 +63,11 @@ Rails.application.routes.draw do
   resources :chapters, only: %i[index show] do
     scope module: :chapters do
       resource :like, only: %i[create destroy]
-      resources :comments, only: %i[index create update destroy]
+      resources :comments, only: %i[index create update destroy] do
+        scope module: :comments do
+          resource :like, only: %i[create destroy]
+        end
+      end
     end
   end
   resources :journals, only: [:show] do

@@ -28,6 +28,34 @@ class Chapters::CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_empty JSON.parse(@response.body)
   end
 
+  test 'index tells the caller how the comment was received' do
+    users(:me).liked!(comments(:on_my_published_chapter))
+
+    stub_google_auth(users(:me)) do
+      get "/chapters/#{chapters(:my_published).id}/comments",
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    res = JSON.parse(@response.body).first
+
+    assert res['liked']
+    assert_equal 1, res['likes_count']
+  end
+
+  test 'index does not claim a like the caller never left' do
+    users(:you).liked!(comments(:on_my_published_chapter))
+
+    stub_google_auth(users(:me)) do
+      get "/chapters/#{chapters(:my_published).id}/comments",
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    res = JSON.parse(@response.body).first
+
+    assert_not res['liked']
+    assert_equal 1, res['likes_count']
+  end
+
   test 'index marks the caller own comment editable' do
     stub_google_auth(users(:you)) do
       get "/chapters/#{chapters(:my_published).id}/comments",
