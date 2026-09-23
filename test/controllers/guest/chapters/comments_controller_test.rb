@@ -28,11 +28,19 @@ class Guest::Chapters::CommentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'index tells a guest how many likes a comment holds' do
-    users(:me).liked!(comments(:on_my_published_chapter))
+    comment = comments(:on_my_published_chapter)
 
     get "/guest/chapters/#{chapters(:my_published).id}/comments"
 
-    assert_equal 1, JSON.parse(@response.body).first['likes_count']
+    assert_equal comment.votes.count,
+                 JSON.parse(@response.body).first['likes_count']
+
+    users(:me).liked!(comment)
+
+    get "/guest/chapters/#{chapters(:my_published).id}/comments"
+
+    assert_equal comment.votes.count,
+                 JSON.parse(@response.body).first['likes_count']
   end
 
   test 'index withholds only the reader own state from a guest' do

@@ -4,6 +4,7 @@ class Comment < ApplicationRecord
   include Revisable
   include RevisableStatus
   include Moderatable
+  include Votable
 
   self.revision_attributes = %i[body]
 
@@ -15,8 +16,6 @@ class Comment < ApplicationRecord
            class_name: 'CommentRevision',
            dependent: :destroy,
            inverse_of: :comment
-  has_many :votes, as: :votable, dependent: :destroy
-  has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   enum :status, { published: 'published', deleted: 'deleted' }, validate: true
@@ -33,10 +32,6 @@ class Comment < ApplicationRecord
             presence: true
 
   after_create :create_notification, unless: :on_yourself?
-
-  def liked_by?(user)
-    votes.any? { |vote| vote.voter_id == user.id }
-  end
 
   def image_url
     commentable.image_url

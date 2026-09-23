@@ -26,7 +26,6 @@ class Map < ApplicationRecord
   has_many :bookmarking_users, through: :bookmarks, source: :user
   has_many :coauthorship_invitations, dependent: :destroy
   has_many :votes, as: :votable, dependent: :destroy
-  has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :images, through: :current_revision
   has_many :journeys, dependent: :nullify
   has_many :chapters, dependent: :nullify

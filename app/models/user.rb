@@ -177,10 +177,6 @@ class User < ApplicationRecord
     votes.find_by!(votable: votable).destroy!
   end
 
-  def liked?(votable)
-    votable.voters.any? { |voter| voter.id == id }
-  end
-
   private
 
   def image_must_be_owned

@@ -7,6 +7,7 @@ class Pin < ApplicationRecord
   include RevisableStatus
   include RevisableImages
   include Moderatable
+  include Votable
 
   self.revision_attributes = %i[name comment latitude longitude]
 
@@ -22,8 +23,6 @@ class Pin < ApplicationRecord
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :comments, -> { not_deleted.visible }, as: :commentable, inverse_of: :commentable
   has_many :all_comments, class_name: 'Comment', as: :commentable, dependent: :destroy, inverse_of: :commentable
-  has_many :votes, as: :votable, dependent: :destroy
-  has_many :voters, through: :votes, source: :voter, source_type: User.name
   has_many :milestones, dependent: :nullify
   has_many :journey_checkins, dependent: :nullify
 
@@ -101,10 +100,6 @@ class Pin < ApplicationRecord
   scope :preloaded_with_votes, lambda {
     preloaded.preload(:votes, comments: :votes)
   }
-
-  def liked_by?(user)
-    votes.any? { |vote| vote.voter_id == user.id }
-  end
 
   def image_url
     images.first&.url.to_s

@@ -50,11 +50,17 @@ class Guest::ChaptersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'show tells a guest how many likes the chapter holds' do
-    users(:you).liked!(chapters(:my_published))
+    chapter = chapters(:my_published)
 
-    get "/guest/chapters/#{chapters(:my_published).id}"
+    get "/guest/chapters/#{chapter.id}"
 
-    assert_equal 1, JSON.parse(@response.body)['likes_count']
+    assert_equal chapter.votes.count, JSON.parse(@response.body)['likes_count']
+
+    users(:me).liked!(chapter)
+
+    get "/guest/chapters/#{chapter.id}"
+
+    assert_equal chapter.votes.count, JSON.parse(@response.body)['likes_count']
   end
 
   test 'show does not tell a guest whether the chapter was liked' do
