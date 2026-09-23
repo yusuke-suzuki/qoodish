@@ -33,6 +33,6 @@ else
 end
 json.editable current_user.author?(chapter)
 json.liked chapter.liked_by?(current_user)
-json.likes_count chapter.votes.size
+json.likes_count chapter.votes.length
 json.created_at chapter.created_at
 json.updated_at chapter.updated_at

@@ -99,8 +99,12 @@ class Pin < ApplicationRecord
   }
 
   scope :preloaded_with_votes, lambda {
-    preloaded.preload(:voters, :votes, comments: :votes)
+    preloaded.preload(:votes, comments: :votes)
   }
+
+  def liked_by?(user)
+    votes.any? { |vote| vote.voter_id == user.id }
+  end
 
   def image_url
     images.first&.url.to_s

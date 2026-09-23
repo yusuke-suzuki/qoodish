@@ -17,6 +17,23 @@ class Guest::PinsControllerTest < ActionDispatch::IntegrationTest
     assert_equal res['id'], pins(:public_one).id
   end
 
+  test 'show tells a guest how many likes the pin holds' do
+    users(:me).liked!(pins(:public_one))
+
+    get "/guest/pins/#{pins(:public_one).id}"
+
+    assert_equal pins(:public_one).votes.count,
+                 JSON.parse(@response.body)['likes_count']
+  end
+
+  test 'show does not tell a guest whether the pin was liked' do
+    users(:me).liked!(pins(:public_one))
+
+    get "/guest/pins/#{pins(:public_one).id}"
+
+    assert_not_includes JSON.parse(@response.body).keys, 'liked'
+  end
+
   test 'request pins without params should raise bad request error' do
     get '/guest/pins'
 
