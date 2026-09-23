@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.18.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.17.0...v4.18.0) (2026-09-23)
+
+
+### Features
+
+* drop the inappropriate_contents table ([106a30d](https://github.com/yusuke-suzuki/qoodish/commit/106a30d5ff9e21e5d639fff4d4a6d87a1ad2c175))
+
 ## [4.17.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.16.0...v4.17.0) (2026-09-23)
 
 
