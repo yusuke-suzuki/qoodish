@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.16.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.15.0...v4.16.0) (2026-09-23)
+
+
+### Features
+
+* let readers like a chapter comment ([5e907af](https://github.com/yusuke-suzuki/qoodish/commit/5e907afcebf163920f50fbbe3ab7a5162d69e554))
+
 ## [4.15.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.14.0...v4.15.0) (2026-09-23)
 
 
