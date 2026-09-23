@@ -28,5 +28,6 @@ json.map do
   json.name pin.map.name
   json.private pin.map.private
 end
+json.likes_count pin.votes.length
 json.created_at pin.created_at
 json.updated_at pin.updated_at

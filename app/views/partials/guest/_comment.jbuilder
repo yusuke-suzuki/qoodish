@@ -6,5 +6,6 @@ json.author do
   json.image_url comment.user.image_url
 end
 json.body comment.body
+json.likes_count comment.votes.length
 json.created_at comment.created_at
 json.updated_at comment.updated_at

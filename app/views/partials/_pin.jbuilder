@@ -29,7 +29,7 @@ json.map do
   json.private pin.map.private
 end
 json.editable current_user.author?(pin)
-json.liked current_user.liked?(pin)
-json.likes_count pin.voters.size
+json.liked pin.liked_by?(current_user)
+json.likes_count pin.votes.length
 json.created_at pin.created_at
 json.updated_at pin.updated_at

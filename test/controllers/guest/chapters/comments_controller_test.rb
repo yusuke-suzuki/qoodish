@@ -27,6 +27,14 @@ class Guest::Chapters::CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes JSON.parse(@response.body).first.keys, 'liked'
   end
 
+  test 'index tells a guest how many likes a comment holds' do
+    users(:me).liked!(comments(:on_my_published_chapter))
+
+    get "/guest/chapters/#{chapters(:my_published).id}/comments"
+
+    assert_equal 1, JSON.parse(@response.body).first['likes_count']
+  end
+
   test 'index withholds only the reader own state from a guest' do
     get "/guest/chapters/#{chapters(:my_published).id}/comments"
 
@@ -39,7 +47,7 @@ class Guest::Chapters::CommentsControllerTest < ActionDispatch::IntegrationTest
 
     reader_keys = JSON.parse(@response.body).first.keys
 
-    assert_equal reader_keys - %w[editable liked likes_count], guest_keys
+    assert_equal reader_keys - %w[editable liked], guest_keys
   end
 
   test 'index does not serve a comment that was taken down' do

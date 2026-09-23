@@ -27,5 +27,6 @@ if chapter.user.journal.present?
 else
   json.journal nil
 end
+json.likes_count chapter.votes.length
 json.created_at chapter.created_at
 json.updated_at chapter.updated_at
