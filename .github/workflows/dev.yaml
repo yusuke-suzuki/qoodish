@@ -14,6 +14,9 @@ env:
 
 jobs:
   test:
+    concurrency:
+      group: dev-test-${{ github.event.number }}
+      cancel-in-progress: true
     permissions:
       contents: read
       id-token: write
@@ -62,6 +65,9 @@ jobs:
 
   build-and-push-image:
     needs: test
+    concurrency:
+      group: dev-build-${{ github.event.number }}
+      cancel-in-progress: true
     permissions:
       contents: read
       id-token: write
@@ -111,9 +117,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy-runner:
+  deploy:
     needs:
       - build-and-push-image
+    concurrency:
+      group: dev-deploy
+      cancel-in-progress: false
+      queue: max
     permissions:
       contents: read
       id-token: write
@@ -143,22 +153,6 @@ jobs:
           kustomize build . | gcloud run jobs replace - \
             --project=$PROJECT_ID \
             --region=$REGION
-
-  migrate:
-    needs:
-      - deploy-runner
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - id: auth
-        uses: google-github-actions/auth@v1
-        with:
-          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
-          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
       - name: Run db:migrate on the Job carrying this image
         env:
           CLOUDSDK_CORE_DISABLE_PROMPTS: 1
@@ -183,23 +177,6 @@ jobs:
               exit 1
             fi
           fi
-
-  deploy-api:
-    needs:
-      - migrate
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - id: auth
-        uses: google-github-actions/auth@v1
-        with:
-          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
-          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
       - name: Deploy Service using kustomize
         working-directory: run/dev/api
         env:
