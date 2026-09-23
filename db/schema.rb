@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_23_102408) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -138,16 +138,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_000001) do
     t.bigint "user_id", null: false
     t.index ["url"], name: "index_images_on_url", unique: true
     t.index ["user_id"], name: "index_images_on_user_id"
-  end
-
-  create_table "inappropriate_contents", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "content_id_val", null: false
-    t.string "content_type", null: false
-    t.datetime "created_at", null: false
-    t.integer "reason_id_val", null: false
-    t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
-    t.index ["user_id"], name: "index_inappropriate_contents_on_user_id"
   end
 
   create_table "journal_bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
