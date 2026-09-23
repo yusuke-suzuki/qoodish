@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.17.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.16.0...v4.17.0) (2026-09-23)
+
+
+### Features
+
+* remove the inappropriate_contents endpoint ([30cea61](https://github.com/yusuke-suzuki/qoodish/commit/30cea61cbdd6e4a28b35320460bd11850cda1765))
+
 ## [4.16.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.15.0...v4.16.0) (2026-09-23)
 
 
