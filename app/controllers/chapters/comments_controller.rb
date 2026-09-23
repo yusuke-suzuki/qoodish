@@ -3,7 +3,7 @@ module Chapters
     before_action :authenticate_user!
 
     def index
-      @comments = chapter.comments.order(:id).preload(user: :image)
+      @comments = chapter.comments.order(:id).preload({ user: :image }, :votes)
     end
 
     def create

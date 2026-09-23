@@ -19,6 +19,14 @@ class Guest::Chapters::CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes JSON.parse(@response.body).first.keys, 'editable'
   end
 
+  test 'index does not tell a guest whether a comment was liked' do
+    users(:me).liked!(comments(:on_my_published_chapter))
+
+    get "/guest/chapters/#{chapters(:my_published).id}/comments"
+
+    assert_not_includes JSON.parse(@response.body).first.keys, 'liked'
+  end
+
   test 'index does not serve a comment that was taken down' do
     comments(:on_my_published_chapter).discard!(user: users(:you))
 

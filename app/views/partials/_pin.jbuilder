@@ -10,20 +10,9 @@ json.author do
 end
 json.comment pin.comment
 json.comments pin.comments do |comment|
-  json.id comment.id
+  json.partial! 'partials/comment', comment: comment
   json.pin_id pin.id
   json.review_id pin.id
-  json.author do
-    json.id comment.user.id
-    json.name comment.user.name
-    json.image comment.user.image_variants
-    json.image_url comment.user.image_url
-  end
-  json.body comment.body
-  json.liked comment.liked_by?(current_user)
-  json.likes_count comment.votes.size
-  json.created_at comment.created_at
-  json.updated_at comment.updated_at
 end
 json.images pin.images do |image|
   variants = image.variants
