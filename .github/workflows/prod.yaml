@@ -3,6 +3,10 @@ on:
   push:
     tags:
       - v*
+concurrency:
+  group: prod-deploy
+  cancel-in-progress: false
+  queue: max
 env:
   PROJECT_ID: qoodish
   REGION: asia-northeast1
