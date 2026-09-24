@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.18.1](https://github.com/yusuke-suzuki/qoodish/compare/v4.18.0...v4.18.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* tell a guest how many likes a post holds ([3bcf27f](https://github.com/yusuke-suzuki/qoodish/commit/3bcf27f0c7893ac6e3378748090741815cd9a10f))
+
 ## [4.18.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.17.0...v4.18.0) (2026-09-23)
 
 
