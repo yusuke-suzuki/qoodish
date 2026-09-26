@@ -2,7 +2,6 @@ json.partial! 'admin/reports/report', report: @report
 json.status @report.status
 json.locale @report.locale
 json.details @report.details
-json.evidence_url @report.evidence_url
 json.content_snapshot @report.content_snapshot
 json.target_available @report.moderatable.present?
 json.moderatable_parent do

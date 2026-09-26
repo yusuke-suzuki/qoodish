@@ -12,6 +12,6 @@ class ReportsController < ApplicationController
   private
 
   def report_params
-    params.permit(:category, :details, :evidence_url)
+    params.permit(:category, :details)
   end
 end
