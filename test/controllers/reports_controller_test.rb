@@ -78,8 +78,25 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :bad_request
   end
 
-  test 'a second report on the same content answers unprocessable' do
+  test 'a second report while the first waits for a decision answers unprocessable' do
     Report.create!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
+
+    stub_google_auth(users(:me)) do
+      post '/reports',
+           params: { moderatable_type: 'Pin', moderatable_id: pins(:public_you_one).id, category: 'hate' },
+           headers: { 'Authorization': 'Bearer dummytoken', 'Accept-Language': 'ja' }
+    end
+
+    assert_response :unprocessable_content
+    assert_equal '対象はすでに報告を受け付けており、確認が完了するまで再度報告することはできません。',
+                 JSON.parse(@response.body)['detail']
+    assert_equal 1, Report.count
+  end
+
+  test 'a second report after the first was decided is filed' do
+    first = Report.create!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
+    first.decide!(staff_member: staff_members(:moderator), outcome: 'kept', reason: 'Not spam.')
+    travel 1.minute
 
     stub_google_auth(users(:me)) do
       post '/reports',
@@ -87,8 +104,8 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
-    assert_response :unprocessable_content
-    assert_equal 1, Report.count
+    assert_response :created
+    assert_equal 2, Report.count
   end
 
   test 'reporting your own pin answers unprocessable' do

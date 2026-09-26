@@ -35,7 +35,7 @@ ja:
             moderatable:
               blank: が見つかりません。
             moderatable_id:
-              taken: は既に報告済みです。
+              taken: はすでに報告を受け付けており、確認が完了するまで再度報告することはできません。
             moderatable_type:
               inclusion: は報告できません。
             reporter:
@@ -120,4 +120,3 @@ ja:
       duplicate_journal_bookmark: 既にブックマーク済みです。
 
       report_type_not_supported: このコンテンツは報告できません。
-      duplicate_report: このコンテンツは既に報告済みです。
