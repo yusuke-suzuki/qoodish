@@ -26,7 +26,9 @@ class Report < ApplicationRecord
   validates :moderatable, presence: true, on: :create
   validates :reporter, presence: true, on: :create
   validates :reporter, comparison: { other_than: :author }, allow_nil: true, on: :create
-  validates :moderatable_id, uniqueness: { scope: %i[moderatable_type reporter_id] }, if: :reporter_id?, on: :create
+  validates :moderatable_id,
+            uniqueness: { scope: %i[moderatable_type reporter_id], conditions: -> { pending } },
+            if: :reporter_id?, on: :create
   validates :moderatable_type, inclusion: { in: MODERATABLE_TYPES }
   validates :locale, inclusion: { in: -> (_report) { I18n.available_locales.map(&:to_s) } }
   validates :details, presence: true, if: :details_required?
@@ -51,9 +53,7 @@ class Report < ApplicationRecord
   }
 
   def self.file!(attributes)
-    create!(attributes)
-  rescue ActiveRecord::RecordNotUnique
-    raise Exceptions::UnprocessableContent, I18n.t('messages.api.duplicate_report')
+    attributes[:reporter].with_lock { create!(attributes) }
   end
 
   def self.moderatable_for(type, id, viewer)

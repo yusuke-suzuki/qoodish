@@ -64,7 +64,7 @@ en:
             moderatable:
               blank: could not be found.
             moderatable_id:
-              taken: has already been reported by you.
+              taken: has already been reported by you and is being reviewed.
             moderatable_type:
               inclusion: cannot be reported.
             reporter:
@@ -148,4 +148,3 @@ en:
       duplicate_journal_bookmark: The journal is already bookmarked.
 
       report_type_not_supported: This content cannot be reported.
-      duplicate_report: You have already reported this content.
