@@ -4,7 +4,7 @@ class ReportsController < ApplicationController
   def create
     moderatable = Report.moderatable_for(params[:moderatable_type], params[:moderatable_id], current_user)
 
-    @report = Report.file!(report_params.merge(moderatable: moderatable, reporter: current_user))
+    @report = Report.create!(report_params.merge(moderatable: moderatable, reporter: current_user))
 
     render status: :created
   end
