@@ -6,7 +6,7 @@ class MapVisibilityTest < ActiveSupport::TestCase
 
     assert_includes Map.referenceable_by(users(:me)), map
 
-    ModerationDecision.remove!(moderatable: map, reason: 'Spam map.')
+    decide(map, outcome: 'removed', reason: 'Spam map.')
 
     assert_not_includes Map.referenceable_by(users(:me)), map
   end
@@ -16,7 +16,7 @@ class MapVisibilityTest < ActiveSupport::TestCase
 
     assert_includes Map.editable_by(users(:me)), map
 
-    ModerationDecision.remove!(moderatable: map, reason: 'Spam map.')
+    decide(map, outcome: 'removed', reason: 'Spam map.')
 
     assert_not_includes Map.editable_by(users(:me)), map
   end
@@ -26,7 +26,7 @@ class MapVisibilityTest < ActiveSupport::TestCase
 
     assert_includes Map.related_to(users(:me)), map
 
-    ModerationDecision.remove!(moderatable: map, reason: 'Spam map.')
+    decide(map, outcome: 'removed', reason: 'Spam map.')
 
     assert_not_includes Map.related_to(users(:me)), map
   end

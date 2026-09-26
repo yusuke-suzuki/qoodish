@@ -5,6 +5,7 @@ class ModerationMailer < ApplicationMailer
     @report = report
 
     I18n.with_locale(I18n.default_locale) do
+      @dashboard_url = "#{ENV['ADMIN_ENDPOINT']}/#{I18n.locale}/reports/#{report.id}"
       mail(to: Report.operator_email, subject: default_i18n_subject(id: report.id))
     end
   end

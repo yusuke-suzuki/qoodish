@@ -3,7 +3,7 @@ A new report was filed.
 Report:     #<%= @report.id %>
 Category:   <%= @report.category %>
 Target:     <%= @report.moderatable_type %> <%= @report.moderatable_id %>
-Reporter:   <%= @report.reporter ? "user #{@report.reporter.id} (#{@report.reporter.name})" : "guest #{@report.reporter_email}" %>
+Reporter:   <%= @report.reporter ? "user #{@report.reporter.id} (#{@report.reporter.name})" : 'deleted account' %>
 Locale:     <%= @report.locale %>
 Filed at:   <%= @report.created_at.utc.iso8601 %>
 
@@ -16,7 +16,5 @@ Evidence URL:
 Snapshot of the content at the time of the report:
 <%= @report.content_snapshot.presence || '(none)' %>
 
-Decide it from the runner:
-  bin/rails "moderation:show[<%= @report.id %>]"
-  bin/rails "moderation:keep[<%= @report.id %>,<reason>]"
-  bin/rails "moderation:remove[<%= @report.id %>,<reason>]"
+Decide it on the dashboard:
+<%= @dashboard_url %>

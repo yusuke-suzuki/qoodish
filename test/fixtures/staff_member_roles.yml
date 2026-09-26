@@ -1,0 +1,14 @@
+_fixture:
+  model_class: Admin::StaffMemberRole
+
+moderator_moderator:
+  staff_member: moderator
+  role: moderator
+
+reader_reader:
+  staff_member: reader
+  role: reader
+
+revoked_moderator:
+  staff_member: revoked
+  role: moderator

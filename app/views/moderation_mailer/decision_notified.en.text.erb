@@ -1,8 +1,8 @@
 We have finished reviewing what you reported.
 
-Report:     #<%= @report.id %>
-Category:   <%= t("moderation.categories.#{@report.category}") %>
-Filed at:   <%= @report.created_at.utc.iso8601 %>
+Report: #<%= @report.id %>
+Category: <%= t("moderation.categories.#{@report.category}") %>
+Filed at: <%= @report.created_at.utc.iso8601 %>
 Decided at: <%= @decision.created_at.utc.iso8601 %>
 
 Outcome: <%= t("moderation.outcomes.#{@decision.outcome}") %>

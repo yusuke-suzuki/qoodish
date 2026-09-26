@@ -1,0 +1,12 @@
+_fixture:
+  model_class: Admin::StaffMember
+
+moderator:
+  email: moderator@example.com
+
+reader:
+  email: reader@example.com
+
+revoked:
+  email: revoked@example.com
+  revoked_at: <%= 1.day.ago.to_fs(:db) %>

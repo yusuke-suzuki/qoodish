@@ -78,6 +78,14 @@ Rails.application.routes.draw do
   resources :reports, only: [:create]
   resources :images, only: [:create]
 
+  namespace :admin do
+    resources :reports, only: %i[index show] do
+      scope module: :reports do
+        resource :decision, only: [:create]
+      end
+    end
+  end
+
   namespace :guest do
     resources :maps, only: %i[index show] do
       get :featured, on: :collection
