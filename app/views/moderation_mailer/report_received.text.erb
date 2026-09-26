@@ -10,9 +10,6 @@ Filed at:   <%= @report.created_at.utc.iso8601 %>
 Details:
 <%= @report.details.presence || '(none)' %>
 
-Evidence URL:
-<%= @report.evidence_url.presence || '(none)' %>
-
 Snapshot of the content at the time of the report:
 <%= @report.content_snapshot.presence || '(none)' %>
 
