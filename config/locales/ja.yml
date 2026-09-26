@@ -15,6 +15,8 @@ ja:
         outcome: 対応結果
         reason: 理由
         staff_member: 担当者
+      admin/staff_member:
+        email: メールアドレス
     errors:
       models:
         report:
@@ -51,6 +53,13 @@ ja:
               blank: を入力してください。
             staff_member:
               blank: が見つかりません。
+        admin/staff_member:
+          format: "%{attribute}%{message}"
+          attributes:
+            email:
+              blank: を入力してください。
+              invalid: の形式が正しくありません。
+              taken: は既に登録されています。
   messages:
     api:
       error_400: 不正なリクエストです。
@@ -62,6 +71,8 @@ ja:
       error_429: リクエストが多すぎます。しばらくしてからやり直してください。
       error_500: サーバー内部エラーが発生しました。
       error_separator: ""
+
+      staff_member_self_change: 自分自身のロールの削除や取り消しはできません。ほかの管理者に依頼してください。
 
       duplicate_map_name: 既に存在するマップ名です。
       map_name_required: マップ名を入力してください。

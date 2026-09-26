@@ -84,6 +84,13 @@ Rails.application.routes.draw do
         resource :decision, only: [:create]
       end
     end
+    resources :staff_members, only: %i[index create] do
+      scope module: :staff_members do
+        resources :roles, only: [:destroy]
+        resource :revocation, only: [:create]
+      end
+    end
+    resources :roles, only: [:index]
   end
 
   namespace :guest do

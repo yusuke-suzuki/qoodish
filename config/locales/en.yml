@@ -46,6 +46,8 @@ en:
         outcome: Outcome
         reason: Reason
         staff_member: Staff member
+      admin/staff_member:
+        email: Email
     errors:
       models:
         report:
@@ -80,6 +82,12 @@ en:
               blank: must be filled in.
             staff_member:
               blank: could not be found.
+        admin/staff_member:
+          attributes:
+            email:
+              blank: must be filled in.
+              invalid: is not a valid email address.
+              taken: is already registered.
   messages:
     api:
       error_400: Invalid parameter specified.
@@ -91,6 +99,8 @@ en:
       error_429: Too many requests. Please try again later.
       error_500: The request has failed due to some unknown error.
       error_separator: " "
+
+      staff_member_self_change: You cannot remove your own roles or revoke yourself. Ask another administrator.
 
       duplicate_map_name: Map name is duplicated.
       map_name_required: Map name is required.
