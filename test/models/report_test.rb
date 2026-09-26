@@ -42,16 +42,6 @@ class ReportTest < ActiveSupport::TestCase
     end
   end
 
-  test 'a Japanese message keeps a space after a half-width attribute name' do
-    report = Report.new(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam',
-                        evidence_url: 'ftp://example.com')
-
-    I18n.with_locale(:ja) do
-      assert_not report.valid?
-      assert_equal ['参考 URL は http:// または https:// で始めてください。'], report.errors.full_messages
-    end
-  end
-
   test 'a report records the locale the reporter was reading in' do
     RequestContext.locale = 'ja'
 

@@ -1,11 +1,10 @@
 MAX_REPORT_DETAILS_LENGTH = 2000
-MAX_REPORT_EVIDENCE_URL_LENGTH = 2000
 
 class Report < ApplicationRecord
   MODERATABLE_TYPES = [Pin.name, Comment.name, Map.name, Chapter.name, Journal.name, User.name].freeze
   DETAILS_REQUIRED_CATEGORIES = %w[copyright privacy other].freeze
 
-  self.ignored_columns += %w[reporter_email]
+  self.ignored_columns += %w[reporter_email evidence_url]
 
   belongs_to :moderatable, polymorphic: true, optional: true
   belongs_to :reporter, class_name: User.name, optional: true
@@ -35,9 +34,6 @@ class Report < ApplicationRecord
   validates :locale, inclusion: { in: -> (_report) { I18n.available_locales.map(&:to_s) } }
   validates :details, presence: true, if: :details_required?
   validates :details, length: { allow_blank: true, maximum: MAX_REPORT_DETAILS_LENGTH }
-  validates :evidence_url,
-            format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true },
-            length: { allow_blank: true, maximum: MAX_REPORT_EVIDENCE_URL_LENGTH }
 
   before_validation :assign_locale, on: :create
   before_create :take_content_snapshot

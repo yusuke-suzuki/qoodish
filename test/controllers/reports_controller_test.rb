@@ -117,6 +117,21 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
+  test 'a reference URL from an older client is ignored' do
+    stub_google_auth(users(:me)) do
+      post '/reports',
+           params: {
+             moderatable_type: 'Pin',
+             moderatable_id: pins(:public_you_one).id,
+             category: 'spam',
+             evidence_url: 'https://example.com/original'
+           },
+           headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :created
+  end
+
   test 'an email in the payload does not change who filed the report' do
     stub_google_auth(users(:me)) do
       post '/reports',

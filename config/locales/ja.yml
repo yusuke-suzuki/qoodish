@@ -4,7 +4,6 @@ ja:
       report:
         category: 報告の理由
         details: 詳しい内容
-        evidence_url: 参考 URL
         locale: 言語
         moderatable: 対象
         moderatable_id: 対象
@@ -25,10 +24,6 @@ ja:
               inclusion: を選択してください。
             details:
               blank: をご記入ください。
-              too_long: は %{count} 文字以内でご記入ください。
-            evidence_url:
-              format: "%{attribute} %{message}"
-              invalid: は http:// または https:// で始めてください。
               too_long: は %{count} 文字以内でご記入ください。
             locale:
               inclusion: がサポート対象外です。

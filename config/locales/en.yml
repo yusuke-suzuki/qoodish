@@ -35,7 +35,6 @@ en:
       report:
         category: Reason for reporting
         details: Details
-        evidence_url: Reference URL
         locale: Language
         moderatable: Target
         moderatable_id: Target
@@ -55,9 +54,6 @@ en:
               inclusion: must be selected.
             details:
               blank: must be filled in.
-              too_long: must be %{count} characters or fewer.
-            evidence_url:
-              invalid: must start with http:// or https://.
               too_long: must be %{count} characters or fewer.
             locale:
               inclusion: is not supported.
