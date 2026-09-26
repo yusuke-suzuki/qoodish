@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.19.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.18.1...v4.19.0) (2026-09-26)
+
+
+### Features
+
+* add an admin API for deciding reports ([f02daa0](https://github.com/yusuke-suzuki/qoodish/commit/f02daa0c62b4726bece0798c1991e4abe764ee8e))
+
 ## [4.18.1](https://github.com/yusuke-suzuki/qoodish/compare/v4.18.0...v4.18.1) (2026-09-24)
 
 
