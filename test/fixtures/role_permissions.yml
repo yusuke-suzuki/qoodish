@@ -1,0 +1,22 @@
+_fixture:
+  model_class: Admin::RolePermission
+
+administrator_read_reports:
+  role: administrator
+  permission: read_reports
+
+administrator_decide_reports:
+  role: administrator
+  permission: decide_reports
+
+moderator_read_reports:
+  role: moderator
+  permission: read_reports
+
+moderator_decide_reports:
+  role: moderator
+  permission: decide_reports
+
+reader_read_reports:
+  role: reader
+  permission: read_reports

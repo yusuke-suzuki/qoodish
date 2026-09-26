@@ -1,4 +1,61 @@
 ja:
+  activerecord:
+    attributes:
+      report:
+        category: 報告の理由
+        details: 詳しい内容
+        evidence_url: 参考 URL
+        locale: 言語
+        moderatable: 対象
+        moderatable_id: 対象
+        moderatable_type: 対象の種類
+        reporter: 報告者
+      moderation_decision:
+        moderatable: 対象
+        moderatable_type: 対象の種類
+        outcome: 対応結果
+        reason: 理由
+        staff_member: 担当者
+    errors:
+      models:
+        report:
+          format: "%{attribute}%{message}"
+          attributes:
+            category:
+              inclusion: を選択してください。
+            details:
+              blank: をご記入ください。
+              too_long: は %{count} 文字以内でご記入ください。
+            evidence_url:
+              format: "%{attribute} %{message}"
+              invalid: は http:// または https:// で始めてください。
+              too_long: は %{count} 文字以内でご記入ください。
+            locale:
+              inclusion: がサポート対象外です。
+            moderatable:
+              blank: が見つかりません。
+            moderatable_id:
+              taken: は既に報告済みです。
+            moderatable_type:
+              inclusion: は報告できません。
+            reporter:
+              blank: が見つかりません。ログインしてから報告してください。
+              other_than: が投稿者本人のため報告できません。
+        moderation_decision:
+          format: "%{attribute}%{message}"
+          attributes:
+            moderatable:
+              blank: は既に存在しません。「対象がないため終了する」を選んでください。
+              present: はまだ存在します。「対象を維持する」か「対象を非表示にする」を選んでください。
+            moderatable_type:
+              exclusion: がアカウントか手帳の場合は、非表示にできません。「対象を維持する」を選んでください。
+              inclusion: がサポート対象外です。
+            outcome:
+              inclusion: を選択してください。
+            reason:
+              blank: を入力してください。
+            staff_member:
+              blank: が見つかりません。
   messages:
     api:
       error_400: 不正なリクエストです。
@@ -62,9 +119,4 @@ ja:
       duplicate_journal_bookmark: 既にブックマーク済みです。
 
       report_type_not_supported: このコンテンツは報告できません。
-      report_details_required: 問題の内容を入力してください。
-      report_details_exceed: "問題の内容が長すぎます。(最大: 2000 文字)"
-      report_email_required: ログインせずに報告する場合は、ご連絡のためメールアドレスが必要です。
-      report_email_invalid: メールアドレスの形式が正しくありません。
-      report_own_content: 自身の投稿は報告できません。
       duplicate_report: このコンテンツは既に報告済みです。

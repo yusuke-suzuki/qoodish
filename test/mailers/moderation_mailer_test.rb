@@ -17,7 +17,12 @@ class ModerationMailerTest < ActionMailer::TestCase
     assert_includes mail.subject, "##{@report.id}"
     assert_includes mail.body.decoded, 'Targets me by name.'
     assert_includes mail.body.decoded, pins(:public_you_one).comment
-    assert_includes mail.body.decoded, "moderation:show[#{@report.id}]"
+  end
+
+  test 'report_received links the report on the admin dashboard' do
+    mail = ModerationMailer.report_received(@report)
+
+    assert_includes mail.body.decoded, "/en/reports/#{@report.id}"
   end
 
   test 'a reporter can reply to a notice that was sent from the unattended address' do
@@ -37,7 +42,7 @@ class ModerationMailerTest < ActionMailer::TestCase
 
   test 'report_acknowledged answers a Japanese reporter in Japanese' do
     RequestContext.locale = 'ja'
-    japanese_report = Report.create!(moderatable: pins(:public_you_one), reporter_email: 'guest@example.com',
+    japanese_report = Report.create!(moderatable: pins(:public_you_one), reporter: record_user('japanese'),
                                      category: 'harassment')
 
     mail = ModerationMailer.report_acknowledged(japanese_report)
@@ -47,7 +52,7 @@ class ModerationMailerTest < ActionMailer::TestCase
   end
 
   test 'decision_notified tells the reporter the outcome and the reason' do
-    decision = ModerationDecision.keep!(moderatable: pins(:public_you_one), reason: 'Not harassment.')
+    decision = @report.decide!(staff_member: staff_members(:moderator), outcome: 'kept', reason: 'Not harassment.')
 
     mail = ModerationMailer.decision_notified(@report, decision)
 
@@ -58,7 +63,7 @@ class ModerationMailerTest < ActionMailer::TestCase
 
   test 'content_removed tells the author what was removed and why' do
     comment = pins(:public_you_one).comment
-    decision = ModerationDecision.remove!(moderatable: pins(:public_you_one), reason: 'Harassment.')
+    decision = @report.decide!(staff_member: staff_members(:moderator), outcome: 'removed', reason: 'Harassment.')
 
     mail = ModerationMailer.content_removed(decision)
 
@@ -69,7 +74,8 @@ class ModerationMailerTest < ActionMailer::TestCase
 
   test 'content_removed follows the locale recorded on the author' do
     users(:you).update!(locale: 'ja')
-    decision = ModerationDecision.remove!(moderatable: pins(:public_you_one).reload, reason: 'Harassment.')
+    decision = @report.reload.decide!(staff_member: staff_members(:moderator), outcome: 'removed',
+                                      reason: 'Harassment.')
 
     mail = ModerationMailer.content_removed(decision)
 

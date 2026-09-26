@@ -22,49 +22,18 @@ class Report < ApplicationRecord
   }, validate: true
 
   normalizes :details, with: ->(text) { text.delete("\r") }
-  normalizes :reporter_email, with: ->(email) { email.strip.downcase }
 
   validates :moderatable, presence: true, on: :create
+  validates :reporter, presence: true, on: :create
+  validates :reporter, comparison: { other_than: :author }, allow_nil: true, on: :create
+  validates :moderatable_id, uniqueness: { scope: %i[moderatable_type reporter_id] }, if: :reporter_id?, on: :create
   validates :moderatable_type, inclusion: { in: MODERATABLE_TYPES }
   validates :locale, inclusion: { in: -> (_report) { I18n.available_locales.map(&:to_s) } }
-  validates :details,
-            presence: { message: ->(_report, _data) { I18n.t('messages.api.report_details_required') } },
-            if: :details_required?
-  validates :details,
-            length: {
-              allow_blank: true,
-              maximum: MAX_REPORT_DETAILS_LENGTH,
-              message: ->(_report, _data) { I18n.t('messages.api.report_details_exceed') }
-            }
+  validates :details, presence: true, if: :details_required?
+  validates :details, length: { allow_blank: true, maximum: MAX_REPORT_DETAILS_LENGTH }
   validates :evidence_url,
-            format: {
-              with: URI::DEFAULT_PARSER.make_regexp(%w[http https]),
-              allow_blank: true,
-              message: ->(_report, _data) { I18n.t('messages.api.invalid_uri') }
-            },
+            format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true },
             length: { allow_blank: true, maximum: MAX_REPORT_EVIDENCE_URL_LENGTH }
-  validates :reporter_email,
-            presence: { message: ->(_report, _data) { I18n.t('messages.api.report_email_required') } },
-            if: :reporter_email_required?
-  validates :reporter_email,
-            format: {
-              with: URI::MailTo::EMAIL_REGEXP,
-              allow_blank: true,
-              message: ->(_report, _data) { I18n.t('messages.api.report_email_invalid') }
-            }
-  validates :reporter_id,
-            uniqueness: {
-              scope: %i[moderatable_type moderatable_id],
-              allow_nil: true,
-              message: ->(_report, _data) { I18n.t('messages.api.duplicate_report') }
-            }
-  validates :reporter_email,
-            uniqueness: {
-              scope: %i[moderatable_type moderatable_id],
-              allow_blank: true,
-              message: ->(_report, _data) { I18n.t('messages.api.duplicate_report') }
-            }
-  validate :reporter_is_not_the_author, on: :create
 
   before_validation :assign_locale, on: :create
   before_create :take_content_snapshot
@@ -121,12 +90,33 @@ class Report < ApplicationRecord
     persisted?
   end
 
-  def decision
+  def decisions
     ModerationDecision
       .where(moderatable_type: moderatable_type, moderatable_id: moderatable_id)
-      .where('moderation_decisions.created_at >= ?', created_at)
       .order(:created_at, :id)
-      .first
+  end
+
+  def decision
+    decisions.where('moderation_decisions.created_at >= ?', created_at).first
+  end
+
+  def other_pending_reports
+    Report
+      .pending
+      .where(moderatable_type: moderatable_type, moderatable_id: moderatable_id)
+      .where.not(id: id)
+      .order(:created_at, :id)
+  end
+
+  def decide!(staff_member:, **decision)
+    ModerationDecision.record!(report: self, staff_member: staff_member, **decision)
+  end
+
+  def moderatable_parent
+    case moderatable
+    when Comment then moderatable.commentable
+    when Journal then moderatable.user
+    end
   end
 
   def status
@@ -134,7 +124,7 @@ class Report < ApplicationRecord
   end
 
   def reporter_address
-    reporter&.email.presence || reporter_email.presence
+    reporter&.email.presence
   end
 
   def author
@@ -157,17 +147,6 @@ class Report < ApplicationRecord
 
   def details_required?
     DETAILS_REQUIRED_CATEGORIES.include?(category)
-  end
-
-  def reporter_email_required?
-    reporter.nil?
-  end
-
-  def reporter_is_not_the_author
-    return if reporter.blank? || author.blank?
-    return unless author.id == reporter.id
-
-    errors.add(:moderatable, I18n.t('messages.api.report_own_content'))
   end
 
   def assign_locale

@@ -1,0 +1,14 @@
+_fixture:
+  model_class: Admin::Role
+
+administrator:
+  name: administrator
+  description: Everything the admin API allows
+
+moderator:
+  name: moderator
+  description: Reads reports and decides them
+
+reader:
+  name: reader
+  description: Reads reports

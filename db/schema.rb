@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_102408) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_26_145115) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -295,9 +295,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_102408) do
     t.string "outcome", null: false
     t.text "reason", null: false
     t.bigint "reviewed_revision_id"
+    t.bigint "staff_member_id"
     t.index ["author_id"], name: "index_moderation_decisions_on_author_id"
     t.index ["moderatable_type", "moderatable_id", "created_at"], name: "index_moderation_decisions_on_moderatable_and_time"
     t.index ["moderator_id"], name: "index_moderation_decisions_on_moderator_id"
+    t.index ["staff_member_id"], name: "index_moderation_decisions_on_staff_member_id"
   end
 
   create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -379,6 +381,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_102408) do
     t.index ["reporter_email", "moderatable_type", "moderatable_id"], name: "index_reports_on_reporter_email_and_moderatable", unique: true
     t.index ["reporter_id", "moderatable_type", "moderatable_id"], name: "index_reports_on_reporter_and_moderatable", unique: true
     t.index ["reporter_id"], name: "index_reports_on_reporter_id"
+  end
+
+  create_table "role_permissions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "permission", null: false
+    t.bigint "role_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["role_id", "permission"], name: "index_role_permissions_on_role_id_and_permission", unique: true
+  end
+
+  create_table "roles", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_roles_on_name", unique: true
+  end
+
+  create_table "staff_member_roles", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "role_id", null: false
+    t.bigint "staff_member_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["role_id"], name: "index_staff_member_roles_on_role_id"
+    t.index ["staff_member_id", "role_id"], name: "index_staff_member_roles_on_staff_member_id_and_role_id", unique: true
+  end
+
+  create_table "staff_members", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.datetime "revoked_at"
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_staff_members_on_email", unique: true
   end
 
   create_table "user_preferences", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -474,6 +509,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_102408) do
   add_foreign_key "maps", "users"
   add_foreign_key "milestones", "journeys"
   add_foreign_key "milestones", "pins"
+  add_foreign_key "moderation_decisions", "staff_members"
   add_foreign_key "moderation_decisions", "users", column: "author_id"
   add_foreign_key "moderation_decisions", "users", column: "moderator_id"
   add_foreign_key "pin_revision_images", "images"
@@ -484,6 +520,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_102408) do
   add_foreign_key "pins", "pin_revisions", column: "current_revision_id"
   add_foreign_key "pins", "users"
   add_foreign_key "reports", "users", column: "reporter_id"
+  add_foreign_key "role_permissions", "roles"
+  add_foreign_key "staff_member_roles", "roles"
+  add_foreign_key "staff_member_roles", "staff_members"
   add_foreign_key "user_preferences", "users"
   add_foreign_key "user_revisions", "users"
   add_foreign_key "users", "images", on_delete: :nullify

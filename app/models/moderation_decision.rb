@@ -1,20 +1,21 @@
 class ModerationDecision < ApplicationRecord
   UNREMOVABLE_TYPES = [User.name, Journal.name].freeze
-  GONE_MESSAGE = 'the content is gone; close the report as unavailable instead'.freeze
-  UNREMOVABLE_MESSAGE = 'an account or a journal is not removed through moderation; keep the report instead'.freeze
-  STILL_THERE_MESSAGE = 'the content is still there; keep or remove it instead of closing the report'.freeze
 
   belongs_to :moderatable, polymorphic: true, optional: true
   belongs_to :author, class_name: User.name, optional: true
   belongs_to :moderator, class_name: User.name, optional: true
+  belongs_to :staff_member, class_name: Admin::StaffMember.name, optional: true
 
   enum :outcome, { kept: 'kept', removed: 'removed', unavailable: 'unavailable' }, validate: true
 
   normalizes :reason, with: ->(text) { text.delete("\r") }
 
-  validates :moderatable, presence: true, on: :create, unless: :unavailable?
   validates :moderatable_type, inclusion: { in: Report::MODERATABLE_TYPES }
   validates :reason, presence: true
+  validates :staff_member, presence: true, on: :create
+  validates :moderatable, presence: true, on: :create, unless: :unavailable?
+  validates :moderatable, absence: true, on: :create, if: :unavailable?
+  validates :moderatable_type, exclusion: { in: UNREMOVABLE_TYPES }, on: :create, if: :removed?
 
   after_create_commit :deliver_decision_mails
 
@@ -35,32 +36,11 @@ class ModerationDecision < ApplicationRecord
       .where(latest_decisions: { ordinal: 1, outcome: 'removed' })
   end
 
-  def self.keep!(moderatable:, reason:, moderator: nil)
-    raise ArgumentError, GONE_MESSAGE if moderatable.blank?
+  def self.record!(report:, staff_member:, **decision)
+    target = report.moderatable
+    attributes = target && decision[:outcome] != 'unavailable' ? decision_attributes(target) : report_attributes(report)
 
-    create!(**decision_attributes(moderatable), outcome: 'kept', reason: reason, moderator: moderator)
-  end
-
-  def self.remove!(moderatable:, reason:, moderator: nil)
-    raise ArgumentError, GONE_MESSAGE if moderatable.blank?
-
-    raise ArgumentError, UNREMOVABLE_MESSAGE if UNREMOVABLE_TYPES.include?(moderatable.class.name)
-
-    create!(**decision_attributes(moderatable), outcome: 'removed', reason: reason, moderator: moderator)
-  end
-
-  def self.close_unavailable!(report:, reason:, moderator: nil)
-    raise ArgumentError, STILL_THERE_MESSAGE if report.moderatable.present?
-
-    create!(
-      moderatable_type: report.moderatable_type,
-      moderatable_id: report.moderatable_id,
-      content_snapshot: report.content_snapshot,
-      reviewed_revision_id: report.reported_revision_id,
-      outcome: 'unavailable',
-      reason: reason,
-      moderator: moderator
-    )
+    create!(**attributes, staff_member: staff_member, **decision)
   end
 
   def self.decision_attributes(moderatable)
@@ -72,6 +52,16 @@ class ModerationDecision < ApplicationRecord
     }
   end
   private_class_method :decision_attributes
+
+  def self.report_attributes(report)
+    {
+      moderatable_type: report.moderatable_type,
+      moderatable_id: report.moderatable_id,
+      content_snapshot: report.content_snapshot,
+      reviewed_revision_id: report.reported_revision_id
+    }
+  end
+  private_class_method :report_attributes
 
   def readonly?
     persisted?

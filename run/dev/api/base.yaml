@@ -108,6 +108,12 @@ spec:
               value: noreply@qoodish.com
             - name: REPORT_NOTIFICATION_EMAIL
               value: support@qoodish.com
+            - name: ADMIN_ENDPOINT
+              value: https://admin-dev.qoodish.com
+            - name: CF_ACCESS_TEAM_DOMAIN
+              value: yusuke-suzuki-0707.cloudflareaccess.com
+            - name: CF_ACCESS_AUD
+              value: 3ee39327262eb73242846c4cfc838367252dd82641f8370f089d6c6979147cb6
             - name: SMTP_PASSWORD
               valueFrom:
                 secretKeyRef:

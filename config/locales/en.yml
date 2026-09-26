@@ -30,6 +30,60 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
+  activerecord:
+    attributes:
+      report:
+        category: Reason for reporting
+        details: Details
+        evidence_url: Reference URL
+        locale: Language
+        moderatable: Target
+        moderatable_id: Target
+        moderatable_type: Target type
+        reporter: Reporter
+      moderation_decision:
+        moderatable: Target
+        moderatable_type: Target type
+        outcome: Outcome
+        reason: Reason
+        staff_member: Staff member
+    errors:
+      models:
+        report:
+          attributes:
+            category:
+              inclusion: must be selected.
+            details:
+              blank: must be filled in.
+              too_long: must be %{count} characters or fewer.
+            evidence_url:
+              invalid: must start with http:// or https://.
+              too_long: must be %{count} characters or fewer.
+            locale:
+              inclusion: is not supported.
+            moderatable:
+              blank: could not be found.
+            moderatable_id:
+              taken: has already been reported by you.
+            moderatable_type:
+              inclusion: cannot be reported.
+            reporter:
+              blank: could not be found. Sign in to report.
+              other_than: is the author and cannot report their own post.
+        moderation_decision:
+          attributes:
+            moderatable:
+              blank: is gone. Choose "Close because the content is gone" instead.
+              present: is still there. Choose "Keep the content" or "Remove the content" instead.
+            moderatable_type:
+              exclusion: is an account or a journal, which cannot be removed. Choose "Keep the content" instead.
+              inclusion: is not supported.
+            outcome:
+              inclusion: must be selected.
+            reason:
+              blank: must be filled in.
+            staff_member:
+              blank: could not be found.
   messages:
     api:
       error_400: Invalid parameter specified.
@@ -93,9 +147,4 @@ en:
       duplicate_journal_bookmark: The journal is already bookmarked.
 
       report_type_not_supported: This content cannot be reported.
-      report_details_required: Please describe the problem.
-      report_details_exceed: "The description is too long. (Max: 2000)"
-      report_email_required: An email address is required to report without signing in so we can reply.
-      report_email_invalid: The email address is invalid.
-      report_own_content: You cannot report your own content.
       duplicate_report: You have already reported this content.

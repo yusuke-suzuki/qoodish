@@ -25,12 +25,33 @@ class ActiveSupport::TestCase
     GoogleAuth.stub :new, GoogleAuthMock.new(current_user), &block
   end
 
+  def stub_cloudflare_access(email, &block)
+    CloudflareAccess.stub :new, CloudflareAccessMock.new(email), &block
+  end
+
   def stub_identity_platform(&block)
     IdentityPlatform.stub :new, IdentityPlatformMock.new, &block
   end
 
   def stub_cloudflare_images(&block)
     Cloudflare::Images.stub :new, CloudflareImagesMock.new, &block
+  end
+
+  def record_user(name)
+    User.record!(uid: "#{name}-uid", name: name, email: "#{name}@example.com")
+  end
+
+  def decide(moderatable, outcome:, reason:)
+    report = Report.create!(moderatable: moderatable, reporter: record_user("reporter-#{SecureRandom.hex(4)}"),
+                            category: 'spam')
+
+    report.decide!(staff_member: staff_members(:moderator), outcome: outcome, reason: reason)
+  end
+
+  def error_message_keys(model, locale)
+    attributes = I18n.t("activerecord.errors.models.#{model}.attributes", locale: locale, fallback: false)
+
+    attributes.flat_map { |attribute, keys| (keys.keys - [:format]).map { |key| "#{attribute}.#{key}" } }.sort
   end
 
   class GoogleAuthMock
@@ -52,6 +73,16 @@ class ActiveSupport::TestCase
 
     def fetch_access_token(_scope)
       'dummy_access_token'
+    end
+  end
+
+  class CloudflareAccessMock
+    def initialize(email)
+      @email = email
+    end
+
+    def verify(token)
+      { 'email' => @email } if token.present? && @email
     end
   end
 
