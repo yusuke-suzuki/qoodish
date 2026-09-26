@@ -9,6 +9,10 @@ administrator_decide_reports:
   role: administrator
   permission: decide_reports
 
+administrator_manage_staff:
+  role: administrator
+  permission: manage_staff
+
 moderator_read_reports:
   role: moderator
   permission: read_reports

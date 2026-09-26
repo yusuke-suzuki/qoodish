@@ -1,6 +1,10 @@
 _fixture:
   model_class: Admin::StaffMemberRole
 
+administrator_administrator:
+  staff_member: administrator
+  role: administrator
+
 moderator_moderator:
   staff_member: moderator
   role: moderator
