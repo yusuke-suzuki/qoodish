@@ -46,6 +46,9 @@ en:
         outcome: Outcome
         reason: Reason
         staff_member: Staff member
+      admin/staff_member:
+        changed_by: Operator
+        email: Email
     errors:
       models:
         report:
@@ -80,6 +83,14 @@ en:
               blank: must be filled in.
             staff_member:
               blank: could not be found.
+        admin/staff_member:
+          attributes:
+            changed_by:
+              exclusion: is the staff member being changed. Ask another administrator to remove your roles or revoke you.
+            email:
+              blank: must be filled in.
+              invalid: is not a valid email address.
+              taken: is already registered.
   messages:
     api:
       error_400: Invalid parameter specified.
