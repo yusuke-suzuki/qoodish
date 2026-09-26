@@ -38,7 +38,8 @@ class ApplicationController < ActionController::API
 
   def handle_record_invalid(exception)
     Rails.logger.warn(exception)
-    render_error(Exceptions::UnprocessableContent.new(exception.message))
+    detail = exception.record.errors.full_messages.join(I18n.t('messages.api.error_separator'))
+    render_error(Exceptions::UnprocessableContent.new(detail.presence || I18n.t('messages.api.error_422')))
   end
 
   def handle_faraday_error(exception)
