@@ -66,6 +66,7 @@ ja:
       error_422: リクエストの内容が不正です。
       error_429: リクエストが多すぎます。しばらくしてからやり直してください。
       error_500: サーバー内部エラーが発生しました。
+      error_separator: ""
 
       duplicate_map_name: 既に存在するマップ名です。
       map_name_required: マップ名を入力してください。

@@ -94,6 +94,7 @@ en:
       error_422: The request is invalid or malformed.
       error_429: Too many requests. Please try again later.
       error_500: The request has failed due to some unknown error.
+      error_separator: " "
 
       duplicate_map_name: Map name is duplicated.
       map_name_required: Map name is required.
