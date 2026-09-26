@@ -118,7 +118,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
-  test 'a guest email in the signed-in payload is ignored' do
+  test 'an email in the payload does not change who filed the report' do
     stub_google_auth(users(:me)) do
       post '/reports',
            params: {
@@ -131,7 +131,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :created
-    assert_nil Report.last.reporter_email
+    assert_equal users(:me), Report.last.reporter
   end
 
   test 'without authentication the endpoint answers unauthorized' do
