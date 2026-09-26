@@ -35,7 +35,6 @@ en:
       report:
         category: Reason for reporting
         details: Details
-        evidence_url: Reference URL
         locale: Language
         moderatable: Target
         moderatable_id: Target
@@ -47,6 +46,8 @@ en:
         outcome: Outcome
         reason: Reason
         staff_member: Staff member
+      admin/staff_member:
+        email: Email
     errors:
       models:
         report:
@@ -56,15 +57,12 @@ en:
             details:
               blank: must be filled in.
               too_long: must be %{count} characters or fewer.
-            evidence_url:
-              invalid: must start with http:// or https://.
-              too_long: must be %{count} characters or fewer.
             locale:
               inclusion: is not supported.
             moderatable:
               blank: could not be found.
             moderatable_id:
-              taken: has already been reported by you.
+              taken: has already been reported by you and is being reviewed.
             moderatable_type:
               inclusion: cannot be reported.
             reporter:
@@ -84,6 +82,12 @@ en:
               blank: must be filled in.
             staff_member:
               blank: could not be found.
+        admin/staff_member:
+          attributes:
+            email:
+              blank: must be filled in.
+              invalid: is not a valid email address.
+              taken: is already registered.
   messages:
     api:
       error_400: Invalid parameter specified.
@@ -94,6 +98,9 @@ en:
       error_422: The request is invalid or malformed.
       error_429: Too many requests. Please try again later.
       error_500: The request has failed due to some unknown error.
+      error_separator: " "
+
+      staff_member_self_change: You cannot remove your own roles or revoke yourself. Ask another administrator.
 
       duplicate_map_name: Map name is duplicated.
       map_name_required: Map name is required.
@@ -147,4 +154,3 @@ en:
       duplicate_journal_bookmark: The journal is already bookmarked.
 
       report_type_not_supported: This content cannot be reported.
-      duplicate_report: You have already reported this content.

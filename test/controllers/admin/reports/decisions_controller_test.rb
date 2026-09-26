@@ -68,8 +68,8 @@ class Admin::Reports::DecisionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_content
-    assert_includes JSON.parse(@response.body)['detail'],
-                    'Target type is an account or a journal, which cannot be removed. Choose "Keep the content" instead.'
+    assert_equal 'Target type is an account or a journal, which cannot be removed. Choose "Keep the content" instead.',
+                 JSON.parse(@response.body)['detail']
     assert_empty ModerationDecision.all
   end
 
@@ -92,8 +92,19 @@ class Admin::Reports::DecisionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_content
-    assert_includes JSON.parse(@response.body)['detail'], '理由を入力してください。'
+    assert_equal '理由を入力してください。', JSON.parse(@response.body)['detail']
     assert_empty ModerationDecision.all
+  end
+
+  test 'every refusal of a decision is listed in one Japanese message' do
+    stub_cloudflare_access(MODERATOR_EMAIL) do
+      post "/admin/reports/#{@report.id}/decision",
+           params: { outcome: 'deleted' },
+           headers: ACCESS_HEADERS.merge('Accept-Language': 'ja')
+    end
+
+    assert_response :unprocessable_content
+    assert_equal '対応結果を選択してください。理由を入力してください。', JSON.parse(@response.body)['detail']
   end
 
   test 'a decision without an outcome answers unprocessable' do

@@ -78,8 +78,24 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :bad_request
   end
 
-  test 'a second report on the same content answers unprocessable' do
+  test 'a second report while the first waits for a decision answers unprocessable' do
     Report.create!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
+
+    stub_google_auth(users(:me)) do
+      post '/reports',
+           params: { moderatable_type: 'Pin', moderatable_id: pins(:public_you_one).id, category: 'hate' },
+           headers: { 'Authorization': 'Bearer dummytoken', 'Accept-Language': 'ja' }
+    end
+
+    assert_response :unprocessable_content
+    assert_equal '対象は報告済みで、現在確認中です。', JSON.parse(@response.body)['detail']
+    assert_equal 1, Report.count
+  end
+
+  test 'a second report after the first was decided is filed' do
+    first = Report.create!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
+    first.decide!(staff_member: staff_members(:moderator), outcome: 'kept', reason: 'Not spam.')
+    travel 1.minute
 
     stub_google_auth(users(:me)) do
       post '/reports',
@@ -87,8 +103,8 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
            headers: { 'Authorization': 'Bearer dummytoken' }
     end
 
-    assert_response :unprocessable_content
-    assert_equal 1, Report.count
+    assert_response :created
+    assert_equal 2, Report.count
   end
 
   test 'reporting your own pin answers unprocessable' do
@@ -101,7 +117,22 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
-  test 'a guest email in the signed-in payload is ignored' do
+  test 'a reference URL from an older client is ignored' do
+    stub_google_auth(users(:me)) do
+      post '/reports',
+           params: {
+             moderatable_type: 'Pin',
+             moderatable_id: pins(:public_you_one).id,
+             category: 'spam',
+             evidence_url: 'https://example.com/original'
+           },
+           headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :created
+  end
+
+  test 'an email in the payload does not change who filed the report' do
     stub_google_auth(users(:me)) do
       post '/reports',
            params: {
@@ -114,7 +145,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :created
-    assert_nil Report.last.reporter_email
+    assert_equal users(:me), Report.last.reporter
   end
 
   test 'without authentication the endpoint answers unauthorized' do

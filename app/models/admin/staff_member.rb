@@ -8,8 +8,13 @@ module Admin
     normalizes :email, with: ->(email) { email.strip.downcase }
 
     validates :email, presence: true, uniqueness: true
+    validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
 
     scope :active, -> { where(revoked_at: nil) }
+
+    def self.grant!(email:, role:)
+      find_or_create_by!(email: email).tap { |staff_member| staff_member.grant!(role) }
+    end
 
     def can?(permission)
       permissions.include?(permission)
@@ -24,6 +29,10 @@ module Admin
         update!(revoked_at: nil)
         roles << role unless roles.include?(role)
       end
+    end
+
+    def unassign!(role)
+      staff_member_roles.find_by!(role: role).destroy!
     end
 
     def revoke!

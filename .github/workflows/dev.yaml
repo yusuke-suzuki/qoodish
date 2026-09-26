@@ -63,8 +63,52 @@ jobs:
           bundle exec rails db:setup
           bundle exec rails test
 
+  migrations:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Refuse changes to migrations dev may have applied
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BEFORE_SHA: ${{ github.event.action == 'synchronize' && github.event.before || '' }}
+        run: |
+          refs=("$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")")
+
+          if [ -n "$BEFORE_SHA" ]; then
+            if git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null || git fetch --quiet --no-tags origin "$BEFORE_SHA"; then
+              refs+=("$BEFORE_SHA")
+            else
+              echo "::warning::Could not fetch the previous head $BEFORE_SHA; checking against $BASE_REF only."
+            fi
+          fi
+
+          status=0
+          for ref in "${refs[@]}"; do
+            changed=$(git diff --name-status --diff-filter=DMR "$ref" "$HEAD_SHA" -- db/migrate)
+            if [ -n "$changed" ]; then
+              echo "::error::Migrations changed since $ref:"
+              echo "$changed"
+              status=1
+            fi
+          done
+
+          if [ "$status" -ne 0 ]; then
+            echo "The dev deploy runs db:migrate on every push, so dev may already have applied these files."
+            echo "db:migrate never reruns an applied version, so an edit would not reach dev and its schema would drift."
+            echo "Restore the files and add a new migration for the change instead."
+          fi
+
+          exit $status
+
   build-and-push-image:
-    needs: test
+    needs:
+      - test
+      - migrations
     concurrency:
       group: dev-build-${{ github.event.number }}
       cancel-in-progress: true

@@ -64,6 +64,7 @@ These rules cover database migrations, releases, and backward compatibility. Fol
 ### Migrations and Data Migration
 
 - Migration files in `db/migrate` must contain schema changes only. Do not write data-manipulation Ruby (model updates, backfills, record rewrites) inside a migration.
+- Never edit, rename or delete a migration once it has been pushed. The dev deploy runs `db:migrate` on every PR push, and `db:migrate` never reruns an applied version, so an edited migration leaves the dev schema drifted. Add a new migration instead; the `migrations` job in the Dev workflow refuses such changes.
 - Perform all data migration through scripts in `lib/tasks`, kept separate from schema migrations. These are plain Ruby scripts loaded by `bin/rails runner`, not Rake tasks, so they are invoked by path.
 
 ### Running Tasks in Production

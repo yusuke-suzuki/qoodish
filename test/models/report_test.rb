@@ -38,17 +38,7 @@ class ReportTest < ActiveSupport::TestCase
 
     I18n.with_locale(:ja) do
       assert_not duplicate.valid?
-      assert_equal ['対象は既に報告済みです。'], duplicate.errors.full_messages
-    end
-  end
-
-  test 'a Japanese message keeps a space after a half-width attribute name' do
-    report = Report.new(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam',
-                        evidence_url: 'ftp://example.com')
-
-    I18n.with_locale(:ja) do
-      assert_not report.valid?
-      assert_equal ['参考 URL は http:// または https:// で始めてください。'], report.errors.full_messages
+      assert_equal ['対象は報告済みで、現在確認中です。'], duplicate.errors.full_messages
     end
   end
 
@@ -99,12 +89,23 @@ class ReportTest < ActiveSupport::TestCase
     assert report.errors.of_kind?(:reporter, :other_than)
   end
 
-  test 'a reporter files one report per content' do
+  test 'a reporter cannot report content again while the report waits for a decision' do
     Report.create!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
     duplicate = Report.new(moderatable: pins(:public_you_one), reporter: users(:me), category: 'hate')
 
     assert_not duplicate.valid?
     assert duplicate.errors.of_kind?(:moderatable_id, :taken)
+  end
+
+  test 'a reporter can report content again once the earlier report is decided' do
+    first = Report.create!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
+    first.decide!(staff_member: staff_members(:moderator), outcome: 'kept', reason: 'Not spam.')
+    travel 1.minute
+
+    again = Report.file!(moderatable: pins(:public_you_one).reload, reporter: users(:me), category: 'hate')
+
+    assert_equal 'pending', again.status
+    assert_equal 'kept', first.status
   end
 
   test 'another reporter can report the same content' do
@@ -132,16 +133,6 @@ class ReportTest < ActiveSupport::TestCase
     decide(pins(:public_you_one).reload, outcome: 'removed', reason: 'Reported again since.')
 
     assert_equal 'kept', report.status
-  end
-
-  test 'a report that loses the race with an identical one is refused, not crashed' do
-    Report.stub :create!, ->(*) { raise ActiveRecord::RecordNotUnique, 'duplicate entry' } do
-      error = assert_raises(Exceptions::UnprocessableContent) do
-        Report.file!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
-      end
-
-      assert_equal I18n.t('messages.api.duplicate_report'), error.message
-    end
   end
 
   test 'an unknown type is refused before any lookup' do

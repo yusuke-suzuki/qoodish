@@ -4,7 +4,6 @@ ja:
       report:
         category: 報告の理由
         details: 詳しい内容
-        evidence_url: 参考 URL
         locale: 言語
         moderatable: 対象
         moderatable_id: 対象
@@ -16,6 +15,8 @@ ja:
         outcome: 対応結果
         reason: 理由
         staff_member: 担当者
+      admin/staff_member:
+        email: メールアドレス
     errors:
       models:
         report:
@@ -26,16 +27,12 @@ ja:
             details:
               blank: をご記入ください。
               too_long: は %{count} 文字以内でご記入ください。
-            evidence_url:
-              format: "%{attribute} %{message}"
-              invalid: は http:// または https:// で始めてください。
-              too_long: は %{count} 文字以内でご記入ください。
             locale:
               inclusion: がサポート対象外です。
             moderatable:
               blank: が見つかりません。
             moderatable_id:
-              taken: は既に報告済みです。
+              taken: は報告済みで、現在確認中です。
             moderatable_type:
               inclusion: は報告できません。
             reporter:
@@ -56,6 +53,13 @@ ja:
               blank: を入力してください。
             staff_member:
               blank: が見つかりません。
+        admin/staff_member:
+          format: "%{attribute}%{message}"
+          attributes:
+            email:
+              blank: を入力してください。
+              invalid: の形式が正しくありません。
+              taken: は既に登録されています。
   messages:
     api:
       error_400: 不正なリクエストです。
@@ -66,6 +70,9 @@ ja:
       error_422: リクエストの内容が不正です。
       error_429: リクエストが多すぎます。しばらくしてからやり直してください。
       error_500: サーバー内部エラーが発生しました。
+      error_separator: ""
+
+      staff_member_self_change: 自分自身のロールの削除や取り消しはできません。ほかの管理者に依頼してください。
 
       duplicate_map_name: 既に存在するマップ名です。
       map_name_required: マップ名を入力してください。
@@ -119,4 +126,3 @@ ja:
       duplicate_journal_bookmark: 既にブックマーク済みです。
 
       report_type_not_supported: このコンテンツは報告できません。
-      duplicate_report: このコンテンツは既に報告済みです。

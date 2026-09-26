@@ -1,6 +1,9 @@
 _fixture:
   model_class: Admin::StaffMember
 
+administrator:
+  email: administrator@example.com
+
 moderator:
   email: moderator@example.com
 

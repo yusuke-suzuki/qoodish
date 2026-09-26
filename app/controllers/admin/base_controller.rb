@@ -27,5 +27,12 @@ module Admin
 
       raise Exceptions::Forbidden unless permission && current_staff_member&.can?(permission)
     end
+
+    def other_staff_member(id)
+      staff_member = StaffMember.find(id)
+      raise Exceptions::UnprocessableContent, I18n.t('messages.api.staff_member_self_change') if staff_member == current_staff_member
+
+      staff_member
+    end
   end
 end
