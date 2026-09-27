@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.20.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.19.0...v4.20.0) (2026-09-27)
+
+
+### Features
+
+* allow reporting again after a decision ([fe72da3](https://github.com/yusuke-suzuki/qoodish/commit/fe72da3c883fd291d8235c929d8e40fbd50e942b))
+* manage staff members through the admin API ([d8f97d8](https://github.com/yusuke-suzuki/qoodish/commit/d8f97d85dbcec1717bf4e155b99ceda269931f51))
+* retire the reference URL on reports ([e6dad49](https://github.com/yusuke-suzuki/qoodish/commit/e6dad490d30c576c7e3f46d83c3ba4ca036794cd))
+
+
+### Bug Fixes
+
+* answer validation errors without a prefix ([66856a1](https://github.com/yusuke-suzuki/qoodish/commit/66856a17ebec19eec2e8974c936f253886e09f05))
+
 ## [4.19.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.18.1...v4.19.0) (2026-09-26)
 
 
