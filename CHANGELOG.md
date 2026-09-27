@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.21.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.20.0...v4.21.0) (2026-09-27)
+
+
+### Features
+
+* drop reporter_email and evidence_url ([40d0012](https://github.com/yusuke-suzuki/qoodish/commit/40d0012a5623e4ea79388369de80442afe18045f))
+
 ## [4.20.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.19.0...v4.20.0) (2026-09-27)
 
 
