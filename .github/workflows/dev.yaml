@@ -128,6 +128,9 @@ jobs:
       contents: read
       id-token: write
     runs-on: ubuntu-latest
+    env:
+      RELEASE_CANDIDATE: ${{ github.head_ref == 'release-please--branches--master' && github.base_ref == 'master' && github.event.pull_request.head.repo.full_name == github.repository }}
+      CLOUDSDK_CORE_DISABLE_PROMPTS: 1
     steps:
       - uses: actions/checkout@v4
       - id: auth
@@ -138,10 +141,10 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
       - name: Deploy Job using kustomize
+        if: env.RELEASE_CANDIDATE == 'true'
         working-directory: run/dev/runner
         env:
           IMAGE_URL: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
-          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
         run: |
           echo "Setting image to $IMAGE_URL"
           kustomize edit set image IMAGE_PLACEHOLDER=$IMAGE_URL
@@ -154,8 +157,7 @@ jobs:
             --project=$PROJECT_ID \
             --region=$REGION
       - name: Run db:migrate on the Job carrying this image
-        env:
-          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+        if: env.RELEASE_CANDIDATE == 'true'
         run: |
           EXECUTION=$(gcloud run jobs execute $JOB_NAME \
             --args=bin/rails,db:migrate \
@@ -178,10 +180,10 @@ jobs:
             fi
           fi
       - name: Deploy Service using kustomize
+        if: env.RELEASE_CANDIDATE == 'true'
         working-directory: run/dev/api
         env:
           IMAGE_URL: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
-          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
         run: |
           echo "Setting image to $IMAGE_URL"
           kustomize edit set image IMAGE_PLACEHOLDER=$IMAGE_URL
@@ -193,11 +195,14 @@ jobs:
           kustomize build . | gcloud run services replace - \
             --project=$PROJECT_ID \
             --region=$REGION
-      - name: Update traffic tag to the new revision
+      - name: Deploy a tagged revision without traffic
+        if: env.RELEASE_CANDIDATE != 'true'
         env:
-          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+          IMAGE_URL: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
         run: |
-          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
-            --update-tags=pr-${{ github.event.number }}=LATEST \
+          gcloud run deploy $SERVICE_NAME \
+            --image=$IMAGE_URL \
+            --no-traffic \
+            --tag=pr-${{ github.event.number }} \
             --project=$PROJECT_ID \
             --region=$REGION
