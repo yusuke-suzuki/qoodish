@@ -4,8 +4,6 @@ class Report < ApplicationRecord
   MODERATABLE_TYPES = [Pin.name, Comment.name, Map.name, Chapter.name, Journal.name, User.name].freeze
   DETAILS_REQUIRED_CATEGORIES = %w[copyright privacy other].freeze
 
-  self.ignored_columns += %w[reporter_email evidence_url]
-
   belongs_to :moderatable, polymorphic: true, optional: true
   belongs_to :reporter, class_name: User.name, optional: true
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_26_172813) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_27_164425) do
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -370,15 +370,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_172813) do
     t.text "content_snapshot"
     t.datetime "created_at", null: false
     t.text "details"
-    t.text "evidence_url"
     t.string "locale", null: false
     t.bigint "moderatable_id", null: false
     t.string "moderatable_type", null: false
     t.bigint "reported_revision_id"
-    t.string "reporter_email"
     t.bigint "reporter_id"
     t.index ["moderatable_type", "moderatable_id"], name: "index_reports_on_moderatable"
-    t.index ["reporter_email", "moderatable_type", "moderatable_id"], name: "index_reports_on_reporter_email_and_moderatable", unique: true
     t.index ["reporter_id"], name: "index_reports_on_reporter_id"
   end
 
