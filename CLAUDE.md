@@ -64,6 +64,8 @@ These rules cover database migrations, releases, and backward compatibility. Fol
 ### Migrations and Data Migration
 
 - Migration files in `db/migrate` must contain schema changes only. Do not write data-manipulation Ruby (model updates, backfills, record rewrites) inside a migration.
+- Only the release PR that `release-please` keeps in step with `master` runs `db:migrate` on dev and takes its traffic; any other PR push deploys a tagged dev revision without traffic and without migrating. A migration may therefore be edited, renamed or squashed while its PR is open, but never after it has been merged: `db:migrate` never reruns an applied version, so add a new migration instead.
+- A feature that needs a schema change starts with a `feat:` PR that contains only the migration and the model it adds, and merges it before the PR that uses it. A PR revision on dev runs against the dev schema of the release PR, so the feature can only be exercised there once its schema has been merged and the release PR has been updated.
 - Perform all data migration through scripts in `lib/tasks`, kept separate from schema migrations. These are plain Ruby scripts loaded by `bin/rails runner`, not Rake tasks, so they are invoked by path.
 
 ### Running Tasks in Production
@@ -77,10 +79,10 @@ These rules cover database migrations, releases, and backward compatibility. Fol
 - A migration therefore applies before any instance serves the code that reads it. It also applies while the previous version is still serving, so a migration must leave that version working: add and backfill in one release, and read the result in the same release or a later one, but never remove or rename what the running version still reads.
 - A release cannot apply a migration before its own image exists. Nothing in a release procedure can run `db:migrate` earlier than the release itself.
 
-### Dropping Columns
+### Dropping Columns and Tables
 
-- Removing a column takes two separate releases. First, ship a PR that only adds the column to `ignored_columns`, and release it. Only after that release is live, ship a second PR with the column-drop migration.
-- Never combine the `ignored_columns` addition and the column-drop migration in the same PR or the same release version.
+- Removing a column or a table takes two separate releases. First, ship a PR that removes every reference to it (models, associations, validations, controllers, views, jobs, rake tasks, fixtures and tests) and, for a column, adds it to `ignored_columns`, and release it. Only after that release is live, ship a second PR with the drop migration.
+- Never combine the reference removal and the drop migration in the same PR or the same release version.
 
 ### Backward Compatibility with qoodish-web
 
