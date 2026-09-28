@@ -6,7 +6,11 @@ module Pins
       def index
         pin = current_user.referenceable_pins.find_by!(id: params[:pin_id])
 
-        comment = pin.comments.find_by!(id: params[:comment_id])
+        comment = pin
+                  .comments
+                  .not_blocking(current_user)
+                  .not_blocked_by(current_user)
+                  .find_by!(id: params[:comment_id])
 
         @likes = comment.votes
       end
@@ -14,17 +18,39 @@ module Pins
       def create
         pin = current_user.referenceable_pins.find_by!(id: params[:pin_id])
 
-        current_user.liked!(pin.comments.find_by!(id: params[:comment_id]))
+        comment = pin
+                  .comments
+                  .not_blocking(current_user)
+                  .not_blocked_by(current_user)
+                  .find_by!(id: params[:comment_id])
 
-        @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
+        current_user.liked!(comment)
+
+        @pin = current_user.referenceable_pins.preload(:map, { user: :image }, :images, :votes).find(pin.id)
+        @comments = @pin
+                    .comments
+                    .not_blocking(current_user)
+                    .not_blocked_by(current_user)
+                    .preload({ user: :image }, :votes)
       end
 
       def destroy
         pin = current_user.referenceable_pins.find_by!(id: params[:pin_id])
 
-        current_user.unliked!(pin.comments.find_by!(id: params[:comment_id]))
+        comment = pin
+                  .comments
+                  .not_blocking(current_user)
+                  .not_blocked_by(current_user)
+                  .find_by!(id: params[:comment_id])
 
-        @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
+        current_user.unliked!(comment)
+
+        @pin = current_user.referenceable_pins.preload(:map, { user: :image }, :images, :votes).find(pin.id)
+        @comments = @pin
+                    .comments
+                    .not_blocking(current_user)
+                    .not_blocked_by(current_user)
+                    .preload({ user: :image }, :votes)
       end
     end
   end

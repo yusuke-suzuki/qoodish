@@ -14,7 +14,12 @@ module Chapters
       private
 
       def comment
-        @comment ||= chapter.comments.preload(user: :image).find_by!(id: params[:comment_id])
+        @comment ||= chapter
+                     .comments
+                     .not_blocking(current_user)
+                     .not_blocked_by(current_user)
+                     .preload(user: :image)
+                     .find_by!(id: params[:comment_id])
       end
 
       def chapter

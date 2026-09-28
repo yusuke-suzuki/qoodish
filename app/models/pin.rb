@@ -8,6 +8,8 @@ class Pin < ApplicationRecord
   include RevisableImages
   include Moderatable
   include Votable
+  include Blockable
+  include Mutable
 
   self.revision_attributes = %i[name comment latitude longitude]
 
@@ -66,6 +68,7 @@ class Pin < ApplicationRecord
       .visible
       .joins(:map)
       .where(maps: { id: Map.referenceable_by(user) })
+      .not_blocking(user)
   }
 
   scope :feed_for, lambda { |user|
@@ -73,6 +76,9 @@ class Pin < ApplicationRecord
       .visible
       .joins(:map)
       .where(maps: { id: Map.related_to(user) })
+      .not_blocking(user)
+      .not_blocked_by(user)
+      .not_muted_by(user)
   }
 
   scope :latest_feed, lambda {
@@ -91,14 +97,6 @@ class Pin < ApplicationRecord
       .group('pins.id')
       .order('count(votes.id) desc')
       .limit(10)
-  }
-
-  scope :preloaded, lambda {
-    preload(:map, { user: :image }, :images, { comments: { user: :image } })
-  }
-
-  scope :preloaded_with_votes, lambda {
-    preloaded.preload(:votes, comments: :votes)
   }
 
   def image_url

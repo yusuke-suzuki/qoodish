@@ -3,6 +3,7 @@ class JournalsController < ApplicationController
 
   def show
     @journal = Journal
+               .not_blocking(current_user)
                .preload(:bookmarks, user: :image)
                .find_by!(id: params[:id])
   end

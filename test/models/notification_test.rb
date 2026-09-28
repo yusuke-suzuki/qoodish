@@ -48,6 +48,32 @@ class NotificationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'no web push from an account the recipient muted' do
+    users(:you).mute!(users(:me))
+
+    assert_no_enqueued_jobs do
+      Notification.create!(
+        notifiable: pins(:public_you_one),
+        notifier: users(:me),
+        recipient: users(:you),
+        key: 'liked'
+      )
+    end
+  end
+
+  test 'no web push from an account the recipient blocked' do
+    notification = Notification.new(
+      notifiable: pins(:public_you_one),
+      notifier: users(:me),
+      recipient: users(:you),
+      key: 'liked'
+    )
+
+    users(:you).block!(users(:me))
+
+    assert_not notification.allowed_web_push?
+  end
+
   test 'a liked pin links to the pin' do
     notification = Notification.new(
       notifiable: pins(:public_you_one),

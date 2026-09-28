@@ -43,6 +43,18 @@ class Notification < ApplicationRecord
     where(key: KEYS)
   }
 
+  scope :not_blocking, lambda { |user|
+    where.not(notifier_id: Block.active.where(blocked_id: user.id).select(:blocker_id))
+  }
+
+  scope :not_blocked_by, lambda { |user|
+    where.not(notifier_id: Block.active.where(blocker_id: user.id).select(:blocked_id))
+  }
+
+  scope :not_muted_by, lambda { |user|
+    where.not(notifier_id: Mute.active.where(muter_id: user.id).select(:muted_id))
+  }
+
   def client_notifiable_type
     RENAMED_NOTIFIABLE_TYPES.fetch(notifiable_type, notifiable_type.downcase)
   end
@@ -116,7 +128,7 @@ class Notification < ApplicationRecord
   end
 
   def allowed_web_push?
-    recipient.web_push_preferences[key]
+    recipient.web_push_preferences[key] && !recipient.blocked_with?(notifier) && !recipient.muting?(notifier)
   end
 
   private

@@ -17,6 +17,21 @@ class CoauthorshipInvitation < ApplicationRecord
             on: :create
   validate :invitee_is_not_author, on: :create
   validate :invitee_is_not_coauthor, on: :create
+  validates :invitee_id,
+            exclusion: {
+              in: lambda { |invitation|
+                [invitation.inviter, invitation.map&.user].compact.flat_map(&:blocked_with_user_ids)
+              },
+              message: :blocked_interaction
+            },
+            on: :create
+
+  scope :between, lambda { |user, other|
+    where(inviter_id: user.id, invitee_id: other.id)
+      .or(where(inviter_id: other.id, invitee_id: user.id))
+      .or(where(map_id: user.maps.select(:id), invitee_id: other.id))
+      .or(where(map_id: other.maps.select(:id), invitee_id: user.id))
+  }
 
   private
 

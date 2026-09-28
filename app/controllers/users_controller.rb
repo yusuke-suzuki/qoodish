@@ -3,7 +3,10 @@ class UsersController < ApplicationController
 
   def index
     @users = if params[:q].present?
-               User.search_by_name(params[:q]).preload(:image)
+               User
+                 .where.not(id: current_user.received_blocks.active.select(:blocker_id))
+                 .search_by_name(params[:q])
+                 .preload(:image)
              else
                User.none
              end

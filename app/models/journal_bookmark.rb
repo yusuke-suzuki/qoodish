@@ -8,6 +8,16 @@ class JournalBookmark < ApplicationRecord
               message: I18n.t('messages.api.duplicate_journal_bookmark')
             }
   validate :user_cannot_bookmark_own_journal
+  validates :user_id,
+            exclusion: {
+              in: ->(bookmark) { bookmark.journal ? bookmark.journal.user.blocked_with_user_ids : [] },
+              message: :blocked_interaction
+            }
+
+  scope :between, lambda { |user, other|
+    where(user_id: user.id, journal_id: Journal.where(user_id: other.id).select(:id))
+      .or(where(user_id: other.id, journal_id: Journal.where(user_id: user.id).select(:id)))
+  }
 
   private
 

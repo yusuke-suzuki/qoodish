@@ -6,6 +6,9 @@ class MapsController < ApplicationController
               Map
                 .public_open
                 .not_bookmarked_by(current_user)
+                .not_blocking(current_user)
+                .not_blocked_by(current_user)
+                .not_muted_by(current_user)
                 .preload(:images, user: :image)
                 .order(created_at: :desc)
                 .sample(10)

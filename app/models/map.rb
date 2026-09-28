@@ -3,6 +3,8 @@ class Map < ApplicationRecord
   include RevisableStatus
   include RevisableImages
   include Moderatable
+  include Blockable
+  include Mutable
 
   # Shield running instances from the legacy columns the follow-up migration
   # drops, so in-flight INSERTs do not reference a column that is gone.
@@ -75,6 +77,7 @@ class Map < ApplicationRecord
       .or(where(id: Coauthorship.where(user_id: user.id).select(:map_id)))
       .published
       .visible
+      .not_blocking(user)
   }
 
   scope :editable_by, lambda { |user|

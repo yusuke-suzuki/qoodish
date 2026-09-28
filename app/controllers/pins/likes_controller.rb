@@ -13,7 +13,12 @@ module Pins
 
       current_user.liked!(pin)
 
-      @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
+      @pin = current_user.referenceable_pins.preload(:map, { user: :image }, :images, :votes).find(pin.id)
+      @comments = @pin
+                  .comments
+                  .not_blocking(current_user)
+                  .not_blocked_by(current_user)
+                  .preload({ user: :image }, :votes)
     end
 
     def destroy
@@ -21,7 +26,12 @@ module Pins
 
       current_user.unliked!(pin)
 
-      @pin = current_user.referenceable_pins.preloaded_with_votes.find(pin.id)
+      @pin = current_user.referenceable_pins.preload(:map, { user: :image }, :images, :votes).find(pin.id)
+      @comments = @pin
+                  .comments
+                  .not_blocking(current_user)
+                  .not_blocked_by(current_user)
+                  .preload({ user: :image }, :votes)
     end
   end
 end

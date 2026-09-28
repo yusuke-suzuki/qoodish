@@ -117,6 +117,31 @@ en:
           attributes:
             mute_id:
               taken: has already been lifted.
+        vote:
+          attributes:
+            voter_id:
+              format: "%{message}"
+              blocked_interaction: You cannot like a post by an account you have blocked or that has blocked you.
+        comment:
+          attributes:
+            user_id:
+              format: "%{message}"
+              blocked_interaction: You cannot comment on a post by an account you have blocked or that has blocked you.
+        bookmark:
+          attributes:
+            user_id:
+              format: "%{message}"
+              blocked_interaction: You cannot bookmark a map by an account you have blocked or that has blocked you.
+        journal_bookmark:
+          attributes:
+            user_id:
+              format: "%{message}"
+              blocked_interaction: You cannot bookmark the journal of an account you have blocked or that has blocked you.
+        coauthorship_invitation:
+          attributes:
+            invitee_id:
+              format: "%{message}"
+              blocked_interaction: You cannot invite an account as a coauthor when you or the map's author has blocked it or been blocked by it.
   messages:
     api:
       error_400: Invalid parameter specified.

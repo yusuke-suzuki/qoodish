@@ -8,26 +8,37 @@ module Me
                   .pins
                   .published
                   .visible
-                  .preloaded_with_votes
+                  .preload(:map, { user: :image }, :images, :votes)
                   .feed_before(params[:next_timestamp], params[:next_id])
               else
                 current_user
                   .pins
                   .published
                   .visible
-                  .preloaded_with_votes
+                  .preload(:map, { user: :image }, :images, :votes)
                   .latest_feed
               end
+
+      @comments_by_pin_id = Comment
+                            .not_deleted
+                            .visible
+                            .where(commentable: @pins.to_a)
+                            .not_blocking(current_user)
+                            .not_blocked_by(current_user)
+                            .preload({ user: :image }, :votes)
+                            .group_by(&:commentable_id)
     end
 
     def update
-      @pin = current_user.pins.published.find_by!(id: params[:id])
-      @pin.revise!(user: current_user, **pin_params)
+      pin = current_user.pins.published.find_by!(id: params[:id])
+      pin.revise!(user: current_user, **pin_params)
 
-      ActiveRecord::Associations::Preloader.new(
-        records: [@pin],
-        associations: [:map, :images, { comments: [{ user: :image }, :votes] }, :votes]
-      ).call
+      @pin = current_user.pins.preload(:map, :images, :votes).find(pin.id)
+      @comments = @pin
+                  .comments
+                  .not_blocking(current_user)
+                  .not_blocked_by(current_user)
+                  .preload({ user: :image }, :votes)
     end
 
     def destroy

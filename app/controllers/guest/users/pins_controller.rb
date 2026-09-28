@@ -3,7 +3,7 @@ class Guest::Users::PinsController < ApplicationController
     scope = Pin
             .public_open
             .where(user_id: params[:user_id])
-            .preloaded_with_votes
+            .preload(:map, { user: :image }, :images, :votes, comments: [{ user: :image }, :votes])
 
     @pins = if params[:next_timestamp]
               scope.feed_before(params[:next_timestamp], params[:next_id])

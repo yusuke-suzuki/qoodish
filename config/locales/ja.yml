@@ -93,6 +93,31 @@ ja:
           attributes:
             mute_id:
               taken: は既に解除されています。
+        vote:
+          attributes:
+            voter_id:
+              format: "%{message}"
+              blocked_interaction: ブロックしている、またはブロックされているアカウントの投稿にはいいねできません。
+        comment:
+          attributes:
+            user_id:
+              format: "%{message}"
+              blocked_interaction: ブロックしている、またはブロックされているアカウントの投稿にはコメントできません。
+        bookmark:
+          attributes:
+            user_id:
+              format: "%{message}"
+              blocked_interaction: ブロックしている、またはブロックされているアカウントの地図はブックマークできません。
+        journal_bookmark:
+          attributes:
+            user_id:
+              format: "%{message}"
+              blocked_interaction: ブロックしている、またはブロックされているアカウントの手帳はブックマークできません。
+        coauthorship_invitation:
+          attributes:
+            invitee_id:
+              format: "%{message}"
+              blocked_interaction: あなたか地図の作成者がブロックしている、またはブロックされているアカウントは共同編集者に招待できません。
   messages:
     api:
       error_400: 不正なリクエストです。
