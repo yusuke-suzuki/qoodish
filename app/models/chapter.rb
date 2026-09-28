@@ -10,6 +10,8 @@ class Chapter < ApplicationRecord
   include RevisableImages
   include Moderatable
   include Votable
+  include Blockable
+  include Mutable
 
   EMPTY_FEATURE_COLLECTION = { 'type' => 'FeatureCollection', 'features' => [] }.freeze
 
@@ -65,7 +67,7 @@ class Chapter < ApplicationRecord
   validate :journey_must_match_author_and_map
 
   scope :referenceable_by, lambda { |user|
-    published.visible.where(map_id: Map.referenceable_by(user))
+    published.visible.where(map_id: Map.referenceable_by(user)).not_blocking(user)
   }
 
   scope :readable_by, lambda { |user|
@@ -84,7 +86,7 @@ class Chapter < ApplicationRecord
   }
 
   scope :feed_for, lambda { |user|
-    published.visible.where(map_id: Map.related_to(user))
+    published.visible.where(map_id: Map.related_to(user)).not_blocking(user).not_blocked_by(user).not_muted_by(user)
   }
 
   scope :latest_feed, lambda {

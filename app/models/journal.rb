@@ -1,5 +1,6 @@
 class Journal < ApplicationRecord
   include Revisable
+  include Blockable
 
   self.revision_attributes = %i[title description]
 

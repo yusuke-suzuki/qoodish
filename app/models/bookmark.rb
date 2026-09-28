@@ -9,6 +9,16 @@ class Bookmark < ApplicationRecord
             }
   validate :map_must_be_public
   validate :user_cannot_bookmark_editable_map
+  validates :user_id,
+            exclusion: {
+              in: ->(bookmark) { bookmark.map ? bookmark.map.user.blocked_with_user_ids : [] },
+              message: :blocked_interaction
+            }
+
+  scope :between, lambda { |user, other|
+    where(user_id: user.id, map_id: other.maps.select(:id))
+      .or(where(user_id: other.id, map_id: user.maps.select(:id)))
+  }
 
   private
 

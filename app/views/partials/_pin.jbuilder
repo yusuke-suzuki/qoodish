@@ -9,7 +9,7 @@ json.author do
   json.image_url pin.user.image_url
 end
 json.comment pin.comment
-json.comments pin.comments do |comment|
+json.comments comments do |comment|
   json.partial! 'partials/comment', comment: comment
   json.pin_id pin.id
   json.review_id pin.id

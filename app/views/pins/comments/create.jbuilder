@@ -1,1 +1,1 @@
-json.partial! 'partials/pin', pin: @pin
+json.partial! 'partials/pin', pin: @pin, comments: @comments

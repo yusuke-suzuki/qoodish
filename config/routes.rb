@@ -5,6 +5,8 @@ Rails.application.routes.draw do
       resources :pins, only: [:index]
       resources :chapters, only: [:index]
       resource :journal, only: [:show]
+      resource :block, only: %i[create destroy]
+      resource :mute, only: %i[create destroy]
     end
   end
   resources :maps do
@@ -55,6 +57,8 @@ Rails.application.routes.draw do
       end
     end
     resources :chapters, only: %i[index show update destroy]
+    resources :blocks, only: [:index]
+    resources :mutes, only: [:index]
     namespace :bookmarks do
       resources :maps, only: [:index]
       resources :journals, only: [:index]

@@ -6,8 +6,17 @@ module Maps
       @pins = current_user
               .referenceable_pins
               .where(map_id: params[:map_id])
-              .preloaded_with_votes
+              .preload(:map, { user: :image }, :images, :votes)
               .order(created_at: :desc)
+
+      @comments_by_pin_id = Comment
+                            .not_deleted
+                            .visible
+                            .where(commentable: @pins.to_a)
+                            .not_blocking(current_user)
+                            .not_blocked_by(current_user)
+                            .preload({ user: :image }, :votes)
+                            .group_by(&:commentable_id)
     end
 
     def create

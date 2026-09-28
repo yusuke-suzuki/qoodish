@@ -11,6 +11,13 @@ class Vote < ApplicationRecord
               in: [User.name]
             }
 
+  validates :voter_id,
+            exclusion: {
+              in: ->(vote) { vote.votable ? vote.votable.user.blocked_with_user_ids : [] },
+              message: :blocked_interaction
+            },
+            on: :create
+
   after_create :create_notification, unless: :on_yourself?
 
   private

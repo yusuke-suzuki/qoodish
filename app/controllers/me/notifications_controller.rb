@@ -7,6 +7,9 @@ module Me
         current_user
         .notifications
         .renderable
+        .not_blocking(current_user)
+        .not_blocked_by(current_user)
+        .not_muted_by(current_user)
         .recent
         .includes({ notifier: :image }, :notifiable)
         .select(&:renderable?)
@@ -18,6 +21,9 @@ module Me
       @notification =
         current_user
         .notifications
+        .not_blocking(current_user)
+        .not_blocked_by(current_user)
+        .not_muted_by(current_user)
         .find_by!(id: params[:id])
 
       # The serialized payload needs both associations, so a notification

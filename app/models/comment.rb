@@ -5,6 +5,7 @@ class Comment < ApplicationRecord
   include RevisableStatus
   include Moderatable
   include Votable
+  include Blockable
 
   self.revision_attributes = %i[body]
 
@@ -30,6 +31,12 @@ class Comment < ApplicationRecord
             }
   validates :user_id,
             presence: true
+  validates :user_id,
+            exclusion: {
+              in: ->(comment) { comment.commentable ? comment.commentable.user.blocked_with_user_ids : [] },
+              message: :blocked_interaction
+            },
+            on: :create
 
   after_create :create_notification, unless: :on_yourself?
 

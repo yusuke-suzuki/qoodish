@@ -57,6 +57,93 @@ class BlockTest < ActiveSupport::TestCase
     assert_not Unblock.exists?(block_id: block.id)
   end
 
+  test 'blocking removes the bookmarks each side holds on the other' do
+    Bookmark.create!(map: maps(:public_unfollowing), user: users(:me))
+    JournalBookmark.create!(journal: journals(:my_journal), user: users(:you))
+
+    users(:me).block!(users(:you))
+
+    assert_not Bookmark.exists?(map: maps(:public_one), user: users(:you))
+    assert_not Bookmark.exists?(map: maps(:public_unfollowing), user: users(:me))
+    assert_not JournalBookmark.exists?(journal: journals(:my_journal), user: users(:you))
+  end
+
+  test 'blocking ends the coauthorships each side holds on the other' do
+    users(:me).block!(users(:you))
+
+    assert_not Coauthorship.exists?(map: maps(:private), user: users(:you))
+    assert_not Coauthorship.exists?(map: maps(:private_following), user: users(:me))
+  end
+
+  test 'blocking declines pending invitations between the two' do
+    invitation = CoauthorshipInvitation.create!(map: maps(:public_two), inviter: users(:me), invitee: users(:you))
+
+    users(:you).block!(users(:me))
+
+    assert_predicate invitation.reload, :declined?
+  end
+
+  test 'blocking declines pending invitations to either map from a third member' do
+    third = record_user('third')
+    Coauthorship.create!(map: maps(:public_two), user: third)
+    Coauthorship.create!(map: maps(:private_unfollowing), user: third)
+    to_blocked = CoauthorshipInvitation.create!(map: maps(:public_two), inviter: third, invitee: users(:you))
+    to_blocker = CoauthorshipInvitation.create!(map: maps(:private_unfollowing), inviter: third, invitee: users(:me))
+
+    users(:me).block!(users(:you))
+
+    assert_predicate to_blocked.reload, :declined?
+    assert_predicate to_blocker.reload, :declined?
+  end
+
+  test 'neither side can interact with the other while blocked' do
+    users(:me).block!(users(:you))
+
+    assert_raises(ActiveRecord::RecordInvalid) { users(:you).liked!(pins(:public_one)) }
+    assert_raises(ActiveRecord::RecordInvalid) { users(:me).liked!(pins(:public_unfollowing_you)) }
+    assert_raises(ActiveRecord::RecordInvalid) do
+      Comment.record!(user: users(:me), commentable: pins(:public_unfollowing_you), body: 'hello')
+    end
+    assert_not Bookmark.new(map: maps(:public_unfollowing), user: users(:me)).valid?
+    assert_not JournalBookmark.new(journal: journals(:you_journal), user: users(:me)).valid?
+    assert_not CoauthorshipInvitation.new(map: maps(:public_two), inviter: users(:me), invitee: users(:you)).valid?
+  end
+
+  test 'a refusal across a block reads as one sentence in each locale' do
+    users(:me).block!(users(:you))
+    vote = Vote.new(votable: pins(:public_unfollowing_you), voter: users(:me))
+
+    messages = %i[en ja].index_with do |locale|
+      I18n.with_locale(locale) do
+        vote.valid?
+        vote.errors.full_messages
+      end
+    end
+
+    assert_equal ['You cannot like a post by an account you have blocked or that has blocked you.'], messages[:en]
+    assert_equal ['ブロックしている、またはブロックされているアカウントの投稿にはいいねできません。'], messages[:ja]
+  end
+
+  test 'unblocking lets the two interact again' do
+    block = users(:me).block!(users(:you))
+    Unblock.create!(block: block)
+
+    assert users(:me).liked!(pins(:public_unfollowing_you))
+    assert Bookmark.new(map: maps(:public_unfollowing), user: users(:me)).valid?
+  end
+
+  test 'each refusal across a block is worded for what it refuses in each locale' do
+    keys = %w[vote.attributes.voter_id comment.attributes.user_id bookmark.attributes.user_id
+              journal_bookmark.attributes.user_id coauthorship_invitation.attributes.invitee_id]
+
+    I18n.available_locales.each do |locale|
+      keys.each do |key|
+        assert I18n.exists?("activerecord.errors.models.#{key}.blocked_interaction", locale),
+               "#{locale} has no refusal for #{key}"
+      end
+    end
+  end
+
   test 'every error message is worded in each locale' do
     I18n.available_locales.combination(2).each do |one, other|
       assert_equal error_message_keys(:block, one), error_message_keys(:block, other),

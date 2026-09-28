@@ -207,6 +207,34 @@ class User < ApplicationRecord
     votes.find_by!(votable: votable).destroy!
   end
 
+  def blocking?(user)
+    active_blocks.exists?(blocked_id: user.id)
+  end
+
+  def blocked_by?(user)
+    received_blocks.active.exists?(blocker_id: user.id)
+  end
+
+  def blocked_with?(user)
+    blocking?(user) || blocked_by?(user)
+  end
+
+  def blocked_with_user_ids
+    active_blocks.pluck(:blocked_id) | received_blocks.active.pluck(:blocker_id)
+  end
+
+  def muting?(user)
+    active_mutes.exists?(muted_id: user.id)
+  end
+
+  def block!(user)
+    blocks.create!(blocked: user)
+  end
+
+  def mute!(user)
+    mutes.create!(muted: user)
+  end
+
   private
 
   def image_must_be_owned
