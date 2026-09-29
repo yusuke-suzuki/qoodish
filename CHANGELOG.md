@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.22.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.21.0...v4.22.0) (2026-09-29)
+
+
+### Features
+
+* record blocks and mutes between users ([31052c4](https://github.com/yusuke-suzuki/qoodish/commit/31052c4785f6d4a599e10e6e229066b9d3c21c19))
+
+
+### Bug Fixes
+
+* call maps 地図 in Japanese error messages ([ad1a94a](https://github.com/yusuke-suzuki/qoodish/commit/ad1a94a0076f2a0b749a7098a1f3dc5a497ad192))
+
 ## [4.21.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.20.0...v4.21.0) (2026-09-27)
 
 
