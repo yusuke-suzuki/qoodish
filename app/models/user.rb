@@ -55,6 +55,36 @@ class User < ApplicationRecord
            foreign_key: :moderator_id,
            inverse_of: :moderator,
            dependent: :nullify
+  has_many :blocks,
+           foreign_key: :blocker_id,
+           inverse_of: :blocker,
+           dependent: :delete_all
+  has_many :active_blocks,
+           -> { active },
+           class_name: 'Block',
+           foreign_key: :blocker_id,
+           inverse_of: :blocker
+  has_many :blocked_users, through: :active_blocks, source: :blocked
+  has_many :received_blocks,
+           class_name: 'Block',
+           foreign_key: :blocked_id,
+           inverse_of: :blocked,
+           dependent: :delete_all
+  has_many :mutes,
+           foreign_key: :muter_id,
+           inverse_of: :muter,
+           dependent: :delete_all
+  has_many :active_mutes,
+           -> { active },
+           class_name: 'Mute',
+           foreign_key: :muter_id,
+           inverse_of: :muter
+  has_many :muted_users, through: :active_mutes, source: :muted
+  has_many :received_mutes,
+           class_name: 'Mute',
+           foreign_key: :muted_id,
+           inverse_of: :muted,
+           dependent: :delete_all
 
   validates :uid,
             presence: true,

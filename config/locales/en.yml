@@ -49,6 +49,14 @@ en:
       admin/staff_member:
         changed_by: Operator
         email: Email
+      block:
+        blocked_id: Account
+      mute:
+        muted_id: Account
+      unblock:
+        block_id: The block
+      unmute:
+        mute_id: The mute
     errors:
       models:
         report:
@@ -91,6 +99,24 @@ en:
               blank: must be filled in.
               invalid: is not a valid email address.
               taken: is already registered.
+        block:
+          attributes:
+            blocked_id:
+              other_than: is your own and cannot be blocked.
+              taken: is already blocked.
+        mute:
+          attributes:
+            muted_id:
+              other_than: is your own and cannot be muted.
+              taken: is already muted.
+        unblock:
+          attributes:
+            block_id:
+              taken: has already been lifted.
+        unmute:
+          attributes:
+            mute_id:
+              taken: has already been lifted.
   messages:
     api:
       error_400: Invalid parameter specified.
