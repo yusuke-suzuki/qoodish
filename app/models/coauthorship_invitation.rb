@@ -6,10 +6,8 @@ class CoauthorshipInvitation < ApplicationRecord
   enum :status, { pending: 0, accepted: 1, declined: 2 }
 
   after_create :create_notification
+  after_update :join_map_as_coauthor, if: -> { saved_change_to_status?(to: 'accepted') }
 
-  # Creation-time invariants only: accept!/decline! merely change status and
-  # must not re-evaluate whether the invitation could be created (a migrated
-  # user may already be a coauthor while holding a pending invitation).
   validates :invitee_id,
             uniqueness: {
               scope: :map_id,
@@ -20,18 +18,11 @@ class CoauthorshipInvitation < ApplicationRecord
   validate :invitee_is_not_author, on: :create
   validate :invitee_is_not_coauthor, on: :create
 
-  def accept!
-    transaction do
-      accepted!
-      Coauthorship.find_or_create_by!(map: map, user: invitee)
-    end
-  end
-
-  def decline!
-    declined!
-  end
-
   private
+
+  def join_map_as_coauthor
+    Coauthorship.find_or_create_by!(map: map, user: invitee)
+  end
 
   def invitee_is_not_author
     return if map.blank? || invitee_id.blank?
