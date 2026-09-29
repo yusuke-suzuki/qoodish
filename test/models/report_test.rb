@@ -97,6 +97,17 @@ class ReportTest < ActiveSupport::TestCase
     assert duplicate.errors.of_kind?(:moderatable_id, :taken)
   end
 
+  test 'one decision answers a report filed twice at once' do
+    first = Report.create!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
+    second = Report.new(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam', locale: 'en')
+    second.save!(validate: false)
+
+    first.decide!(staff_member: staff_members(:moderator), outcome: 'kept', reason: 'Not spam.')
+
+    assert_equal 'kept', second.status
+    assert_not_includes Report.pending, second
+  end
+
   test 'a reporter can report content again once the earlier report is decided' do
     first = Report.create!(moderatable: pins(:public_you_one), reporter: users(:me), category: 'spam')
     first.decide!(staff_member: staff_members(:moderator), outcome: 'kept', reason: 'Not spam.')

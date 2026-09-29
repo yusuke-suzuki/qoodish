@@ -34,7 +34,6 @@ class Report < ApplicationRecord
   validates :details, length: { allow_blank: true, maximum: MAX_REPORT_DETAILS_LENGTH }
 
   before_validation :assign_locale, on: :create
-  before_validation :lock_reporter, on: :create, if: :reporter
   before_create :take_content_snapshot
   before_create :note_reported_revision
   after_create_commit :deliver_receipt_mails
@@ -144,10 +143,6 @@ class Report < ApplicationRecord
 
   def assign_locale
     self.locale ||= RequestContext.locale.presence || I18n.locale
-  end
-
-  def lock_reporter
-    reporter.lock!
   end
 
   def take_content_snapshot
