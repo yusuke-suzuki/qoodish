@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_27_164425) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_28_230444) do
+  create_table "blocks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "blocked_id", null: false
+    t.bigint "blocker_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blocked_id"], name: "index_blocks_on_blocked_id"
+    t.index ["blocker_id", "blocked_id"], name: "index_blocks_on_blocker_id_and_blocked_id"
+  end
+
   create_table "bookmarks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "map_id", null: false
@@ -302,6 +310,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_27_164425) do
     t.index ["staff_member_id"], name: "index_moderation_decisions_on_staff_member_id"
   end
 
+  create_table "mutes", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "muted_id", null: false
+    t.bigint "muter_id", null: false
+    t.index ["muted_id"], name: "index_mutes_on_muted_id"
+    t.index ["muter_id", "muted_id"], name: "index_mutes_on_muter_id_and_muted_id"
+  end
+
   create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -412,6 +428,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_27_164425) do
     t.index ["email"], name: "index_staff_members_on_email", unique: true
   end
 
+  create_table "unblocks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "block_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["block_id"], name: "index_unblocks_on_block_id", unique: true
+  end
+
+  create_table "unmutes", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "mute_id", null: false
+    t.index ["mute_id"], name: "index_unmutes_on_mute_id", unique: true
+  end
+
   create_table "user_preferences", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -462,6 +490,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_27_164425) do
     t.index ["voter_type", "voter_id"], name: "index_votes_on_voter_type_and_voter_id"
   end
 
+  add_foreign_key "blocks", "users", column: "blocked_id"
+  add_foreign_key "blocks", "users", column: "blocker_id"
   add_foreign_key "bookmarks", "maps"
   add_foreign_key "bookmarks", "users"
   add_foreign_key "chapter_revision_images", "chapter_revisions"
@@ -508,6 +538,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_27_164425) do
   add_foreign_key "moderation_decisions", "staff_members"
   add_foreign_key "moderation_decisions", "users", column: "author_id"
   add_foreign_key "moderation_decisions", "users", column: "moderator_id"
+  add_foreign_key "mutes", "users", column: "muted_id"
+  add_foreign_key "mutes", "users", column: "muter_id"
   add_foreign_key "pin_revision_images", "images"
   add_foreign_key "pin_revision_images", "pin_revisions"
   add_foreign_key "pin_revisions", "pins"
@@ -519,6 +551,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_27_164425) do
   add_foreign_key "role_permissions", "roles"
   add_foreign_key "staff_member_roles", "roles"
   add_foreign_key "staff_member_roles", "staff_members"
+  add_foreign_key "unblocks", "blocks", on_delete: :cascade
+  add_foreign_key "unmutes", "mutes", on_delete: :cascade
   add_foreign_key "user_preferences", "users"
   add_foreign_key "user_revisions", "users"
   add_foreign_key "users", "images", on_delete: :nullify

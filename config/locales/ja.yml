@@ -18,6 +18,14 @@ ja:
       admin/staff_member:
         changed_by: 操作者
         email: メールアドレス
+      block:
+        blocked_id: アカウント
+      mute:
+        muted_id: アカウント
+      unblock:
+        block_id: ブロック
+      unmute:
+        mute_id: ミュート
     errors:
       models:
         report:
@@ -63,6 +71,28 @@ ja:
               blank: を入力してください。
               invalid: の形式が正しくありません。
               taken: は既に登録されています。
+        block:
+          format: "%{attribute}%{message}"
+          attributes:
+            blocked_id:
+              other_than: がご自身のため、ブロックできません。
+              taken: は既にブロックしています。
+        mute:
+          format: "%{attribute}%{message}"
+          attributes:
+            muted_id:
+              other_than: がご自身のため、ミュートできません。
+              taken: は既にミュートしています。
+        unblock:
+          format: "%{attribute}%{message}"
+          attributes:
+            block_id:
+              taken: は既に解除されています。
+        unmute:
+          format: "%{attribute}%{message}"
+          attributes:
+            mute_id:
+              taken: は既に解除されています。
   messages:
     api:
       error_400: 不正なリクエストです。
