@@ -42,6 +42,16 @@ This document provides essential context for Claude Code to understand the Qoodi
 - Ensure new features are covered by tests in the `test/` directory.
 - Write all text committed to the repository — PR descriptions, issue bodies, code comments, commit messages — in English. This rule covers developer-facing text only. User-facing copy is localized and Japanese belongs in it: `config/locales/*.ja.yml` and the `*.ja.*` mailer templates under `app/views` are deliberately Japanese, and a new user-facing string needs both an English and a Japanese version rather than one bilingual string.
 
+### Model Design Principles
+
+- **Transactions:** Never open an explicit `transaction` block. Let the transaction ActiveRecord opens around `save`/`destroy` carry multi-record writes: put dependent writes in callbacks or `autosave` associations of the record being saved.
+- **External calls:** Decide where an external call goes by which failure can be detected and corrected.
+    - A call whose outcome the saved state asserts (deleting or creating a resource at an external service the record points to) runs inside the transaction, before the write it guards, so that its failure raises and rolls the write back instead of committing a state that is not true. Make it idempotent so that a retry corrects the opposite failure, where the call succeeded and the commit did not, and give it a short timeout, because it holds the transaction open.
+    - A call that only reports a committed fact (mail, Web Push, notifications) runs in `after_commit` or a job. Sent from inside the transaction, it cannot be taken back when the transaction rolls back.
+- **Validations:** Use Rails' built-in validators (`presence`, `uniqueness`, `inclusion`, `comparison`, `format`, `length`, `numericality`, ...) whenever they can express the rule, and write a custom `validate` method only when they cannot. Back every integrity rule with a database constraint (NOT NULL, unique index, foreign key), because validations alone race.
+- **Immutable data model:** Design tables as immutable by default, following https://scrapbox.io/kawasima/イミュータブルデータモデル. Record what happened as insert-only rows and derive current state from them instead of updating status or flag columns in place. Physical deletion required to remove personal data takes precedence.
+- **Locking:** Keep transactions short: a migration's DDL waits for the metadata lock (MDL) held by any open transaction on the table, and every later query on that table queues behind it. Do not reach for `lock!`/`with_lock` first; prefer a unique index, an insert-only design, or optimistic locking (`lock_version`), and take a row lock only when none of these can serve.
+
 ## 5. Commit Message Generation Rules
 
 When generating commit messages, please follow these rules:
