@@ -5,18 +5,26 @@ class CoauthorshipInvitationTest < ActiveSupport::TestCase
     invitation = coauthorship_invitations(:pending_you_to_me)
 
     assert_difference 'Coauthorship.count', 1 do
-      invitation.accept!
+      invitation.accepted!
     end
 
     assert invitation.accepted?
     assert Coauthorship.exists?(map: invitation.map, user: invitation.invitee)
   end
 
+  test 'accept leaves the invitation pending when the coauthorship cannot be created' do
+    invitation = coauthorship_invitations(:pending_you_to_me)
+    invitation.map.update_columns(user_id: invitation.invitee_id)
+
+    assert_raises(ActiveRecord::RecordInvalid) { invitation.accepted! }
+    assert invitation.reload.pending?
+  end
+
   test 'decline marks the invitation declined without creating a coauthorship' do
     invitation = coauthorship_invitations(:pending_you_to_me)
 
     assert_no_difference 'Coauthorship.count' do
-      invitation.decline!
+      invitation.declined!
     end
 
     assert invitation.declined?
@@ -44,7 +52,7 @@ class CoauthorshipInvitationTest < ActiveSupport::TestCase
     invitation = coauthorship_invitations(:pending_you_to_me)
     Coauthorship.create!(map: invitation.map, user: invitation.invitee)
 
-    assert_nothing_raised { invitation.accept! }
+    assert_nothing_raised { invitation.accepted! }
     assert invitation.reload.accepted?
   end
 
@@ -52,7 +60,7 @@ class CoauthorshipInvitationTest < ActiveSupport::TestCase
     invitation = coauthorship_invitations(:pending_you_to_me)
     Coauthorship.create!(map: invitation.map, user: invitation.invitee)
 
-    assert_nothing_raised { invitation.decline! }
+    assert_nothing_raised { invitation.declined! }
     assert invitation.reload.declined?
   end
 

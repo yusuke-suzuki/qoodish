@@ -13,12 +13,12 @@ module Me
 
     def accept
       @invitation = pending_invitation
-      @invitation.accept!
+      @invitation.accepted!
     end
 
     def decline
       @invitation = pending_invitation
-      @invitation.decline!
+      @invitation.declined!
     end
 
     private
