@@ -22,6 +22,7 @@ module Users
                             .where(commentable: @pins.to_a)
                             .not_blocking(current_user)
                             .not_blocked_by(current_user)
+                            .not_muted_by(current_user)
                             .preload({ user: :image }, :votes)
                             .group_by(&:commentable_id)
     end

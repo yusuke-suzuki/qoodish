@@ -31,6 +31,7 @@ module Pins
                     .comments
                     .not_blocking(current_user)
                     .not_blocked_by(current_user)
+                    .not_muted_by(current_user)
                     .preload({ user: :image }, :votes)
       end
 
@@ -50,6 +51,7 @@ module Pins
                     .comments
                     .not_blocking(current_user)
                     .not_blocked_by(current_user)
+                    .not_muted_by(current_user)
                     .preload({ user: :image }, :votes)
       end
     end

@@ -113,6 +113,43 @@ class Users::MutesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'comments by a muted account are hidden' do
+    users(:me).mute!(users(:you))
+
+    stub_google_auth(users(:me)) do
+      get "/pins/#{pins(:public_one).id}", headers: HEADERS
+      comment_ids = JSON.parse(@response.body)['comments'].pluck('id')
+
+      assert_includes comment_ids, comments(:one).id
+      assert_not_includes comment_ids, comments(:two).id
+
+      get "/chapters/#{chapters(:my_published).id}/comments", headers: HEADERS
+      assert_not_includes JSON.parse(@response.body).pluck('id'), comments(:on_my_published_chapter).id
+    end
+  end
+
+  test 'comment counts leave out comments by a muted account' do
+    users(:me).mute!(users(:you))
+
+    stub_google_auth(users(:me)) do
+      get "/chapters/#{chapters(:my_published).id}", headers: HEADERS
+      assert_equal 0, JSON.parse(@response.body)['comments_count']
+
+      get "/me/chapters/#{chapters(:my_published).id}", headers: HEADERS
+      assert_equal 0, JSON.parse(@response.body)['comments_count']
+    end
+  end
+
+  test 'the muted account still sees comments by the account that muted it' do
+    users(:you).mute!(users(:me))
+
+    stub_google_auth(users(:me)) do
+      get "/pins/#{pins(:public_one).id}", headers: HEADERS
+    end
+
+    assert_includes JSON.parse(@response.body)['comments'].pluck('id'), comments(:two).id
+  end
+
   test 'notifications from a muted account are hidden' do
     notification = Notification.create!(notifiable: pins(:public_one), notifier: users(:you), recipient: users(:me), key: 'liked')
     users(:me).mute!(users(:you))
