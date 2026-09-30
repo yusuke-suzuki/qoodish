@@ -6,6 +6,7 @@ class Comment < ApplicationRecord
   include Moderatable
   include Votable
   include Blockable
+  include Mutable
 
   self.revision_attributes = %i[body]
 

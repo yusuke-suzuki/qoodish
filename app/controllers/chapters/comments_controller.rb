@@ -7,6 +7,7 @@ module Chapters
                   .comments
                   .not_blocking(current_user)
                   .not_blocked_by(current_user)
+                  .not_muted_by(current_user)
                   .order(:id)
                   .preload({ user: :image }, :votes)
     end
