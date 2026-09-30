@@ -164,6 +164,29 @@ class Users::BlocksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes author_ids, users(:you).id
   end
 
+  test 'content of a blocked account tells the blocking account that its author is blocked' do
+    users(:me).block!(users(:you))
+
+    stub_google_auth(users(:me)) do
+      get "/pins/#{pins(:public_unfollowing_you).id}", headers: HEADERS
+      assert JSON.parse(@response.body)['author']['blocking']
+
+      get "/maps/#{maps(:public_unfollowing).id}", headers: HEADERS
+      assert JSON.parse(@response.body)['author']['blocking']
+
+      get "/chapters/#{chapters(:you_published).id}", headers: HEADERS
+      assert JSON.parse(@response.body)['author']['blocking']
+    end
+  end
+
+  test 'content of an account that is not blocked says its author is not blocked' do
+    stub_google_auth(users(:me)) do
+      get "/pins/#{pins(:public_unfollowing_you).id}", headers: HEADERS
+    end
+
+    assert_equal false, JSON.parse(@response.body)['author']['blocking']
+  end
+
   test 'comments across a block are hidden on both sides' do
     users(:me).block!(users(:you))
 

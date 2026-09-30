@@ -7,6 +7,8 @@ json.author do
   json.name pin.user.name
   json.image pin.user.image_variants
   json.image_url pin.user.image_url
+  json.blocking current_user.blocking?(pin.user)
+  json.muting current_user.muting?(pin.user)
 end
 json.comment pin.comment
 json.comments comments do |comment|
