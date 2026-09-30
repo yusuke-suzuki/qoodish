@@ -4,6 +4,8 @@ json.author do
   json.name map.user.name
   json.image map.user.image_variants
   json.image_url map.user.image_url
+  json.blocking current_user.blocking?(map.user)
+  json.muting current_user.muting?(map.user)
 end
 json.name map.name
 json.description map.description

@@ -150,6 +150,29 @@ class Users::MutesControllerTest < ActionDispatch::IntegrationTest
     assert_includes JSON.parse(@response.body)['comments'].pluck('id'), comments(:two).id
   end
 
+  test 'content of a muted account tells the muter that its author is muted' do
+    users(:me).mute!(users(:you))
+
+    stub_google_auth(users(:me)) do
+      get "/pins/#{pins(:public_unfollowing_you).id}", headers: HEADERS
+      assert JSON.parse(@response.body)['author']['muting']
+
+      get "/maps/#{maps(:public_unfollowing).id}", headers: HEADERS
+      assert JSON.parse(@response.body)['author']['muting']
+
+      get "/chapters/#{chapters(:you_published).id}", headers: HEADERS
+      assert JSON.parse(@response.body)['author']['muting']
+    end
+  end
+
+  test 'content of an account that is not muted says its author is not muted' do
+    stub_google_auth(users(:me)) do
+      get "/pins/#{pins(:public_unfollowing_you).id}", headers: HEADERS
+    end
+
+    assert_equal false, JSON.parse(@response.body)['author']['muting']
+  end
+
   test 'notifications from a muted account are hidden' do
     notification = Notification.create!(notifiable: pins(:public_one), notifier: users(:you), recipient: users(:me), key: 'liked')
     users(:me).mute!(users(:you))

@@ -13,6 +13,8 @@ json.author do
   json.biography chapter.user.biography
   json.image chapter.user.image_variants
   json.image_url chapter.user.image_url
+  json.blocking current_user.blocking?(chapter.user)
+  json.muting current_user.muting?(chapter.user)
 end
 if chapter.map.present?
   json.map do
