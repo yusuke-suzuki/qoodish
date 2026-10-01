@@ -54,5 +54,7 @@ module Qoodish
     config.active_record.encryption.support_unencrypted_data = false
 
     config.active_model.i18n_customize_full_message = true
+
+    config.active_record.schema_format = :sql
   end
 end
