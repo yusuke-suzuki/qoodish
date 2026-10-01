@@ -437,6 +437,7 @@ CREATE TABLE `maps` (
   KEY `index_maps_on_current_revision_id` (`current_revision_id`),
   KEY `index_maps_on_status_and_created_at` (`status`,`created_at`),
   KEY `index_maps_on_user_id` (`user_id`),
+  FULLTEXT KEY `index_maps_on_name_and_description` (`name`,`description`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_rails_4ab1ab6be6` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `fk_rails_7fe7872f86` FOREIGN KEY (`current_revision_id`) REFERENCES `map_revisions` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -587,6 +588,7 @@ CREATE TABLE `pins` (
   KEY `index_pins_on_map_id` (`map_id`),
   KEY `index_pins_on_status_and_created_at` (`status`,`created_at`),
   KEY `index_pins_on_user_id` (`user_id`),
+  FULLTEXT KEY `index_pins_on_name_and_comment` (`name`,`comment`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_rails_51b0c024f1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `fk_rails_717eb8a1a6` FOREIGN KEY (`map_id`) REFERENCES `maps` (`id`),
   CONSTRAINT `fk_rails_ae6e2f1f41` FOREIGN KEY (`current_revision_id`) REFERENCES `pin_revisions` (`id`)
@@ -748,6 +750,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `index_users_on_uid` (`uid`),
   KEY `index_users_on_current_revision_id` (`current_revision_id`),
   KEY `index_users_on_image_id` (`image_id`),
+  FULLTEXT KEY `index_users_on_name` (`name`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_rails_3674e37df0` FOREIGN KEY (`current_revision_id`) REFERENCES `user_revisions` (`id`),
   CONSTRAINT `fk_rails_47c7c64b36` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -785,6 +788,7 @@ CREATE TABLE `votes` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 INSERT INTO `schema_migrations` (version) VALUES
+('20261001164544'),
 ('20260928230444'),
 ('20260928230443'),
 ('20260928171758'),
