@@ -15,6 +15,29 @@ class Guest::ChaptersControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes ids, chapters(:my_draft).id
   end
 
+  test 'index by input should find published chapters on public maps only' do
+    get '/guest/chapters', params: { input: 'chapter' }
+
+    assert_response :success
+
+    ids = JSON.parse(@response.body).map { |chapter| chapter['id'] }
+
+    assert_includes ids, chapters(:my_published).id
+    assert_includes ids, chapters(:you_published).id
+    assert_not_includes ids, chapters(:my_draft).id
+    assert_not_includes ids, chapters(:you_private_published_following).id
+  end
+
+  test 'index by input should answer only what a search result shows' do
+    get '/guest/chapters', params: { input: '醤油' }
+
+    assert_response :success
+
+    assert_equal [{ 'id' => chapters(:you_ramen_walk).id, 'title' => '横丁さんぽ', 'image' => nil,
+                    'map' => { 'id' => maps(:ramen_alley).id, 'name' => 'ラーメン横丁' } }],
+                 JSON.parse(@response.body)
+  end
+
   test 'index should page with next_timestamp' do
     newest = chapters(:you_published_on_my_map)
 

@@ -14,7 +14,7 @@ class JournalsControllerTest < ActionDispatch::IntegrationTest
     assert_equal journals(:you_journal).id, res['id']
     assert_not res['editable']
     assert res['bookmarking']
-    assert_equal 4, res['chapters_count']
+    assert_equal 5, res['chapters_count']
   end
 
   test 'show a journal without authentication should raise unauthorized error' do
