@@ -7,7 +7,14 @@ class Guest::PinsController < ApplicationController
   end
 
   def index
-    @pins = if params[:feed]
+    @pins = if params[:input].present?
+              Pin
+                .public_open
+                .search(params[:input])
+                .order(created_at: :desc)
+                .limit(20)
+                .preload(:map, { user: :image }, :images, :votes, comments: [{ user: :image }, :votes])
+            elsif params[:feed]
               feed
             elsif params[:recent]
               Pin

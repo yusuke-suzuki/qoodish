@@ -45,6 +45,27 @@ class Guest::PinsControllerTest < ActionDispatch::IntegrationTest
     assert_response :bad_request
   end
 
+  test 'list of pins by input should find pins by name or comment' do
+    get '/guest/pins', params: { input: '醤油 broth' }
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal [pins(:ramen_alley).id], res.map { |pin| pin['id'] }
+  end
+
+  test 'list of pins by input should not include pins on private maps' do
+    get '/guest/pins', params: { input: 'name' }
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_not res.empty?
+    assert(res.all? { |pin| pin['map']['private'] == false })
+  end
+
   test 'list of recent pins should not include pins on private maps' do
     get '/guest/pins?recent=true'
 

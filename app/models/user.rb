@@ -1,7 +1,10 @@
 class User < ApplicationRecord
   include Revisable
+  include FulltextSearchable
 
   self.revision_attributes = %i[name biography]
+
+  fulltext_searchable :name
 
   has_many :devices, dependent: :destroy
   has_many :maps, dependent: :destroy
@@ -102,11 +105,6 @@ class User < ApplicationRecord
   before_destroy :delete_id_platform_account
   after_create :create_default_map
   after_create :create_default_journal
-
-  scope :search_by_name, lambda { |name|
-    where('name LIKE ?', "%#{name}%")
-      .limit(20)
-  }
 
   def self.record!(**content)
     account = new

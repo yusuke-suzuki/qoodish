@@ -98,3 +98,12 @@ public_two:
   latitude: 35.681382
   longitude: 139.766084
   current_revision: public_two
+
+ramen_alley:
+  user: you
+  map: ramen_alley
+  name: 渋谷の醤油ラーメン
+  comment: Rich soy broth
+  latitude: 35.681382
+  longitude: 139.766084
+  current_revision: ramen_alley

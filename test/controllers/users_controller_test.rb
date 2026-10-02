@@ -80,6 +80,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert(res.any? { |user| user['id'] == users(:you).id })
   end
 
+  test 'search users should treat LIKE wildcards literally' do
+    stub_google_auth(users(:me)) do
+      get '/users', params: { q: '%' }, headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+    assert_empty JSON.parse(@response.body)
+  end
+
   test 'signing up records the email and the locale from the request' do
     newcomer = User.new(uid: 'newcomer1234', name: 'newcomer', email: 'newcomer@qoodish.com')
 
