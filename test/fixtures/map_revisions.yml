@@ -51,3 +51,21 @@ public_unfollowing:
   private: false
   latitude: 35.681382
   longitude: 139.766084
+
+ramen_alley:
+  map: ramen_alley
+  user: you
+  name: ラーメン横丁
+  description: 屋台が並ぶ横丁
+  private: false
+  latitude: 35.681382
+  longitude: 139.766084
+
+tokyo_cafe:
+  map: tokyo_cafe
+  user: you
+  name: 東京ラーメンカフェ
+  description: ラーメンとラーメンスープのカフェ
+  private: false
+  latitude: 35.681382
+  longitude: 139.766084

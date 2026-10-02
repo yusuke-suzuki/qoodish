@@ -10,8 +10,11 @@ class Pin < ApplicationRecord
   include Votable
   include Blockable
   include Mutable
+  include FulltextSearchable
 
   self.revision_attributes = %i[name comment latitude longitude]
+
+  fulltext_searchable :name, :comment
 
   belongs_to :user
   belongs_to :map

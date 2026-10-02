@@ -86,6 +86,16 @@ class Guest::MapsControllerTest < ActionDispatch::IntegrationTest
     assert(res.any? { |map| map['id'] == maps(:public_one).id })
   end
 
+  test 'list of maps by input should rank the closest match first' do
+    get '/guest/maps', params: { input: 'ラーメン' }
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal [maps(:tokyo_cafe).id, maps(:ramen_alley).id], res.map { |map| map['id'] }
+  end
+
   test 'list of recent maps should not include private maps' do
     get '/guest/maps?recent=true'
 

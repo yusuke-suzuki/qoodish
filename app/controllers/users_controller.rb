@@ -5,7 +5,8 @@ class UsersController < ApplicationController
     @users = if params[:q].present?
                User
                  .where.not(id: current_user.received_blocks.active.select(:blocker_id))
-                 .search_by_name(params[:q])
+                 .search(params[:q])
+                 .limit(20)
                  .preload(:image)
              else
                User.none

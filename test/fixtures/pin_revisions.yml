@@ -85,3 +85,11 @@ public_two:
   comment: This is a comment
   latitude: 35.681382
   longitude: 139.766084
+
+ramen_alley:
+  pin: ramen_alley
+  user: you
+  name: 渋谷の醤油ラーメン
+  comment: Rich soy broth
+  latitude: 35.681382
+  longitude: 139.766084

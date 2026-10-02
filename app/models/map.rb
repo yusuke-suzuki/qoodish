@@ -5,12 +5,15 @@ class Map < ApplicationRecord
   include Moderatable
   include Blockable
   include Mutable
+  include FulltextSearchable
 
   # Shield running instances from the legacy columns the follow-up migration
   # drops, so in-flight INSERTs do not reference a column that is gone.
   self.ignored_columns += %w[shared invitable]
 
   self.revision_attributes = %i[name description latitude longitude private]
+
+  fulltext_searchable :name, :description
 
   belongs_to :user
   belongs_to :current_revision, class_name: 'MapRevision', optional: true
@@ -125,12 +128,6 @@ class Map < ApplicationRecord
       .group('maps.id')
       .order('count(bookmarks.id) desc')
       .limit(10)
-  }
-
-  scope :search_by_words, lambda { |words|
-    visible.tap do |q|
-      words.each { |word| q.where!('name LIKE :word', word: "%#{sanitize_sql_like(word)}%") }
-    end
   }
 
   def image_url

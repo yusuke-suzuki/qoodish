@@ -18,7 +18,7 @@ class Guest::MapsController < ApplicationController
               Map
                 .public_open
                 .preload(:images, user: :image)
-                .search_by_words(params[:input].strip.split(/[[:blank:]]+/))
+                .search(params[:input])
                 .order(created_at: :desc)
                 .limit(20)
             elsif params[:recent].present?
