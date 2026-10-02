@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.24.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.23.0...v4.24.0) (2026-10-02)
+
+
+### Features
+
+* search maps, pins and users by full text ([11b387e](https://github.com/yusuke-suzuki/qoodish/commit/11b387e6ee63bd6fdfb68ce0078b32cc881979af))
+
+
+### Bug Fixes
+
+* build fulltext indexes without stopwords ([ce89c87](https://github.com/yusuke-suzuki/qoodish/commit/ce89c87a3bbd4be068119549329cd34b037c9a0c))
+
 ## [4.23.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.22.0...v4.23.0) (2026-10-02)
 
 
