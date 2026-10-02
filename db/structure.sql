@@ -105,12 +105,14 @@ CREATE TABLE `chapters` (
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `updated_at` datetime(6) NOT NULL,
   `user_id` bigint NOT NULL,
+  `content_text` mediumtext COLLATE utf8mb4_general_ci GENERATED ALWAYS AS (json_unquote(json_extract(`content`,_utf8mb4'$**.text'))) STORED,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_chapters_on_journey_id` (`journey_id`),
   KEY `index_chapters_on_current_revision_id` (`current_revision_id`),
   KEY `index_chapters_on_map_id` (`map_id`),
   KEY `index_chapters_on_status_and_created_at` (`status`,`created_at`),
   KEY `index_chapters_on_user_id_and_status` (`user_id`,`status`),
+  FULLTEXT KEY `index_chapters_on_title_and_content_text` (`title`,`content_text`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_rails_1c8a18c6b0` FOREIGN KEY (`current_revision_id`) REFERENCES `chapter_revisions` (`id`),
   CONSTRAINT `fk_rails_227ce80201` FOREIGN KEY (`map_id`) REFERENCES `maps` (`id`),
   CONSTRAINT `fk_rails_b5e9549ad2` FOREIGN KEY (`journey_id`) REFERENCES `journeys` (`id`),
@@ -788,6 +790,7 @@ CREATE TABLE `votes` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 INSERT INTO `schema_migrations` (version) VALUES
+('20261002152648'),
 ('20261002045305'),
 ('20261001164544'),
 ('20260928230444'),
