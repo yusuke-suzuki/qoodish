@@ -41,6 +41,14 @@ class FulltextSearchableTest < ActiveSupport::TestCase
     assert_equal [pins(:ramen_alley)], Pin.public_open.search('醤油 broth').to_a
   end
 
+  test 'finds public chapters by words in their body' do
+    assert_equal [chapters(:you_ramen_walk)], Chapter.public_open.search('食べ歩').to_a
+  end
+
+  test 'finds public chapters by their title' do
+    assert_equal [chapters(:you_ramen_walk)], Chapter.public_open.search('さんぽ').to_a
+  end
+
   test 'finds users by name' do
     assert_equal [users(:you)], User.search('kay').to_a
   end

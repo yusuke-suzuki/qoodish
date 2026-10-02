@@ -12,10 +12,13 @@ class Chapter < ApplicationRecord
   include Votable
   include Blockable
   include Mutable
+  include FulltextSearchable
 
   EMPTY_FEATURE_COLLECTION = { 'type' => 'FeatureCollection', 'features' => [] }.freeze
 
   self.revision_attributes = %i[title content map_features]
+
+  fulltext_searchable :title, :content_text
 
   # Styling keys from the simplestyle spec (marker-color, marker-symbol) are
   # deliberately absent until there is UI to set them; unknown keys pass so

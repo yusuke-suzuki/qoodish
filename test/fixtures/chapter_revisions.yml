@@ -143,3 +143,23 @@ you_private_published_following:
   map_features:
     type: FeatureCollection
     features: []
+
+you_ramen_walk:
+  chapter: you_ramen_walk
+  user: you
+  title: 横丁さんぽ
+  status: published
+  content:
+    root:
+      type: root
+      version: 1
+      children:
+        - type: paragraph
+          version: 1
+          children:
+            - type: text
+              version: 1
+              text: 醤油ラーメンを食べ歩いた
+  map_features:
+    type: FeatureCollection
+    features: []

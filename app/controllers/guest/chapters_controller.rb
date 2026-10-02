@@ -1,5 +1,16 @@
 class Guest::ChaptersController < ApplicationController
   def index
+    if params[:input].present?
+      @chapters = Chapter
+                  .public_open
+                  .search(params[:input])
+                  .order(created_at: :desc)
+                  .limit(20)
+                  .preload(:map, :images)
+
+      return render :search
+    end
+
     @chapters = if params[:next_timestamp]
                   Chapter
                     .public_open
