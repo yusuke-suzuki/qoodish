@@ -93,7 +93,9 @@ class Guest::MapsControllerTest < ActionDispatch::IntegrationTest
 
     res = JSON.parse(@response.body)
 
-    assert_equal [maps(:tokyo_cafe).id, maps(:ramen_alley).id], res.map { |map| map['id'] }
+    expected = ordered_by_relevance([maps(:tokyo_cafe), maps(:ramen_alley)], 'maps.name, maps.description', 'ラーメン')
+
+    assert_equal expected.map(&:id), res.map { |map| map['id'] }
   end
 
   test 'list of recent maps should not include private maps' do
