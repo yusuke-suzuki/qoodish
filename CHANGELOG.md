@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.23.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.22.0...v4.23.0) (2026-10-02)
+
+
+### Features
+
+* add ngram fulltext indexes for search ([20f9627](https://github.com/yusuke-suzuki/qoodish/commit/20f96279c422dab595751560b35a4a9ff72cc750))
+* hide comments by muted accounts ([4c3252b](https://github.com/yusuke-suzuki/qoodish/commit/4c3252bf75b005336452f5ac504a2cca8934e6fa))
+* let members block and mute other accounts ([78601d0](https://github.com/yusuke-suzuki/qoodish/commit/78601d071d8bdb8fe606998742c2626d2c51462a))
+* tell whether a content author is blocked ([6d9356e](https://github.com/yusuke-suzuki/qoodish/commit/6d9356e549640cca9b2e171deb3f81dab21614d7))
+
 ## [4.22.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.21.0...v4.22.0) (2026-09-29)
 
 
