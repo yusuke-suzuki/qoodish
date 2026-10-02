@@ -48,6 +48,17 @@ class ActiveSupport::TestCase
     report.decide!(staff_member: staff_members(:moderator), outcome: outcome, reason: reason)
   end
 
+  # InnoDB can score every match 0, as it does right after an OPTIMIZE of the
+  # full-text index, so the expected order is read from the current scores.
+  def ordered_by_relevance(records, columns, input)
+    match = ApplicationRecord.sanitize_sql_array(
+      ["MATCH(#{columns}) AGAINST (? IN BOOLEAN MODE)", SearchQuery.new(input).boolean_mode_query]
+    )
+    scores = records.first.class.where(id: records.map(&:id)).pluck(:id, Arel.sql(match)).to_h
+
+    records.sort_by { |record| [-scores.fetch(record.id), -record.created_at.to_f] }
+  end
+
   def error_message_keys(model, locale)
     attributes = I18n.t("activerecord.errors.models.#{model}.attributes", locale: locale, fallback: false)
 

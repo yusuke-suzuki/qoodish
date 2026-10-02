@@ -6,7 +6,9 @@ class FulltextSearchableTest < ActiveSupport::TestCase
   end
 
   test 'ranks by relevance before any ordering added after the search' do
-    assert_equal [maps(:tokyo_cafe), maps(:ramen_alley)], Map.search('ラーメン').order(created_at: :desc).to_a
+    expected = ordered_by_relevance([maps(:tokyo_cafe), maps(:ramen_alley)], 'maps.name, maps.description', 'ラーメン')
+
+    assert_equal expected, Map.search('ラーメン').order(created_at: :desc).to_a
   end
 
   test 'requires every term to match' do
