@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.25.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.24.0...v4.25.0) (2026-10-02)
+
+
+### Features
+
+* index chapter text for search ([93fb513](https://github.com/yusuke-suzuki/qoodish/commit/93fb513c31b97f1b3af2ce6b685986affb5e4c66))
+* search public chapters by full text ([c582419](https://github.com/yusuke-suzuki/qoodish/commit/c582419b5d5f8caa3781cb0d264d53311f20360c))
+
 ## [4.24.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.23.0...v4.24.0) (2026-10-02)
 
 
