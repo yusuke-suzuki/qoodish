@@ -57,7 +57,7 @@ class ModerationMailerTest < ActionMailer::TestCase
     mail = ModerationMailer.decision_notified(@report, decision)
 
     assert_equal [users(:me).email], mail.to
-    assert_includes mail.body.decoded, 'No removal or other measure was taken.'
+    assert_includes mail.body.decoded, 'so we did not remove it or take any other measure.'
     assert_includes mail.body.decoded, 'Not harassment.'
   end
 
