@@ -10,55 +10,39 @@ class NotificationGroup
       .order(Arel.sql('MAX(notifications.id) DESC'))
       .limit(limit)
       .pluck(
-        Arel.sql('MAX(notifications.id)'),
+        *Notification::GROUPING_ATTRIBUTES,
         Arel.sql('COUNT(DISTINCT notifications.notifier_id)'),
         Arel.sql('MIN(notifications.read)')
       )
 
-    latest =
-      Notification
-      .where(id: summaries.map(&:first))
-      .includes({ notifier: :image }, :notifiable)
-      .index_by(&:id)
-
-    notifier_ids = summaries.to_h do |id, _, _|
-      [id, recent_notifier_ids(notifications.grouped_with(latest[id]))]
+    latest_ids = summaries.map do |key, notifiable_type, notifiable_id, *|
+      latest_ids_by_notifier(
+        notifications.where(key: key, notifiable_type: notifiable_type, notifiable_id: notifiable_id)
+      )
     end
-    users = User.where(id: notifier_ids.values.flatten).includes(:image).index_by(&:id)
+    records = notifications.where(id: latest_ids.flatten).index_by(&:id)
 
-    groups = summaries.filter_map do |id, notifiers_count, read|
-      notification = latest[id]
+    summaries.zip(latest_ids).filter_map do |(*, notifiers_count, read), ids|
+      notification = records[ids.first]
       next unless notification.renderable?
 
       new(
         notification: notification,
-        notifiers: users.values_at(*notifier_ids[id]).compact,
+        notifiers: records.values_at(*ids).map(&:notifier).compact,
         notifiers_count: notifiers_count,
         read: read.to_i == 1
       )
     end
-
-    preload_notifiable_images(groups.map { |group| group.notification.notifiable })
-
-    groups
   end
 
-  def self.preload_notifiable_images(notifiables)
-    comments, others = notifiables.partition { |notifiable| notifiable.is_a?(Comment) }
-
-    ActiveRecord::Associations::Preloader.new(records: others, associations: :images).call
-    ActiveRecord::Associations::Preloader.new(records: comments, associations: { commentable: :images }).call
-  end
-  private_class_method :preload_notifiable_images
-
-  def self.recent_notifier_ids(notifications)
+  def self.latest_ids_by_notifier(notifications)
     notifications
       .group(:notifier_id)
       .order(Arel.sql('MAX(notifications.id) DESC'))
       .limit(NOTIFIERS_LIMIT)
-      .pluck(:notifier_id)
+      .pluck(Arel.sql('MAX(notifications.id)'))
   end
-  private_class_method :recent_notifier_ids
+  private_class_method :latest_ids_by_notifier
 
   def initialize(notification:, notifiers:, notifiers_count:, read:)
     @notification = notification

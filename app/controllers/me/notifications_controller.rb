@@ -11,6 +11,7 @@ module Me
           .not_blocking(current_user)
           .not_blocked_by(current_user)
           .not_muted_by(current_user)
+          .preload({ notifier: :image }, notifiable: [:images, { commentable: :images }])
         )
     end
 

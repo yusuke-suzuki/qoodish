@@ -23,10 +23,12 @@ class Me::NotificationsControllerTest < ActionDispatch::IntegrationTest
     assert notification['notifiable'].key?('image')
   end
 
-  test 'index serves the image of a liked comment from its pin' do
-    comment = comments(:one)
-    Notification.create!(notifiable: comment, notifier: users(:you), recipient: users(:me), key: 'liked')
-    Notification.create!(notifiable: pins(:public_two), notifier: users(:you), recipient: users(:me), key: 'liked')
+  test 'index serves groups of every kind of subject without N+1 queries' do
+    [comments(:one), comments(:two), pins(:public_one), pins(:public_two), chapters(:my_published)].each do |notifiable|
+      %i[me you].each do |notifier|
+        Notification.create!(notifiable: notifiable, notifier: users(notifier), recipient: users(:me), key: 'liked')
+      end
+    end
 
     stub_google_auth(users(:me)) do
       get '/me/notifications', headers: { 'Authorization': 'Bearer dummytoken' }
@@ -34,9 +36,9 @@ class Me::NotificationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
 
-    notification = JSON.parse(@response.body).find { |n| n['notifiable']['type'] == 'comment' }
+    comment = JSON.parse(@response.body).find { |n| n['notifiable']['type'] == 'comment' }
 
-    assert_equal comment.commentable.image_variants.as_json, notification['notifiable']['image']
+    assert_equal pins(:public_one).image_variants.as_json, comment['notifiable']['image']
   end
 
   test 'index drops a notification whose pin is deleted' do

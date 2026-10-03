@@ -52,14 +52,10 @@ class Notification < ApplicationRecord
     where.not(notifier_id: Mute.active.where(muter_id: user.id).select(:muted_id))
   }
 
-  scope :grouped_with, lambda { |notification|
-    where(notification.slice(*GROUPING_ATTRIBUTES))
-  }
-
   def read_with_earlier_in_group!
     recipient
       .notifications
-      .grouped_with(self)
+      .where(slice(*GROUPING_ATTRIBUTES))
       .where(id: ...id, read: false)
       .update_all(read: true, updated_at: Time.current)
 
