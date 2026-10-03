@@ -1,16 +1,16 @@
 en:
   moderation:
     categories:
-      spam: Spam or misleading advertising
+      spam: Spam or advertising
       harassment: Harassment or bullying
-      hate: Hate speech
-      sexual: Sexual or explicit content
-      violence: Violence or dangerous acts
-      illegal: Illegal goods or acts
-      privacy: Privacy violation
+      hate: Hate speech or discrimination
+      sexual: Sexual content
+      violence: Violent or graphic content
+      illegal: Illegal activity or content
+      privacy: Privacy violation or defamation
       copyright: Copyright or trademark infringement
       impersonation: Impersonation
-      other: Other
+      other: Something else
     outcomes:
       kept: No removal or other measure was taken.
       removed: It was removed.
