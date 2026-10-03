@@ -3,18 +3,17 @@ module Me
     before_action :authenticate_user!
 
     def index
-      @notifications =
-        current_user
-        .notifications
-        .renderable
-        .not_blocking(current_user)
-        .not_blocked_by(current_user)
-        .not_muted_by(current_user)
-        .recent
-        .includes({ notifier: :image }, :notifiable)
-        .select(&:renderable?)
+      @notification_groups =
+        NotificationGroup.recent(
+          current_user
+          .notifications
+          .renderable
+          .not_blocking(current_user)
+          .not_blocked_by(current_user)
+          .not_muted_by(current_user)
+        )
 
-      preload_notifiable_images(@notifications)
+      preload_notifiable_images(@notification_groups.map(&:notification))
     end
 
     def update
@@ -30,7 +29,7 @@ module Me
       # orphaned by their deletion is treated as missing, like in index.
       raise ActiveRecord::RecordNotFound unless @notification.renderable?
 
-      @notification.update!(read: true)
+      @notification.read_with_earlier_in_group!
     end
 
     private

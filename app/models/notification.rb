@@ -5,6 +5,8 @@ class Notification < ApplicationRecord
 
   KEYS = %w[coauthor_invited liked comment published].freeze
 
+  GROUPING_ATTRIBUTES = %i[key notifiable_type notifiable_id].freeze
+
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
   # Clients released before the rename look their message up by the name the
@@ -31,11 +33,6 @@ class Notification < ApplicationRecord
 
   after_create_commit :broadcast_web_push_later
 
-  scope :recent, lambda {
-    order(created_at: :desc)
-      .limit(10)
-  }
-
   # Rows created before a feature was retired can carry keys outside KEYS
   # ('followed', 'invited'); they reference concepts and data that no longer
   # exist, so they are kept but never served.
@@ -54,6 +51,20 @@ class Notification < ApplicationRecord
   scope :not_muted_by, lambda { |user|
     where.not(notifier_id: Mute.active.where(muter_id: user.id).select(:muted_id))
   }
+
+  scope :grouped_with, lambda { |notification|
+    where(notification.slice(*GROUPING_ATTRIBUTES))
+  }
+
+  def read_with_earlier_in_group!
+    recipient
+      .notifications
+      .grouped_with(self)
+      .where(id: ...id, read: false)
+      .update_all(read: true, updated_at: Time.current)
+
+    update!(read: true)
+  end
 
   def client_notifiable_type
     RENAMED_NOTIFIABLE_TYPES.fetch(notifiable_type, notifiable_type.downcase)

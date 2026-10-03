@@ -8,10 +8,7 @@ json.notifiable do
   json.image_url notification.notifiable.image_url
 end
 json.notifier do
-  json.id notification.notifier_id
-  json.name notification.notifier.name
-  json.image notification.notifier.image_variants
-  json.image_url notification.notifier.image_url
+  json.partial! 'partials/notifier', notifier: notification.notifier
 end
 json.read notification.read
 json.created_at notification.created_at
