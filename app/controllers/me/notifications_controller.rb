@@ -12,8 +12,6 @@ module Me
           .not_blocked_by(current_user)
           .not_muted_by(current_user)
         )
-
-      preload_notifiable_images(@notification_groups.map(&:notification))
     end
 
     def update
@@ -30,25 +28,6 @@ module Me
       raise ActiveRecord::RecordNotFound unless @notification.renderable?
 
       @notification.read_with_earlier_in_group!
-    end
-
-    private
-
-    # Polymorphic preload: `includes(notifiable: :images)` cannot work because
-    # Comment has no :images association of its own (it serves images via its
-    # commentable). Group notifiables by type and preload appropriately.
-    def preload_notifiable_images(notifications)
-      notifiables = notifications.map(&:notifiable)
-      direct = notifiables.reject { |n| n.is_a?(Comment) }
-      comments = notifiables.select { |n| n.is_a?(Comment) }
-
-      if direct.any?
-        ActiveRecord::Associations::Preloader.new(records: direct, associations: :images).call
-      end
-
-      if comments.any?
-        ActiveRecord::Associations::Preloader.new(records: comments, associations: { commentable: :images }).call
-      end
     end
   end
 end
