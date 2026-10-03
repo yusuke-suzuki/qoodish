@@ -26,7 +26,7 @@ class NotificationGroup
     end
     users = User.where(id: notifier_ids.values.flatten).includes(:image).index_by(&:id)
 
-    summaries.filter_map do |id, notifiers_count, read|
+    groups = summaries.filter_map do |id, notifiers_count, read|
       notification = latest[id]
       next unless notification.renderable?
 
@@ -37,7 +37,19 @@ class NotificationGroup
         read: read.to_i == 1
       )
     end
+
+    preload_notifiable_images(groups.map { |group| group.notification.notifiable })
+
+    groups
   end
+
+  def self.preload_notifiable_images(notifiables)
+    comments, others = notifiables.partition { |notifiable| notifiable.is_a?(Comment) }
+
+    ActiveRecord::Associations::Preloader.new(records: others, associations: :images).call
+    ActiveRecord::Associations::Preloader.new(records: comments, associations: { commentable: :images }).call
+  end
+  private_class_method :preload_notifiable_images
 
   def self.recent_notifier_ids(notifications)
     notifications

@@ -23,6 +23,22 @@ class Me::NotificationsControllerTest < ActionDispatch::IntegrationTest
     assert notification['notifiable'].key?('image')
   end
 
+  test 'index serves the image of a liked comment from its pin' do
+    comment = comments(:one)
+    Notification.create!(notifiable: comment, notifier: users(:you), recipient: users(:me), key: 'liked')
+    Notification.create!(notifiable: pins(:public_two), notifier: users(:you), recipient: users(:me), key: 'liked')
+
+    stub_google_auth(users(:me)) do
+      get '/me/notifications', headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    notification = JSON.parse(@response.body).find { |n| n['notifiable']['type'] == 'comment' }
+
+    assert_equal comment.commentable.image_variants.as_json, notification['notifiable']['image']
+  end
+
   test 'index drops a notification whose pin is deleted' do
     pin = pins(:public_one)
     [pin, pins(:public_two)].each do |notifiable|
