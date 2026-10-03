@@ -1,11 +1,11 @@
 A new report was filed.
 
-Report:     #<%= @report.id %>
-Category:   <%= @report.category %>
-Target:     <%= @report.moderatable_type %> <%= @report.moderatable_id %>
-Reporter:   <%= @report.reporter ? "user #{@report.reporter.id} (#{@report.reporter.name})" : 'deleted account' %>
-Locale:     <%= @report.locale %>
-Filed at:   <%= @report.created_at.utc.iso8601 %>
+Report: #<%= @report.id %>
+Category: <%= @report.category %>
+Target: <%= @report.moderatable_type %> <%= @report.moderatable_id %>
+Reporter: <%= @report.reporter ? "user #{@report.reporter.id} (#{@report.reporter.name})" : 'deleted account' %>
+Locale: <%= @report.locale %>
+Filed at: <%= @report.created_at.utc.iso8601 %>
 
 Details:
 <%= @report.details.presence || '(none)' %>
