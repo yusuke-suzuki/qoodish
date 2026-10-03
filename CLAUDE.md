@@ -52,6 +52,11 @@ This document provides essential context for Claude Code to understand the Qoodi
 - **Immutable data model:** Design tables as immutable by default, following https://scrapbox.io/kawasima/イミュータブルデータモデル. Record what happened as insert-only rows and derive current state from them instead of updating status or flag columns in place. Physical deletion required to remove personal data takes precedence.
 - **Locking:** Keep transactions short: a migration's DDL waits for the metadata lock (MDL) held by any open transaction on the table, and every later query on that table queues behind it. Do not reach for `lock!`/`with_lock` first; prefer a unique index, an insert-only design, or optimistic locking (`lock_version`), and take a row lock only when none of these can serve.
 
+### N+1 Queries
+
+- Avoid N+1 queries with `preload`, not `includes` or `eager_load`.
+- Write the `preload` inline in the controller action, on the relation whose records the action serializes. Do not wrap it in a scope, a model method, or a helper method. Bullet raises on N+1 queries and unused eager loading in tests, so keeping the preload next to the query lets you fix whatever Bullet reports by adding or removing the association it names.
+
 ## 5. Commit Message Generation Rules
 
 When generating commit messages, please follow these rules:
