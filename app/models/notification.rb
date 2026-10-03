@@ -57,7 +57,7 @@ class Notification < ApplicationRecord
       .notifications
       .where(slice(*GROUPING_ATTRIBUTES))
       .where(id: ...id, read: false)
-      .update_all(read: true, updated_at: Time.current)
+      .find_each { |notification| notification.update!(read: true) }
 
     update!(read: true)
   end
