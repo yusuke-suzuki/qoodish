@@ -5,9 +5,10 @@ Reason: <%= t("moderation.categories.#{@report.category}") %>
 Filed at: <%= @report.created_at.utc.iso8601 %>
 Decided at: <%= @decision.created_at.utc.iso8601 %>
 
-Outcome: <%= t("moderation.outcomes.#{@decision.outcome}") %>
+Outcome:
+<%= t("moderation.outcomes.#{@decision.outcome}") %>
 
-Reason:
+Reason for the decision:
 <%= @decision.reason %>
 
 If you believe this outcome is wrong, you may write to support@qoodish.com.

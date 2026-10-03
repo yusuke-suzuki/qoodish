@@ -12,9 +12,9 @@ ja:
       impersonation: なりすまし
       other: その他
     outcomes:
-      kept: 削除その他の措置は行いませんでした。
-      removed: 削除しました。
-      unavailable: 確認した時点で、対象はすでに削除されていました。
+      kept: 利用規約に違反するとは判断しなかったため、報告された投稿の削除その他の措置は行いませんでした。
+      removed: 利用規約に違反すると判断し、報告された投稿を削除しました。
+      unavailable: 確認した時点で、報告された投稿はすでに削除されていました。
   moderation_mailer:
     report_received:
       subject: "[Qoodish] 新しい報告 #%{id}"
