@@ -54,7 +54,7 @@ This document provides essential context for Claude Code to understand the Qoodi
 
 ### N+1 Queries
 
-- Avoid N+1 queries with `preload`, not `includes` or `eager_load`.
+- Avoid N+1 queries with `preload`, not `includes` or `eager_load`. Of the three, `preload` states its intent most plainly, which is to load these associations for the records already selected, and its behavior is the easiest to predict: it always runs one separate query per association. `includes` switches to a JOIN when the relation references the association's table, so its queries depend on the rest of the chain. `eager_load` always joins, so the association's rows can change which rows the main query returns.
 - Write the `preload` inline in the controller action, on the relation whose records the action serializes. Do not wrap it in a scope, a model method, or a helper method. Bullet raises on N+1 queries and unused eager loading in tests, so keeping the preload next to the query lets you fix whatever Bullet reports by adding or removing the association it names.
 
 ## 5. Commit Message Generation Rules
