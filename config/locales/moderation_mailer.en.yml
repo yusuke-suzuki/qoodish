@@ -12,9 +12,9 @@ en:
       impersonation: Impersonation
       other: Something else
     outcomes:
-      kept: No removal or other measure was taken.
-      removed: It was removed.
-      unavailable: It was no longer available when we reviewed it.
+      kept: We did not find that the reported content violates our Terms of Service, so we did not remove it or take any other measure.
+      removed: We found that the reported content violates our Terms of Service and removed it.
+      unavailable: The reported content had already been deleted when we reviewed it.
   moderation_mailer:
     report_received:
       subject: "[Qoodish] New report #%{id}"
