@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.25.1](https://github.com/yusuke-suzuki/qoodish/compare/v4.25.0...v4.25.1) (2026-10-03)
+
+
+### Bug Fixes
+
+* align report reason labels with the form ([abf4f61](https://github.com/yusuke-suzuki/qoodish/commit/abf4f610954277b1e08391737a3a4278e8e8b68c))
+* drop column padding in new report mail ([2c21551](https://github.com/yusuke-suzuki/qoodish/commit/2c2155191fb2440f2299b12cd0a48e76dce18820))
+* state what was decided in the outcome mail ([1bd5776](https://github.com/yusuke-suzuki/qoodish/commit/1bd5776840c5750e84dd3a45e56bfcba507a839f))
+
 ## [4.25.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.24.0...v4.25.0) (2026-10-02)
 
 
