@@ -179,6 +179,18 @@ jobs:
               exit 1
             fi
           fi
+      - name: Record the traffic tags of PR revisions
+        id: tags
+        if: env.RELEASE_CANDIDATE == 'true'
+        run: |
+          TAGS=$(gcloud run services describe $SERVICE_NAME \
+            --format=json \
+            --project=$PROJECT_ID \
+            --region=$REGION \
+            | jq -r --arg own "pr-${{ github.event.number }}" \
+              '[.spec.traffic[]? | select(.tag and .revisionName and .tag != $own) | "\(.tag)=\(.revisionName)"] | join(",")')
+          echo "Tags to keep: ${TAGS:-none}"
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
       - name: Deploy Service using kustomize
         if: env.RELEASE_CANDIDATE == 'true'
         working-directory: run/dev/api
@@ -193,6 +205,15 @@ jobs:
           echo "----------------------------------"
 
           kustomize build . | gcloud run services replace - \
+            --project=$PROJECT_ID \
+            --region=$REGION
+      - name: Tag the new revision and restore the PR tags
+        if: env.RELEASE_CANDIDATE == 'true'
+        env:
+          KEPT_TAGS: ${{ steps.tags.outputs.tags }}
+        run: |
+          gcloud run services update-traffic $SERVICE_NAME \
+            --update-tags=${KEPT_TAGS:+$KEPT_TAGS,}pr-${{ github.event.number }}=LATEST \
             --project=$PROJECT_ID \
             --region=$REGION
       - name: Deploy a tagged revision without traffic
