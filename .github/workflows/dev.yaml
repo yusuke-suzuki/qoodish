@@ -127,6 +127,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: read
     runs-on: ubuntu-latest
     env:
       RELEASE_CANDIDATE: ${{ github.head_ref == 'release-please--branches--master' && github.base_ref == 'master' && github.event.pull_request.head.repo.full_name == github.repository }}
@@ -179,16 +180,25 @@ jobs:
               exit 1
             fi
           fi
-      - name: Record the traffic tags of PR revisions
+      - name: Record the traffic tags of open PRs
         id: tags
         if: env.RELEASE_CANDIDATE == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          OPEN_PR_TAGS=$(gh pr list \
+            --repo ${{ github.repository }} \
+            --state open \
+            --limit 1000 \
+            --json number \
+            --jq '[.[] | "pr-\(.number)"]')
+
           TAGS=$(gcloud run services describe $SERVICE_NAME \
             --format=json \
             --project=$PROJECT_ID \
             --region=$REGION \
-            | jq -r --arg own "pr-${{ github.event.number }}" \
-              '[.spec.traffic[]? | select(.tag and .revisionName and .tag != $own) | "\(.tag)=\(.revisionName)"] | join(",")')
+            | jq -r --arg own "pr-${{ github.event.number }}" --argjson open "$OPEN_PR_TAGS" \
+              '[.spec.traffic[]? | select(.tag and .revisionName and .tag != $own) | select(.tag as $tag | any($open[]; . == $tag)) | "\(.tag)=\(.revisionName)"] | join(",")')
           echo "Tags to keep: ${TAGS:-none}"
           echo "tags=$TAGS" >> $GITHUB_OUTPUT
       - name: Deploy Service using kustomize
@@ -212,8 +222,13 @@ jobs:
         env:
           KEPT_TAGS: ${{ steps.tags.outputs.tags }}
         run: |
+          REVISION=$(gcloud run services describe $SERVICE_NAME \
+            --format='value(status.latestReadyRevisionName)' \
+            --project=$PROJECT_ID \
+            --region=$REGION)
+
           gcloud run services update-traffic $SERVICE_NAME \
-            --update-tags=${KEPT_TAGS:+$KEPT_TAGS,}pr-${{ github.event.number }}=LATEST \
+            --update-tags=${KEPT_TAGS:+$KEPT_TAGS,}pr-${{ github.event.number }}=$REVISION \
             --project=$PROJECT_ID \
             --region=$REGION
       - name: Deploy a tagged revision without traffic
