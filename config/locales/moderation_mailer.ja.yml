@@ -1,14 +1,14 @@
 ja:
   moderation:
     categories:
-      spam: スパム・誇大広告
+      spam: スパム・宣伝
       harassment: 嫌がらせ・いじめ
-      hate: ヘイトスピーチ
-      sexual: 性的・露骨な表現
-      violence: 暴力・危険行為
-      illegal: 違法な物品・行為
-      privacy: プライバシーの侵害
-      copyright: 著作権・商標権の侵害
+      hate: 差別・ヘイトスピーチ
+      sexual: 性的なコンテンツ
+      violence: 暴力的・残虐なコンテンツ
+      illegal: 違法な行為・コンテンツ
+      privacy: プライバシー侵害・名誉毀損
+      copyright: 著作権・商標などの権利侵害
       impersonation: なりすまし
       other: その他
     outcomes:
