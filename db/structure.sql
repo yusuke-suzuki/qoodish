@@ -31,8 +31,8 @@ CREATE TABLE `blocks` (
   PRIMARY KEY (`id`),
   KEY `index_blocks_on_blocked_id` (`blocked_id`),
   KEY `index_blocks_on_blocker_id_and_blocked_id` (`blocker_id`,`blocked_id`),
-  CONSTRAINT `fk_rails_c0ad31bb25` FOREIGN KEY (`blocker_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_rails_c7fbc30382` FOREIGN KEY (`blocked_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `fk_rails_c0ad31bb25` FOREIGN KEY (`blocker_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_rails_c7fbc30382` FOREIGN KEY (`blocked_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bookmarks`;
@@ -113,7 +113,7 @@ CREATE TABLE `chapters` (
   KEY `index_chapters_on_status_and_created_at` (`status`,`created_at`),
   KEY `index_chapters_on_user_id_and_status` (`user_id`,`status`),
   FULLTEXT KEY `index_chapters_on_title_and_content_text` (`title`,`content_text`) /*!50100 WITH PARSER `ngram` */ ,
-  CONSTRAINT `fk_rails_1c8a18c6b0` FOREIGN KEY (`current_revision_id`) REFERENCES `chapter_revisions` (`id`),
+  CONSTRAINT `fk_rails_1c8a18c6b0` FOREIGN KEY (`current_revision_id`) REFERENCES `chapter_revisions` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_rails_227ce80201` FOREIGN KEY (`map_id`) REFERENCES `maps` (`id`),
   CONSTRAINT `fk_rails_b5e9549ad2` FOREIGN KEY (`journey_id`) REFERENCES `journeys` (`id`),
   CONSTRAINT `fk_rails_ca7ffbce5f` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
@@ -194,7 +194,7 @@ CREATE TABLE `comments` (
   KEY `index_comments_on_commentable_type_and_commentable_id` (`commentable_type`,`commentable_id`),
   KEY `index_comments_on_current_revision_id` (`current_revision_id`),
   KEY `index_comments_on_user_id` (`user_id`),
-  CONSTRAINT `fk_rails_598e499e12` FOREIGN KEY (`current_revision_id`) REFERENCES `comment_revisions` (`id`)
+  CONSTRAINT `fk_rails_598e499e12` FOREIGN KEY (`current_revision_id`) REFERENCES `comment_revisions` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `devices`;
@@ -292,7 +292,7 @@ CREATE TABLE `journals` (
   UNIQUE KEY `index_journals_on_user_id` (`user_id`),
   KEY `index_journals_on_current_revision_id` (`current_revision_id`),
   CONSTRAINT `fk_rails_1f2015adde` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_rails_d8345f1b83` FOREIGN KEY (`current_revision_id`) REFERENCES `journal_revisions` (`id`)
+  CONSTRAINT `fk_rails_d8345f1b83` FOREIGN KEY (`current_revision_id`) REFERENCES `journal_revisions` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `journey_checkin_revision_images`;
@@ -353,7 +353,7 @@ CREATE TABLE `journey_checkins` (
   KEY `index_journey_checkins_on_current_revision_id` (`current_revision_id`),
   KEY `index_journey_checkins_on_pin_id` (`pin_id`),
   CONSTRAINT `fk_rails_0d440e8bad` FOREIGN KEY (`journey_id`) REFERENCES `journeys` (`id`),
-  CONSTRAINT `fk_rails_4de318bcf3` FOREIGN KEY (`current_revision_id`) REFERENCES `journey_checkin_revisions` (`id`),
+  CONSTRAINT `fk_rails_4de318bcf3` FOREIGN KEY (`current_revision_id`) REFERENCES `journey_checkin_revisions` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_rails_ee27fafe59` FOREIGN KEY (`pin_id`) REFERENCES `pins` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -441,7 +441,7 @@ CREATE TABLE `maps` (
   KEY `index_maps_on_user_id` (`user_id`),
   FULLTEXT KEY `index_maps_on_name_and_description` (`name`,`description`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_rails_4ab1ab6be6` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_rails_7fe7872f86` FOREIGN KEY (`current_revision_id`) REFERENCES `map_revisions` (`id`)
+  CONSTRAINT `fk_rails_7fe7872f86` FOREIGN KEY (`current_revision_id`) REFERENCES `map_revisions` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `milestones`;
@@ -501,8 +501,8 @@ CREATE TABLE `mutes` (
   PRIMARY KEY (`id`),
   KEY `index_mutes_on_muted_id` (`muted_id`),
   KEY `index_mutes_on_muter_id_and_muted_id` (`muter_id`,`muted_id`),
-  CONSTRAINT `fk_rails_2f059f5877` FOREIGN KEY (`muted_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_rails_3169283784` FOREIGN KEY (`muter_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `fk_rails_2f059f5877` FOREIGN KEY (`muted_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_rails_3169283784` FOREIGN KEY (`muter_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notifications`;
@@ -593,7 +593,7 @@ CREATE TABLE `pins` (
   FULLTEXT KEY `index_pins_on_name_and_comment` (`name`,`comment`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_rails_51b0c024f1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `fk_rails_717eb8a1a6` FOREIGN KEY (`map_id`) REFERENCES `maps` (`id`),
-  CONSTRAINT `fk_rails_ae6e2f1f41` FOREIGN KEY (`current_revision_id`) REFERENCES `pin_revisions` (`id`)
+  CONSTRAINT `fk_rails_ae6e2f1f41` FOREIGN KEY (`current_revision_id`) REFERENCES `pin_revisions` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `reports`;
@@ -753,7 +753,7 @@ CREATE TABLE `users` (
   KEY `index_users_on_current_revision_id` (`current_revision_id`),
   KEY `index_users_on_image_id` (`image_id`),
   FULLTEXT KEY `index_users_on_name` (`name`) /*!50100 WITH PARSER `ngram` */ ,
-  CONSTRAINT `fk_rails_3674e37df0` FOREIGN KEY (`current_revision_id`) REFERENCES `user_revisions` (`id`),
+  CONSTRAINT `fk_rails_3674e37df0` FOREIGN KEY (`current_revision_id`) REFERENCES `user_revisions` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_rails_47c7c64b36` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -790,6 +790,7 @@ CREATE TABLE `votes` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 INSERT INTO `schema_migrations` (version) VALUES
+('20261003232736'),
 ('20261002152648'),
 ('20261002045305'),
 ('20261001164544'),
