@@ -25,6 +25,7 @@ json.images pin.images do |image|
   json.hero variants[:hero]
   json.ogp variants[:ogp]
 end
+json.property_option_ids pin.property_options.map(&:id)
 json.map do
   json.id pin.map_id
   json.name pin.map.name

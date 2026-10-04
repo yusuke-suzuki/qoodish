@@ -7,7 +7,7 @@ module Users
 
       pins = user
              .pins
-             .preload(:map, { user: :image }, :images, :votes)
+             .preload(:map, { user: :image }, :images, :property_options, :votes)
              .referenceable_by(current_user)
 
       @pins = if params[:next_timestamp]

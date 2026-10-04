@@ -6,12 +6,12 @@ class PinsController < ApplicationController
               Pin
                 .feed_for(current_user)
                 .feed_before(params[:next_timestamp], params[:next_id])
-                .preload(:map, { user: :image }, :images, :votes)
+                .preload(:map, { user: :image }, :images, :property_options, :votes)
             else
               Pin
                 .feed_for(current_user)
                 .latest_feed
-                .preload(:map, { user: :image }, :images, :votes)
+                .preload(:map, { user: :image }, :images, :property_options, :votes)
             end
 
     @comments_by_pin_id = Comment
@@ -29,7 +29,7 @@ class PinsController < ApplicationController
     @pin =
       current_user
       .referenceable_pins
-      .preload(:map, { user: :image }, :images, :votes)
+      .preload(:map, { user: :image }, :images, :property_options, :votes)
       .find_by!(id: params[:id])
 
     @comments = @pin
