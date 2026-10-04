@@ -8,14 +8,4 @@ module RevisableStatus
   def discard!(user:)
     revise!(user: user, status: :deleted)
   end
-
-  private
-
-  def guarded_attributes
-    super + [:status]
-  end
-
-  def revision_content
-    super.merge(status: status)
-  end
 end

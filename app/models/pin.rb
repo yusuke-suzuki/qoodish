@@ -5,14 +5,14 @@ PIN_FEED_PER_PAGE = 12
 class Pin < ApplicationRecord
   include Revisable
   include RevisableStatus
-  include RevisableImages
   include Moderatable
   include Votable
   include Blockable
   include Mutable
   include FulltextSearchable
 
-  self.revision_attributes = %i[name comment latitude longitude]
+  self.revision_attributes = %i[name comment latitude longitude status]
+  self.revision_collections = %i[images]
 
   fulltext_searchable :name, :comment
 

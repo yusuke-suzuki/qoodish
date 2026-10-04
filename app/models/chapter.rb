@@ -7,7 +7,6 @@ CHAPTER_FEED_PER_PAGE = 12
 class Chapter < ApplicationRecord
   include Revisable
   include RevisableStatus
-  include RevisableImages
   include Moderatable
   include Votable
   include Blockable
@@ -16,7 +15,8 @@ class Chapter < ApplicationRecord
 
   EMPTY_FEATURE_COLLECTION = { 'type' => 'FeatureCollection', 'features' => [] }.freeze
 
-  self.revision_attributes = %i[title content map_features]
+  self.revision_attributes = %i[title content map_features status]
+  self.revision_collections = %i[images]
 
   fulltext_searchable :title, :content_text
 

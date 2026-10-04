@@ -61,6 +61,22 @@ class PinTest < ActiveSupport::TestCase
     assert_equal 2, previous.images.count
   end
 
+  test 'an image submitted twice is recorded once' do
+    pin = pins(:public_two)
+
+    pin.revise!(user: users(:me), image_ids: [images(:one).id, images(:one).id.to_s])
+
+    assert_equal [images(:one).id], pin.reload.images.ids
+  end
+
+  test 'submitting the images the pin already has in another order appends nothing' do
+    pin = pins(:public_one)
+
+    assert_no_difference -> { pin.revisions.count } do
+      pin.revise!(user: users(:me), image_ids: pin.images.ids.reverse.map(&:to_s))
+    end
+  end
+
   test 'a revision cannot be rewritten' do
     revision = pins(:public_one).current_revision
 
