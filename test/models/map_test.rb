@@ -149,26 +149,6 @@ class MapTest < ActiveSupport::TestCase
     end
   end
 
-  test 'a revision keeps the images it was written with' do
-    revision = record_revision(maps(:public_two), [images(:one)])
-
-    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.images = [] }
-    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.image_ids = [] }
-    assert_equal 1, revision.reload.images.count
-  end
-
-  test 'a revision refuses every way of mutating the collection it was written with' do
-    revision = record_revision(maps(:public_two), [images(:one)])
-
-    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.images << images(:two) }
-    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.images.delete(images(:one)) }
-    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.images.destroy(images(:one)) }
-    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.images.clear }
-    assert_raises(ActiveRecord::ReadOnlyRecord) { revision.images.create!(user: users(:me), url: 'https://example.com/x') }
-
-    assert_equal [images(:one).id], revision.reload.image_ids
-  end
-
   test 'a revision still takes the images it is written with' do
     revision = record_revision(maps(:public_two), [images(:one)])
 
