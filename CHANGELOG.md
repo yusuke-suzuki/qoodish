@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.28.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.27.0...v4.28.0) (2026-10-04)
+
+
+### Features
+
+* add API for pin properties ([f855f0e](https://github.com/yusuke-suzuki/qoodish/commit/f855f0e99c426f21c22f04a80a98e484775a31e5))
+
 ## [4.27.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.26.0...v4.27.0) (2026-10-04)
 
 
