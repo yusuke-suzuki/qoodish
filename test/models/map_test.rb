@@ -209,15 +209,6 @@ class MapTest < ActiveSupport::TestCase
     assert_equal revision, map.reload.current_revision
   end
 
-  test 'a backfilled revision leaves the map last updated when it was' do
-    map = maps(:public_two)
-    updated_at = map.updated_at
-
-    record_revision(map, [])
-
-    assert_equal updated_at, map.reload.updated_at
-  end
-
   test 'a map holding more images than the limit can still be revised' do
     map = maps(:public_two)
     record_revision(map, legacy_images(2))

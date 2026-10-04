@@ -60,8 +60,7 @@ class User < ApplicationRecord
            dependent: :nullify
   has_many :blocks,
            foreign_key: :blocker_id,
-           inverse_of: :blocker,
-           dependent: :delete_all
+           inverse_of: :blocker
   has_many :active_blocks,
            -> { active },
            class_name: 'Block',
@@ -71,12 +70,10 @@ class User < ApplicationRecord
   has_many :received_blocks,
            class_name: 'Block',
            foreign_key: :blocked_id,
-           inverse_of: :blocked,
-           dependent: :delete_all
+           inverse_of: :blocked
   has_many :mutes,
            foreign_key: :muter_id,
-           inverse_of: :muter,
-           dependent: :delete_all
+           inverse_of: :muter
   has_many :active_mutes,
            -> { active },
            class_name: 'Mute',
@@ -86,8 +83,7 @@ class User < ApplicationRecord
   has_many :received_mutes,
            class_name: 'Mute',
            foreign_key: :muted_id,
-           inverse_of: :muted,
-           dependent: :delete_all
+           inverse_of: :muted
 
   validates :uid,
             presence: true,
@@ -101,7 +97,6 @@ class User < ApplicationRecord
             }
   validate :image_must_be_owned, if: :image_id_changed?
 
-  before_destroy :detach_image, prepend: true
   before_destroy :delete_id_platform_account
   after_create :create_default_map
   after_create :create_default_journal
@@ -240,10 +235,6 @@ class User < ApplicationRecord
     return if image&.user_id == id
 
     errors.add(:image, :invalid)
-  end
-
-  def detach_image
-    update_column(:image_id, nil) if image_id
   end
 
   def delete_id_platform_account
