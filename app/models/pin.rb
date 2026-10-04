@@ -12,7 +12,7 @@ class Pin < ApplicationRecord
   include FulltextSearchable
 
   self.revision_attributes = %i[name comment latitude longitude status]
-  self.revision_collections = %i[images]
+  self.revision_collections = %i[images property_options]
 
   fulltext_searchable :name, :comment
 
@@ -25,6 +25,7 @@ class Pin < ApplicationRecord
            dependent: :destroy,
            inverse_of: :pin
   has_many :images, through: :current_revision
+  has_many :property_options, through: :current_revision
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :comments, -> { not_deleted.visible }, as: :commentable, inverse_of: :commentable
   has_many :all_comments, class_name: 'Comment', as: :commentable, dependent: :destroy, inverse_of: :commentable

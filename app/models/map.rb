@@ -24,6 +24,7 @@ class Map < ApplicationRecord
            inverse_of: :map
   has_many :pins, dependent: :destroy
   has_many :published_pins, -> { published }, class_name: 'Pin', inverse_of: :map, dependent: nil
+  has_many :pin_properties, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :map
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :coauthorships, dependent: :destroy
   has_many :coauthors, through: :coauthorships, source: :user

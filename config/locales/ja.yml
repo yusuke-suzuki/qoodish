@@ -175,6 +175,11 @@ ja:
       chapter_journey_mismatch: 指定された旅はチャプターの著者または地図に属していません。
       duplicate_chapter_for_journey: この旅のチャプターは既に作成されています。
 
+      pin_property_name_required: タグの名前を入力してください。
+      pin_property_name_exceed: "タグの名前が長すぎます。(最大: 30 文字)"
+      pin_property_option_name_required: 選択肢の名前を入力してください。
+      pin_property_option_name_exceed: "選択肢の名前が長すぎます。(最大: 30 文字)"
+
       journal_title_required: 手帳のタイトルを入力してください。
       journal_title_exceed: "手帳のタイトルが長すぎます。(最大: 50 文字)"
       journal_description_exceed: "手帳の説明が長すぎます。(最大: 200 文字)"

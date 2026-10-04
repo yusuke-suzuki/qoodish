@@ -1,0 +1,17 @@
+payment:
+  pin_property: payment
+  user: me
+  name: Payment
+  position: 0
+
+genre:
+  pin_property: genre
+  user: me
+  name: Genre
+  position: 1
+
+other_map_genre:
+  pin_property: other_map_genre
+  user: me
+  name: Genre
+  position: 0

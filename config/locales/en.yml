@@ -199,6 +199,11 @@ en:
       chapter_journey_mismatch: The journey does not belong to the author or the map of the chapter.
       duplicate_chapter_for_journey: A chapter has already been created for this journey.
 
+      pin_property_name_required: Tag name is required.
+      pin_property_name_exceed: "Tag name is too long. (Max: 30)"
+      pin_property_option_name_required: Option name is required.
+      pin_property_option_name_exceed: "Option name is too long. (Max: 30)"
+
       journal_title_required: Journal title is required.
       journal_title_exceed: "Journal title is too long. (Max: 50)"
       journal_description_exceed: "Journal description is too long. (Max: 200)"

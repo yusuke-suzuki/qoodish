@@ -145,6 +145,104 @@ class PinTest < ActiveSupport::TestCase
     assert_equal 2, Image.where(id: [images(:one).id, images(:two).id]).count
   end
 
+  test 'revise! records the options it was given' do
+    pin = pins(:public_one)
+    previous = pin.current_revision
+
+    pin.revise!(user: users(:me), property_option_ids: [pin_property_options(:cash_only).id])
+
+    assert_equal [pin_property_options(:cash_only)], pin.reload.property_options
+    assert_equal [pin_property_options(:paypay), pin_property_options(:ramen)], previous.reload.property_options
+  end
+
+  test 'revise! keeps the options of the previous revision when none are given' do
+    pin = pins(:public_one)
+    option_ids = pin.property_options.ids
+
+    pin.revise!(user: users(:me), name: 'renamed')
+
+    assert_equal option_ids, pin.reload.property_options.ids
+  end
+
+  test 'submitting the options the pin already has appends nothing' do
+    pin = pins(:public_one)
+
+    assert_no_difference -> { pin.revisions.count } do
+      pin.revise!(user: users(:me), property_option_ids: pin.property_options.ids.reverse.map(&:to_s))
+    end
+  end
+
+  test 'a property taking several options records them all' do
+    pin = pins(:public_one)
+    option_ids = [pin_property_options(:cash_only).id, pin_property_options(:paypay).id]
+
+    pin.revise!(user: users(:me), property_option_ids: option_ids)
+
+    assert_equal option_ids.sort, pin.reload.property_options.ids.sort
+  end
+
+  test 'an option submitted twice is recorded once' do
+    pin = pins(:public_one)
+    option_id = pin_property_options(:cash_only).id
+
+    pin.revise!(user: users(:me), property_option_ids: [option_id, option_id.to_s])
+
+    assert_equal [option_id], pin.reload.property_options.ids
+  end
+
+  test 'a property taking one option rejects two' do
+    pin = pins(:public_one)
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      pin.revise!(
+        user: users(:me),
+        property_option_ids: [pin_property_options(:ramen).id, pin_property_options(:cafe).id]
+      )
+    end
+  end
+
+  test 'an option of another map is rejected' do
+    pin = pins(:public_one)
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      pin.revise!(user: users(:me), property_option_ids: [pin_property_options(:other_map_ramen).id])
+    end
+  end
+
+  test 'a discarded option is rejected' do
+    pin = pins(:public_one)
+    option = pin_property_options(:cash_only)
+    option.discard!(user: users(:me))
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      pin.revise!(user: users(:me), property_option_ids: [option.id])
+    end
+  end
+
+  test 'an option of a discarded property is rejected' do
+    pin = pins(:public_one)
+    pin_properties(:payment).discard!(user: users(:me))
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      pin.revise!(user: users(:me), property_option_ids: [pin_property_options(:cash_only).id])
+    end
+  end
+
+  test 'a pin keeps an option discarded after it was chosen' do
+    pin = pins(:public_one)
+    pin_property_options(:paypay).discard!(user: users(:me))
+
+    pin.revise!(user: users(:me), name: 'renamed')
+
+    assert_includes pin.reload.property_options, pin_property_options(:paypay)
+  end
+
+  test 'record! takes options with the first revision' do
+    pin = publish(property_option_ids: [pin_property_options(:cafe).id])
+
+    assert_equal [pin_property_options(:cafe)], pin.property_options
+  end
+
   private
 
   def legacy_images(count)

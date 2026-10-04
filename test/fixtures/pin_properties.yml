@@ -1,0 +1,20 @@
+payment:
+  map: public_one
+  current_revision: payment
+  name: Payment
+  position: 0
+  multiple: true
+
+genre:
+  map: public_one
+  current_revision: genre
+  name: Genre
+  position: 1
+  multiple: false
+
+other_map_genre:
+  map: public_two
+  current_revision: other_map_genre
+  name: Genre
+  position: 0
+  multiple: false
