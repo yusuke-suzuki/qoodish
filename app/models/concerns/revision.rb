@@ -10,7 +10,6 @@ module Revision
   private
 
   def become_current
-    revisable.current_revision = self
-    revisable.update_column(:current_revision_id, id)
+    revisable.update!(current_revision: self)
   end
 end

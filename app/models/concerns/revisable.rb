@@ -11,7 +11,6 @@ module Revisable
     before_create :reject_creation_outside_a_revision
     before_save :reject_change_outside_a_revision, if: :persisted?
     after_save :append_revision, if: :revised_by
-    before_destroy :detach_current_revision, prepend: true
   end
 
   class_methods do
@@ -74,9 +73,5 @@ module Revisable
 
   def forget_submission
     self.revised_by = nil
-  end
-
-  def detach_current_revision
-    update_columns(current_revision_id: nil) if current_revision_id
   end
 end
