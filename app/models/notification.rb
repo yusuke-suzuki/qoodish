@@ -40,6 +40,10 @@ class Notification < ApplicationRecord
     where(key: KEYS)
   }
 
+  scope :with_existing_notifier, lambda {
+    where(notifier_id: User.select(:id))
+  }
+
   scope :not_blocking, lambda { |user|
     where.not(notifier_id: Block.active.where(blocked_id: user.id).select(:blocker_id))
   }

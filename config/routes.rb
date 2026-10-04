@@ -69,6 +69,11 @@ Rails.application.routes.draw do
       resources :journals, only: [:index]
     end
   end
+  namespace :v2 do
+    namespace :me do
+      resources :notifications, only: [:index]
+    end
+  end
   resources :chapters, only: %i[index show] do
     scope module: :chapters do
       resource :like, only: %i[create destroy]
