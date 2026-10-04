@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.27.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.26.0...v4.27.0) (2026-10-04)
+
+
+### Features
+
+* add tag properties for pins on a map ([10e47bb](https://github.com/yusuke-suzuki/qoodish/commit/10e47bb6f77beedffd4aa35d51f7f7daf654a20b))
+
 ## [4.26.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.25.1...v4.26.0) (2026-10-04)
 
 
