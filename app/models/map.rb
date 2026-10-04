@@ -1,7 +1,6 @@
 class Map < ApplicationRecord
   include Revisable
   include RevisableStatus
-  include RevisableImages
   include Moderatable
   include Blockable
   include Mutable
@@ -11,7 +10,8 @@ class Map < ApplicationRecord
   # drops, so in-flight INSERTs do not reference a column that is gone.
   self.ignored_columns += %w[shared invitable]
 
-  self.revision_attributes = %i[name description latitude longitude private]
+  self.revision_attributes = %i[name description latitude longitude private status]
+  self.revision_collections = %i[images]
 
   fulltext_searchable :name, :description
 

@@ -6,9 +6,9 @@ class JourneyCheckin < ApplicationRecord
   include PinSnapshot
   include Revisable
   include RevisableStatus
-  include RevisableImages
 
-  self.revision_attributes = %i[note checked_in_at]
+  self.revision_attributes = %i[note checked_in_at status]
+  self.revision_collections = %i[images]
 
   belongs_to :journey
   belongs_to :current_revision, class_name: 'JourneyCheckinRevision', optional: true

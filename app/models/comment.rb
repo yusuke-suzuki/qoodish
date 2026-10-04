@@ -8,7 +8,7 @@ class Comment < ApplicationRecord
   include Blockable
   include Mutable
 
-  self.revision_attributes = %i[body]
+  self.revision_attributes = %i[body status]
 
   belongs_to :commentable, polymorphic: true
   belongs_to :user
