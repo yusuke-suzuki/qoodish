@@ -25,12 +25,17 @@ module RevisionPropertyOptions
   end
 
   def property_options_not_offered_on_the_map
-    property_options.reject { |option| option.offered_on?(pin.map_id) }
+    property_options_with_their_properties.reject { |option| option.offered_on?(pin.map_id) }
   end
 
   def single_choice_properties_given_several_options
-    property_options.group_by(&:pin_property).filter_map do |property, options|
+    property_options_with_their_properties.group_by(&:pin_property).filter_map do |property, options|
       property if !property.multiple? && options.many?
     end
+  end
+
+  def property_options_with_their_properties
+    ActiveRecord::Associations::Preloader.new(records: property_options.to_a, associations: :pin_property).call
+    property_options
   end
 end

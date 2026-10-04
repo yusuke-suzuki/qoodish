@@ -17,6 +17,11 @@ Rails.application.routes.draw do
       resources :coauthorship_invitations, only: [:create]
       resources :journeys, only: [:create]
       resources :chapters, only: %i[index create]
+      resources :pin_properties, only: %i[index create update destroy] do
+        scope module: :pin_properties do
+          resources :options, only: %i[create update destroy]
+        end
+      end
     end
   end
   resources :pins, only: %i[index show] do
@@ -105,6 +110,7 @@ Rails.application.routes.draw do
         resources :pins, only: [:index]
         resources :coauthors, only: [:index]
         resources :chapters, only: [:index]
+        resources :pin_properties, only: [:index]
       end
     end
     resources :pins, only: %i[index show]

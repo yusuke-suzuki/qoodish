@@ -26,7 +26,7 @@ module Pins
 
         current_user.liked!(comment)
 
-        @pin = current_user.referenceable_pins.preload(:map, { user: :image }, :images, :votes).find(pin.id)
+        @pin = current_user.referenceable_pins.preload(:map, { user: :image }, :images, :property_options, :votes).find(pin.id)
         @comments = @pin
                     .comments
                     .not_blocking(current_user)
@@ -46,7 +46,7 @@ module Pins
 
         current_user.unliked!(comment)
 
-        @pin = current_user.referenceable_pins.preload(:map, { user: :image }, :images, :votes).find(pin.id)
+        @pin = current_user.referenceable_pins.preload(:map, { user: :image }, :images, :property_options, :votes).find(pin.id)
         @comments = @pin
                     .comments
                     .not_blocking(current_user)

@@ -35,6 +35,46 @@ class Maps::PinsControllerTest < ActionDispatch::IntegrationTest
     res = JSON.parse(@response.body)
 
     assert(res.all? { |pin| pin['map']['id'] == maps(:public_one).id })
+    assert_equal [pin_property_options(:paypay).id, pin_property_options(:ramen).id].sort,
+                 res.find { |pin| pin['id'] == pins(:public_one).id }['property_option_ids'].sort
+  end
+
+  test 'create records the property options chosen for the pin' do
+    stub_google_auth(users(:me)) do
+      post "/maps/#{maps(:public_one).id}/pins",
+           params: {
+             name: 'Cafe Bonjour',
+             comment: 'Nice place',
+             latitude: 35.681382,
+             longitude: 139.766084,
+             property_option_ids: [pin_property_options(:paypay).id, pin_property_options(:cafe).id]
+           },
+           headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    res = JSON.parse(@response.body)
+
+    assert_equal [pin_property_options(:paypay).id, pin_property_options(:cafe).id].sort,
+                 res['property_option_ids'].sort
+    assert_equal res['property_option_ids'].sort, Pin.find(res['id']).property_option_ids.sort
+  end
+
+  test 'create rejects several options of a single choice property' do
+    stub_google_auth(users(:me)) do
+      post "/maps/#{maps(:public_one).id}/pins",
+           params: {
+             name: 'Cafe Bonjour',
+             comment: 'Nice place',
+             latitude: 35.681382,
+             longitude: 139.766084,
+             property_option_ids: [pin_property_options(:ramen).id, pin_property_options(:cafe).id]
+           },
+           headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :unprocessable_content
   end
 
   test 'create publishes a pin with its first revision' do

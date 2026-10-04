@@ -6,7 +6,7 @@ module Maps
       @pins = current_user
               .referenceable_pins
               .where(map_id: params[:map_id])
-              .preload(:map, { user: :image }, :images, :votes)
+              .preload(:map, { user: :image }, :images, :property_options, :votes)
               .order(created_at: :desc)
 
       @comments_by_pin_id = Comment
@@ -32,7 +32,7 @@ module Maps
 
     def pin_params
       params
-        .permit(:name, :comment, :latitude, :longitude, image_ids: [])
+        .permit(:name, :comment, :latitude, :longitude, image_ids: [], property_option_ids: [])
         .to_h
         .symbolize_keys
     end

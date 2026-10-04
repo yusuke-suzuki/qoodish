@@ -111,6 +111,36 @@ class Me::PinsControllerTest < ActionDispatch::IntegrationTest
                  pins(:public_one).reload.image_ids.sort
   end
 
+  test 'update with property_option_ids replaces the options of the pin' do
+    pin = pins(:public_one)
+
+    stub_google_auth(users(:me)) do
+      put "/me/pins/#{pin.id}",
+          params: { property_option_ids: [pin_property_options(:cash_only).id, pin_property_options(:cafe).id] },
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+    assert_equal [pin_property_options(:cash_only).id, pin_property_options(:cafe).id].sort,
+                 JSON.parse(@response.body)['property_option_ids'].sort
+    assert_equal [pin_property_options(:cash_only).id, pin_property_options(:cafe).id].sort,
+                 pin.reload.property_option_ids.sort
+  end
+
+  test 'update rejects property_option_ids offered on another map' do
+    pin = pins(:public_one)
+
+    stub_google_auth(users(:me)) do
+      put "/me/pins/#{pin.id}",
+          params: { property_option_ids: [pin_property_options(:other_map_ramen).id] },
+          headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :unprocessable_content
+    assert_equal [pin_property_options(:paypay).id, pin_property_options(:ramen).id].sort,
+                 pin.reload.property_option_ids.sort
+  end
+
   test 'update a pin of another user should raise not found error' do
     stub_google_auth(users(:me)) do
       put "/me/pins/#{pins(:public_you_one).id}",

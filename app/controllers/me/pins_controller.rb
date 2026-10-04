@@ -8,14 +8,14 @@ module Me
                   .pins
                   .published
                   .visible
-                  .preload(:map, { user: :image }, :images, :votes)
+                  .preload(:map, { user: :image }, :images, :property_options, :votes)
                   .feed_before(params[:next_timestamp], params[:next_id])
               else
                 current_user
                   .pins
                   .published
                   .visible
-                  .preload(:map, { user: :image }, :images, :votes)
+                  .preload(:map, { user: :image }, :images, :property_options, :votes)
                   .latest_feed
               end
 
@@ -34,7 +34,7 @@ module Me
       pin = current_user.pins.published.find_by!(id: params[:id])
       pin.revise!(user: current_user, **pin_params)
 
-      @pin = current_user.pins.preload(:map, :images, :votes).find(pin.id)
+      @pin = current_user.pins.preload(:map, :images, :property_options, :votes).find(pin.id)
       @comments = @pin
                   .comments
                   .not_blocking(current_user)
@@ -51,7 +51,7 @@ module Me
 
     def pin_params
       params
-        .permit(:name, :comment, :latitude, :longitude, image_ids: [])
+        .permit(:name, :comment, :latitude, :longitude, image_ids: [], property_option_ids: [])
         .to_h
         .symbolize_keys
     end
