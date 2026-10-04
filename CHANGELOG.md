@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.26.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.25.1...v4.26.0) (2026-10-04)
+
+
+### Features
+
+* clear dependent rows through foreign keys ([9a5b5a7](https://github.com/yusuke-suzuki/qoodish/commit/9a5b5a79d80742f8713c2aad9a47c30064260071))
+* group notifications by action and subject ([4d1fe11](https://github.com/yusuke-suzuki/qoodish/commit/4d1fe11837e0c89e33913fe53723a769e213c215))
+
+
+### Bug Fixes
+
+* keep a constraint on each column while swapping ([6263dd0](https://github.com/yusuke-suzuki/qoodish/commit/6263dd07f724251201518f7af14ee8cef6e363d9))
+
 ## [4.25.1](https://github.com/yusuke-suzuki/qoodish/compare/v4.25.0...v4.25.1) (2026-10-03)
 
 
