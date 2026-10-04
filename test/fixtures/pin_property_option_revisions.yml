@@ -1,0 +1,29 @@
+cash_only:
+  pin_property_option: cash_only
+  user: me
+  name: Cash only
+  position: 0
+
+paypay:
+  pin_property_option: paypay
+  user: me
+  name: PayPay
+  position: 1
+
+ramen:
+  pin_property_option: ramen
+  user: me
+  name: Ramen
+  position: 0
+
+cafe:
+  pin_property_option: cafe
+  user: me
+  name: Cafe
+  position: 1
+
+other_map_ramen:
+  pin_property_option: other_map_ramen
+  user: me
+  name: Ramen
+  position: 0

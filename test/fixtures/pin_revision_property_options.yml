@@ -1,0 +1,7 @@
+public_one_paypay:
+  pin_revision: public_one
+  pin_property_option: paypay
+
+public_one_ramen:
+  pin_revision: public_one
+  pin_property_option: ramen

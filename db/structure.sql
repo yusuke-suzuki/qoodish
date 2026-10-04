@@ -529,6 +529,85 @@ CREATE TABLE `notifications` (
   KEY `index_notifications_on_recipient_type_and_recipient_id` (`recipient_type`,`recipient_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pin_properties`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pin_properties` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `map_id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `position` int NOT NULL DEFAULT '0',
+  `multiple` tinyint(1) NOT NULL DEFAULT '0',
+  `status` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'published',
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  `current_revision_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_pin_properties_on_map_id` (`map_id`),
+  KEY `index_pin_properties_on_current_revision_id` (`current_revision_id`),
+  CONSTRAINT `fk_rails_7aa3d21401` FOREIGN KEY (`current_revision_id`) REFERENCES `pin_property_revisions` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_rails_fae93bc161` FOREIGN KEY (`map_id`) REFERENCES `maps` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pin_property_option_revisions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pin_property_option_revisions` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `pin_property_option_id` bigint NOT NULL,
+  `user_id` bigint DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `position` int NOT NULL,
+  `status` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'published',
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_pin_property_option_revisions_on_pin_property_option_id` (`pin_property_option_id`),
+  KEY `index_pin_property_option_revisions_on_user_id` (`user_id`),
+  KEY `idx_on_pin_property_option_id_id_cd060b3bcd` (`pin_property_option_id`,`id`),
+  CONSTRAINT `fk_rails_15b9c08085` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_rails_2779a33909` FOREIGN KEY (`pin_property_option_id`) REFERENCES `pin_property_options` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pin_property_options`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pin_property_options` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `pin_property_id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `position` int NOT NULL DEFAULT '0',
+  `status` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'published',
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  `current_revision_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_pin_property_options_on_pin_property_id` (`pin_property_id`),
+  KEY `index_pin_property_options_on_current_revision_id` (`current_revision_id`),
+  CONSTRAINT `fk_rails_6c5501d9b4` FOREIGN KEY (`current_revision_id`) REFERENCES `pin_property_option_revisions` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_rails_6db8616e90` FOREIGN KEY (`pin_property_id`) REFERENCES `pin_properties` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pin_property_revisions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pin_property_revisions` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `pin_property_id` bigint NOT NULL,
+  `user_id` bigint DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `position` int NOT NULL,
+  `status` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'published',
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_pin_property_revisions_on_pin_property_id` (`pin_property_id`),
+  KEY `index_pin_property_revisions_on_user_id` (`user_id`),
+  KEY `index_pin_property_revisions_on_pin_property_id_and_id` (`pin_property_id`,`id`),
+  CONSTRAINT `fk_rails_af07909f81` FOREIGN KEY (`pin_property_id`) REFERENCES `pin_properties` (`id`),
+  CONSTRAINT `fk_rails_ed5042ae90` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pin_revision_images`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -544,6 +623,23 @@ CREATE TABLE `pin_revision_images` (
   KEY `index_pin_revision_images_on_pin_revision_id` (`pin_revision_id`),
   CONSTRAINT `fk_rails_30dccb4e7c` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`),
   CONSTRAINT `fk_rails_6d4f867f43` FOREIGN KEY (`pin_revision_id`) REFERENCES `pin_revisions` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pin_revision_property_options`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pin_revision_property_options` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `pin_revision_id` bigint NOT NULL,
+  `pin_property_option_id` bigint NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_on_pin_revision_id_pin_property_option_id_e17f1d524a` (`pin_revision_id`,`pin_property_option_id`),
+  KEY `index_pin_revision_property_options_on_pin_revision_id` (`pin_revision_id`),
+  KEY `index_pin_revision_property_options_on_pin_property_option_id` (`pin_property_option_id`),
+  CONSTRAINT `fk_rails_7551758728` FOREIGN KEY (`pin_property_option_id`) REFERENCES `pin_property_options` (`id`),
+  CONSTRAINT `fk_rails_b19c669733` FOREIGN KEY (`pin_revision_id`) REFERENCES `pin_revisions` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pin_revisions`;
@@ -790,6 +886,13 @@ CREATE TABLE `votes` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 INSERT INTO `schema_migrations` (version) VALUES
+('20261004004236'),
+('20261004004235'),
+('20261004004231'),
+('20261004004228'),
+('20261004004224'),
+('20261004004221'),
+('20261004004218'),
 ('20261003232736'),
 ('20261002152648'),
 ('20261002045305'),

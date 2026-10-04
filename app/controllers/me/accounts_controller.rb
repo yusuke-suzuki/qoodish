@@ -9,6 +9,7 @@ module Me
           { pins: [:revisions, :votes, :notifications, { all_comments: %i[revisions votes notifications] }] },
           { maps: [:revisions, :coauthorships, :bookmarks, :coauthorship_invitations, :votes, :notifications,
                    :featured_maps,
+                   { pin_properties: [:revisions, { options: :revisions }] },
                    { pins: [:revisions, :votes, :notifications,
                             { all_comments: %i[revisions votes notifications] }] }] },
           { journeys: [:milestones, { all_checkins: :revisions }] },

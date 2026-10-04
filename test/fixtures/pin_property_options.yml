@@ -1,0 +1,29 @@
+cash_only:
+  pin_property: payment
+  current_revision: cash_only
+  name: Cash only
+  position: 0
+
+paypay:
+  pin_property: payment
+  current_revision: paypay
+  name: PayPay
+  position: 1
+
+ramen:
+  pin_property: genre
+  current_revision: ramen
+  name: Ramen
+  position: 0
+
+cafe:
+  pin_property: genre
+  current_revision: cafe
+  name: Cafe
+  position: 1
+
+other_map_ramen:
+  pin_property: other_map_genre
+  current_revision: other_map_ramen
+  name: Ramen
+  position: 0
