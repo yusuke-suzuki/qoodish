@@ -3,7 +3,9 @@ class FeedCursor
 
   def self.decode(token)
     timestamp, id = Base64.urlsafe_decode64(token.to_s).split(',', 2)
-    new(timestamp, id.presence || raise(Exceptions::BadRequest))
+    raise Exceptions::BadRequest unless id&.match?(/\A[1-9]\d*\z/)
+
+    new(timestamp, id)
   rescue ArgumentError
     raise Exceptions::BadRequest
   end

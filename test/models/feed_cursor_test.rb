@@ -43,6 +43,8 @@ class FeedCursorTest < ActiveSupport::TestCase
     assert_raises(Exceptions::BadRequest) { FeedCursor.decode('not-a-cursor') }
     assert_raises(Exceptions::BadRequest) { FeedCursor.decode(Base64.urlsafe_encode64('2026-06-08T00:00:00Z')) }
     assert_raises(Exceptions::BadRequest) { FeedCursor.decode(Base64.urlsafe_encode64("\xFF\xFE,1")) }
+    assert_raises(Exceptions::BadRequest) { FeedCursor.decode(Base64.urlsafe_encode64('2026-06-08T00:00:00Z,abc')) }
+    assert_raises(Exceptions::BadRequest) { FeedCursor.decode(Base64.urlsafe_encode64('2026-06-08T00:00:00Z,0')) }
   end
 
   test 'rejects a cursor that is not a time' do
