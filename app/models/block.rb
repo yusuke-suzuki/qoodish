@@ -21,6 +21,10 @@ class Block < ApplicationRecord
     next_id.present? ? page.having('MAX(blocks.id) < ?', next_id) : page
   }
 
+  def self.next_cursor(page)
+    page.to_a.last.id.to_s if page.to_a.size == PER_PAGE
+  end
+
   def readonly?
     persisted?
   end

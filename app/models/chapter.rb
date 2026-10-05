@@ -103,6 +103,10 @@ class Chapter < ApplicationRecord
       .limit(CHAPTER_FEED_PER_PAGE)
   }
 
+  scope :feed_page, lambda { |token = nil|
+    token.present? ? where(*FeedCursor.decode(token).condition('chapters')).latest_feed : latest_feed
+  }
+
   def content=(value)
     super(value.is_a?(Hash) ? value.deep_stringify_keys : value)
   end

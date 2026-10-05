@@ -70,8 +70,26 @@ Rails.application.routes.draw do
     end
   end
   namespace :v2 do
+    resources :pins, only: [:index]
+    resources :users, only: [] do
+      scope module: :users do
+        resources :pins, only: [:index]
+      end
+    end
     namespace :me do
       resources :notifications, only: [:index]
+      resources :pins, only: [:index]
+      resources :mutes, only: [:index]
+      resources :blocks, only: [:index]
+    end
+  end
+  scope 'guest/v2', module: 'v2/guest', as: 'v2_guest' do
+    resources :pins, only: [:index]
+    resources :chapters, only: [:index]
+    resources :users, only: [] do
+      scope module: :users do
+        resources :pins, only: [:index]
+      end
     end
   end
   resources :chapters, only: %i[index show] do
