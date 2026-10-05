@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.29.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.28.0...v4.29.0) (2026-10-05)
+
+
+### Features
+
+* add v2 notifications with cursor paging ([3feebc7](https://github.com/yusuke-suzuki/qoodish/commit/3feebc777a5305bcad7568f311adc96d02602e48))
+
 ## [4.28.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.27.0...v4.28.0) (2026-10-04)
 
 
