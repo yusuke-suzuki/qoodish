@@ -133,40 +133,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # Clients released before the rename still address pins as reviews. These
-  # aliases keep them working until that version is out of service.
-  resources :reviews, only: %i[index show], controller: 'pins'
-  scope path: 'reviews/:pin_id', as: :review do
-    scope module: :pins do
-      resource :like, only: %i[create destroy], controller: 'likes'
-      resources :likes, only: [:index]
-      resources :comments, only: %i[create destroy] do
-        scope module: :comments do
-          resource :like, only: %i[create destroy], controller: 'likes'
-          resources :likes, only: [:index]
-        end
-      end
-    end
-  end
-  scope path: 'maps/:map_id', as: :map do
-    resources :reviews, only: %i[index create], controller: 'maps/pins'
-  end
-  namespace :me do
-    resources :reviews, only: %i[index update destroy], controller: 'pins'
-  end
-  scope path: 'users/:user_id', as: :user do
-    resources :reviews, only: [:index], controller: 'users/pins'
-  end
-  namespace :guest do
-    resources :reviews, only: %i[index show], controller: 'pins'
-    scope path: 'maps/:map_id', as: :map do
-      resources :reviews, only: [:index], controller: 'maps/pins'
-    end
-    scope path: 'users/:user_id', as: :user do
-      resources :reviews, only: [:index], controller: 'users/pins'
-    end
-  end
-
   get '/healthcheck' => 'application#healthcheck'
   root 'application#healthcheck'
 

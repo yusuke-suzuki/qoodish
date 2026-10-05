@@ -9,11 +9,6 @@ class Notification < ApplicationRecord
 
   FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
-  # Clients released before the rename look their message up by the name the
-  # subject had then, so a pin keeps arriving as a review until they are out
-  # of service.
-  RENAMED_NOTIFIABLE_TYPES = { 'Pin' => 'review' }.freeze
-
   validates :notifiable_type,
             inclusion: {
               in: [Pin.name, Map.name, Comment.name, Chapter.name]
@@ -67,7 +62,7 @@ class Notification < ApplicationRecord
   end
 
   def client_notifiable_type
-    RENAMED_NOTIFIABLE_TYPES.fetch(notifiable_type, notifiable_type.downcase)
+    notifiable_type.downcase
   end
 
   def renderable?

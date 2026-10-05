@@ -5,7 +5,7 @@ module Me
 
       def create
         journey = current_user.journeys.find_by!(id: params[:journey_id])
-        pin = current_user.referenceable_pins.find_by!(id: params[:pin_id] || params[:review_id])
+        pin = current_user.referenceable_pins.find_by!(id: params[:pin_id])
 
         @checkin = journey.checkins.record!(user: current_user, pin: pin, **checkin_params)
       end
