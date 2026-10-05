@@ -96,6 +96,10 @@ class Pin < ApplicationRecord
       .limit(PIN_FEED_PER_PAGE)
   }
 
+  scope :feed_page, lambda { |token = nil|
+    token.present? ? where(*FeedCursor.decode(token).condition('pins')).latest_feed : latest_feed
+  }
+
   scope :popular, lambda {
     joins(:votes)
       .group('pins.id')

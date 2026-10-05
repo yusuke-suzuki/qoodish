@@ -65,6 +65,24 @@ class ActiveSupport::TestCase
     attributes.flat_map { |attribute, keys| (keys.keys - [:format]).map { |key| "#{attribute}.#{key}" } }.sort
   end
 
+  def publish_pins(count, user: users(:me), map: maps(:public_one))
+    travel_to Time.zone.parse('2030-01-01 00:00:00') do
+      Array.new(count) do |i|
+        Pin.record!(user: user, map_id: map.id, name: "Pin #{i}", comment: 'A comment',
+                    latitude: 35.681382, longitude: 139.766084)
+      end
+    end
+  end
+
+  def publish_chapters(count, user: users(:me), map: maps(:public_one))
+    travel_to Time.zone.parse('2030-01-01 00:00:00') do
+      Array.new(count) do |i|
+        Chapter.record!(user: user, map: map, title: "Chapter #{i}", content: chapters(:my_published).content)
+               .tap { |chapter| chapter.revise!(user: user, status: 'published') }
+      end
+    end
+  end
+
   class GoogleAuthMock
     def initialize(current_user)
       @current_user = current_user
@@ -113,5 +131,25 @@ class ActiveSupport::TestCase
     end
 
     def delete(_image_id); end
+  end
+end
+
+class ActionDispatch::IntegrationTest
+  def page_through(path, headers: {})
+    pages = []
+    params = {}
+
+    10.times do
+      get path, params: params, headers: headers
+      assert_response :success
+
+      body = JSON.parse(@response.body)
+      pages << body['data'].pluck('id')
+      return pages if body['next_cursor'].nil?
+
+      params = { cursor: body['next_cursor'] }
+    end
+
+    flunk "#{path} kept handing out a cursor"
   end
 end
