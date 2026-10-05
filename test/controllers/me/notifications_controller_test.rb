@@ -17,7 +17,7 @@ class Me::NotificationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     res = JSON.parse(@response.body)
-    notification = res.find { |n| n['notifiable']['id'] == pin.id && n['notifiable']['type'] == 'review' }
+    notification = res.find { |n| n['notifiable']['id'] == pin.id && n['notifiable']['type'] == 'pin' }
 
     assert notification
     assert notification['notifiable'].key?('image')

@@ -129,7 +129,7 @@ class NotificationTest < ActiveSupport::TestCase
     assert_equal "/chapters/#{chapters(:my_published).id}", notification.click_action
   end
 
-  test 'a pin is still named review for the clients that expect it' do
+  test 'a pin is named pin' do
     notification = Notification.new(
       notifiable: pins(:public_one),
       notifier: users(:you),
@@ -137,10 +137,10 @@ class NotificationTest < ActiveSupport::TestCase
       key: 'liked'
     )
 
-    assert_equal 'review', notification.client_notifiable_type
+    assert_equal 'pin', notification.client_notifiable_type
   end
 
-  test 'every other subject keeps its own name' do
+  test 'a chapter is named chapter' do
     notification = Notification.new(
       notifiable: chapters(:you_published_on_my_map),
       notifier: users(:you),

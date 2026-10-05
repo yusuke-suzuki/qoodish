@@ -6,5 +6,4 @@ json.image_url user.image_url
 json.maps_count user.maps.published.count
 json.bookmarked_maps_count user.bookmark_count
 json.pins_count user.pins.published.count
-json.reviews_count user.pins.published.count
 json.likes_count user.votes.count

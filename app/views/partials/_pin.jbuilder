@@ -14,7 +14,6 @@ json.comment pin.comment
 json.comments comments do |comment|
   json.partial! 'partials/comment', comment: comment
   json.pin_id pin.id
-  json.review_id pin.id
 end
 json.images pin.images do |image|
   variants = image.variants
