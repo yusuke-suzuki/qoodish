@@ -104,3 +104,9 @@ These rules cover database migrations, releases, and backward compatibility. Fol
 
 - Do not create a PR whose release would immediately break the behavior of the current `qoodish-web` version. Keep the API backward compatible, and plan a release sequence that includes the corresponding `qoodish-web` changes.
 - When a large change has ordering constraints across releases (or across the backend and frontend), document the release procedure in the PR description.
+
+### API Versioning
+
+- Paths without a version prefix are v1, and their contracts are frozen: do not change the shape of a response or the meaning of a parameter there.
+- To change an endpoint's contract, add the new contract under `/v2` (`namespace :v2` in `config/routes.rb`, controllers under `app/controllers/v2`) next to the v1 endpoint. An endpoint whose contract does not change stays at v1 only.
+- Once qoodish-web no longer calls a v1 endpoint that has a v2 successor, remove the v1 endpoint in a PR of its own.
