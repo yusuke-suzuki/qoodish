@@ -6,38 +6,6 @@ class NotificationGroup
 
   attr_reader :notification, :notifiers, :notifiers_count
 
-  def self.recent(notifications, limit: 10)
-    summaries =
-      notifications
-      .group(*Notification::GROUPING_ATTRIBUTES)
-      .order(Arel.sql('MAX(notifications.id) DESC'))
-      .limit(limit)
-      .pluck(
-        *Notification::GROUPING_ATTRIBUTES,
-        Arel.sql('COUNT(DISTINCT notifications.notifier_id)'),
-        Arel.sql('MIN(notifications.read)')
-      )
-
-    latest_ids = summaries.map do |key, notifiable_type, notifiable_id, *|
-      latest_ids_by_notifier(
-        notifications.where(key: key, notifiable_type: notifiable_type, notifiable_id: notifiable_id)
-      )
-    end
-    records = notifications.where(id: latest_ids.flatten).index_by(&:id)
-
-    summaries.zip(latest_ids).filter_map do |(*, notifiers_count, read), ids|
-      notification = records[ids.first]
-      next unless notification.renderable?
-
-      new(
-        notification: notification,
-        notifiers: records.values_at(*ids).map(&:notifier).compact,
-        notifiers_count: notifiers_count,
-        read: read.to_i == 1
-      )
-    end
-  end
-
   def self.page(notifications, cursor: nil, unread: false)
     summaries_query =
       notifications

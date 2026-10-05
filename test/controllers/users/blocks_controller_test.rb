@@ -235,9 +235,9 @@ class Users::BlocksControllerTest < ActionDispatch::IntegrationTest
     users(:me).block!(users(:you))
 
     stub_google_auth(users(:me)) do
-      get '/me/notifications', headers: HEADERS
+      get '/v2/me/notifications', headers: HEADERS
       assert_response :success
-      assert_empty JSON.parse(@response.body)
+      assert_empty JSON.parse(@response.body)['data']
 
       patch "/me/notifications/#{notification.id}", headers: HEADERS
       assert_response :not_found
