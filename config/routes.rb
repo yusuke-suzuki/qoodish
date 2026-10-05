@@ -44,7 +44,7 @@ Rails.application.routes.draw do
     resources :maps, only: [:index]
     resources :pins, only: %i[index update destroy]
     resources :devices, only: %i[update destroy]
-    resources :notifications, only: %i[index update]
+    resources :notifications, only: [:update]
     resources :coauthorship_invitations, only: [:index] do
       member do
         post :accept
