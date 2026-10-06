@@ -90,12 +90,6 @@ class Pin < ApplicationRecord
       .limit(PIN_FEED_PER_PAGE)
   }
 
-  scope :feed_before, lambda { |created_at, id = nil|
-    where(*FeedCursor.new(created_at, id).condition('pins'))
-      .order(created_at: :desc, id: :desc)
-      .limit(PIN_FEED_PER_PAGE)
-  }
-
   scope :feed_page, lambda { |token = nil|
     token.present? ? where(*FeedCursor.decode(token).condition('pins')).latest_feed : latest_feed
   }

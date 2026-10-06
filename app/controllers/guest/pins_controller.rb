@@ -14,8 +14,6 @@ class Guest::PinsController < ApplicationController
                 .order(created_at: :desc)
                 .limit(20)
                 .preload(:map, { user: :image }, :images, :property_options, :votes, comments: [{ user: :image }, :votes])
-            elsif params[:feed]
-              feed
             elsif params[:recent]
               Pin
                 .public_open
@@ -30,19 +28,5 @@ class Guest::PinsController < ApplicationController
             else
               raise Exceptions::BadRequest
             end
-  end
-
-  private
-
-  def feed
-    scope = Pin
-            .public_open
-            .preload(:map, { user: :image }, :images, :property_options, :votes, comments: [{ user: :image }, :votes])
-
-    if params[:next_timestamp]
-      scope.feed_before(params[:next_timestamp], params[:next_id])
-    else
-      scope.latest_feed
-    end
   end
 end

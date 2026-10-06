@@ -11,17 +11,10 @@ class Guest::ChaptersController < ApplicationController
       return render :search
     end
 
-    @chapters = if params[:next_timestamp]
-                  Chapter
-                    .public_open
-                    .feed_before(params[:next_timestamp], params[:next_id])
-                    .preload(:map, :images, :votes, user: %i[image journal])
-                else
-                  Chapter
-                    .public_open
-                    .latest_feed
-                    .preload(:map, :images, :votes, user: %i[image journal])
-                end
+    @chapters = Chapter
+                .public_open
+                .latest_feed
+                .preload(:map, :images, :votes, user: %i[image journal])
   end
 
   def show

@@ -1,30 +1,6 @@
 class PinsController < ApplicationController
   before_action :authenticate_user!
 
-  def index
-    @pins = if params[:next_timestamp]
-              Pin
-                .feed_for(current_user)
-                .feed_before(params[:next_timestamp], params[:next_id])
-                .preload(:map, { user: :image }, :images, :property_options, :votes)
-            else
-              Pin
-                .feed_for(current_user)
-                .latest_feed
-                .preload(:map, { user: :image }, :images, :property_options, :votes)
-            end
-
-    @comments_by_pin_id = Comment
-                          .not_deleted
-                          .visible
-                          .where(commentable: @pins.to_a)
-                          .not_blocking(current_user)
-                          .not_blocked_by(current_user)
-                          .not_muted_by(current_user)
-                          .preload({ user: :image }, :votes)
-                          .group_by(&:commentable_id)
-  end
-
   def show
     @pin =
       current_user

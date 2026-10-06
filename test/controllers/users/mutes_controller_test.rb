@@ -95,8 +95,8 @@ class Users::MutesControllerTest < ActionDispatch::IntegrationTest
     users(:me).mute!(users(:you))
 
     stub_google_auth(users(:me)) do
-      get '/pins', headers: HEADERS
-      assert_not_includes JSON.parse(@response.body).map { |pin| pin['author']['id'] }, users(:you).id
+      get '/v2/pins', headers: HEADERS
+      assert_not_includes JSON.parse(@response.body)['data'].map { |pin| pin['author']['id'] }, users(:you).id
 
       get '/chapters', headers: HEADERS
       assert_not_includes JSON.parse(@response.body).map { |chapter| chapter['author']['id'] }, users(:you).id
