@@ -154,12 +154,12 @@ class Users::BlocksControllerTest < ActionDispatch::IntegrationTest
     users(:me).block!(users(:you))
 
     stub_google_auth(users(:me)) do
-      get '/pins', headers: HEADERS
+      get '/v2/pins', headers: HEADERS
     end
 
     assert_response :success
 
-    author_ids = JSON.parse(@response.body).map { |pin| pin['author']['id'] }
+    author_ids = JSON.parse(@response.body)['data'].map { |pin| pin['author']['id'] }
 
     assert_not_includes author_ids, users(:you).id
   end

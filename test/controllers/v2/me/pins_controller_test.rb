@@ -10,6 +10,19 @@ class V2::Me::PinsControllerTest < ActionDispatch::IntegrationTest
     assert_equal users(:me).pins.published.visible.order(created_at: :desc, id: :desc).ids, pages.flatten
   end
 
+  test 'index returns own pins only' do
+    stub_google_auth(users(:me)) do
+      get '/v2/me/pins', headers: { 'Authorization': 'Bearer dummytoken' }
+    end
+
+    assert_response :success
+
+    data = JSON.parse(@response.body)['data']
+
+    assert_not_empty data
+    assert(data.all? { |pin| pin['author']['id'] == users(:me).id })
+  end
+
   test 'index rejects a cursor it did not hand out' do
     stub_google_auth(users(:me)) do
       get '/v2/me/pins', params: { cursor: 'not-a-cursor' }, headers: { 'Authorization': 'Bearer dummytoken' }

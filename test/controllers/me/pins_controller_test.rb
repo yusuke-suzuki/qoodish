@@ -1,43 +1,6 @@
 require 'test_helper'
 
 class Me::PinsControllerTest < ActionDispatch::IntegrationTest
-  test 'index should return own pins only' do
-    stub_google_auth(users(:me)) do
-      get '/me/pins', headers: { 'Authorization': 'Bearer dummytoken' }
-    end
-
-    assert_response :success
-
-    res = JSON.parse(@response.body)
-
-    assert_not res.empty?
-    assert_equal users(:me).pins.pluck(:id).sort,
-                 res.map { |pin| pin['id'] }.sort
-  end
-
-  test 'index with next_timestamp should return only older pins' do
-    newer = pins(:public_one)
-    older = pins(:public_two)
-    newer.update_columns(created_at: Time.zone.parse('2021-02-01 00:00:00'))
-    older.update_columns(created_at: Time.zone.parse('2021-01-01 00:00:00'))
-
-    stub_google_auth(users(:me)) do
-      get '/me/pins',
-          params: { next_timestamp: newer.created_at.iso8601 },
-          headers: { 'Authorization': 'Bearer dummytoken' }
-    end
-
-    assert_response :success
-
-    res = JSON.parse(@response.body)
-    ids = res.map { |pin| pin['id'] }
-
-    assert_includes ids, older.id
-    assert_not_includes ids, newer.id
-    assert_equal users(:me).pins.where(created_at: ...newer.created_at).pluck(:id).sort,
-                 ids.sort
-  end
-
   test 'update own pin should be success' do
     stub_google_auth(users(:me)) do
       put "/me/pins/#{pins(:public_one).id}",

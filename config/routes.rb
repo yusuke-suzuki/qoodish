@@ -2,7 +2,6 @@ Rails.application.routes.draw do
   resources :users, only: %i[index show create] do
     scope module: :users do
       resources :maps, only: [:index]
-      resources :pins, only: [:index]
       resources :chapters, only: [:index]
       resource :journal, only: [:show]
       resource :block, only: %i[create destroy]
@@ -24,7 +23,7 @@ Rails.application.routes.draw do
       end
     end
   end
-  resources :pins, only: %i[index show] do
+  resources :pins, only: [:show] do
     scope module: :pins do
       resource :like, only: %i[create destroy]
       resources :likes, only: [:index]
@@ -42,7 +41,7 @@ Rails.application.routes.draw do
     resource :journal, only: %i[show update]
     resource :preferences, only: [:update]
     resources :maps, only: [:index]
-    resources :pins, only: %i[index update destroy]
+    resources :pins, only: %i[update destroy]
     resources :devices, only: %i[update destroy]
     resources :notifications, only: [:update]
     resources :coauthorship_invitations, only: [:index] do
@@ -62,8 +61,6 @@ Rails.application.routes.draw do
       end
     end
     resources :chapters, only: %i[index show update destroy]
-    resources :blocks, only: [:index]
-    resources :mutes, only: [:index]
     namespace :bookmarks do
       resources :maps, only: [:index]
       resources :journals, only: [:index]
@@ -145,7 +142,6 @@ Rails.application.routes.draw do
     resources :users, only: %i[show] do
       scope module: :users do
         resources :maps, only: [:index]
-        resources :pins, only: [:index]
         resources :chapters, only: [:index]
       end
     end

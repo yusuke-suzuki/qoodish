@@ -1,21 +1,6 @@
 require 'test_helper'
 
 class PinsControllerTest < ActionDispatch::IntegrationTest
-  test 'get feeds should be success' do
-    stub_google_auth(users(:me)) do
-      get '/pins', headers: { 'Authorization': 'Bearer dummytoken' }
-    end
-
-    assert_response :success
-
-    res = JSON.parse(@response.body)
-
-    assert_not res.empty?
-    assert_not(res.any? do |pin|
-                 pin['map']['id'] == maps(:private_unfollowing).id || pin['map']['id'] == maps(:public_unfollowing).id
-               end)
-  end
-
   test 'a pin says how many likes each of its comments holds' do
     users(:me).liked!(comments(:two))
 

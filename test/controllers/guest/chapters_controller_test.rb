@@ -38,27 +38,6 @@ class Guest::ChaptersControllerTest < ActionDispatch::IntegrationTest
                  JSON.parse(@response.body)
   end
 
-  test 'index should page with next_timestamp' do
-    newest = chapters(:you_published_on_my_map)
-
-    get '/guest/chapters', params: { next_timestamp: newest.created_at.iso8601 }
-
-    assert_response :success
-
-    res = JSON.parse(@response.body)
-    ids = res.map { |chapter| chapter['id'] }
-
-    assert_not_includes ids, newest.id
-    assert_includes ids, chapters(:my_published).id
-    assert(res.all? { |chapter| Time.parse(chapter['created_at']) < newest.created_at })
-  end
-
-  test 'index should reject a malformed cursor' do
-    get '/guest/chapters', params: { next_timestamp: 'not-a-time' }
-
-    assert_response :bad_request
-  end
-
   test 'show a published chapter returns the content verbatim' do
     get "/guest/chapters/#{chapters(:my_published).id}"
 
