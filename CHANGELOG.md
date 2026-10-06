@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.30.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.29.0...v4.30.0) (2026-10-06)
+
+
+### Features
+
+* add v2 list endpoints paged by next_cursor ([71cf298](https://github.com/yusuke-suzuki/qoodish/commit/71cf2987ad83d949957db9a3d06cddc79b8a84bc))
+
+
+### Bug Fixes
+
+* reject feed cursors with a non-numeric id ([fc9bdd1](https://github.com/yusuke-suzuki/qoodish/commit/fc9bdd170bd8e9de0a61060df9a18da7f58b89f4))
+
 ## [4.29.0](https://github.com/yusuke-suzuki/qoodish/compare/v4.28.0...v4.29.0) (2026-10-05)
 
 
