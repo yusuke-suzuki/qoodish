@@ -34,8 +34,6 @@ spec:
                   value: 10.86.64.26
                 - name: DB_PORT
                   value: "3306"
-                - name: ALLOWED_ENDPOINTS
-                  value: https://qoodish.com
                 - name: GOOGLE_PROJECT_ID
                   value: qoodish
                 - name: GOOGLE_ACCOUNT_TYPE

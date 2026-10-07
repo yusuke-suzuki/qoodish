@@ -21,7 +21,6 @@ gem 'opentelemetry-exporter-otlp'
 gem 'opentelemetry-instrumentation-all'
 gem 'opentelemetry-sdk'
 gem 'puma'
-gem 'rack-cors'
 gem 'trilogy'
 
 group :development, :test do

@@ -58,8 +58,6 @@ spec:
               value: 10.86.64.26
             - name: DB_PORT
               value: "3306"
-            - name: ALLOWED_ENDPOINTS
-              value: https://qoodish.com
             - name: CLOUDFLARE_ACCOUNT_ID
               value: 9671c836ad132f87d892b12ccd1809e0
             - name: CLOUDFLARE_IMAGES_ACCOUNT_HASH
