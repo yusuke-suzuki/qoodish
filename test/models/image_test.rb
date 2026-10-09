@@ -52,4 +52,28 @@ class ImageTest < ActiveSupport::TestCase
 
     mock.verify
   end
+
+  test 'unattached includes an image that is not attached to anything' do
+    image = users(:me).owned_images.create!(url: 'https://imagedelivery.net/mockhash/abandoned/public')
+
+    assert_includes Image.unattached, image
+  end
+
+  test 'unattached excludes an image attached to a revision' do
+    assert_not_includes Image.unattached, images(:one)
+  end
+
+  test 'unattached excludes an image used as a profile image' do
+    image = users(:me).owned_images.create!(url: 'https://imagedelivery.net/mockhash/avatar/public')
+    users(:me).update!(image: image)
+
+    assert_not_includes Image.unattached, image
+  end
+
+  test 'referencing_foreign_keys covers every table that references images' do
+    tables = Image.referencing_foreign_keys.map(&:from_table)
+
+    assert_equal %w[chapter_revision_images journey_checkin_revision_images map_revision_images
+                    pin_revision_images users], tables.sort
+  end
 end

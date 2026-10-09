@@ -180,6 +180,22 @@ jobs:
               exit 1
             fi
           fi
+      - name: Deploy the Job that destroys unattached images
+        if: env.RELEASE_CANDIDATE == 'true'
+        working-directory: run/dev/destroy-unattached-images
+        env:
+          IMAGE_URL: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+        run: |
+          echo "Setting image to $IMAGE_URL"
+          kustomize edit set image IMAGE_PLACEHOLDER=$IMAGE_URL
+
+          echo "--- Generated job manifest ---"
+          kustomize build .
+          echo "----------------------------"
+
+          kustomize build . | gcloud run jobs replace - \
+            --project=$PROJECT_ID \
+            --region=$REGION
       - name: Record the traffic tags of open PRs
         id: tags
         if: env.RELEASE_CANDIDATE == 'true'

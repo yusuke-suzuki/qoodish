@@ -130,6 +130,39 @@ jobs:
             fi
           fi
 
+  deploy-destroy-unattached-images:
+    needs:
+      - migrate
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: projects/438842534630/locations/global/workloadIdentityPools/github-actions/providers/github-actions
+          service_account: github-actions@qoodish-common.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Deploy Job using kustomize
+        working-directory: run/prod/destroy-unattached-images
+        env:
+          IMAGE_URL: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.ref_name }}
+          CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+        run: |
+          echo "Setting image to $IMAGE_URL"
+          kustomize edit set image IMAGE_PLACEHOLDER=$IMAGE_URL
+
+          echo "--- Generated job manifest ---"
+          kustomize build .
+          echo "----------------------------"
+
+          kustomize build . | gcloud run jobs replace - \
+            --project=$PROJECT_ID \
+            --region=$REGION
+
   deploy-api:
     needs:
       - migrate
