@@ -12,6 +12,8 @@ class D1Export
   TIME_TYPES = %w[datetime timestamp].freeze
   BINARY_TYPES = %w[binary varbinary tinyblob blob mediumblob longblob].freeze
   REAL_LITERAL = /\A-?\d+(\.\d+)?(e[+-]?\d+)?\z/i.freeze
+  QUOTED_CHARACTERS = { "'" => "''", "\0" => "' || char(0) || '" }.freeze
+  QUOTED_PATTERN = /['\0]/.freeze
 
   Column = Data.define(:name, :data_type, :nullable)
   Table = Data.define(:name, :columns, :deferred)
@@ -194,7 +196,7 @@ class D1Export
     size = 0
 
     text.each_char do |char|
-      char_size = char == "'" ? 2 : char.bytesize
+      char_size = QUOTED_CHARACTERS.fetch(char, char).bytesize
 
       if size + char_size > limit
         yield chunk
@@ -289,7 +291,7 @@ class D1Export
   end
 
   def quote_text(text)
-    "'#{text.gsub("'", "''")}'"
+    "'#{text.gsub(QUOTED_PATTERN, QUOTED_CHARACTERS)}'"
   end
 
   def quote_identifier(name)

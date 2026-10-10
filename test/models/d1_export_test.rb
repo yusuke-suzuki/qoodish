@@ -48,6 +48,12 @@ class D1ExportTest < ActiveSupport::TestCase
     assert_includes export_statements.join("\n"), "(#{map.id}, "
   end
 
+  test 'writes NUL characters outside the quotes, where SQLite would end the statement' do
+    Map.record!(user: users(:me), name: "Null\0Map", description: 'A map', latitude: 35.1, longitude: 139.2)
+
+    assert_includes export_statements.join("\n"), "'Null' || char(0) || 'Map'"
+  end
+
   test 'keeps JSON as MySQL stores it' do
     chapter = chapters(:my_published)
     stored = Chapter.where(id: chapter.id).pick(Arel.sql('CAST(content AS CHAR)'))
