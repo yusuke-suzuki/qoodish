@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { assertCloseTo } from '../test/assertions.ts';
 import {
+  departedSpots,
   movingSampleIntervalMs,
   nextAnchorState,
   nextHighAccuracy,
@@ -221,6 +222,24 @@ describe('surveySpots', () => {
       surveySpots(buildFix(0, { accuracy: 100 }), [spot]).reached,
       [spot]
     );
+  });
+});
+
+describe('departedSpots', () => {
+  it('departs only from spots whose check-in radius the error circle clears', () => {
+    const left = pointAt(61);
+    const near = pointAt(59);
+
+    assert.deepEqual(departedSpots(buildFix(0), [left, near]), [left]);
+  });
+
+  it('lets a coarse fix prove a departure only from far enough away', () => {
+    const spot = pointAt(400);
+
+    assert.deepEqual(departedSpots(buildFix(0, { accuracy: 300 }), [spot]), [
+      spot
+    ]);
+    assert.deepEqual(departedSpots(buildFix(0, { accuracy: 360 }), [spot]), []);
   });
 });
 

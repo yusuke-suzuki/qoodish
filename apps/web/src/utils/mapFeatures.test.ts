@@ -47,6 +47,25 @@ describe('createMapFeatures', () => {
     );
   });
 
+  it('places one feature per pin, at its first visit', () => {
+    const journey = buildJourney([
+      buildCheckin(3, '2026-08-03T00:00:00Z', { pin_id: 100, spot: tower }),
+      buildCheckin(2, '2026-08-02T00:00:00Z', { spot: castle }),
+      buildCheckin(1, '2026-08-01T00:00:00Z', { pin_id: 100, spot: tower })
+    ]);
+
+    assert.deepEqual(featureSpots(createMapFeatures(journey)), [tower, castle]);
+  });
+
+  it('keeps every check-in that lost its pin', () => {
+    const journey = buildJourney([
+      buildCheckin(1, '2026-08-01T00:00:00Z', { pin_id: null, spot: tower }),
+      buildCheckin(2, '2026-08-02T00:00:00Z', { pin_id: null, spot: castle })
+    ]);
+
+    assert.deepEqual(featureSpots(createMapFeatures(journey)), [tower, castle]);
+  });
+
   it('builds an empty collection for a journey without check-ins', () => {
     assert.deepEqual(createMapFeatures(buildJourney([])), {
       type: 'FeatureCollection',

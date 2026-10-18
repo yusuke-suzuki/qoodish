@@ -73,7 +73,7 @@ import { createChapterContent } from '../../utils/chapterContent.ts';
 import { trailDistanceMeters } from '../../utils/geo.ts';
 import { deletePaused } from '../../utils/journeyPauseStorage.ts';
 import { deleteTrail, loadTrail } from '../../utils/journeyTrailStorage.ts';
-import { createMapFeatures } from '../../utils/mapFeatures.ts';
+import { createMapFeatures, visitedSpots } from '../../utils/mapFeatures.ts';
 import { decodePath, encodePath } from '../../utils/polyline.ts';
 import MapLinkChip from '../chapters/MapLinkChip.tsx';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
@@ -161,10 +161,7 @@ export default function JourneyDetailView({
     [checkins]
   );
 
-  const checkinSpots = useMemo(
-    () => checkins.map((checkin) => checkin.spot),
-    [checkins]
-  );
+  const checkinSpots = useMemo(() => visitedSpots(checkins), [checkins]);
 
   const mapCenter = useMemo(
     () =>

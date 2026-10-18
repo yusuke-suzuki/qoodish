@@ -1,9 +1,26 @@
 import type {
   Journey,
+  JourneyCheckin,
   MapFeature,
   MapFeatureCollection,
   Spot
 } from '../../types/index.ts';
+
+export function visitedSpots(checkins: JourneyCheckin[]): Spot[] {
+  const spots = new Map<number | string, Spot>();
+
+  for (const checkin of checkins.toSorted((a, b) =>
+    a.checked_in_at.localeCompare(b.checked_in_at)
+  )) {
+    const key = checkin.pin_id ?? `checkin:${checkin.id}`;
+
+    if (!spots.has(key)) {
+      spots.set(key, checkin.spot);
+    }
+  }
+
+  return [...spots.values()];
+}
 
 export function spotFeature(spot: Spot): MapFeature {
   return {
@@ -19,9 +36,7 @@ export function spotFeature(spot: Spot): MapFeature {
 export function createMapFeatures(journey: Journey): MapFeatureCollection {
   return {
     type: 'FeatureCollection',
-    features: journey.checkins
-      .toSorted((a, b) => a.checked_in_at.localeCompare(b.checked_in_at))
-      .map((checkin) => spotFeature(checkin.spot))
+    features: visitedSpots(journey.checkins).map(spotFeature)
   };
 }
 

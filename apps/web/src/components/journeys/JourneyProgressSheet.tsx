@@ -241,8 +241,10 @@ function JourneyProgressSheet({
   const checkinsByPin = useMemo(() => {
     const map = new Map<number | null, JourneyCheckin>();
 
-    for (const checkin of journey?.checkins ?? []) {
-      if (checkin.pin_id !== null) {
+    for (const checkin of (journey?.checkins ?? []).toSorted((a, b) =>
+      a.checked_in_at.localeCompare(b.checked_in_at)
+    )) {
+      if (checkin.pin_id !== null && !map.has(checkin.pin_id)) {
         map.set(checkin.pin_id, checkin);
       }
     }
@@ -271,13 +273,12 @@ function JourneyProgressSheet({
   );
 
   const extraItems = useMemo<TimelineItem[]>(() => {
-    const plannedPinIds = new Set(plannedItems.map((item) => item.pinId));
+    const plannedCheckinIds = new Set(
+      plannedItems.map((item) => item.checkin?.id)
+    );
 
     return (journey?.checkins ?? [])
-      .filter(
-        (checkin) =>
-          checkin.pin_id === null || !plannedPinIds.has(checkin.pin_id)
-      )
+      .filter((checkin) => !plannedCheckinIds.has(checkin.id))
       .map((checkin) => ({
         key: `checkin-${checkin.id}`,
         spot: checkin.spot,
