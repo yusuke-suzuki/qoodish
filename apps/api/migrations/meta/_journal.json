@@ -22,6 +22,20 @@
       "when": 1791677717132,
       "tag": "0002_search_trigram",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792297328478,
+      "tag": "0003_checkin_revisits",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792297330236,
+      "tag": "0004_checkin_interval",
+      "breakpoints": true
     }
   ]
 }
