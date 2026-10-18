@@ -70,6 +70,7 @@ import useLocalDateTime, {
   LOCAL_DATE_TIME_PLACEHOLDER
 } from '../../hooks/useLocalDateTime.ts';
 import { createChapterContent } from '../../utils/chapterContent.ts';
+import { toDatetimeLocal } from '../../utils/datetimeLocal.ts';
 import { trailDistanceMeters } from '../../utils/geo.ts';
 import { deletePaused } from '../../utils/journeyPauseStorage.ts';
 import { deleteTrail, loadTrail } from '../../utils/journeyTrailStorage.ts';
@@ -101,15 +102,6 @@ const DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
   hour: '2-digit',
   minute: '2-digit'
 };
-
-function toDatetimeLocal(value: string): string {
-  const date = new Date(value);
-  const pad = (part: number) => String(part).padStart(2, '0');
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
-    date.getDate()
-  )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
 
 type Props = {
   journey: Journey;

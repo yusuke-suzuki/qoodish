@@ -24,6 +24,33 @@ export async function initJourney(
   return { success: true, data };
 }
 
+export async function recordPastJourney(
+  mapId: number,
+  startedAt: string,
+  finishedAt: string
+): Promise<ActionResult<Journey>> {
+  const { data, error } = await apiFetch<Journey>(
+    `/v2/maps/${mapId}/journeys`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ started_at: startedAt, finished_at: finishedAt })
+    }
+  );
+
+  if (error) {
+    return { success: false, error };
+  }
+
+  if (data) {
+    recordEvent({
+      name: 'record_past_journey',
+      params: { map_id: data.map_id }
+    });
+  }
+
+  return { success: true, data };
+}
+
 export async function startJourney(
   journeyId: number
 ): Promise<ActionResult<Journey>> {

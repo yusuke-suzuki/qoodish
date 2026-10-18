@@ -1,6 +1,7 @@
 import {
   Delete,
   Edit,
+  History,
   Link,
   MoreVert,
   PersonAdd,
@@ -36,6 +37,7 @@ type Props = {
   onDeleteClick: () => void;
   onReportClick: () => void;
   onPinPropertiesClick: () => void;
+  onRecordPastJourneyClick: () => void;
 };
 
 export default memo(function MapMenuButton({
@@ -44,7 +46,8 @@ export default memo(function MapMenuButton({
   onEditClick,
   onDeleteClick,
   onReportClick,
-  onPinPropertiesClick
+  onPinPropertiesClick,
+  onRecordPastJourneyClick
 }: Props) {
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -95,6 +98,12 @@ export default memo(function MapMenuButton({
     setAnchorEl(null);
 
     onPinPropertiesClick();
+  };
+
+  const handleRecordPastJourneyClick = () => {
+    setAnchorEl(null);
+
+    onRecordPastJourneyClick();
   };
 
   const handleInviteClick = () => {
@@ -167,6 +176,15 @@ export default memo(function MapMenuButton({
           </ListItemIcon>
           <ListItemText primary={dictionary['copy link']} />
         </MenuItem>
+
+        {currentProfile && map && (
+          <MenuItem onClick={handleRecordPastJourneyClick}>
+            <ListItemIcon>
+              <History fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary={dictionary['record past journey']} />
+          </MenuItem>
+        )}
 
         {currentProfile && map && !isAuthor && (
           <MuteMenuItem
