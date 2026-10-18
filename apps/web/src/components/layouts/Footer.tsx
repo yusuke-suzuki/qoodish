@@ -75,7 +75,7 @@ export default memo(function Footer() {
               {dictionary.contact}
             </MuiLink>
             <MuiLink
-              href="https://github.com/yusuke-suzuki/qoodish-web"
+              href="https://github.com/yusuke-suzuki/qoodish"
               underline="hover"
               color="inherit"
               variant="body2"
