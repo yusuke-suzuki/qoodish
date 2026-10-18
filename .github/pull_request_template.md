@@ -14,6 +14,3 @@
 
 <!-- How the changes were verified (e.g., `pnpm lint` and `pnpm typecheck`
 results). If testing is not applicable, state why. -->
-
-<!-- Add a "Release procedure" section when the release has ordering
-constraints with the qoodish backend -->
