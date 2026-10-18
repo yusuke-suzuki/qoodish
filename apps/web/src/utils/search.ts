@@ -5,6 +5,7 @@ import type {
   SearchResult,
   UserSummary
 } from '../../types/index.ts';
+import fetchApiList from './fetchApiList.ts';
 
 const MIN_TERM_LENGTH = 2;
 
@@ -70,39 +71,29 @@ export function toSearchResults(
   ];
 }
 
-async function fetchSearch<T>(path: string, signal: AbortSignal): Promise<T[]> {
-  const res = await fetch(`/api/v1/${path}`, { signal });
-
-  if (!res.ok) {
-    throw new Error(`Search for ${path} failed with status ${res.status}`);
-  }
-
-  return (await res.json()) as T[];
-}
-
 export function searchMaps(query: string, signal: AbortSignal) {
-  return fetchSearch<GuestMap>(
+  return fetchApiList<GuestMap>(
     `guest/maps?input=${encodeURIComponent(query)}`,
     signal
   );
 }
 
 export function searchChapters(query: string, signal: AbortSignal) {
-  return fetchSearch<GuestChapter>(
+  return fetchApiList<GuestChapter>(
     `guest/chapters?input=${encodeURIComponent(query)}`,
     signal
   );
 }
 
 export function searchPins(query: string, signal: AbortSignal) {
-  return fetchSearch<GuestPin>(
+  return fetchApiList<GuestPin>(
     `guest/pins?input=${encodeURIComponent(query)}`,
     signal
   );
 }
 
 export function searchUsers(query: string, signal: AbortSignal) {
-  return fetchSearch<UserSummary>(
+  return fetchApiList<UserSummary>(
     `users?q=${encodeURIComponent(query)}`,
     signal
   );

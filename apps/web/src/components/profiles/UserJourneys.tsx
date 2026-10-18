@@ -1,9 +1,16 @@
 'use client';
 
-import { Delete, DirectionsWalk, MoreVert } from '@mui/icons-material';
+import {
+  Delete,
+  DirectionsWalk,
+  HistoryEdu,
+  MoreVert
+} from '@mui/icons-material';
 import {
   Box,
+  Button,
   Chip,
+  Fab,
   IconButton,
   List,
   ListItem,
@@ -25,6 +32,10 @@ import useLocalDateTime from '../../hooks/useLocalDateTime.ts';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
 import DiscoverButton from '../common/DiscoverButton.tsx';
 import NoContents from '../common/NoContents.tsx';
+import RecordPastJourneyDialog from '../journeys/RecordPastJourneyDialog.tsx';
+import { BOTTOM_NAV_HEIGHT } from '../layouts/BottomNav.tsx';
+
+const FAB_CLEARANCE = 10;
 
 const DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -44,7 +55,8 @@ function UserJourneys({
   const formatLocal = useLocalDateTime();
   const router = useRouter();
 
-  const [journeys, setJourneys] = useState(initialJourneys);
+  const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
+  const [importOpen, setImportOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [menuJourney, setMenuJourney] = useState<JourneySummary | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<JourneySummary | null>(null);
@@ -77,9 +89,7 @@ function UserJourneys({
       return;
     }
 
-    setJourneys((current) =>
-      current.filter((journey) => journey.id !== target.id)
-    );
+    setDeletedIds((current) => new Set(current).add(target.id));
     enqueueSnackbar(dictionary['delete journey success'], {
       variant: 'success'
     });
@@ -87,101 +97,134 @@ function UserJourneys({
     router.refresh();
   };
 
-  if (journeys.length < 1) {
-    return (
-      <NoContents
-        icon={DirectionsWalk}
-        message={dictionary['journeys will see here']}
-        action={<DiscoverButton />}
-      />
-    );
-  }
+  const journeys = initialJourneys.filter(
+    (journey) => !deletedIds.has(journey.id)
+  );
 
   return (
     <>
-      <Paper variant="outlined">
-        <List disablePadding>
-          {journeys.map((journey, index) => {
-            const started = Boolean(journey.started_at);
-            const active = started && !journey.finished_at;
-            const dateSource =
-              journey.finished_at ?? journey.started_at ?? journey.created_at;
-
-            return (
-              <ListItem
-                key={journey.id}
-                disablePadding
-                divider={index < journeys.length - 1}
+      {journeys.length < 1 ? (
+        <NoContents
+          icon={DirectionsWalk}
+          message={dictionary['journeys will see here']}
+          action={
+            <>
+              <Button
+                variant="contained"
+                color="secondary"
+                disableElevation
+                onClick={() => setImportOpen(true)}
+                startIcon={<HistoryEdu />}
               >
-                <ListItemButton
-                  component={Link}
-                  href={`/${lang}/journeys/${journey.id}`}
-                  sx={{ flex: 1, minWidth: 0 }}
-                >
-                  <ListItemIcon sx={{ minWidth: 40 }}>
-                    <DirectionsWalk fontSize="small" color="action" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={formatLocal(dateSource, DATE_TIME_OPTIONS)}
-                    secondary={
-                      <>
-                        {journey.map?.name && (
-                          <Box
-                            component="span"
-                            sx={{
-                              display: 'block',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {journey.map.name}
-                          </Box>
-                        )}
-                        <Box component="span" sx={{ display: 'block' }}>
-                          {started
-                            ? dictionary['checkins count'].replace(
-                                '{count}',
-                                String(journey.checkins_count)
-                              )
-                            : dictionary['milestones count'].replace(
-                                '{count}',
-                                String(journey.milestones_count)
-                              )}
-                        </Box>
-                      </>
-                    }
-                    slotProps={{ primary: { noWrap: true } }}
-                  />
-                  {active && (
-                    <Chip
-                      label={dictionary['in progress']}
-                      size="small"
-                      color="primary"
-                      sx={{ ml: 1, flexShrink: 0 }}
-                    />
-                  )}
-                  {!started && (
-                    <Chip
-                      label={dictionary.planned}
-                      size="small"
-                      sx={{ ml: 1, flexShrink: 0 }}
-                    />
-                  )}
-                </ListItemButton>
+                {dictionary['record past journey']}
+              </Button>
+              <DiscoverButton />
+            </>
+          }
+        />
+      ) : (
+        <>
+          <Fab
+            variant="extended"
+            color="secondary"
+            onClick={() => setImportOpen(true)}
+            sx={{
+              position: 'fixed',
+              right: 16,
+              bottom: { xs: BOTTOM_NAV_HEIGHT + 16, md: 16 }
+            }}
+          >
+            <HistoryEdu sx={{ mr: 1 }} />
+            {dictionary['record past journey']}
+          </Fab>
 
-                <IconButton
-                  aria-label={dictionary.more}
-                  onClick={(event) => openMenu(event, journey)}
-                  sx={{ mr: 0.5 }}
-                >
-                  <MoreVert />
-                </IconButton>
-              </ListItem>
-            );
-          })}
-        </List>
-      </Paper>
+          <Paper variant="outlined" sx={{ mb: FAB_CLEARANCE }}>
+            <List disablePadding>
+              {journeys.map((journey, index) => {
+                const started = Boolean(journey.started_at);
+                const active = started && !journey.finished_at;
+                const dateSource =
+                  journey.finished_at ??
+                  journey.started_at ??
+                  journey.created_at;
+
+                return (
+                  <ListItem
+                    key={journey.id}
+                    disablePadding
+                    divider={index < journeys.length - 1}
+                  >
+                    <ListItemButton
+                      component={Link}
+                      href={`/${lang}/journeys/${journey.id}`}
+                      sx={{ flex: 1, minWidth: 0 }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 40 }}>
+                        <DirectionsWalk fontSize="small" color="action" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={formatLocal(dateSource, DATE_TIME_OPTIONS)}
+                        secondary={
+                          <>
+                            {journey.map?.name && (
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: 'block',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {journey.map.name}
+                              </Box>
+                            )}
+                            <Box component="span" sx={{ display: 'block' }}>
+                              {started
+                                ? dictionary['checkins count'].replace(
+                                    '{count}',
+                                    String(journey.checkins_count)
+                                  )
+                                : dictionary['milestones count'].replace(
+                                    '{count}',
+                                    String(journey.milestones_count)
+                                  )}
+                            </Box>
+                          </>
+                        }
+                        slotProps={{ primary: { noWrap: true } }}
+                      />
+                      {active && (
+                        <Chip
+                          label={dictionary['in progress']}
+                          size="small"
+                          color="primary"
+                          sx={{ ml: 1, flexShrink: 0 }}
+                        />
+                      )}
+                      {!started && (
+                        <Chip
+                          label={dictionary.planned}
+                          size="small"
+                          sx={{ ml: 1, flexShrink: 0 }}
+                        />
+                      )}
+                    </ListItemButton>
+
+                    <IconButton
+                      aria-label={dictionary.more}
+                      onClick={(event) => openMenu(event, journey)}
+                      sx={{ mr: 0.5 }}
+                    >
+                      <MoreVert />
+                    </IconButton>
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Paper>
+        </>
+      )}
 
       <Menu
         anchorEl={menuAnchor}
@@ -195,6 +238,11 @@ function UserJourneys({
           <ListItemText primary={dictionary.delete} />
         </MenuItem>
       </Menu>
+
+      <RecordPastJourneyDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+      />
 
       <ConfirmDeleteDialog
         open={Boolean(deleteTarget)}
