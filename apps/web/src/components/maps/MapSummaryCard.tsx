@@ -37,6 +37,7 @@ type Props = {
   onDeleteClick: () => void;
   onReportClick: () => void;
   onPinPropertiesClick: () => void;
+  onRecordPastJourneyClick: () => void;
   onSaved: () => void;
 };
 
@@ -50,6 +51,7 @@ export default memo(function MapSummaryCard({
   onDeleteClick,
   onReportClick,
   onPinPropertiesClick,
+  onRecordPastJourneyClick,
   onSaved
 }: Props) {
   const dictionary = useDictionary();
@@ -108,6 +110,7 @@ export default memo(function MapSummaryCard({
             onEditClick={onEditClick}
             onDeleteClick={onDeleteClick}
             onPinPropertiesClick={onPinPropertiesClick}
+            onRecordPastJourneyClick={onRecordPastJourneyClick}
           />
         }
       />

@@ -5,7 +5,7 @@ export type AnalyticsEvent =
     }
   | { name: 'publish_chapter'; params: { chapter_id: number } }
   | {
-      name: 'start_journey' | 'finish_journey';
+      name: 'start_journey' | 'finish_journey' | 'record_past_journey';
       params: { map_id: number | null };
     }
   | {

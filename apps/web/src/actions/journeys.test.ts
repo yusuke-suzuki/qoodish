@@ -39,6 +39,49 @@ describe('initJourney', () => {
   });
 });
 
+describe('recordPastJourney', () => {
+  it('records a finished journey with its period against its map', async () => {
+    const { recordPastJourney } = await actions();
+    respondWith(journey);
+
+    const result = await recordPastJourney(
+      2,
+      '2026-05-01T00:00:00.000Z',
+      '2026-05-03T09:00:00.000Z'
+    );
+
+    assert.deepEqual(result, { success: true, data: journey });
+    assert.deepEqual(apiRequests(), [
+      {
+        path: '/v2/maps/2/journeys',
+        method: 'POST',
+        body: {
+          started_at: '2026-05-01T00:00:00.000Z',
+          finished_at: '2026-05-03T09:00:00.000Z'
+        }
+      }
+    ]);
+    assert.deepEqual(recordedEvents(), [
+      { name: 'record_past_journey', params: { map_id: 2 } }
+    ]);
+  });
+
+  it('reports the API error without recording an event', async () => {
+    const { recordPastJourney } = await actions();
+    failWith('The journey cannot finish in the future.', 422);
+
+    assert.deepEqual(
+      await recordPastJourney(
+        2,
+        '2026-05-01T00:00:00.000Z',
+        '2999-01-01T00:00:00.000Z'
+      ),
+      { success: false, error: 'The journey cannot finish in the future.' }
+    );
+    assert.deepEqual(recordedEvents(), []);
+  });
+});
+
 describe('startJourney', () => {
   it('starts the journey and records it against its map', async () => {
     const { startJourney } = await actions();
