@@ -65,7 +65,7 @@ export const ja: Messages = {
   journey_not_in_progress: '進行中の旅ではありません。',
   journey_encoded_path_exceed: '旅の経路データが大きすぎます。',
   duplicate_milestone: 'このピンは既にマイルストーンに追加されています。',
-  duplicate_checkin: 'このピンには既にチェックイン済みです。',
+  duplicate_checkin: 'このピンには近い時刻にチェックイン済みです。',
   pin_not_on_journey_map: 'このピンは旅の地図に属していません。',
   images_per_checkin_reached_limit:
     'チェックインごとの画像数の上限に達しました。',

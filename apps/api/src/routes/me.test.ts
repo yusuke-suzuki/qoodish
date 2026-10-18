@@ -1320,7 +1320,9 @@ describe('journey writes', () => {
     bobImage = inserted?.id ?? 0;
 
     expect(await checkIn({ pin_id: feedPin(0) })).toEqual(
-      invalid('The journey has already checked in at this pin.')
+      invalid(
+        'The journey has already checked in at this pin around this time.'
+      )
     );
     expect(await checkIn({ pin_id: ids.secretPin })).toEqual(
       invalid('The pin does not belong to the map of the journey.')
@@ -1358,7 +1360,9 @@ describe('journey writes', () => {
       200, 422
     ]);
     expect(responses.find((response) => response.status === 422)).toEqual(
-      invalid('The journey has already checked in at this pin.')
+      invalid(
+        'The journey has already checked in at this pin around this time.'
+      )
     );
     expect(
       await db()
@@ -1446,6 +1450,44 @@ describe('journey writes', () => {
     expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(2);
   });
 
+  it('records a revisit to a pin only 2 hours apart from its other checkins', async () => {
+    const pinId = (await checkinRow(retroactiveCheckin))?.pinId;
+    const checkIn = (checkedInAt: string) =>
+      send('POST', '/me/journeys/1/checkins', 'alice', {
+        pin_id: pinId,
+        checked_in_at: checkedInAt
+      });
+    const tooClose = invalid(
+      'The journey has already checked in at this pin around this time.'
+    );
+
+    expect(await checkIn('2026-01-05 14:29:59')).toEqual(tooClose);
+    expect(await checkIn('2026-01-05 10:30:01')).toEqual(tooClose);
+
+    const revisit = await checkIn('2026-01-05 14:30:00');
+
+    expect(revisit).toMatchObject({
+      status: 200,
+      body: { pin_id: pinId, checked_in_at: '2026-01-05T14:30:00.000000Z' }
+    });
+
+    const path = `/me/journeys/1/checkins/${revisit.body.id}`;
+
+    expect(
+      await send('PUT', path, 'alice', { checked_in_at: '2026-01-05 13:00:00' })
+    ).toEqual(tooClose);
+    expect(await checkinRevisionsOf(revisit.body.id)).toHaveLength(1);
+    expect((await send('PATCH', path, 'alice', { note: 'Again' })).status).toBe(
+      200
+    );
+    expect((await send('DELETE', path, 'alice')).status).toBe(204);
+    expect(await checkinRow(revisit.body.id)).toMatchObject({
+      status: 'deleted',
+      pinId
+    });
+    expect((await checkIn('2026-01-05 15:00:00')).status).toBe(200);
+  });
+
   it('replaces the images and note, leaving the earlier revision as it was', async () => {
     const path = `/me/journeys/${cafeJourney}/checkins/${feedCheckin}`;
     const { status, body } = await send('PUT', path, 'alice', {
@@ -1486,7 +1528,7 @@ describe('journey writes', () => {
     ).toBe(404);
   });
 
-  it('discards a checkin as a revision and frees its pin', async () => {
+  it('discards a checkin as a revision, keeping its pin without blocking a new checkin', async () => {
     const path = `/me/journeys/${cafeJourney}/checkins/${feedCheckin}`;
 
     expect((await send('DELETE', path, 'bob')).status).toBe(404);
@@ -1494,7 +1536,7 @@ describe('journey writes', () => {
     expect((await send('DELETE', path, 'alice')).status).toBe(404);
     expect(await checkinRow(feedCheckin)).toMatchObject({
       status: 'deleted',
-      pinId: null,
+      pinId: feedPin(0),
       name: 'Feed 0',
       note: 'Edited'
     });
@@ -1535,8 +1577,8 @@ describe('journey writes', () => {
         .where(inArray(journeyCheckinRevisions.journeyCheckinId, checkinIds))
     ).map((row) => row.id);
 
-    expect(checkinIds).toHaveLength(4);
-    expect(revisionIds).toHaveLength(3);
+    expect(checkinIds).toHaveLength(6);
+    expect(revisionIds).toHaveLength(7);
     expect((await send('DELETE', '/me/journeys/1', 'bob')).status).toBe(404);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(204);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(404);

@@ -25,13 +25,13 @@ import { z } from 'zod';
 import { detachJourneys } from './chapters.ts';
 import {
   chunks,
-  constraintViolated,
   currentTimestamp,
   type Database,
   generatedId,
   reviseUntilCurrent,
   scalar,
   selected,
+  triggerRaised,
   unrevisedRecord
 } from './db/client.ts';
 import {
@@ -69,6 +69,7 @@ const ENCODED_PATH_LIMIT = 1_000_000;
 const CHECKIN_NOTE_LIMIT = 500;
 const CHECKIN_IMAGE_LIMIT = 4;
 const IMAGES_PER_INSERT = 10;
+const CHECKIN_INTERVAL_VIOLATION = 'journey_checkin_interval';
 
 const qb = new QueryBuilder();
 
@@ -730,19 +731,9 @@ export async function recordCheckin(
   }
 
   const imageIds = changes.image_ids ?? [];
-  const [[journey], [pin], [duplicate], imageOwners] = await db.batch([
+  const [[journey], [pin], imageOwners] = await db.batch([
     ownedJourneyQuery(db, owner),
     referenceablePinQuery(db, viewer, pinId),
-    db
-      .select({ id: journeyCheckins.id })
-      .from(journeyCheckins)
-      .where(
-        and(
-          eq(journeyCheckins.journeyId, owner.journeyId),
-          eq(journeyCheckins.pinId, pinId)
-        )
-      )
-      .limit(1),
     imageOwnersQuery(db, imageIds)
   ]);
 
@@ -756,7 +747,6 @@ export async function recordCheckin(
 
   assertValid([
     ...pinErrors(journey, pin),
-    ...(duplicate ? (['duplicate_checkin'] as const) : []),
     ...periodErrors(journey, checkedInAt)
   ]);
   assertValid(unownedImages(imageOwners, imageIds, editorId));
@@ -773,8 +763,8 @@ export async function recordCheckin(
       .where(eq(journeyCheckins.journeyId, journey.id))
   );
 
-  try {
-    const [inserted] = await db.batch([
+  const [inserted] = await withinCheckinInterval(() =>
+    db.batch([
       db
         .insert(journeyCheckins)
         .values({
@@ -795,18 +785,17 @@ export async function recordCheckin(
         imageIds,
         now
       })
-    ]);
+    ])
+  );
 
-    return first(inserted).id;
+  return first(inserted).id;
+}
+
+async function withinCheckinInterval<T>(write: () => Promise<T>): Promise<T> {
+  try {
+    return await write();
   } catch (error) {
-    if (
-      constraintViolated(
-        error,
-        'UNIQUE',
-        journeyCheckins.journeyId,
-        journeyCheckins.pinId
-      )
-    ) {
+    if (triggerRaised(error, CHECKIN_INTERVAL_VIOLATION)) {
       throw ApiError.invalid(['duplicate_checkin']);
     }
 
@@ -890,23 +879,21 @@ async function writeCheckinRevision(
 
   const now = currentTimestamp();
 
-  await db.batch([
-    db
-      .update(journeyCheckins)
-      .set({
-        ...content,
-        ...(content.status === 'deleted' ? { pinId: null } : {}),
-        updatedAt: now
+  await withinCheckinInterval(() =>
+    db.batch([
+      db
+        .update(journeyCheckins)
+        .set({ ...content, updatedAt: now })
+        .where(eq(journeyCheckins.id, checkin.id)),
+      ...checkinRevisionStatements(db, {
+        checkinId: unrevisedRecord(db, journeyCheckins, checkin),
+        editorId,
+        content,
+        imageIds,
+        now
       })
-      .where(eq(journeyCheckins.id, checkin.id)),
-    ...checkinRevisionStatements(db, {
-      checkinId: unrevisedRecord(db, journeyCheckins, checkin),
-      editorId,
-      content,
-      imageIds,
-      now
-    })
-  ]);
+    ])
+  );
 }
 
 export function reviseCheckin(

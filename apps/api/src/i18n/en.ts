@@ -66,7 +66,8 @@ export const en = {
   journey_not_in_progress: 'The journey is not in progress.',
   journey_encoded_path_exceed: 'The journey path is too large.',
   duplicate_milestone: 'The pin is already added as a milestone.',
-  duplicate_checkin: 'The journey has already checked in at this pin.',
+  duplicate_checkin:
+    'The journey has already checked in at this pin around this time.',
   pin_not_on_journey_map: 'The pin does not belong to the map of the journey.',
   images_per_checkin_reached_limit:
     'The limit of images per checkin has been reached.',

@@ -628,7 +628,7 @@ export const journeyCheckins = sqliteTable(
     updatedAt: text('updated_at').notNull()
   },
   (t) => [
-    uniqueIndex('index_journey_checkins_on_journey_id_and_pin_id').on(
+    index('index_journey_checkins_on_journey_id_and_pin_id').on(
       t.journeyId,
       t.pinId
     ),
