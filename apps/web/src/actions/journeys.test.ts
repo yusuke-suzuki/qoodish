@@ -242,6 +242,18 @@ describe('addCheckin', () => {
     });
   });
 
+  it('attaches the images when some are given', async () => {
+    const { addCheckin } = await actions();
+
+    await addCheckin(11, 3, '2026-05-01T09:00:00Z', [5, 6]);
+
+    assert.deepEqual(apiRequests()[0].body, {
+      pin_id: 3,
+      checked_in_at: '2026-05-01T09:00:00Z',
+      image_ids: [5, 6]
+    });
+  });
+
   it('reports the API error', async () => {
     const { addCheckin } = await actions();
     failWith('Too far away', 422);

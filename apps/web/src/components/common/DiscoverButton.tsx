@@ -17,7 +17,7 @@ export default function DiscoverButton() {
       href={localePath('/discover')}
       startIcon={<Explore />}
     >
-      {dictionary['look around']}
+      {dictionary.discover}
     </Button>
   );
 }

@@ -56,6 +56,7 @@ type Props = {
   cancelLabel?: string;
   /** Extra actions on the left of the action row. Stay at the bottom in full screen. */
   secondaryActions?: ReactNode;
+  actions?: ReactNode;
   /** Take over the whole window below the sm breakpoint (600px). */
   fullScreenOnMobile?: boolean;
   maxWidth?: DialogProps['maxWidth'];
@@ -78,6 +79,7 @@ function AppDialog({
   confirmAction,
   cancelLabel,
   secondaryActions,
+  actions,
   fullScreenOnMobile,
   maxWidth,
   dividers,
@@ -160,7 +162,9 @@ function AppDialog({
         {children}
       </DialogContent>
 
-      {fullScreen ? (
+      {actions ? (
+        <DialogActions>{actions}</DialogActions>
+      ) : fullScreen ? (
         secondarySlot && <DialogActions>{secondarySlot}</DialogActions>
       ) : (
         <DialogActions>

@@ -20,6 +20,7 @@ export type {
   CoauthorshipInvitation,
   CoauthorshipInvitationStatus,
   Comment,
+  CountedMap,
   GuestChapterAuthor,
   GuestCoauthor,
   GuestComment,

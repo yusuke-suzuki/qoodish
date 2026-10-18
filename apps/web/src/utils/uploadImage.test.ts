@@ -4,8 +4,10 @@ import uploadImage, {
   buildVariants,
   MAX_IMAGE_FILE_SIZE,
   splitOversizedImages,
+  UPLOAD_RETRY_DELAY_MS,
   UploadRateLimitedError,
-  uploadFailureMessage
+  uploadFailureMessage,
+  uploadImageWhenAllowed
 } from './uploadImage.ts';
 
 describe('uploadImage', () => {
@@ -20,6 +22,74 @@ describe('uploadImage', () => {
       uploadImage(new File([], 'a.jpg')),
       UploadRateLimitedError
     );
+  });
+});
+
+const CLOUDFLARE_VARIANTS = ['avatar', 'card', 'hero', 'ogp', 'public'].map(
+  (name) => `https://imagedelivery.net/hash/image-1/${name}`
+);
+
+function respondInTurn(responses: Response[]) {
+  return async () => responses.shift() ?? new Response('{}', { status: 500 });
+}
+
+const allocated = () =>
+  Response.json({ upload_url: 'https://upload.example/1', id: 7 });
+
+const stored = () =>
+  Response.json({
+    success: true,
+    result: { id: 'image-1', variants: CLOUDFLARE_VARIANTS }
+  });
+
+const refused = () => new Response('{}', { status: 429 });
+
+describe('uploadImageWhenAllowed', () => {
+  it('waits out a refused allocation and uploads once allowed', async (t) => {
+    t.mock.method(
+      globalThis,
+      'fetch',
+      respondInTurn([refused(), refused(), allocated(), stored()])
+    );
+    const waits: number[] = [];
+
+    const image = await uploadImageWhenAllowed(
+      new File([], 'a.jpg'),
+      async (ms) => waits.push(ms)
+    );
+
+    assert.equal(image.id, 7);
+    assert.deepEqual(waits, [UPLOAD_RETRY_DELAY_MS, UPLOAD_RETRY_DELAY_MS]);
+  });
+
+  it('gives up after six waits', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => refused());
+    const waits: number[] = [];
+
+    await assert.rejects(
+      uploadImageWhenAllowed(new File([], 'a.jpg'), async (ms) =>
+        waits.push(ms)
+      ),
+      UploadRateLimitedError
+    );
+    assert.equal(waits.length, 6);
+  });
+
+  it('does not retry any other failure', async (t) => {
+    t.mock.method(
+      globalThis,
+      'fetch',
+      async () => new Response('{}', { status: 500 })
+    );
+    const waits: number[] = [];
+
+    await assert.rejects(
+      uploadImageWhenAllowed(new File([], 'a.jpg'), async (ms) =>
+        waits.push(ms)
+      ),
+      /Failed to allocate upload URL/
+    );
+    assert.deepEqual(waits, []);
   });
 });
 

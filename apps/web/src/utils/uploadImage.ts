@@ -1,4 +1,5 @@
 import type { Image, ImageVariants } from '../../types/index.ts';
+import sleep from './sleep.ts';
 
 type DirectUploadAllocation = {
   upload_url: string;
@@ -68,6 +69,30 @@ export class UploadRateLimitedError extends Error {
   constructor() {
     super('Upload rate limit reached');
     this.name = 'UploadRateLimitedError';
+  }
+}
+
+export const UPLOAD_RETRY_DELAY_MS = 10 * 1000;
+
+const UPLOAD_RETRY_LIMIT = 6;
+
+export async function uploadImageWhenAllowed(
+  file: File,
+  wait: (ms: number) => Promise<unknown> = sleep
+): Promise<Image> {
+  for (let retries = 0; ; retries++) {
+    try {
+      return await uploadImage(file);
+    } catch (error) {
+      if (
+        !(error instanceof UploadRateLimitedError) ||
+        retries >= UPLOAD_RETRY_LIMIT
+      ) {
+        throw error;
+      }
+
+      await wait(UPLOAD_RETRY_DELAY_MS);
+    }
   }
 }
 

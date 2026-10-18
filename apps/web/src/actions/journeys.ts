@@ -147,7 +147,8 @@ export async function removeMilestone(
 export async function addCheckin(
   journeyId: number,
   pinId: number,
-  checkedInAt?: string
+  checkedInAt?: string,
+  imageIds: number[] = []
 ): Promise<ActionResult<JourneyCheckin>> {
   const { data, error } = await apiFetch<JourneyCheckin>(
     `/me/journeys/${journeyId}/checkins`,
@@ -155,7 +156,8 @@ export async function addCheckin(
       method: 'POST',
       body: JSON.stringify({
         pin_id: pinId,
-        ...(checkedInAt ? { checked_in_at: checkedInAt } : {})
+        ...(checkedInAt ? { checked_in_at: checkedInAt } : {}),
+        ...(imageIds.length > 0 ? { image_ids: imageIds } : {})
       })
     }
   );

@@ -18,6 +18,8 @@ import useLocalePath from '../../hooks/useLocalePath.ts';
 import useProfile from '../../hooks/useProfile.ts';
 import ProfileAvatar from '../common/ProfileAvatar.tsx';
 
+export const BOTTOM_NAV_HEIGHT = 56;
+
 type ContentProps = {
   profile: Profile | null;
 };
@@ -59,7 +61,7 @@ function BottomNavContent({ profile }: ContentProps) {
 
   return (
     <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-      <Box sx={{ height: 56 }} />
+      <Box sx={{ height: BOTTOM_NAV_HEIGHT }} />
 
       <Box
         sx={{

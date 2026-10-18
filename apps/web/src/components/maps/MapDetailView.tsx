@@ -22,7 +22,6 @@ import EndJourneyDialog from '../journeys/EndJourneyDialog.tsx';
 import JourneyFab from '../journeys/JourneyFab.tsx';
 import JourneyOverlay from '../journeys/JourneyOverlay.tsx';
 import JourneyProgressSheet from '../journeys/JourneyProgressSheet.tsx';
-import PastJourneyDialog from '../journeys/PastJourneyDialog.tsx';
 import StartJourneyDialog from '../journeys/StartJourneyDialog.tsx';
 import CustomOverlays from './CustomOverlays.tsx';
 import { drawerBleeding } from './constants.ts';
@@ -225,7 +224,6 @@ export default function MapDetailView({
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [pinPropertiesDialogOpen, setPinPropertiesDialogOpen] = useState(false);
-  const [pastJourneyDialogOpen, setPastJourneyDialogOpen] = useState(false);
 
   const handlePinSaved = () => {
     router.refresh();
@@ -248,7 +246,6 @@ export default function MapDetailView({
         onDeleteClick={() => setDeleteDialogOpen(true)}
         onReportClick={() => setReportDialogOpen(true)}
         onPinPropertiesClick={() => setPinPropertiesDialogOpen(true)}
-        onRecordPastJourneyClick={() => setPastJourneyDialogOpen(true)}
         onSaved={router.refresh}
         onPinClick={handlePinClick}
         pinDrawerOpen={pinDrawerOpen}
@@ -295,7 +292,6 @@ export default function MapDetailView({
             onDeleteClick={() => setDeleteDialogOpen(true)}
             onReportClick={() => setReportDialogOpen(true)}
             onPinPropertiesClick={() => setPinPropertiesDialogOpen(true)}
-            onRecordPastJourneyClick={() => setPastJourneyDialogOpen(true)}
             onSaved={router.refresh}
           />
         </Box>
@@ -400,12 +396,6 @@ export default function MapDetailView({
         open={startDialogOpen}
         onClose={() => setStartDialogOpen(false)}
         onConfirm={handleStart}
-      />
-
-      <PastJourneyDialog
-        open={pastJourneyDialogOpen}
-        onClose={() => setPastJourneyDialogOpen(false)}
-        mapId={map.id}
       />
 
       <EndJourneyDialog
