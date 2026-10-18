@@ -57,6 +57,15 @@ import type { Viewer } from './visibility.ts';
 
 export type MapRow = typeof maps.$inferSelect;
 
+export async function findMap(db: Database, condition: SQL | undefined) {
+  return first(
+    await db
+      .select({ id: maps.id, userId: maps.userId })
+      .from(maps)
+      .where(condition)
+  );
+}
+
 const MAP_NAME_LIMIT = 30;
 const MAP_DESCRIPTION_LIMIT = 200;
 const MAP_IMAGE_LIMIT = 1;

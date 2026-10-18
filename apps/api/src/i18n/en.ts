@@ -65,6 +65,8 @@ export const en = {
   journey_already_finished: 'The journey has already finished.',
   journey_not_in_progress: 'The journey is not in progress.',
   journey_encoded_path_exceed: 'The journey path is too large.',
+  journey_period_invalid: 'The journey must start before it finishes.',
+  journey_period_in_future: 'The journey cannot finish in the future.',
   duplicate_milestone: 'The pin is already added as a milestone.',
   duplicate_checkin:
     'The journey has already checked in at this pin around this time.',

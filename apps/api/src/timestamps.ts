@@ -43,16 +43,12 @@ export function parseTimestamp(text: string): string | null {
   }
 
   const [monthNumber, dayNumber, hours, minutes, seconds] = fields;
-  const utc =
-    Date.UTC(
-      Number(year),
-      monthNumber - 1,
-      dayNumber,
-      hours,
-      minutes,
-      seconds
-    ) -
-    offsetMinutes(zone) * 60_000;
+  const date = new Date(0);
+
+  date.setUTCFullYear(Number(year), monthNumber - 1, dayNumber);
+  date.setUTCHours(hours, minutes, seconds);
+
+  const utc = date.getTime() - offsetMinutes(zone) * 60_000;
   const wholeSeconds = new Date(utc).toISOString().slice(0, 19);
   const micros = (fraction ?? '').slice(0, 6).padEnd(6, '0');
 
