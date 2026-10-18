@@ -1,12 +1,12 @@
-# Claude Code Context for Qoodish-Web
+# Claude Code Context for Qoodish
 
-This document provides essential context for Claude Code to understand the Qoodish-Web project. Please use this information to generate code that is consistent with the existing architecture, conventions, and dependencies.
+This document provides essential context for Claude Code to understand the Qoodish project, and the web app in `apps/web` in particular. Please use this information to generate code that is consistent with the existing architecture, conventions, and dependencies. The API Worker in `apps/api` has its own `CLAUDE.md` with the rules for changing it.
 
 ## 1. Project Overview
 
-- **Name:** Qoodish Web
+- **Name:** Qoodish
 - **Description:** A web application for sharing and discovering information about places through maps.
-- **Repository:** `github.com/yusuke-suzuki/qoodish-web`
+- **Repository:** `github.com/yusuke-suzuki/qoodish`
 
 ## 2. Technology Stack
 
@@ -14,7 +14,7 @@ This document provides essential context for Claude Code to understand the Qoodi
 - **Language:** TypeScript 7 (the native compiler). It ships no JavaScript compiler API, so tooling that imports `typescript` programmatically will not work; `next build` type-checks through the `tsc` CLI.
 - **UI Components:** Material-UI (MUI) v7 and Emotion for styling.
 - **Data Fetching:** An internal BFF (`src/lib/api.ts`) wraps the API. Server Components and Server Actions call per-domain fetchers in `src/lib/`; client components reach the same backend through internal route handlers under `src/app/api/`. SWR is no longer used.
-- **Backend & Authentication:** The backend is the API Worker in `apps/api`, a Hono app that keeps its records in D1 through Drizzle ORM. Firebase is used for authentication and possibly file storage.
+- **Backend & Authentication:** The backend is the API Worker in `apps/api`, a Hono app that keeps its records in D1 through Drizzle ORM. Firebase is used for authentication, and images are stored in Cloudflare Images.
 - **Mapping:** Google Maps JavaScript API, loaded via `@googlemaps/js-api-loader`.
 - **Package Manager:** pnpm
 
@@ -23,7 +23,7 @@ This document provides essential context for Claude Code to understand the Qoodi
 - **Directory Structure:** The repository is a pnpm workspace. `apps/web` is the web app, and every `src/` path in this document is relative to it. `apps/admin` (moderation dashboard) and `apps/synthetics` (scheduled production checks) are separate Workers with their own READMEs. `apps/api` is the API Worker, with its own README and `CLAUDE.md`. `packages/api-contract` declares the API's response types shared by the apps.
     - `src/app`: App Router routes, locale-prefixed under `[lang]`. Internal API route handlers live under `src/app/api/`.
     - `src/actions`: Server Actions (`'use server'`) for all mutations.
-    - `src/lib`: Internal BFF — `api.ts` wraps the API with auth and `Accept-Language` headers; per-domain fetchers (`maps.ts`, `reviews.ts`, `users.ts`, `auth.ts`) call it from Server Components and Server Actions.
+    - `src/lib`: Internal BFF — `api.ts` wraps the API with auth and `Accept-Language` headers; per-domain fetchers (`maps.ts`, `pins.ts`, `chapters.ts`, `journeys.ts`, `users.ts`, `auth.ts`) call it from Server Components and Server Actions.
     - `src/components`: Reusable React components, organized by feature/domain.
     - `src/components/common`: Shared components referenced by multiple features. Place components here when they are used across two or more feature directories.
     - `src/hooks`: Custom client hooks (e.g., `useDictionary`, `useMapSearch`). Data-fetching SWR hooks have been removed — fetch on the server in `src/lib/` instead.

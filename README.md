@@ -1,18 +1,16 @@
 # Qoodish
 
-## Description
-
 https://qoodish.com
 
-This repository is a pnpm workspace of three Cloudflare Workers under
-`apps/`:
+This repository is a pnpm workspace of four Cloudflare Workers under `apps/` and one shared package under `packages/`:
 
-- [`web`](apps/web): the web app, a Next.js app deployed through
-  [OpenNext](https://opennext.js.org/cloudflare). The API it talks to is
-  [qoodish](https://github.com/yusuke-suzuki/qoodish)
+- [`api`](apps/api/README.md): the API, a Hono app that keeps its records in D1 through Drizzle ORM
+- [`web`](apps/web/README.md): the web app, a Next.js app deployed through [OpenNext](https://opennext.js.org/cloudflare)
 - [`admin`](apps/admin/README.md): the moderation dashboard
-- [`synthetics`](apps/synthetics/README.md): scheduled checks against
-  production
+- [`synthetics`](apps/synthetics/README.md): scheduled checks against production
+- [`api-contract`](packages/api-contract): the JSON shapes of the API's responses, shared by the API and the apps that call it
+
+Each app's README covers how to run, test and deploy it.
 
 ## Installation
 
@@ -20,65 +18,18 @@ This repository is a pnpm workspace of three Cloudflare Workers under
 pnpm install
 ```
 
-Run the commands below from `apps/web` unless noted otherwise.
+## Checks
 
-## Environment variables
-
-`.env.example` lists every variable the app reads. Copy it to `.env.local`
-and fill in the values, or decrypt the shared set:
+From the repository root:
 
 ```bash
-gcloud secrets versions access latest --secret=QOODISH_WEB_DOTENV --project=$PROJECT_ID --out-file=.env.local
+pnpm lint        # Biome, across the repository
+pnpm typecheck   # TypeScript, in every workspace
+pnpm test        # unit tests, in the workspaces that have them
 ```
 
-`.env` files are ignored by git, so never commit one.
-
-A deployed worker takes `APP_ENV` and `API_ENDPOINT` from the `vars` of
-its environment in `wrangler.jsonc` instead.
-
-## Running app
-
-```bash
-pnpm dev
-```
-
-To run the worker as it is deployed, build it for the dev environment and
-serve it with the Workers runtime on http://localhost:8787:
-
-```bash
-pnpm cf:build:dev
-pnpm preview
-```
-
-## Tests
-
-From the repository root, these cover every worker:
-
-```bash
-pnpm lint        # Biome
-pnpm typecheck   # TypeScript
-pnpm test        # unit tests (node:test)
-```
-
-From `apps/web`:
-
-```bash
-pnpm e2e         # Playwright smoke tests
-```
-
-`pnpm e2e` serves the worker with `pnpm preview` unless `E2E_BASE_URL`
-points at a running app, so build it with `pnpm cf:build:dev` first. The
-tests find content through the API at `E2E_API_URL`, which defaults to the
-dev API. Pull requests run all of these in CI, and every push to `master`
-runs the smoke tests against production once it serves that commit.
+Pull requests run all of these in CI, along with the web app's smoke tests.
 
 ## Deployment
 
-Cloudflare Workers Builds deploys the app, so merging to `master` releases
-it to qoodish.com. To deploy the checked-out revision from a machine that
-is logged in to Cloudflare:
-
-```bash
-pnpm cf:deploy        # qoodish.com
-pnpm cf:deploy:dev    # the dev environment
-```
+Cloudflare Workers Builds deploys every worker from `master`, so a merge is the release. The workers deploy at the same time, in no guaranteed order, so a change in one worker that relies on a change in another being live is split into separate pull requests, and the one that relies on it is merged only after the other is deployed.
