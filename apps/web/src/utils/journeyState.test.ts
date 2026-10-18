@@ -15,7 +15,9 @@ import {
   isInactive,
   isRecording,
   remainingSpots,
+  withDepartures,
   withoutCheckin,
+  withoutDeparture,
   withReplacedCheckin
 } from './journeyState.ts';
 
@@ -34,33 +36,58 @@ const plannedJourney = {
 };
 
 describe('remainingSpots', () => {
-  it('leaves out pins already checked in', () => {
+  const noDepartures: ReadonlySet<number> = new Set();
+
+  it('holds back pins already checked in until the traveller departs', () => {
     const pins = [buildPin(100), buildPin(200), buildPin(300)];
     const checkins = [buildCheckin(2, '2026-08-01T01:00:00Z')];
 
-    const result = remainingSpots(null, pins, checkins);
+    const result = remainingSpots(null, pins, checkins, noDepartures);
 
     assert.deepEqual(
       result.spots.map((pin) => pin.id),
       [100, 300]
     );
+    assert.deepEqual(
+      result.lingering.map((pin) => pin.id),
+      [200]
+    );
   });
 
-  it('reuses the previous result while pins and checkins are unchanged', () => {
+  it('offers a checked-in pin again once the traveller has departed from it', () => {
+    const pins = [buildPin(100), buildPin(200)];
+    const checkins = [buildCheckin(2, '2026-08-01T01:00:00Z')];
+
+    const result = remainingSpots(null, pins, checkins, new Set([200]));
+
+    assert.deepEqual(
+      result.spots.map((pin) => pin.id),
+      [100, 200]
+    );
+    assert.deepEqual(result.lingering, []);
+  });
+
+  it('reuses the previous result while its inputs are unchanged', () => {
     const pins = [buildPin(100)];
     const checkins = [buildCheckin(1, '2026-08-01T01:00:00Z')];
-    const previous = remainingSpots(null, pins, checkins);
+    const previous = remainingSpots(null, pins, checkins, noDepartures);
 
-    assert.equal(remainingSpots(previous, pins, checkins), previous);
+    assert.equal(
+      remainingSpots(previous, pins, checkins, noDepartures),
+      previous
+    );
   });
 
   it('recomputes once a new check-in list arrives', () => {
     const pins = [buildPin(100), buildPin(200)];
-    const previous = remainingSpots(null, pins, []);
+    const previous = remainingSpots(null, pins, [], noDepartures);
 
-    const result = remainingSpots(previous, pins, [
-      buildCheckin(1, '2026-08-01T01:00:00Z')
-    ]);
+    const result = remainingSpots(
+      previous,
+      pins,
+      [buildCheckin(1, '2026-08-01T01:00:00Z')],
+      noDepartures
+    );
 
     assert.notEqual(result, previous);
     assert.deepEqual(
@@ -71,18 +98,56 @@ describe('remainingSpots', () => {
 
   it('recomputes once a new pin list arrives', () => {
     const checkins: JourneyCheckin[] = [];
-    const previous = remainingSpots(null, [buildPin(100)], checkins);
+    const previous = remainingSpots(
+      null,
+      [buildPin(100)],
+      checkins,
+      noDepartures
+    );
 
     const result = remainingSpots(
       previous,
       [buildPin(100), buildPin(200)],
-      checkins
+      checkins,
+      noDepartures
     );
 
     assert.deepEqual(
       result.spots.map((pin) => pin.id),
       [100, 200]
     );
+  });
+
+  it('recomputes once a new departure set arrives', () => {
+    const pins = [buildPin(100)];
+    const checkins = [buildCheckin(1, '2026-08-01T01:00:00Z')];
+    const previous = remainingSpots(null, pins, checkins, noDepartures);
+
+    const result = remainingSpots(previous, pins, checkins, new Set([100]));
+
+    assert.deepEqual(
+      result.spots.map((pin) => pin.id),
+      [100]
+    );
+  });
+});
+
+describe('departures', () => {
+  it('adds departed pins and keeps the set when none departed', () => {
+    const departures: ReadonlySet<number> = new Set([100]);
+
+    assert.deepEqual(
+      [...withDepartures(departures, [buildPin(200)])],
+      [100, 200]
+    );
+    assert.equal(withDepartures(departures, []), departures);
+  });
+
+  it('drops a pin and keeps the set when the pin is absent', () => {
+    const departures: ReadonlySet<number> = new Set([100, 200]);
+
+    assert.deepEqual([...withoutDeparture(departures, 100)], [200]);
+    assert.equal(withoutDeparture(departures, 300), departures);
   });
 });
 

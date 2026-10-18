@@ -154,6 +154,15 @@ export function surveySpots<S extends TrackedSpot>(
   return { nearestMeters, reached };
 }
 
+export function departedSpots<S extends TrackedSpot>(
+  fix: TrackingFix,
+  spots: S[]
+): S[] {
+  return spots.filter(
+    (spot) => distanceInMeters(fix, spot) - fix.accuracy > CHECKIN_RADIUS_METERS
+  );
+}
+
 export function nextHighAccuracy(
   enabled: boolean,
   nearestMeters: number

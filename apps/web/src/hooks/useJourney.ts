@@ -43,10 +43,13 @@ import {
   isRecording,
   type RemainingSpots,
   remainingSpots,
+  withDepartures,
   withoutCheckin,
+  withoutDeparture,
   withReplacedCheckin
 } from '../utils/journeyState.ts';
 import {
+  departedSpots,
   MOVING_SAMPLE_MIN_INTERVAL_MS,
   nextHighAccuracy,
   type PreviousFix,
@@ -148,6 +151,7 @@ export default function useJourney({
   }, [pins]);
 
   const remainingRef = useRef<RemainingSpots | null>(null);
+  const departuresRef = useRef<ReadonlySet<number>>(new Set());
 
   const trailSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const trailDirtyRef = useRef(false);
@@ -342,6 +346,7 @@ export default function useJourney({
       }
 
       pendingCheckinsRef.current.add(pin.id);
+      departuresRef.current = withoutDeparture(departuresRef.current, pin.id);
 
       const { success, data } = await addCheckin(current.id, pin.id);
 
@@ -387,10 +392,22 @@ export default function useJourney({
       timestamp: position.timestamp
     };
 
-    remainingRef.current = remainingSpots(
+    const remaining = remainingSpots(
       remainingRef.current,
       pinsRef.current,
-      current.checkins
+      current.checkins,
+      departuresRef.current
+    );
+
+    departuresRef.current = withDepartures(
+      departuresRef.current,
+      departedSpots(fix, remaining.lingering)
+    );
+    remainingRef.current = remainingSpots(
+      remaining,
+      pinsRef.current,
+      current.checkins,
+      departuresRef.current
     );
 
     const decision = trackPosition(
