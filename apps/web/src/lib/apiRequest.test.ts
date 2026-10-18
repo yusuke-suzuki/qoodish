@@ -1,38 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import {
-  buildApiHeaders,
-  parseAcceptLanguage,
-  resolveApiLanguage
-} from './apiRequest.ts';
-
-describe('parseAcceptLanguage', () => {
-  it('keeps the first language of a weighted list', () => {
-    assert.equal(parseAcceptLanguage('ja,en-US;q=0.9,en;q=0.8'), 'ja');
-  });
-
-  it('prefers the heaviest language over the first one', () => {
-    assert.equal(parseAcceptLanguage('en;q=0.5,ja'), 'ja');
-  });
-
-  it('leaves the weight off the language it picks', () => {
-    assert.equal(parseAcceptLanguage('en-US;q=0.9'), 'en-US');
-  });
-
-  it('ignores a language the reader refuses', () => {
-    assert.equal(parseAcceptLanguage('ja;q=0,en'), 'en');
-    assert.equal(parseAcceptLanguage('ja;Q=0,en'), 'en');
-  });
-
-  it('names no locale for a wildcard', () => {
-    assert.equal(parseAcceptLanguage('*'), 'en');
-  });
-
-  it('falls back to English without a usable header', () => {
-    assert.equal(parseAcceptLanguage(null), 'en');
-    assert.equal(parseAcceptLanguage(''), 'en');
-  });
-});
+import { buildApiHeaders, resolveApiLanguage } from './apiRequest.ts';
 
 describe('resolveApiLanguage', () => {
   it('prefers the locale of the page the reader is on', () => {
@@ -53,10 +21,20 @@ describe('resolveApiLanguage', () => {
     );
   });
 
-  it('falls back to the browser language without either', () => {
+  it('falls back to the preferred supported browser language without either', () => {
     assert.equal(
-      resolveApiLanguage({ pageLocale: null, acceptLanguage: 'en-US' }),
-      'en-US'
+      resolveApiLanguage({
+        pageLocale: null,
+        acceptLanguage: 'fr,en-US;q=0.5,ja;q=0.8'
+      }),
+      'ja'
+    );
+  });
+
+  it('falls back to English without a supported browser language', () => {
+    assert.equal(
+      resolveApiLanguage({ pageLocale: null, acceptLanguage: 'fr-FR' }),
+      'en'
     );
   });
 

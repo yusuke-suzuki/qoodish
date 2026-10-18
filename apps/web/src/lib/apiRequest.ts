@@ -1,7 +1,9 @@
 import {
   isLocale,
   LOCALE_COOKIE,
-  PAGE_LOCALE_HEADER
+  type Locale,
+  PAGE_LOCALE_HEADER,
+  rememberedOrPreferredLocale
 } from '../utils/locales.ts';
 import { SESSION_COOKIE } from './session.ts';
 
@@ -21,45 +23,6 @@ export async function getAuthToken(): Promise<string | null> {
   return cookieStore.get(SESSION_COOKIE)?.value ?? null;
 }
 
-function quality(params: string[]): number {
-  for (const param of params) {
-    // A parameter name is case-insensitive, and a 'Q=0' read as no weight at
-    // all would let through a language the reader had refused.
-    const trimmed = param.trim().toLowerCase();
-
-    if (trimmed.startsWith('q=')) {
-      const value = Number.parseFloat(trimmed.slice(2));
-      return Number.isFinite(value) ? value : 1;
-    }
-  }
-
-  return 1;
-}
-
-// The Rails API takes one locale, not a q-weighted list. The header is under
-// no obligation to be ordered by preference, so the first entry is not
-// necessarily the wanted one, and a weight left on the value would reach the
-// backend as part of the locale.
-export function parseAcceptLanguage(header: string | null): string {
-  let best = '';
-  let bestQuality = 0;
-
-  for (const entry of header?.split(',') ?? []) {
-    const [tag, ...params] = entry.trim().split(';');
-    const weight = quality(params);
-
-    // A wildcard names no locale, and a zero weight refuses one.
-    if (!tag || tag === '*' || weight <= 0 || weight <= bestQuality) {
-      continue;
-    }
-
-    best = tag;
-    bestQuality = weight;
-  }
-
-  return best || 'en';
-}
-
 type ApiLanguageSources = {
   pageLocale?: string | null;
   rememberedLocale?: string | null;
@@ -70,16 +33,10 @@ export function resolveApiLanguage({
   pageLocale,
   rememberedLocale,
   acceptLanguage
-}: ApiLanguageSources): string {
-  if (isLocale(pageLocale)) {
-    return pageLocale;
-  }
-
-  if (isLocale(rememberedLocale)) {
-    return rememberedLocale;
-  }
-
-  return parseAcceptLanguage(acceptLanguage);
+}: ApiLanguageSources): Locale {
+  return isLocale(pageLocale)
+    ? pageLocale
+    : rememberedOrPreferredLocale(rememberedLocale, acceptLanguage);
 }
 
 export async function getAcceptLanguage(lang?: string): Promise<string> {
