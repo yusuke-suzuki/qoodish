@@ -45,5 +45,5 @@ The Qoodish API: a Hono app on Cloudflare Workers that keeps its records in D1 t
 
 ## 6. Compatibility
 
-- `apps/web` and `apps/admin` deploy separately from the API, so an API change must keep their deployed versions working. Keep the API backward compatible, and when a change needs the workers deployed in a particular order, write that order in the PR description.
+- `apps/web` and `apps/admin` deploy separately from the API, and a merge to `master` deploys every worker at once in no guaranteed order, so an API change must keep their deployed versions working. Keep the API backward compatible, and when a change in one worker relies on a change in another being live, split it into pull requests and merge the one that relies on it only after the other is deployed.
 - Paths without a version prefix are v1, and their contracts are frozen: do not change the shape of a response or the meaning of a parameter there. To change an endpoint's contract, add the new contract under `/v2` (`src/routes/v2/`) next to the v1 endpoint. An endpoint whose contract does not change stays at v1 only. Once nothing calls a v1 endpoint that has a v2 successor, remove it in a PR of its own.
