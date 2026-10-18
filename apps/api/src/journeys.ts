@@ -70,6 +70,7 @@ const CHECKIN_NOTE_LIMIT = 500;
 const CHECKIN_IMAGE_LIMIT = 4;
 const IMAGES_PER_INSERT = 10;
 const CHECKIN_INTERVAL_VIOLATION = 'journey_checkin_interval';
+const CLIENT_CLOCK_SKEW_MS = 5 * 60 * 1000;
 
 const qb = new QueryBuilder();
 
@@ -200,7 +201,10 @@ export async function journeySummaries(
     .from(journeys)
     .leftJoin(maps, eq(maps.id, journeys.mapId))
     .where(eq(journeys.userId, userId))
-    .orderBy(desc(journeys.createdAt), asc(journeys.id));
+    .orderBy(
+      desc(sql`coalesce(${journeys.startedAt}, ${journeys.createdAt})`),
+      asc(journeys.id)
+    );
 
   return rows.map((row) => ({
     id: row.id,
@@ -332,9 +336,63 @@ function unfinishedJourneyOf(userId: number, mapId: SQLWrapper) {
     );
 }
 
+const journeyTime = z
+  .string({ error: 'journey_period_invalid' })
+  .transform((value, ctx) => {
+    const parsed = parseTimestamp(value);
+
+    if (parsed === null) {
+      ctx.addIssue({
+        code: 'custom',
+        input: value,
+        message: 'journey_period_invalid'
+      });
+      return z.NEVER;
+    }
+
+    return parsed;
+  });
+
+export type JourneyPeriod = { startedAt: string; finishedAt: string };
+
+export const newJourneyInput = z
+  .object({
+    started_at: journeyTime.optional(),
+    finished_at: journeyTime.optional()
+  })
+  .transform(({ started_at, finished_at }, ctx): JourneyPeriod | undefined => {
+    if (started_at === undefined && finished_at === undefined) {
+      return undefined;
+    }
+
+    if (
+      started_at === undefined ||
+      finished_at === undefined ||
+      started_at >= finished_at
+    ) {
+      ctx.addIssue({ code: 'custom', message: 'journey_period_invalid' });
+      return z.NEVER;
+    }
+
+    const latestFinish = new Date(Date.now() + CLIENT_CLOCK_SKEW_MS)
+      .toISOString()
+      .replace('Z', '000Z');
+
+    if (finished_at > latestFinish) {
+      ctx.addIssue({ code: 'custom', message: 'journey_period_in_future' });
+      return z.NEVER;
+    }
+
+    return { startedAt: started_at, finishedAt: finished_at };
+  });
+
 export async function createJourney(
   db: Database,
-  { userId, mapId }: { userId: number; mapId: number }
+  {
+    userId,
+    mapId,
+    period
+  }: { userId: number; mapId: number; period?: JourneyPeriod }
 ): Promise<number> {
   const now = currentTimestamp();
   const [created] = await db
@@ -345,9 +403,9 @@ export async function createJourney(
           id: generatedId(),
           createdAt: selected(now, 'created_at'),
           encodedPath: sql<string | null>`NULL`.as('encoded_path'),
-          finishedAt: sql<string | null>`NULL`.as('finished_at'),
+          finishedAt: selected(period?.finishedAt ?? null, 'finished_at'),
           mapId: maps.id,
-          startedAt: sql<string | null>`NULL`.as('started_at'),
+          startedAt: selected(period?.startedAt ?? null, 'started_at'),
           updatedAt: selected(now, 'updated_at'),
           userId: selected(userId, 'user_id')
         })
@@ -355,7 +413,7 @@ export async function createJourney(
         .where(
           and(
             eq(maps.id, mapId),
-            notExists(unfinishedJourneyOf(userId, maps.id))
+            period ? undefined : notExists(unfinishedJourneyOf(userId, maps.id))
           )
         )
     )

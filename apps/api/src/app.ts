@@ -33,6 +33,7 @@ import me from './routes/me.ts';
 import pins from './routes/pins.ts';
 import reports from './routes/reports.ts';
 import users from './routes/users.ts';
+import v2Maps from './routes/v2/maps.ts';
 import v2Me from './routes/v2/me.ts';
 import v2Pins from './routes/v2/pins.ts';
 import v2Users from './routes/v2/users.ts';
@@ -113,6 +114,7 @@ export function createApp(options: AppOptions = {}) {
   app.route('/v2/pins', v2Pins);
   app.route('/v2/users', v2Users);
   app.route('/v2/me', v2Me);
+  app.route('/v2/maps', v2Maps);
   app.route('/admin/reports', adminReports);
   app.route('/admin/staff_members', adminStaffMembers);
   app.route('/admin/roles', adminRoles);

@@ -29,6 +29,7 @@ import { createJourney, journeyDetail } from '../journeys.ts';
 import {
   createMap,
   discardMap,
+  findMap,
   type MapRow,
   mapInput,
   newMapInput,
@@ -85,15 +86,6 @@ const coauthorParams = pathParams(z.object({ mapId: id, userId: id }));
 const propertyParams = pathParams(z.object({ mapId: id, id }));
 const optionsParams = pathParams(z.object({ mapId: id, propertyId: id }));
 const optionParams = pathParams(z.object({ mapId: id, propertyId: id, id }));
-
-async function findMap(db: Database, condition: SQL | undefined) {
-  return first(
-    await db
-      .select({ id: maps.id, userId: maps.userId })
-      .from(maps)
-      .where(condition)
-  );
-}
 
 async function editableMapRow(
   db: Database,

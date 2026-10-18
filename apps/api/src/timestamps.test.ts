@@ -32,6 +32,12 @@ describe('parseTimestamp', () => {
     );
   });
 
+  it('keeps a year below 100 in its own century', () => {
+    expect(parseTimestamp('0026-05-01T09:00:00Z')).toBe(
+      '0026-05-01T09:00:00.000000Z'
+    );
+  });
+
   it('rejects text that is not a time', () => {
     for (const text of ['', 'x', '2024-13-45T25:99:00Z', '2026-01-05T12']) {
       expect(parseTimestamp(text)).toBeNull();
