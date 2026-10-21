@@ -167,7 +167,8 @@ export async function addCheckin(
   return { success: true, data };
 }
 
-type CheckinParams = {
+export type CheckinParams = {
+  pin_id?: number;
   image_ids?: number[];
   note?: string | null;
 };

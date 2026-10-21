@@ -274,6 +274,21 @@ describe('updateCheckin', () => {
     ]);
   });
 
+  it('moves the check-in to another pin', async () => {
+    const { updateCheckin } = await actions();
+    respondWith({ id: 40, pin_id: 7 });
+
+    await updateCheckin(11, 40, { pin_id: 7 });
+
+    assert.deepEqual(apiRequests(), [
+      {
+        path: '/me/journeys/11/checkins/40',
+        method: 'PUT',
+        body: { pin_id: 7 }
+      }
+    ]);
+  });
+
   it('reports the API error', async () => {
     const { updateCheckin } = await actions();
     failWith();
