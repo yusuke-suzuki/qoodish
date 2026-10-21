@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Delete,
   DirectionsWalk,
+  EditLocationAlt,
   HistoryEdu,
   MoreVert,
   Place,
@@ -59,6 +60,7 @@ import type {
 import { createChapter } from '../../actions/chapters.ts';
 import {
   addCheckin,
+  type CheckinParams,
   deleteJourney,
   finishJourney,
   removeCheckin,
@@ -131,6 +133,10 @@ export default function JourneyDetailView({
   const [ended, setEnded] = useState(false);
   const [recording, setRecording] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [repinning, setRepinning] = useState<JourneyCheckin | null>(null);
+  const [savingCheckinIds, setSavingCheckinIds] = useState<ReadonlySet<number>>(
+    () => new Set()
+  );
   const [pendingPin, setPendingPin] = useState<Pin | null>(null);
   const [pendingTime, setPendingTime] = useState('');
   const [addingCheckin, setAddingCheckin] = useState(false);
@@ -139,6 +145,7 @@ export default function JourneyDetailView({
 
   const [checkins, setCheckins] = useState(journey.checkins);
   const checkinsRef = useRef(journey.checkins);
+  const saveQueuesRef = useRef(new Map<number, Promise<boolean>>());
 
   const trail = decodePath(journey.encoded_path);
 
@@ -172,14 +179,22 @@ export default function JourneyDetailView({
   const milestoneProgress =
     milestones.length > 0 ? (visitedMilestones / milestones.length) * 100 : 0;
 
-  const saveCheckin = async (
-    checkin: JourneyCheckin,
-    params: { image_ids?: number[]; note?: string | null }
+  const persistCheckin = async (
+    checkinId: number,
+    paramsFor: (latest: JourneyCheckin) => CheckinParams
   ): Promise<boolean> => {
+    const latest = checkinsRef.current.find(
+      (existing) => existing.id === checkinId
+    );
+
+    if (!latest) {
+      return false;
+    }
+
     const { success, data, error } = await updateCheckin(
       journey.id,
-      checkin.id,
-      params
+      checkinId,
+      paramsFor(latest)
     );
 
     if (!success || !data) {
@@ -196,40 +211,73 @@ export default function JourneyDetailView({
     return true;
   };
 
-  const handleAttachImage = async (checkin: JourneyCheckin, image: Image) => {
-    const latest =
-      checkinsRef.current.find((existing) => existing.id === checkin.id) ??
-      checkin;
+  const saveCheckin = (
+    checkin: JourneyCheckin,
+    paramsFor: (latest: JourneyCheckin) => CheckinParams
+  ): Promise<boolean> => {
+    const persist = () => persistCheckin(checkin.id, paramsFor);
+    const queued = (
+      saveQueuesRef.current.get(checkin.id) ?? Promise.resolve()
+    ).then(persist, persist);
 
-    await saveCheckin(checkin, {
+    saveQueuesRef.current.set(checkin.id, queued);
+    setSavingCheckinIds((ids) => new Set(ids).add(checkin.id));
+
+    const settle = () => {
+      if (saveQueuesRef.current.get(checkin.id) !== queued) {
+        return;
+      }
+
+      saveQueuesRef.current.delete(checkin.id);
+      setSavingCheckinIds((ids) => {
+        const next = new Set(ids);
+        next.delete(checkin.id);
+        return next;
+      });
+    };
+    queued.then(settle, settle);
+
+    return queued;
+  };
+
+  const handleAttachImage = async (checkin: JourneyCheckin, image: Image) => {
+    await saveCheckin(checkin, (latest) => ({
       image_ids: [...latest.images.map((existing) => existing.id), image.id]
-    });
+    }));
   };
 
   const handleRemoveImage = (
     checkin: JourneyCheckin,
     imageId: number
   ): Promise<boolean> => {
-    const latest =
-      checkinsRef.current.find((existing) => existing.id === checkin.id) ??
-      checkin;
-
-    return saveCheckin(checkin, {
+    return saveCheckin(checkin, (latest) => ({
       image_ids: latest.images
         .filter((existing) => existing.id !== imageId)
         .map((existing) => existing.id)
-    });
+    }));
   };
 
   const handleSaveNote = (
     checkin: JourneyCheckin,
     note: string | null
   ): Promise<boolean> => {
-    return saveCheckin(checkin, { note });
+    return saveCheckin(checkin, () => ({ note }));
+  };
+
+  const handleClosePicker = () => {
+    setPickerOpen(false);
+    setRepinning(null);
   };
 
   const handleSelectPin = (pin: Pin) => {
     setPickerOpen(false);
+
+    if (repinning) {
+      setRepinning(null);
+      saveCheckin(repinning, () => ({ pin_id: pin.id }));
+      return;
+    }
+
     setPendingPin(pin);
 
     const last = checkinsRef.current.at(-1);
@@ -577,6 +625,16 @@ export default function JourneyDetailView({
                         </Typography>
                       </Box>
 
+                      {map && pins.length > 0 && (
+                        <IconButton
+                          size="small"
+                          aria-label={dictionary['change pin']}
+                          onClick={() => setRepinning(checkin)}
+                        >
+                          <EditLocationAlt fontSize="small" />
+                        </IconButton>
+                      )}
+
                       <IconButton
                         size="small"
                         aria-label={dictionary.delete}
@@ -688,6 +746,7 @@ export default function JourneyDetailView({
                 color="secondary"
                 startIcon={<HistoryEdu />}
                 loading={recording}
+                disabled={savingCheckinIds.size > 0}
                 onClick={handleRecord}
               >
                 {dictionary['record as chapter']}
@@ -736,8 +795,8 @@ export default function JourneyDetailView({
       />
 
       <PinPickerDialog
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
+        open={pickerOpen || repinning !== null}
+        onClose={handleClosePicker}
         onSelect={handleSelectPin}
         pins={pins}
         usedPinIds={usedPinIds}
