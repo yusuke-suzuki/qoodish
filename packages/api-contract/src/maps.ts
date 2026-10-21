@@ -28,6 +28,10 @@ export type AppMap = MapAttributes & {
   bookmarkable: boolean;
 };
 
+export type CountedMap = AppMap & {
+  pins_count: number;
+};
+
 export type GuestMap = MapAttributes & {
   author: UserSummary;
   bookmarking: false;

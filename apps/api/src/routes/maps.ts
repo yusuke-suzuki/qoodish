@@ -9,7 +9,7 @@ import type {
   PinProperty,
   PinPropertyOption
 } from '@qoodish/api-contract';
-import { and, asc, desc, eq, type SQL, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, type SQL } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { bookmarkMap, unbookmarkMap } from '../bookmarks.ts';
@@ -30,8 +30,10 @@ import {
   createMap,
   discardMap,
   findMap,
+  listedMaps,
   type MapRow,
   mapInput,
+  mapListQuery,
   newMapInput,
   pinPropertiesOf,
   removeCoauthor,
@@ -60,25 +62,14 @@ import {
 import { createPin, newPinInput, viewerPins } from '../pins.ts';
 import { first } from '../routing.ts';
 import { findUser } from '../users.ts';
-import {
-  flag,
-  id,
-  jsonBody,
-  optionalId,
-  pathParams,
-  queryParams
-} from '../validation.ts';
+import { id, jsonBody, optionalId, pathParams } from '../validation.ts';
 import {
   editableMap,
-  recommendableMap,
   referenceableChapter,
   referenceableMap,
   referenceablePin,
-  relatedMap,
   type Viewer
 } from '../visibility.ts';
-
-const RECOMMENDED_MAPS_LIMIT = 10;
 
 const mapParams = pathParams(z.object({ mapId: id }));
 const idParams = pathParams(z.object({ id }));
@@ -113,21 +104,10 @@ const app = new Hono<ViewerEnv>();
 
 app.use(authenticateUser);
 
-app.get('/', queryParams(z.object({ recommend: flag })), async (c) => {
+app.get('/', mapListQuery, async (c) => {
   const db = c.get('db');
   const viewer = c.get('viewer');
-  const rows = c.req.valid('query').recommend
-    ? await db
-        .select()
-        .from(maps)
-        .where(recommendableMap(viewer))
-        .orderBy(sql`random()`)
-        .limit(RECOMMENDED_MAPS_LIMIT)
-    : await db
-        .select()
-        .from(maps)
-        .where(relatedMap(viewer))
-        .orderBy(desc(maps.createdAt), asc(maps.id));
+  const rows = await listedMaps(db, viewer, c.req.valid('query'));
 
   return c.json<AppMap[]>(await viewerMaps(db, viewer, rows));
 });

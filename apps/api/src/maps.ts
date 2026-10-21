@@ -8,12 +8,14 @@ import type {
 import {
   and,
   asc,
+  desc,
   eq,
   inArray,
   max,
   or,
   type SQL,
-  type SQLWrapper
+  type SQLWrapper,
+  sql
 } from 'drizzle-orm';
 import { z } from 'zod';
 import { removeMapBookmarks } from './bookmarks.ts';
@@ -52,8 +54,8 @@ import {
   userSummary,
   usersQuery
 } from './users.ts';
-import { coordinate, imageIds, text } from './validation.ts';
-import type { Viewer } from './visibility.ts';
+import { coordinate, flag, imageIds, queryParams, text } from './validation.ts';
+import { recommendableMap, relatedMap, type Viewer } from './visibility.ts';
 
 export type MapRow = typeof maps.$inferSelect;
 
@@ -659,6 +661,29 @@ export async function viewerMaps(
       }
     ];
   });
+}
+
+const RECOMMENDED_MAPS_LIMIT = 10;
+
+export const mapListQuery = queryParams(z.object({ recommend: flag }));
+
+export function listedMaps(
+  db: Database,
+  viewer: Viewer,
+  { recommend }: { recommend: boolean }
+): Promise<MapRow[]> {
+  return recommend
+    ? db
+        .select()
+        .from(maps)
+        .where(recommendableMap(viewer))
+        .orderBy(sql`random()`)
+        .limit(RECOMMENDED_MAPS_LIMIT)
+    : db
+        .select()
+        .from(maps)
+        .where(relatedMap(viewer))
+        .orderBy(desc(maps.createdAt), asc(maps.id));
 }
 
 export async function viewerCoauthors(
