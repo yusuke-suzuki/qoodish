@@ -80,7 +80,14 @@ export type JourneyOwner = { userId: number; journeyId: number };
 
 type CheckinRow = typeof journeyCheckins.$inferSelect;
 
-type CheckinContent = {
+type CheckinSpot = {
+  pinId: number | null;
+  name: string;
+  latitude: number;
+  longitude: number;
+};
+
+type CheckinContent = CheckinSpot & {
   note: string | null;
   checkedInAt: string;
   status: 'recorded' | 'deleted';
@@ -312,7 +319,10 @@ export const milestoneInput = z.object({ pin_id: pinId });
 
 export const newCheckinInput = z.object({ pin_id: pinId, ...checkinFields });
 
-export const checkinInput = z.object(checkinFields);
+export const checkinInput = z.object({
+  pin_id: z.union([z.number(), z.string()]).optional(),
+  ...checkinFields
+});
 
 export const finishInput = z.object({
   encoded_path: z
@@ -566,7 +576,11 @@ export function detachJourneysFromPins(db: Database, pinIds: SQLWrapper) {
     db
       .update(journeyCheckins)
       .set({ pinId: null })
-      .where(inArray(journeyCheckins.pinId, pinIds))
+      .where(inArray(journeyCheckins.pinId, pinIds)),
+    db
+      .update(journeyCheckinRevisions)
+      .set({ pinId: null })
+      .where(inArray(journeyCheckinRevisions.pinId, pinIds))
   ] as const;
 }
 
@@ -598,6 +612,15 @@ export async function destroyJourney(
 
 function pinErrors(journey: JourneyRecord, pin: PinRow): MessageKey[] {
   return pin.mapId === journey.mapId ? [] : ['pin_not_on_journey_map'];
+}
+
+function spotOf(pin: PinRow): CheckinSpot {
+  return {
+    pinId: pin.id,
+    name: pin.name,
+    latitude: pin.latitude,
+    longitude: pin.longitude
+  };
 }
 
 function assertValid(errors: readonly MessageKey[]): void {
@@ -810,6 +833,7 @@ export async function recordCheckin(
   assertValid(unownedImages(imageOwners, imageIds, editorId));
 
   const content: CheckinContent = {
+    ...spotOf(pin),
     note: changes.note ?? null,
     checkedInAt,
     status: 'recorded'
@@ -828,10 +852,6 @@ export async function recordCheckin(
         .values({
           ...content,
           journeyId: journey.id,
-          pinId: pin.id,
-          name: pin.name,
-          latitude: pin.latitude,
-          longitude: pin.longitude,
           createdAt: now,
           updatedAt: now
         })
@@ -903,6 +923,10 @@ async function currentCheckinImageIds(
 
 function currentCheckinContent(checkin: CheckinRow): CheckinContent {
   return {
+    pinId: checkin.pinId,
+    name: checkin.name,
+    latitude: checkin.latitude,
+    longitude: checkin.longitude,
     note: checkin.note,
     checkedInAt: checkin.checkedInAt,
     status: checkin.status === 'deleted' ? 'deleted' : 'recorded'
@@ -954,16 +978,54 @@ async function writeCheckinRevision(
   );
 }
 
+async function revisedSpot(
+  db: Database,
+  viewer: Viewer,
+  {
+    journey,
+    current,
+    submitted
+  }: {
+    journey: JourneyRecord;
+    current: CheckinSpot;
+    submitted: number | string | undefined;
+  }
+): Promise<CheckinSpot> {
+  if (submitted === undefined) {
+    return current;
+  }
+
+  const pinId = optionalId(submitted);
+
+  if (pinId === undefined) {
+    throw new ApiError('NotFound');
+  }
+
+  if (pinId === current.pinId) {
+    return current;
+  }
+
+  const [pin] = await referenceablePinQuery(db, viewer, pinId);
+
+  if (!pin) {
+    throw new ApiError('NotFound');
+  }
+
+  assertValid(pinErrors(journey, pin));
+
+  return spotOf(pin);
+}
+
 export function reviseCheckin(
   db: Database,
   read: () => Promise<CheckinRow>,
   {
     journey,
-    editorId,
+    viewer,
     changes
   }: {
     journey: JourneyRecord;
-    editorId: number;
+    viewer: Viewer;
     changes: z.output<typeof checkinInput>;
   }
 ): Promise<void> {
@@ -981,10 +1043,17 @@ export function reviseCheckin(
         assertWithinPeriod(journey, checkedInAt);
       }
 
+      const spot = await revisedSpot(db, viewer, {
+        journey,
+        current,
+        submitted: changes.pin_id
+      });
+
       await writeCheckinRevision(db, checkin, {
-        editorId,
+        editorId: viewer.id,
         content: {
           ...current,
+          ...spot,
           note: changes.note === undefined ? current.note : changes.note,
           checkedInAt
         },

@@ -1488,6 +1488,97 @@ describe('journey writes', () => {
     expect((await checkIn('2026-01-05 15:00:00')).status).toBe(200);
   });
 
+  it('moves a checkin to another pin of the journey map as a new revision', async () => {
+    const path = `/me/journeys/1/checkins/${retroactiveCheckin}`;
+    const misoPin = (await checkinRow(retroactiveCheckin))?.pinId;
+    const shio = await send('POST', `/maps/${ids.ramen}/pins`, 'alice', {
+      name: 'Shio Ramen',
+      comment: 'Light',
+      latitude: 35.2,
+      longitude: 139.2
+    });
+    const revisionCount = (await checkinRevisionsOf(retroactiveCheckin)).length;
+
+    const moved = await send('PUT', path, 'alice', { pin_id: shio.body.id });
+
+    expect(moved).toMatchObject({
+      status: 200,
+      body: {
+        pin_id: shio.body.id,
+        spot: { name: 'Shio Ramen', latitude: 35.2, longitude: 139.2 },
+        checked_in_at: '2026-01-05T12:30:00.000000Z'
+      }
+    });
+    expect((await checkinRevisionsOf(retroactiveCheckin)).at(-1)).toMatchObject(
+      {
+        pinId: shio.body.id,
+        name: 'Shio Ramen',
+        latitude: 35.2,
+        longitude: 139.2
+      }
+    );
+    expect(
+      (await send('PATCH', path, 'alice', { pin_id: `${shio.body.id}` })).status
+    ).toBe(200);
+    expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(
+      revisionCount + 1
+    );
+
+    expect(await send('PUT', path, 'alice', { pin_id: ids.secretPin })).toEqual(
+      invalid('The pin does not belong to the map of the journey.')
+    );
+    expect((await send('PUT', path, 'alice', { pin_id: 999_999 })).status).toBe(
+      404
+    );
+    expect((await send('PUT', path, 'alice', { pin_id: 'abc' })).status).toBe(
+      404
+    );
+
+    const nearby = await send('POST', '/me/journeys/1/checkins', 'alice', {
+      pin_id: misoPin,
+      checked_in_at: '2026-01-05 13:00:00'
+    });
+
+    expect(await send('PUT', path, 'alice', { pin_id: misoPin })).toEqual(
+      invalid(
+        'The journey has already checked in at this pin around this time.'
+      )
+    );
+    expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(
+      revisionCount + 1
+    );
+    expect(
+      (
+        await send(
+          'DELETE',
+          `/me/journeys/1/checkins/${nearby.body.id}`,
+          'alice'
+        )
+      ).status
+    ).toBe(204);
+  });
+
+  it('chooses a pin again for a checkin whose pin was deleted', async () => {
+    const path = `/me/journeys/1/checkins/${retroactiveCheckin}`;
+    const shioPin = (await checkinRow(retroactiveCheckin))?.pinId;
+
+    await db()
+      .update(journeyCheckins)
+      .set({ pinId: null })
+      .where(eq(journeyCheckins.id, retroactiveCheckin));
+
+    expect(
+      (await send('PATCH', path, 'alice', { note: 'Gone' })).body
+    ).toMatchObject({
+      pin_id: null,
+      spot: { name: 'Shio Ramen' },
+      note: 'Gone'
+    });
+    expect(
+      (await send('PUT', path, 'alice', { pin_id: shioPin })).body
+    ).toMatchObject({ pin_id: shioPin, spot: { name: 'Shio Ramen' } });
+  });
+
   it('replaces the images and note, leaving the earlier revision as it was', async () => {
     const path = `/me/journeys/${cafeJourney}/checkins/${feedCheckin}`;
     const { status, body } = await send('PUT', path, 'alice', {
@@ -1577,8 +1668,8 @@ describe('journey writes', () => {
         .where(inArray(journeyCheckinRevisions.journeyCheckinId, checkinIds))
     ).map((row) => row.id);
 
-    expect(checkinIds).toHaveLength(6);
-    expect(revisionIds).toHaveLength(7);
+    expect(checkinIds).toHaveLength(7);
+    expect(revisionIds).toHaveLength(12);
     expect((await send('DELETE', '/me/journeys/1', 'bob')).status).toBe(404);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(204);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(404);
@@ -1631,6 +1722,7 @@ describe('DELETE /me/account', () => {
     bobImage: 0,
     bobPinOnRamen: 0,
     bobJourneyOnRamen: 0,
+    bobCheckinOnRamen: 0,
     bobChapterOnRamen: 0
   };
 
@@ -1675,6 +1767,30 @@ describe('DELETE /me/account', () => {
     fixture.bobPinOnRamen = bobPin.id;
     fixture.bobJourneyOnRamen = bobJourney.id;
     fixture.bobChapterOnRamen = bobChapter.id;
+
+    const bobStop = {
+      pinId: bobPin.id,
+      name: 'Bob Stall',
+      latitude: 35.7,
+      longitude: 139.7,
+      checkedInAt: at(1)
+    };
+    const bobCheckin = await db()
+      .insert(journeyCheckins)
+      .values({ journeyId: bobJourney.id, ...bobStop, ...stamp })
+      .returning({ id: journeyCheckins.id })
+      .get();
+
+    fixture.bobCheckinOnRamen = bobCheckin.id;
+
+    await db()
+      .insert(journeyCheckinRevisions)
+      .values({
+        journeyCheckinId: bobCheckin.id,
+        userId: ids.bob,
+        ...bobStop,
+        ...stamp
+      });
 
     await db()
       .insert(pinRevisions)
@@ -1922,6 +2038,8 @@ describe('DELETE /me/account', () => {
     const [
       othersOnRamen,
       [bobJourney],
+      [bobCheckin],
+      [bobCheckinRevision],
       [bobChapter],
       [aliceEditOfCafe],
       [aliceReport],
@@ -1939,6 +2057,22 @@ describe('DELETE /me/account', () => {
         .select({ mapId: journeys.mapId })
         .from(journeys)
         .where(eq(journeys.id, fixture.bobJourneyOnRamen)),
+      db()
+        .select({ pinId: journeyCheckins.pinId, name: journeyCheckins.name })
+        .from(journeyCheckins)
+        .where(eq(journeyCheckins.id, fixture.bobCheckinOnRamen)),
+      db()
+        .select({
+          pinId: journeyCheckinRevisions.pinId,
+          name: journeyCheckinRevisions.name
+        })
+        .from(journeyCheckinRevisions)
+        .where(
+          eq(
+            journeyCheckinRevisions.journeyCheckinId,
+            fixture.bobCheckinOnRamen
+          )
+        ),
       db()
         .select({ mapId: chapters.mapId })
         .from(chapters)
@@ -1964,6 +2098,8 @@ describe('DELETE /me/account', () => {
 
     expect(othersOnRamen).toEqual([]);
     expect(bobJourney).toEqual({ mapId: null });
+    expect(bobCheckin).toEqual({ pinId: null, name: 'Bob Stall' });
+    expect(bobCheckinRevision).toEqual({ pinId: null, name: 'Bob Stall' });
     expect(bobChapter).toEqual({ mapId: null });
     expect(aliceEditOfCafe).toEqual({ userId: null });
     expect(aliceReport).toEqual({ reporterId: null });
