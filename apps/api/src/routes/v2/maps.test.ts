@@ -12,6 +12,45 @@ const invalid = (detail: string) => ({
   body: { title: 'UnprocessableContent', detail }
 });
 
+describe('GET /v2/maps', () => {
+  it('counts the pins the viewer can see on each map listed by v1', async () => {
+    for (const [uid, query] of [
+      ['alice', ''],
+      ['carol', ''],
+      ['carol', '?recommend=true']
+    ] as const) {
+      const { body } = await send('GET', `/v2/maps${query}`, uid);
+      const counts = await Promise.all(
+        body.map(
+          async (map: { id: number }) =>
+            (await send('GET', `/maps/${map.id}/pins`, uid)).body.length
+        )
+      );
+
+      if (query === '') {
+        expect(body.map((map: { id: number }) => map.id)).toEqual(
+          await idsOf('/maps', uid)
+        );
+      }
+      expect(body.map((map: { pins_count: number }) => map.pins_count)).toEqual(
+        counts
+      );
+    }
+  });
+
+  it('counts zero on a map without pins', async () => {
+    const created = await send('POST', '/maps', 'carol', {
+      name: 'Empty map',
+      description: 'No pins yet.'
+    });
+    const { body } = await send('GET', '/v2/maps', 'carol');
+
+    expect(body).toContainEqual(
+      expect.objectContaining({ id: created.body.id, pins_count: 0 })
+    );
+  });
+});
+
 describe('POST /v2/maps/:mapId/journeys', () => {
   const create = (body: unknown, uid = 'alice', mapId: number = ids.ramen) =>
     send('POST', `/v2/maps/${mapId}/journeys`, uid, body);
