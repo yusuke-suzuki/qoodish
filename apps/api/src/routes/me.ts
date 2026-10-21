@@ -473,7 +473,7 @@ app.on(
     await reviseCheckin(
       db,
       () => recordedCheckin(db, { journeyId: journey.id, checkinId }),
-      { journey, editorId: viewer.id, changes: c.req.valid('json') }
+      { journey, viewer, changes: c.req.valid('json') }
     );
 
     return c.json<JourneyCheckin>(await journeyCheckin(db, checkinId));

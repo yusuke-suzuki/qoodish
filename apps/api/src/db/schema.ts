@@ -648,7 +648,11 @@ export const journeyCheckinRevisions = sqliteTable(
     journeyCheckinId: integer('journey_checkin_id')
       .notNull()
       .references(() => journeyCheckins.id),
+    latitude: real('latitude'),
+    longitude: real('longitude'),
+    name: text('name'),
     note: text('note'),
+    pinId: integer('pin_id').references(() => pins.id),
     status: text('status').notNull().default('recorded'),
     updatedAt: text('updated_at').notNull(),
     userId: integer('user_id')
@@ -663,6 +667,7 @@ export const journeyCheckinRevisions = sqliteTable(
     index('index_journey_checkin_revisions_on_journey_checkin_id').on(
       t.journeyCheckinId
     ),
+    index('index_journey_checkin_revisions_on_pin_id').on(t.pinId),
     index('index_journey_checkin_revisions_on_user_id').on(t.userId)
   ]
 );
