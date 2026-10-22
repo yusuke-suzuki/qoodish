@@ -1,11 +1,4 @@
-import {
-  memo,
-  type ReactNode,
-  Suspense,
-  use,
-  useEffect,
-  useState
-} from 'react';
+import { type ReactNode, Suspense, use, useEffect, useState } from 'react';
 import { browser, createPortal } from 'react-dom';
 import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
 
@@ -42,10 +35,10 @@ function BrowserMapControl({ children, controlPosition, fullWidth }: Props) {
   return createPortal(children, container);
 }
 
-export default memo(function MapControl(props: Props) {
+export default function MapControl(props: Props) {
   return (
     <Suspense fallback={null}>
       <BrowserMapControl {...props} />
     </Suspense>
   );
-});
+}

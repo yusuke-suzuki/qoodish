@@ -9,14 +9,7 @@ import {
   TextField
 } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  memo,
-  type SyntheticEvent,
-  useCallback,
-  useRef,
-  useState,
-  useTransition
-} from 'react';
+import { type SyntheticEvent, useRef, useState, useTransition } from 'react';
 import type { AppMap, UserSummary } from '../../../types/index.ts';
 import { inviteCoauthor, searchUsers } from '../../actions/coauthors.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -39,35 +32,32 @@ function CoauthorInviteDialog({ open, onClose, map }: Props) {
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleInputChange = useCallback(
-    (_event: SyntheticEvent, value: string) => {
-      setInputValue(value);
+  const handleInputChange = (_event: SyntheticEvent, value: string) => {
+    setInputValue(value);
 
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
 
-      if (!value.trim()) {
-        setOptions([]);
+    if (!value.trim()) {
+      setOptions([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const users = await searchUsers(value);
+        setOptions(users);
+      } finally {
         setLoading(false);
-        return;
       }
+    }, 300);
+  };
 
-      setLoading(true);
-
-      debounceRef.current = setTimeout(async () => {
-        try {
-          const users = await searchUsers(value);
-          setOptions(users);
-        } finally {
-          setLoading(false);
-        }
-      }, 300);
-    },
-    []
-  );
-
-  const handleInvite = useCallback(() => {
+  const handleInvite = () => {
     if (!map || !selectedUser) {
       return;
     }
@@ -88,7 +78,7 @@ function CoauthorInviteDialog({ open, onClose, map }: Props) {
         });
       }
     });
-  }, [map, selectedUser, dictionary]);
+  };
 
   return (
     <AppDialog
@@ -142,4 +132,4 @@ function CoauthorInviteDialog({ open, onClose, map }: Props) {
   );
 }
 
-export default memo(CoauthorInviteDialog);
+export default CoauthorInviteDialog;

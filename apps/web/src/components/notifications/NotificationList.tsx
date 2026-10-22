@@ -11,7 +11,7 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo, useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useEffectEvent, useRef } from 'react';
 import type { Notification } from '../../../types/index.ts';
 import { markNotificationAsRead } from '../../actions/notifications.ts';
 import AuthContext from '../../context/AuthContext.ts';
@@ -58,6 +58,8 @@ const NotificationList = ({
 
   const markedIdsRef = useRef(new Set<number>());
 
+  const notifyRead = useEffectEvent(onReadNotifications);
+
   useEffect(() => {
     const unmarked = unreadNotifications.filter(
       (notification) => !markedIdsRef.current.has(notification.id)
@@ -77,9 +79,9 @@ const NotificationList = ({
         await sleep(3000);
       }
 
-      onReadNotifications();
+      notifyRead();
     })();
-  }, [authenticated, unreadNotifications, onReadNotifications]);
+  }, [authenticated, unreadNotifications]);
 
   if (notifications.length < 1) {
     return (
@@ -159,4 +161,4 @@ const NotificationList = ({
   );
 };
 
-export default memo(NotificationList);
+export default NotificationList;

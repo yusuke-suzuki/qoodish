@@ -2,7 +2,7 @@
 
 import { Box, Drawer, ListItemButton, Typography } from '@mui/material';
 import Link from 'next/link';
-import { memo, Suspense } from 'react';
+import { Suspense } from 'react';
 import type { Profile } from '../../../types/index.ts';
 import useNavDestinations, {
   type NavDestination
@@ -92,10 +92,10 @@ function SideNavWithProfile() {
   return <SideNavContent profile={useProfile()} />;
 }
 
-export default memo(function SideNav() {
+export default function SideNav() {
   return (
     <Suspense fallback={<SideNavContent profile={null} />}>
       <SideNavWithProfile />
     </Suspense>
   );
-});
+}

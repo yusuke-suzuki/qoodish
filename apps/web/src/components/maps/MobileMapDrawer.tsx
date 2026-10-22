@@ -8,7 +8,6 @@ import {
   type Theme,
   Typography
 } from '@mui/material';
-import { memo } from 'react';
 import type {
   AppMap,
   Chapter,
@@ -190,4 +189,4 @@ function MobileMapDrawer({
   );
 }
 
-export default memo(MobileMapDrawer);
+export default MobileMapDrawer;

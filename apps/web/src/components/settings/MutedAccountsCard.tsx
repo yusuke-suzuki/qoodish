@@ -3,7 +3,7 @@
 import { Button, Card, CardContent, List, Typography } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { MutedAccount } from '../../../types/index.ts';
 import { fetchMoreMutedAccounts } from '../../actions/mutes.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -100,4 +100,4 @@ function MutedAccountsCard({ accounts, nextCursor }: Props) {
   );
 }
 
-export default memo(MutedAccountsCard);
+export default MutedAccountsCard;

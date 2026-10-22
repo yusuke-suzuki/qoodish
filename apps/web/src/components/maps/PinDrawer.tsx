@@ -10,7 +10,7 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo, useCallback, useState } from 'react';
+import { useState } from 'react';
 import type { AppMap, Pin, PinProperty } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
@@ -62,12 +62,12 @@ function PinDrawer({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [milestoneLoading, setMilestoneLoading] = useState(false);
 
-  const handlePinDeleted = useCallback(() => {
+  const handlePinDeleted = () => {
     onClose();
     onDeleted();
-  }, [onClose, onDeleted]);
+  };
 
-  const handleAddMilestone = useCallback(async () => {
+  const handleAddMilestone = async () => {
     if (!milestoneAction) {
       return;
     }
@@ -79,7 +79,7 @@ function PinDrawer({
     } finally {
       setMilestoneLoading(false);
     }
-  }, [milestoneAction]);
+  };
 
   const pin = currentPin;
 
@@ -232,4 +232,4 @@ function PinDrawer({
   );
 }
 
-export default memo(PinDrawer);
+export default PinDrawer;

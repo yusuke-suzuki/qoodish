@@ -1,7 +1,7 @@
 'use client';
 
 import { type ButtonProps, DialogContentText } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import AppDialog from './AppDialog.tsx';
 
 type Props = {
@@ -54,4 +54,4 @@ function ConfirmDialog({
   );
 }
 
-export default memo(ConfirmDialog);
+export default ConfirmDialog;

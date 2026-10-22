@@ -11,7 +11,7 @@ import {
 import { getAuth } from 'firebase/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { memo, Suspense, useContext, useRef, useState } from 'react';
+import { Suspense, useContext, useRef, useState } from 'react';
 import type { Profile } from '../../../types/index.ts';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -182,10 +182,10 @@ function AccountMenuButtonWithProfile() {
   return <AccountMenuButtonContent profile={useProfile()} />;
 }
 
-export default memo(function AccountMenuButton() {
+export default function AccountMenuButton() {
   return (
     <Suspense fallback={<AccountMenuButtonContent profile={null} />}>
       <AccountMenuButtonWithProfile />
     </Suspense>
   );
-});
+}

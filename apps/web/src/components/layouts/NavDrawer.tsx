@@ -16,7 +16,7 @@ import {
 import { getAuth } from 'firebase/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { memo, Suspense, useContext } from 'react';
+import { Suspense, useContext } from 'react';
 import type { Profile } from '../../../types/index.ts';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -216,10 +216,10 @@ function NavDrawerWithProfile(props: Props) {
   return <NavDrawerContent {...props} profile={useProfile()} />;
 }
 
-export default memo(function NavDrawer(props: Props) {
+export default function NavDrawer(props: Props) {
   return (
     <Suspense fallback={<NavDrawerContent {...props} profile={null} />}>
       <NavDrawerWithProfile {...props} />
     </Suspense>
   );
-});
+}

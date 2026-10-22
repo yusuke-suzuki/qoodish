@@ -5,7 +5,7 @@ import {
   FormLabel,
   Switch
 } from '@mui/material';
-import { type ChangeEvent, memo, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 
@@ -23,9 +23,11 @@ function MapOptions({ currentMap, onChange }: Props) {
 
   const [isPrivate, setIsPrivate] = useState(currentMap?.private ?? false);
 
+  const notifyChange = useEffectEvent(onChange);
+
   useEffect(() => {
-    onChange({ isPrivate });
-  }, [isPrivate, onChange]);
+    notifyChange({ isPrivate });
+  }, [isPrivate]);
 
   return (
     <FormControl component="fieldset" color="secondary" margin="normal">
@@ -49,4 +51,4 @@ function MapOptions({ currentMap, onChange }: Props) {
   );
 }
 
-export default memo(MapOptions);
+export default MapOptions;

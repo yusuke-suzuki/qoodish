@@ -7,7 +7,6 @@ import {
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import {
-  memo,
   type ReactNode,
   useCallback,
   useEffect,
@@ -169,17 +168,17 @@ function AuthProvider({
 
   const signOutCleanupsRef = useRef(new Set<SignOutCleanup>());
 
-  const addSignOutCleanup = useCallback((cleanup: SignOutCleanup) => {
+  const addSignOutCleanup = (cleanup: SignOutCleanup) => {
     signOutCleanupsRef.current.add(cleanup);
     return () => {
       signOutCleanupsRef.current.delete(cleanup);
     };
-  }, []);
+  };
 
   // Server-side state that belongs to the session, such as a push device
   // registration, can only be removed while the session cookie still exists,
   // so every cleanup runs before Firebase is told to sign out.
-  const signOut = useCallback(async () => {
+  const signOut = async () => {
     await Promise.all(
       Array.from(signOutCleanupsRef.current, (cleanup) =>
         cleanup().catch((error) => {
@@ -189,7 +188,7 @@ function AuthProvider({
     );
 
     await signOutOfFirebase(getAuth());
-  }, []);
+  };
 
   return (
     <AuthContext.Provider
@@ -208,4 +207,4 @@ function AuthProvider({
   );
 }
 
-export default memo(AuthProvider);
+export default AuthProvider;

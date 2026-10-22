@@ -3,7 +3,6 @@
 import { Map as MapIcon } from '@mui/icons-material';
 import { Avatar, Chip } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 
@@ -49,4 +48,4 @@ function MapLinkChip({ map, mapDeleted, locale }: Props) {
   );
 }
 
-export default memo(MapLinkChip);
+export default MapLinkChip;

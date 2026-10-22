@@ -1,6 +1,6 @@
 import { Lock } from '@mui/icons-material';
 import { Avatar, CardHeader, Skeleton, type SxProps } from '@mui/material';
-import { memo, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { AppMap, Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import DrawerPuller from '../common/DrawerPuller.tsx';
@@ -76,4 +76,4 @@ function MobileMiniMapHeader({ map, pins, draggable, action, sx }: Props) {
   );
 }
 
-export default memo(MobileMiniMapHeader);
+export default MobileMiniMapHeader;

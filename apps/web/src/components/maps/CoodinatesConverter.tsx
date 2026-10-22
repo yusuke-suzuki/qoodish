@@ -1,5 +1,5 @@
 import { Box, Paper } from '@mui/material';
-import { memo, useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
 import DraggableMarker from './DraggableMarker.tsx';
@@ -65,11 +65,13 @@ function CoodinatesConverter({ onChange, defaultValue }: Props) {
     };
   }, [googleMap, loader]);
 
+  const notifyChange = useEffectEvent(onChange);
+
   useEffect(() => {
     if (center) {
-      onChange(center);
+      notifyChange(center);
     }
-  }, [center, onChange]);
+  }, [center]);
 
   return (
     <>
@@ -93,4 +95,4 @@ function CoodinatesConverter({ onChange, defaultValue }: Props) {
   );
 }
 
-export default memo(CoodinatesConverter);
+export default CoodinatesConverter;

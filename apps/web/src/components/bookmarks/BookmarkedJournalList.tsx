@@ -11,7 +11,6 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { memo } from 'react';
 import type { Journal } from '../../../types/index.ts';
 import useCountLabel from '../../hooks/useCountLabel.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -63,4 +62,4 @@ function BookmarkedJournalList({ journals }: Props) {
   );
 }
 
-export default memo(BookmarkedJournalList);
+export default BookmarkedJournalList;

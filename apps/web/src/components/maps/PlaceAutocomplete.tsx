@@ -12,13 +12,7 @@ import {
 } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import {
-  memo,
-  type RefObject,
-  type SyntheticEvent,
-  useRef,
-  useState
-} from 'react';
+import { type RefObject, type SyntheticEvent, useRef, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { usePlaceSearch } from '../../hooks/usePlaceSearch.ts';
 import { formatDistanceMeters } from '../../utils/geo.ts';
@@ -182,4 +176,4 @@ function PlaceAutocomplete({ ref, onChange, label, autoFocus = true }: Props) {
   );
 }
 
-export default memo(PlaceAutocomplete);
+export default PlaceAutocomplete;

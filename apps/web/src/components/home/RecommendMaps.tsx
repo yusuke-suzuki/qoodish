@@ -1,6 +1,5 @@
 import { Box, Button, Typography } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
@@ -36,4 +35,4 @@ function RecommendMaps({ maps }: Props) {
   );
 }
 
-export default memo(RecommendMaps);
+export default RecommendMaps;

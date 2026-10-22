@@ -15,9 +15,7 @@ import Link from 'next/link';
 import { enqueueSnackbar } from 'notistack';
 import {
   type ChangeEvent,
-  memo,
   useActionState,
-  useCallback,
   useContext,
   useId,
   useState
@@ -108,22 +106,22 @@ function ReportDialog({
     null
   );
 
-  const handleCategoryChange = useCallback(
-    (_event: ChangeEvent<HTMLInputElement>, value: string) => {
-      setCategory(value as ReportCategory);
-    },
-    []
-  );
+  const handleCategoryChange = (
+    _event: ChangeEvent<HTMLInputElement>,
+    value: string
+  ) => {
+    setCategory(value as ReportCategory);
+  };
 
-  const handleExited = useCallback(() => {
+  const handleExited = () => {
     setCategory(null);
     setDetails('');
-  }, []);
+  };
 
-  const handleSignIn = useCallback(() => {
+  const handleSignIn = () => {
     onClose();
     setSignInRequired(true);
-  }, [onClose, setSignInRequired]);
+  };
 
   const termsLink = (
     <Typography variant="caption" color="text.secondary">
@@ -227,4 +225,4 @@ function ReportDialog({
   );
 }
 
-export default memo(ReportDialog);
+export default ReportDialog;

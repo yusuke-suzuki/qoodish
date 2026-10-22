@@ -5,7 +5,7 @@ import {
   ListItemText,
   Typography
 } from '@mui/material';
-import { memo, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { AutocompleteOption } from '../../../types/index.ts';
 import { highlightMatches } from '../../utils/highlightMatches.ts';
 
@@ -17,7 +17,7 @@ type Props = {
   secondary?: string | null;
 };
 
-export default memo(function AutocompleteListItem({
+export default function AutocompleteListItem({
   option,
   inputValue,
   onClick,
@@ -55,4 +55,4 @@ export default memo(function AutocompleteListItem({
       </ListItemButton>
     </ListItem>
   );
-});
+}

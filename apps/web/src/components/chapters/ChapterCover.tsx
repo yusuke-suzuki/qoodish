@@ -10,13 +10,7 @@ import {
   Typography
 } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  type ChangeEvent,
-  memo,
-  useCallback,
-  useEffect,
-  useState
-} from 'react';
+import { type ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import type { ImageVariants } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import uploadImage, {
@@ -54,39 +48,40 @@ function ChapterCover({ image, editable, onChange, onSavingChange }: Props) {
   const dictionary = useDictionary();
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    onSavingChange?.(saving);
-  }, [saving, onSavingChange]);
-
-  const handleInputChange = useCallback(
-    async (event: ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      event.target.value = '';
-
-      if (!file) {
-        return;
-      }
-
-      if (file.size > MAX_IMAGE_FILE_SIZE) {
-        enqueueSnackbar(dictionary['image too large'], { variant: 'error' });
-        return;
-      }
-
-      setSaving(true);
-
-      try {
-        const uploaded = await uploadImage(file);
-        await onChange?.([uploaded.id]);
-      } catch (error) {
-        enqueueSnackbar(uploadFailureMessage(error, dictionary), {
-          variant: 'error'
-        });
-      } finally {
-        setSaving(false);
-      }
-    },
-    [onChange, dictionary]
+  const notifySavingChange = useEffectEvent((value: boolean) =>
+    onSavingChange?.(value)
   );
+
+  useEffect(() => {
+    notifySavingChange(saving);
+  }, [saving]);
+
+  const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_FILE_SIZE) {
+      enqueueSnackbar(dictionary['image too large'], { variant: 'error' });
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const uploaded = await uploadImage(file);
+      await onChange?.([uploaded.id]);
+    } catch (error) {
+      enqueueSnackbar(uploadFailureMessage(error, dictionary), {
+        variant: 'error'
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleRemove = async () => {
     setSaving(true);
@@ -175,4 +170,4 @@ function ChapterCover({ image, editable, onChange, onSavingChange }: Props) {
   );
 }
 
-export default memo(ChapterCover);
+export default ChapterCover;

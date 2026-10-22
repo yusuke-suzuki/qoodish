@@ -1,6 +1,6 @@
 import { Check, HistoryEdu, LocationOff } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from '../common/AppDialog.tsx';
 
@@ -10,7 +10,7 @@ type Props = {
   onEnd: () => void | Promise<void>;
 };
 
-export default memo(function EndJourneyDialog({ open, onClose, onEnd }: Props) {
+export default function EndJourneyDialog({ open, onClose, onEnd }: Props) {
   const dictionary = useDictionary();
 
   const [loading, setLoading] = useState(false);
@@ -72,4 +72,4 @@ export default memo(function EndJourneyDialog({ open, onClose, onEnd }: Props) {
       </List>
     </AppDialog>
   );
-});
+}

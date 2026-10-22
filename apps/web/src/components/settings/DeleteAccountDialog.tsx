@@ -1,5 +1,4 @@
 import { enqueueSnackbar } from 'notistack';
-import { memo, useCallback } from 'react';
 import { deleteAccount } from '../../actions/users.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
@@ -23,7 +22,7 @@ function DeleteAccountDialogContent({
 }: ContentProps) {
   const dictionary = useDictionary();
 
-  const handleConfirm = useCallback(async () => {
+  const handleConfirm = async () => {
     try {
       const result = await deleteAccount(userId);
 
@@ -43,7 +42,7 @@ function DeleteAccountDialogContent({
     } catch (_error) {
       enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
     }
-  }, [dictionary, onClose, onDeleted, userId]);
+  };
 
   return (
     <ConfirmDeleteDialog
@@ -56,7 +55,7 @@ function DeleteAccountDialogContent({
   );
 }
 
-export default memo(function DeleteAccountDialog(props: Props) {
+export default function DeleteAccountDialog(props: Props) {
   return (
     <ProfileBoundary>
       {(profile) => (
@@ -64,4 +63,4 @@ export default memo(function DeleteAccountDialog(props: Props) {
       )}
     </ProfileBoundary>
   );
-});
+}

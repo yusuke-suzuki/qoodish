@@ -1,5 +1,5 @@
 import { Box, Paper, Stack, useMediaQuery, useTheme } from '@mui/material';
-import { memo, type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
 import CurrentPositionButton from './CurrentPositionButton.tsx';
@@ -100,4 +100,4 @@ function CustomMapControls({ filter, onPlaceChange }: Props) {
   );
 }
 
-export default memo(CustomMapControls);
+export default CustomMapControls;

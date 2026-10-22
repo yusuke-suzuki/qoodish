@@ -1,6 +1,5 @@
 import { Divider, Link as MuiLink, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import SignInWithEmailLinkButton from './SignInWithEmailLinkButton.tsx';
@@ -67,4 +66,4 @@ function SignInButtons({ onSignInSuccess }: Props) {
   );
 }
 
-export default memo(SignInButtons);
+export default SignInButtons;

@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import ConfirmDialog from '../common/ConfirmDialog.tsx';
 
@@ -29,4 +28,4 @@ function UnlinkProviderDialog({ open, onClose, onUnlink }: Props) {
   );
 }
 
-export default memo(UnlinkProviderDialog);
+export default UnlinkProviderDialog;

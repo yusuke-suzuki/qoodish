@@ -3,7 +3,6 @@
 import { HistoryEdu } from '@mui/icons-material';
 import { Box, CardActionArea, CardMedia, Typography } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { Chapter } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
@@ -14,7 +13,7 @@ type Props = {
 
 const THUMBNAIL_SIZE = { xs: 80, sm: 100 };
 
-export default memo(function ChapterCard({ chapter }: Props) {
+export default function ChapterCard({ chapter }: Props) {
   const dictionary = useDictionary();
   const localePath = useLocalePath();
 
@@ -93,4 +92,4 @@ export default memo(function ChapterCard({ chapter }: Props) {
       )}
     </CardActionArea>
   );
-});
+}

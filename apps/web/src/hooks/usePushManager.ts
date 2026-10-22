@@ -1,5 +1,5 @@
 import { getMessaging, getToken } from 'firebase/messaging';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useEffectEvent, useState } from 'react';
 import { registerDevice, unregisterDevice } from '../actions/devices.ts';
 import AuthContext from '../context/AuthContext.ts';
 
@@ -15,19 +15,21 @@ export function usePushManager(registration: ServiceWorkerRegistration | null) {
     null
   );
 
+  const registerSignOutCleanup = useEffectEvent(addSignOutCleanup);
+
   useEffect(() => {
     if (!registrationToken) {
       return;
     }
 
-    return addSignOutCleanup(async () => {
+    return registerSignOutCleanup(async () => {
       const { success, error } = await unregisterDevice(registrationToken);
 
       if (!success) {
         console.error('Failed to remove registration token', error);
       }
     });
-  }, [registrationToken, addSignOutCleanup]);
+  }, [registrationToken]);
 
   const subscribe = async () => {
     if (!registration) {

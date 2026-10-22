@@ -18,7 +18,7 @@ import {
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { type MouseEvent, memo, useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 import type { Chapter } from '../../../types/index.ts';
 import { deleteChapter } from '../../actions/chapters.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -225,4 +225,4 @@ function UserChapters({ chapters: initialChapters }: { chapters: Chapter[] }) {
   );
 }
 
-export default memo(UserChapters);
+export default UserChapters;

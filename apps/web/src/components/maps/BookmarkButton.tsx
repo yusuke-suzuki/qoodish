@@ -1,7 +1,7 @@
 import { BookmarkBorder } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useCallback, useContext, useState, useTransition } from 'react';
+import { useContext, useState, useTransition } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import { bookmarkMap } from '../../actions/mapBookmarks.ts';
 import AuthContext from '../../context/AuthContext.ts';
@@ -19,7 +19,7 @@ function BookmarkButton({ map, onSaved }: Props) {
   const [bookmarking, setBookmarking] = useState(map?.bookmarking ?? false);
   const [isPending, startTransition] = useTransition();
 
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
     if (!map) {
       return;
     }
@@ -50,7 +50,7 @@ function BookmarkButton({ map, onSaved }: Props) {
         enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
       }
     });
-  }, [map, authenticated, setSignInRequired, dictionary, onSaved]);
+  };
 
   return (
     <Button
@@ -68,4 +68,4 @@ function BookmarkButton({ map, onSaved }: Props) {
   );
 }
 
-export default memo(BookmarkButton);
+export default BookmarkButton;

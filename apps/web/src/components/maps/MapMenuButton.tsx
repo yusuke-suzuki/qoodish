@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { AppMap, Profile } from '../../../types/index.ts';
 import useBlock from '../../hooks/useBlock.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -40,7 +40,7 @@ type Props = {
   onRecordPastJourneyClick: () => void;
 };
 
-export default memo(function MapMenuButton({
+export default function MapMenuButton({
   map,
   currentProfile,
   onEditClick,
@@ -269,4 +269,4 @@ export default memo(function MapMenuButton({
       />
     </>
   );
-});
+}

@@ -10,7 +10,7 @@ import {
   MenuItem
 } from '@mui/material';
 import Link from 'next/link';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocaleLinks from '../../hooks/useLocaleLinks.ts';
 
@@ -20,7 +20,7 @@ type Props = {
   onNavigate?: () => void;
 };
 
-export default memo(function LocaleMenuButton({ variant, onNavigate }: Props) {
+export default function LocaleMenuButton({ variant, onNavigate }: Props) {
   const dictionary = useDictionary();
   const links = useLocaleLinks();
 
@@ -79,4 +79,4 @@ export default memo(function LocaleMenuButton({ variant, onNavigate }: Props) {
       </Menu>
     </>
   );
-});
+}

@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 type Props = {
@@ -61,4 +61,4 @@ function EmailField({ value, onChange, disabled }: Props) {
   );
 }
 
-export default memo(EmailField);
+export default EmailField;

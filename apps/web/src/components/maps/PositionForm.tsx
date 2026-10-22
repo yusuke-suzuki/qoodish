@@ -1,6 +1,6 @@
 import { Done, Edit } from '@mui/icons-material';
 import { Box, Button, Chip, Stack } from '@mui/material';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import CoodinatesConverter from './CoodinatesConverter.tsx';
 import GoogleMaps from './GoogleMaps.tsx';
@@ -29,11 +29,15 @@ function PositionForm({ onChange, defaultValue }: Props) {
     setEditPosition(false);
   };
 
+  const notifyChange = useEffectEvent(onChange);
+  const defaultLat = defaultValue?.lat;
+  const defaultLng = defaultValue?.lng;
+
   useEffect(() => {
-    if (!saved && defaultValue) {
-      onChange(defaultValue);
+    if (!saved && defaultLat !== undefined && defaultLng !== undefined) {
+      notifyChange({ lat: defaultLat, lng: defaultLng });
     }
-  }, [saved, defaultValue, onChange]);
+  }, [saved, defaultLat, defaultLng]);
 
   return editPosition ? (
     <Stack spacing={1}>
@@ -106,4 +110,4 @@ function PositionForm({ onChange, defaultValue }: Props) {
   );
 }
 
-export default memo(PositionForm);
+export default PositionForm;

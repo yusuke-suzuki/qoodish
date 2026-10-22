@@ -3,7 +3,7 @@
 import { Reviews } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import { fetchMoreTimelinePins } from '../../actions/pins.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -28,7 +28,7 @@ type ReportTarget = {
 
 const skeletonKeys = ['skeleton-1', 'skeleton-2'];
 
-export default memo(function Timeline({ initialPins, nextCursor }: Props) {
+export default function Timeline({ initialPins, nextCursor }: Props) {
   const dictionary = useDictionary();
 
   const [pins, setPins] = useState(initialPins);
@@ -127,4 +127,4 @@ export default memo(function Timeline({ initialPins, nextCursor }: Props) {
       />
     </>
   );
-});
+}

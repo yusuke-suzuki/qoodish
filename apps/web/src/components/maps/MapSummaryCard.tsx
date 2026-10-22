@@ -9,7 +9,6 @@ import {
   Skeleton,
   Typography
 } from '@mui/material';
-import { memo } from 'react';
 import type {
   AppMap,
   Chapter,
@@ -41,7 +40,7 @@ type Props = {
   onSaved: () => void;
 };
 
-export default memo(function MapSummaryCard({
+export default function MapSummaryCard({
   map,
   pins,
   coauthors,
@@ -154,4 +153,4 @@ export default memo(function MapSummaryCard({
       <MapDetailTabs pins={pins} chapters={chapters} />
     </Card>
   );
-});
+}

@@ -1,5 +1,4 @@
 import { enqueueSnackbar } from 'notistack';
-import { memo, useCallback } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import { deleteMap } from '../../actions/maps.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -15,7 +14,7 @@ type Props = {
 const DeleteMapDialog = ({ map, open, onClose, onDeleted }: Props) => {
   const dictionary = useDictionary();
 
-  const handleConfirm = useCallback(async () => {
+  const handleConfirm = async () => {
     if (!map) {
       enqueueSnackbar(dictionary['delete map failed'], { variant: 'error' });
       return;
@@ -40,7 +39,7 @@ const DeleteMapDialog = ({ map, open, onClose, onDeleted }: Props) => {
     } catch (_error) {
       enqueueSnackbar(dictionary['delete map failed'], { variant: 'error' });
     }
-  }, [map, dictionary, onClose, onDeleted]);
+  };
 
   return (
     <ConfirmDeleteDialog
@@ -53,4 +52,4 @@ const DeleteMapDialog = ({ map, open, onClose, onDeleted }: Props) => {
   );
 };
 
-export default memo(DeleteMapDialog);
+export default DeleteMapDialog;

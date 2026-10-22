@@ -15,7 +15,7 @@ import {
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { type ReactNode, useContext, useMemo, useState } from 'react';
+import { type ReactNode, useContext, useState } from 'react';
 import type {
   AppMap,
   Chapter,
@@ -85,10 +85,7 @@ export default function ChapterReadView({
 
   const markerSpots = featureSpots(chapter.map_features);
 
-  const subject = useMemo<ContentRef>(
-    () => ({ type: 'chapter', id: chapter.id }),
-    [chapter.id]
-  );
+  const subject: ContentRef = { type: 'chapter', id: chapter.id };
 
   const mapCenter = map
     ? { latitude: map.latitude, longitude: map.longitude }

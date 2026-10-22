@@ -10,13 +10,7 @@ import {
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import type { Serwist } from '@serwist/window';
 import { closeSnackbar, enqueueSnackbar, SnackbarProvider } from 'notistack';
-import {
-  type ReactNode,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useState
-} from 'react';
+import { type ReactNode, useEffect, useEffectEvent, useState } from 'react';
 import type {
   CursorPage,
   Notification,
@@ -78,9 +72,9 @@ export default function Providers({
 
   usePushManager(registration);
 
-  const serviceWorkerValue = useMemo(() => ({ registration }), [registration]);
+  const serviceWorkerValue = { registration };
 
-  const theme = useMemo(() => createAppTheme(lang), [lang]);
+  const theme = createAppTheme(lang);
 
   const offerUpdate = useEffectEvent((activateUpdate: () => void) => {
     enqueueSnackbar(dictionary['new version available'], {

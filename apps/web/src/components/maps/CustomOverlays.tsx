@@ -1,7 +1,6 @@
 import { useMediaQuery, useTheme } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  memo,
   type ReactNode,
   type RefObject,
   useEffect,
@@ -286,4 +285,4 @@ function CustomOverlays({
   );
 }
 
-export default memo(CustomOverlays);
+export default CustomOverlays;

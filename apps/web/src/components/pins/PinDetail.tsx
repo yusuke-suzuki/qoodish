@@ -4,7 +4,7 @@ import { KeyboardArrowLeft } from '@mui/icons-material';
 import { Box, Button, Card, CardContent, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type {
   AppMap,
   ContentRef,
@@ -39,10 +39,7 @@ export default function PinDetail({ pin, map, pinProperties }: Props) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const subject = useMemo<ContentRef>(
-    () => ({ type: 'pin', id: pin.id }),
-    [pin.id]
-  );
+  const subject: ContentRef = { type: 'pin', id: pin.id };
 
   return (
     <>

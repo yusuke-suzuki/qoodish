@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { type ChangeEvent, memo, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 const MAX_LENGTH = 30;
@@ -33,9 +33,11 @@ function ProfileNameForm({ onChange, defaultValue }: Props) {
     setName(input);
   };
 
+  const notifyChange = useEffectEvent(onChange);
+
   useEffect(() => {
-    onChange(name);
-  }, [name, onChange]);
+    notifyChange(name);
+  }, [name]);
 
   return (
     <TextField
@@ -51,4 +53,4 @@ function ProfileNameForm({ onChange, defaultValue }: Props) {
   );
 }
 
-export default memo(ProfileNameForm);
+export default ProfileNameForm;

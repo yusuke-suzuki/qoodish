@@ -1,7 +1,6 @@
 'use client';
 
 import { Divider, Paper, Stack } from '@mui/material';
-import { memo } from 'react';
 import type { Chapter } from '../../../types/index.ts';
 import ChapterCard from './ChapterCard.tsx';
 
@@ -21,4 +20,4 @@ function ChapterList({ chapters }: Props) {
   );
 }
 
-export default memo(ChapterList);
+export default ChapterList;

@@ -1,7 +1,6 @@
 'use client';
 
 import { Grid, Skeleton } from '@mui/material';
-import { memo } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import PinCard from './PinCard.tsx';
 
@@ -45,4 +44,4 @@ function PinGridList({ pins, loading }: Props) {
   );
 }
 
-export default memo(PinGridList);
+export default PinGridList;

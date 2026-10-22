@@ -3,14 +3,7 @@
 import { Favorite, FavoriteBorder, Link } from '@mui/icons-material';
 import { Box, Checkbox, IconButton, Tooltip } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  type ChangeEvent,
-  memo,
-  useCallback,
-  useContext,
-  useState,
-  useTransition
-} from 'react';
+import { type ChangeEvent, useContext, useState, useTransition } from 'react';
 import type { Chapter } from '../../../types/index.ts';
 import { likeChapter, unlikeChapter } from '../../actions/chapterLikes.ts';
 import AuthContext from '../../context/AuthContext.ts';
@@ -27,49 +20,46 @@ function ChapterActions({ chapter }: Props) {
   const [liked, setLiked] = useState(chapter.liked);
   const [isPending, startTransition] = useTransition();
 
-  const handleLikeChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      if (!authenticated) {
-        setSignInRequired(true);
-        return;
-      }
+  const handleLikeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!authenticated) {
+      setSignInRequired(true);
+      return;
+    }
 
-      const next = event.target.checked;
-      setLiked(next);
+    const next = event.target.checked;
+    setLiked(next);
 
-      startTransition(async () => {
-        try {
-          const result = next
-            ? await likeChapter(chapter.id)
-            : await unlikeChapter(chapter.id);
+    startTransition(async () => {
+      try {
+        const result = next
+          ? await likeChapter(chapter.id)
+          : await unlikeChapter(chapter.id);
 
-          if (result.success) {
-            enqueueSnackbar(dictionary[next ? 'liked!' : 'unliked'], {
-              variant: 'info'
-            });
-          } else {
-            setLiked(!next);
-            enqueueSnackbar(result.error, { variant: 'error' });
-          }
-        } catch (_error) {
-          setLiked(!next);
-          enqueueSnackbar(dictionary['an error occurred'], {
-            variant: 'error'
+        if (result.success) {
+          enqueueSnackbar(dictionary[next ? 'liked!' : 'unliked'], {
+            variant: 'info'
           });
+        } else {
+          setLiked(!next);
+          enqueueSnackbar(result.error, { variant: 'error' });
         }
-      });
-    },
-    [authenticated, chapter.id, setSignInRequired, dictionary]
-  );
+      } catch (_error) {
+        setLiked(!next);
+        enqueueSnackbar(dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      }
+    });
+  };
 
-  const handleCopyLink = useCallback(async () => {
+  const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       enqueueSnackbar(dictionary['link copied'], { variant: 'info' });
     } catch (_error) {
       enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
     }
-  }, [dictionary]);
+  };
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -104,4 +94,4 @@ function ChapterActions({ chapter }: Props) {
   );
 }
 
-export default memo(ChapterActions);
+export default ChapterActions;

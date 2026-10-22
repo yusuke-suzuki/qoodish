@@ -9,7 +9,7 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-import { type ElementType, Fragment, memo } from 'react';
+import { type ElementType, Fragment } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { PHOTOS, type Photo } from '../../utils/photos.ts';
 import LandingSection from './LandingSection.tsx';
@@ -42,7 +42,7 @@ const FEATURES: Feature[] = [
   }
 ];
 
-export default memo(function LandingFeatures() {
+export default function LandingFeatures() {
   const dictionary = useDictionary();
 
   return (
@@ -111,4 +111,4 @@ export default memo(function LandingFeatures() {
       ))}
     </>
   );
-});
+}

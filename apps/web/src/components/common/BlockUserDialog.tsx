@@ -2,7 +2,6 @@
 
 import { Block } from '@mui/icons-material';
 import { List, ListItem, ListItemText } from '@mui/material';
-import { memo } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from './AppDialog.tsx';
 
@@ -52,4 +51,4 @@ function BlockUserDialog({ open, loading, onClose, onConfirm }: Props) {
   );
 }
 
-export default memo(BlockUserDialog);
+export default BlockUserDialog;

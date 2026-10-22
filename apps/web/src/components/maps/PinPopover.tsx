@@ -7,7 +7,7 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import type { AppMap, Pin, PinProperty } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
@@ -141,4 +141,4 @@ function PinPopover({
   );
 }
 
-export default memo(PinPopover);
+export default PinPopover;

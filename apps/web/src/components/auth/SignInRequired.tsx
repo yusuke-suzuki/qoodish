@@ -10,7 +10,7 @@ import {
   CircularProgress,
   Typography
 } from '@mui/material';
-import { memo, useContext } from 'react';
+import { useContext } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import LoadingStatus from '../common/LoadingStatus.tsx';
@@ -62,4 +62,4 @@ function SignInRequired({ title }: Props) {
   );
 }
 
-export default memo(SignInRequired);
+export default SignInRequired;

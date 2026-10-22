@@ -2,11 +2,9 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { Box, type SxProps, useMediaQuery, useTheme } from '@mui/material';
 import { useParams } from 'next/navigation';
 import {
-  memo,
   type ReactNode,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState
 } from 'react';
@@ -158,11 +156,14 @@ function GoogleMaps({
     };
   }, []);
 
+  const centerLat = center?.lat;
+  const centerLng = center?.lng;
+
   useEffect(() => {
-    if (googleMap && center) {
-      googleMap.panTo(center);
+    if (googleMap && centerLat !== undefined && centerLng !== undefined) {
+      googleMap.panTo({ lat: centerLat, lng: centerLng });
     }
-  }, [googleMap, center]);
+  }, [googleMap, centerLat, centerLng]);
 
   useEffect(() => {
     if (googleMap && zoom) {
@@ -170,15 +171,12 @@ function GoogleMaps({
     }
   }, [googleMap, zoom]);
 
-  const contextValue = useMemo(
-    () => ({
-      googleMap,
-      loader,
-      currentPosition,
-      setCurrentPosition
-    }),
-    [googleMap, loader, currentPosition]
-  );
+  const contextValue = {
+    googleMap,
+    loader,
+    currentPosition,
+    setCurrentPosition
+  };
 
   return (
     <Box>
@@ -191,4 +189,4 @@ function GoogleMaps({
   );
 }
 
-export default memo(GoogleMaps);
+export default GoogleMaps;

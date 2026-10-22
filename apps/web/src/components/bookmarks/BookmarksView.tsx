@@ -2,7 +2,7 @@
 
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Card, Tab } from '@mui/material';
-import { memo, type SyntheticEvent, useState } from 'react';
+import { type SyntheticEvent, useState } from 'react';
 import type { AppMap, Journal } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import UserBookmarks from '../profiles/UserBookmarks.tsx';
@@ -43,4 +43,4 @@ function BookmarksView({ maps, journals }: Props) {
   );
 }
 
-export default memo(BookmarksView);
+export default BookmarksView;

@@ -14,13 +14,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import {
-  type ChangeEvent,
-  memo,
-  useCallback,
-  useContext,
-  useState
-} from 'react';
+import { type ChangeEvent, useContext, useState } from 'react';
 import type { Profile } from '../../../types/index.ts';
 import { updatePreferences } from '../../actions/users.ts';
 import ServiceWorkerContext from '../../context/ServiceWorkerContext.ts';
@@ -65,36 +59,36 @@ function PushNotificationsCardContent({
     }
   }
 
-  const handleSubscriptionChange = useCallback(
-    async (_event: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      try {
-        if (checked) {
-          const permission = await Notification.requestPermission();
+  const handleSubscriptionChange = async (
+    _event: ChangeEvent<HTMLInputElement>,
+    checked: boolean
+  ) => {
+    try {
+      if (checked) {
+        const permission = await Notification.requestPermission();
 
-          if (permission === 'granted') {
-            await subscribe();
+        if (permission === 'granted') {
+          await subscribe();
 
-            enqueueSnackbar(dictionary['push enabled'], { variant: 'success' });
-          } else {
-            enqueueSnackbar(dictionary['push denied'], { variant: 'error' });
-          }
-        } else if (await unsubscribe()) {
-          enqueueSnackbar(dictionary['push disabled'], { variant: 'success' });
+          enqueueSnackbar(dictionary['push enabled'], { variant: 'success' });
         } else {
-          enqueueSnackbar(dictionary['an error occurred'], {
-            variant: 'error'
-          });
+          enqueueSnackbar(dictionary['push denied'], { variant: 'error' });
         }
-      } catch (error) {
-        console.error('Failed to change push subscription', error);
-
-        enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
+      } else if (await unsubscribe()) {
+        enqueueSnackbar(dictionary['push disabled'], { variant: 'success' });
+      } else {
+        enqueueSnackbar(dictionary['an error occurred'], {
+          variant: 'error'
+        });
       }
-    },
-    [subscribe, unsubscribe, dictionary]
-  );
+    } catch (error) {
+      console.error('Failed to change push subscription', error);
 
-  const handleSave = useCallback(async () => {
+      enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
+    }
+  };
+
+  const handleSave = async () => {
     setLoading(true);
 
     try {
@@ -121,14 +115,7 @@ function PushNotificationsCardContent({
     } finally {
       setLoading(false);
     }
-  }, [
-    likedEnabled,
-    coauthorInvitedEnabled,
-    commentEnabled,
-    publishedEnabled,
-    dictionary,
-    router
-  ]);
+  };
 
   return (
     <Card>
@@ -241,10 +228,10 @@ function PushNotificationsCardContent({
   );
 }
 
-export default memo(function PushNotificationsCard() {
+export default function PushNotificationsCard() {
   return (
     <ProfileBoundary>
       {(profile) => <PushNotificationsCardContent profile={profile} />}
     </ProfileBoundary>
   );
-});
+}

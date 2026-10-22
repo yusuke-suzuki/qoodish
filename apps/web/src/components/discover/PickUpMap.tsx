@@ -9,7 +9,6 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import MediaPlaceholder from '../common/MediaPlaceholder.tsx';
@@ -75,4 +74,4 @@ function PickUpMap({ map }: Props) {
   );
 }
 
-export default memo(PickUpMap);
+export default PickUpMap;

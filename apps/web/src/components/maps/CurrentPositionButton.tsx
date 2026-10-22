@@ -1,6 +1,6 @@
 import { LocationSearching, MyLocation } from '@mui/icons-material';
 import { CircularProgress, IconButton } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
 
@@ -79,4 +79,4 @@ function CurrentPositionButton() {
   );
 }
 
-export default memo(CurrentPositionButton);
+export default CurrentPositionButton;

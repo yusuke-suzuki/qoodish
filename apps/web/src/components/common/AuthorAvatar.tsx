@@ -1,6 +1,5 @@
 import { Avatar, Link as MuiLink, type SxProps } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { UserSummary } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 
@@ -9,7 +8,7 @@ type Props = {
   sx?: SxProps;
 };
 
-export default memo(function AuthorAvatar({ author, sx }: Props) {
+export default function AuthorAvatar({ author, sx }: Props) {
   const localePath = useLocalePath();
 
   return (
@@ -31,4 +30,4 @@ export default memo(function AuthorAvatar({ author, sx }: Props) {
       />
     </MuiLink>
   );
-});
+}

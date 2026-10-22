@@ -8,7 +8,6 @@ import {
   Link as MuiLink
 } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { BlockedAccount } from '../../../types/index.ts';
 import useBlock from '../../hooks/useBlock.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -70,4 +69,4 @@ function BlockedAccountItem({ account, onUnblocked }: Props) {
   );
 }
 
-export default memo(BlockedAccountItem);
+export default BlockedAccountItem;

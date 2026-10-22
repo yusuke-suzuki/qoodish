@@ -8,7 +8,6 @@ import {
   ListItemText
 } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
-import { memo } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AuthorAvatar from '../common/AuthorAvatar.tsx';
@@ -91,4 +90,4 @@ function MapPinList({ pins, onPinClick }: Props) {
   );
 }
 
-export default memo(MapPinList);
+export default MapPinList;

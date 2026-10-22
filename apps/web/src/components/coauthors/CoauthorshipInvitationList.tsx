@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { CoauthorshipInvitation } from '../../../types/index.ts';
 import {
   acceptCoauthorshipInvitation,
@@ -125,4 +125,4 @@ function CoauthorshipInvitationList({ invitations }: Props) {
   );
 }
 
-export default memo(CoauthorshipInvitationList);
+export default CoauthorshipInvitationList;

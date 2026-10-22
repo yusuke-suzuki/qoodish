@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
 
 type Props = {
@@ -6,7 +6,7 @@ type Props = {
   onLatLngChanged: (center: google.maps.LatLngLiteral) => void;
 };
 
-export default memo(function DraggableMarker({
+export default function DraggableMarker({
   defaultPosition,
   onLatLngChanged
 }: Props) {
@@ -20,7 +20,7 @@ export default memo(function DraggableMarker({
   );
   const [ready, setReady] = useState(false);
 
-  const handleDragEnd = useCallback(
+  const handleDragEnd = useEffectEvent(
     ({ latLng }: google.maps.MapMouseEvent) => {
       if (!latLng) {
         return;
@@ -30,8 +30,7 @@ export default memo(function DraggableMarker({
         lat: latLng.lat(),
         lng: latLng.lng()
       });
-    },
-    [onLatLngChanged]
+    }
   );
 
   useEffect(() => {
@@ -78,12 +77,15 @@ export default memo(function DraggableMarker({
       return;
     }
 
-    const listener = marker.addListener('dragend', handleDragEnd);
+    const listener = marker.addListener(
+      'dragend',
+      (event: google.maps.MapMouseEvent) => handleDragEnd(event)
+    );
 
     return () => {
       listener.remove();
     };
-  }, [ready, handleDragEnd]);
+  }, [ready]);
 
   useEffect(() => {
     const marker = markerRef.current;
@@ -96,4 +98,4 @@ export default memo(function DraggableMarker({
   }, [ready, defaultPosition]);
 
   return null;
-});
+}

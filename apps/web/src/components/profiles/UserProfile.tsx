@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {
-  memo,
   type SyntheticEvent,
   startTransition,
   useContext,
@@ -292,4 +291,4 @@ function UserProfile({
   );
 }
 
-export default memo(UserProfile);
+export default UserProfile;

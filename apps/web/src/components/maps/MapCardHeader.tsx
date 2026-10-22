@@ -5,7 +5,7 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import useRelativeTime from '../../hooks/useRelativeTime.ts';
@@ -58,4 +58,4 @@ function MapCardHeader({ map, action }: Props) {
   );
 }
 
-export default memo(MapCardHeader);
+export default MapCardHeader;

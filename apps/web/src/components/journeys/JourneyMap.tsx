@@ -2,7 +2,7 @@
 
 import { Flag, Place } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import { memo, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { JourneyPathPoint, Spot } from '../../../types/index.ts';
 import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
 import { footprintIcons } from '../../utils/journeyTrailIcons.ts';
@@ -16,7 +16,7 @@ const markerVariants = {
   milestone: { Icon: Flag, color: 'primary.main' }
 } as const;
 
-const JourneySpotMarker = memo(function JourneySpotMarker({
+function JourneySpotMarker({
   spot,
   variant
 }: {
@@ -72,7 +72,7 @@ const JourneySpotMarker = memo(function JourneySpotMarker({
       </Tooltip>
     </MarkerView>
   );
-});
+}
 
 type OverlayProps = {
   spots: Spot[];
@@ -81,7 +81,7 @@ type OverlayProps = {
   fallbackCenter?: JourneyPathPoint;
 };
 
-const JourneyMapOverlay = memo(function JourneyMapOverlay({
+function JourneyMapOverlay({
   spots,
   milestones,
   path,
@@ -220,7 +220,7 @@ const JourneyMapOverlay = memo(function JourneyMapOverlay({
       ))}
     </>
   );
-});
+}
 
 type Props = {
   spots: Spot[];
@@ -259,4 +259,4 @@ function JourneyMap({
   );
 }
 
-export default memo(JourneyMap);
+export default JourneyMap;

@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { memo, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import ShellContext from '../../context/ShellContext.tsx';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -177,7 +177,7 @@ function TopBarContent() {
   );
 }
 
-export default memo(function TopBar() {
+export default function TopBar() {
   const pathname = usePathname();
 
   // The bar lives in the persistent root layout, so useScrollTrigger keeps its
@@ -185,4 +185,4 @@ export default memo(function TopBar() {
   // scroll event. Remount on path change so the scroll state reflects the new
   // page (scrolled to top) instead of staying hidden.
   return <TopBarContent key={pathname} />;
-});
+}

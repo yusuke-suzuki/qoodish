@@ -4,7 +4,7 @@ import { HistoryEdu } from '@mui/icons-material';
 import { Button, Stack } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { Chapter } from '../../../types/index.ts';
 import { fetchMoreChapterFeed } from '../../actions/chapters.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -18,10 +18,7 @@ type Props = {
   nextCursor: string | null;
 };
 
-export default memo(function ChapterFeed({
-  initialChapters,
-  nextCursor
-}: Props) {
+export default function ChapterFeed({ initialChapters, nextCursor }: Props) {
   const dictionary = useDictionary();
   const { lang } = useParams<{ lang: string }>();
 
@@ -73,4 +70,4 @@ export default memo(function ChapterFeed({
       </Stack>
     </>
   );
-});
+}

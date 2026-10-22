@@ -1,7 +1,7 @@
 'use client';
 
 import { Avatar, AvatarGroup, ButtonBase } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import type { AppMap, Coauthor, Profile } from '../../../types/index.ts';
 import CoauthorsDialog from './CoauthorsDialog.tsx';
 
@@ -54,4 +54,4 @@ function Coauthors({ coauthors, map, currentProfile }: Props) {
   );
 }
 
-export default memo(Coauthors);
+export default Coauthors;

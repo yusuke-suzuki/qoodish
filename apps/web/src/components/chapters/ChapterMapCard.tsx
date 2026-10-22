@@ -9,7 +9,7 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { AppMap, JourneyPathPoint, Spot } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import JourneyMap from '../journeys/JourneyMap.tsx';
@@ -88,4 +88,4 @@ function ChapterMapCard({
   );
 }
 
-export default memo(ChapterMapCard);
+export default ChapterMapCard;

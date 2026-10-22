@@ -2,7 +2,7 @@
 
 import { Box, Button, Typography } from '@mui/material';
 import Link from 'next/link';
-import { memo, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 type Props = {
   icon: ReactNode;
@@ -11,7 +11,7 @@ type Props = {
   linkLabel: string;
 };
 
-export default memo(function SectionHeading({
+export default function SectionHeading({
   icon,
   title,
   href,
@@ -28,4 +28,4 @@ export default memo(function SectionHeading({
       </Button>
     </Box>
   );
-});
+}

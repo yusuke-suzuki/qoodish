@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { JourneyPathPoint } from '../../../types/index.ts';
 import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
 import { footprintIcons } from '../../utils/journeyTrailIcons.ts';
@@ -76,4 +76,4 @@ function JourneyOverlay({ position, path }: Props) {
   return null;
 }
 
-export default memo(JourneyOverlay);
+export default JourneyOverlay;

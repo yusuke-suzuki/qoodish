@@ -8,7 +8,7 @@ import {
   verifyBeforeUpdateEmail
 } from 'firebase/auth';
 import { useParams } from 'next/navigation';
-import { memo, useCallback, useContext, useMemo, useState } from 'react';
+import { useContext, useState } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog, { type ConfirmAction } from '../common/AppDialog.tsx';
@@ -33,34 +33,31 @@ function ChangeEmailDialog({ open, onClose }: Props) {
   const [reauthStep, setReauthStep] = useState<ReauthStep>('idle');
   const [error, setError] = useState<string | null>(null);
 
-  const handleEmailChange = useCallback((value: string, isValid: boolean) => {
+  const handleEmailChange = (value: string, isValid: boolean) => {
     setEmail(value);
     setEmailValid(isValid);
-  }, []);
+  };
 
-  const getErrorMessage = useCallback(
-    (errorCode: string): string => {
-      switch (errorCode) {
-        case 'auth/invalid-email':
-          return dictionary['change email error invalid email'];
-        case 'auth/requires-recent-login':
-          return dictionary['change email error requires recent login'];
-        case 'auth/email-already-in-use':
-          return dictionary['change email error email already in use'];
-        case 'auth/too-many-requests':
-          return dictionary['email link error too many requests'];
-        case 'auth/network-request-failed':
-          return dictionary['email link error network request failed'];
-        default:
-          return dictionary['an error occurred'];
-      }
-    },
-    [dictionary]
-  );
+  const getErrorMessage = (errorCode: string): string => {
+    switch (errorCode) {
+      case 'auth/invalid-email':
+        return dictionary['change email error invalid email'];
+      case 'auth/requires-recent-login':
+        return dictionary['change email error requires recent login'];
+      case 'auth/email-already-in-use':
+        return dictionary['change email error email already in use'];
+      case 'auth/too-many-requests':
+        return dictionary['email link error too many requests'];
+      case 'auth/network-request-failed':
+        return dictionary['email link error network request failed'];
+      default:
+        return dictionary['an error occurred'];
+    }
+  };
 
   const basePath = `/${lang ?? 'en'}`;
 
-  const attemptEmailUpdate = useCallback(async () => {
+  const attemptEmailUpdate = async () => {
     const firebaseUser = getAuth().currentUser;
     if (!firebaseUser) return;
 
@@ -72,9 +69,9 @@ function ChangeEmailDialog({ open, onClose }: Props) {
       handleCodeInApp: false
     });
     setSent(true);
-  }, [email, lang, basePath]);
+  };
 
-  const handleSend = useCallback(async () => {
+  const handleSend = async () => {
     setLoading(true);
     setError(null);
 
@@ -94,9 +91,9 @@ function ChangeEmailDialog({ open, onClose }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [attemptEmailUpdate, getErrorMessage]);
+  };
 
-  const handleReauth = useCallback(async () => {
+  const handleReauth = async () => {
     const firebaseUser = getAuth().currentUser;
     if (!firebaseUser) return;
 
@@ -120,9 +117,9 @@ function ChangeEmailDialog({ open, onClose }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [lang, attemptEmailUpdate, getErrorMessage]);
+  };
 
-  const handleSendReauthLink = useCallback(async () => {
+  const handleSendReauthLink = async () => {
     const currentEmail = getAuth().currentUser?.email;
     if (!currentEmail) return;
 
@@ -151,9 +148,9 @@ function ChangeEmailDialog({ open, onClose }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [email, lang, basePath, getErrorMessage]);
+  };
 
-  const handleExited = useCallback(() => {
+  const handleExited = () => {
     setEmail('');
     setEmailValid(true);
     setSent(false);
@@ -162,47 +159,29 @@ function ChangeEmailDialog({ open, onClose }: Props) {
     window.localStorage.removeItem('emailForReauth');
     window.localStorage.removeItem('pendingEmailChange');
     window.localStorage.removeItem('reauthForEmailChange');
-  }, []);
+  };
 
-  const confirmAction = useMemo<ConfirmAction | undefined>(() => {
-    if (reauthStep === 'google') {
-      return {
-        label: dictionary['sign in again'],
-        loading,
-        onClick: handleReauth
-      };
-    }
-
-    if (reauthStep === 'emailLink') {
-      return {
-        label: dictionary['send reauth link'],
-        loading,
-        onClick: handleSendReauthLink
-      };
-    }
-
-    if (!sent && reauthStep === 'idle') {
-      return {
-        label: dictionary['send verification email'],
-        loading,
-        disabled: !email || !emailValid || !authenticated,
-        onClick: handleSend
-      };
-    }
-
-    return undefined;
-  }, [
-    reauthStep,
-    sent,
-    loading,
-    email,
-    emailValid,
-    authenticated,
-    dictionary,
-    handleReauth,
-    handleSendReauthLink,
-    handleSend
-  ]);
+  const confirmAction: ConfirmAction | undefined =
+    reauthStep === 'google'
+      ? {
+          label: dictionary['sign in again'],
+          loading,
+          onClick: handleReauth
+        }
+      : reauthStep === 'emailLink'
+        ? {
+            label: dictionary['send reauth link'],
+            loading,
+            onClick: handleSendReauthLink
+          }
+        : !sent && reauthStep === 'idle'
+          ? {
+              label: dictionary['send verification email'],
+              loading,
+              disabled: !email || !emailValid || !authenticated,
+              onClick: handleSend
+            }
+          : undefined;
 
   return (
     <AppDialog
@@ -268,4 +247,4 @@ function ChangeEmailDialog({ open, onClose }: Props) {
   );
 }
 
-export default memo(ChangeEmailDialog);
+export default ChangeEmailDialog;

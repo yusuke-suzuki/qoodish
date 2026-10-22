@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Pin, Profile } from '../../../types/index.ts';
 import useBlock from '../../hooks/useBlock.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -38,7 +38,7 @@ type Props = {
   hideDetail?: boolean;
 };
 
-export default memo(function PinMenuButton({
+export default function PinMenuButton({
   pin,
   currentProfile,
   onEditClick,
@@ -240,4 +240,4 @@ export default memo(function PinMenuButton({
       />
     </>
   );
-});
+}

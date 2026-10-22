@@ -24,14 +24,7 @@ import {
 } from 'firebase/auth';
 import { useParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState
-} from 'react';
+import { useContext, useEffect, useState } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import LinkEmailDialog from './LinkEmailDialog.tsx';
@@ -58,21 +51,17 @@ function ProvidersCard() {
   >(null);
   const [linkEmailDialogOpen, setLinkEmailDialogOpen] = useState(false);
 
-  const googleProvider = useMemo(
-    () =>
-      providerData.find((p) => p.providerId === GoogleAuthProvider.PROVIDER_ID),
-    [providerData]
+  const googleProvider = providerData.find(
+    (p) => p.providerId === GoogleAuthProvider.PROVIDER_ID
   );
 
-  const emailProvider = useMemo(
-    () =>
-      providerData.find((p) => p.providerId === EmailAuthProvider.PROVIDER_ID),
-    [providerData]
+  const emailProvider = providerData.find(
+    (p) => p.providerId === EmailAuthProvider.PROVIDER_ID
   );
 
   const canUnlink = [googleProvider, emailProvider].filter(Boolean).length > 1;
 
-  const handleLinkGoogle = useCallback(async () => {
+  const handleLinkGoogle = async () => {
     const firebaseUser = getAuth().currentUser;
     if (!firebaseUser) return;
 
@@ -111,14 +100,14 @@ function ProvidersCard() {
     } finally {
       setLoading(false);
     }
-  }, [lang, dictionary]);
+  };
 
-  const handleOpenUnlinkDialog = useCallback((providerId: string) => {
+  const handleOpenUnlinkDialog = (providerId: string) => {
     setUnlinkTargetProviderId(providerId);
     setUnlinkDialogOpen(true);
-  }, []);
+  };
 
-  const handleUnlink = useCallback(async () => {
+  const handleUnlink = async () => {
     const firebaseUser = getAuth().currentUser;
     if (!firebaseUser || !unlinkTargetProviderId) return;
 
@@ -134,7 +123,7 @@ function ProvidersCard() {
       console.error(error);
       enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
     }
-  }, [unlinkTargetProviderId, dictionary]);
+  };
 
   return (
     <>
@@ -237,4 +226,4 @@ function ProvidersCard() {
   );
 }
 
-export default memo(ProvidersCard);
+export default ProvidersCard;

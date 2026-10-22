@@ -1,14 +1,7 @@
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { Checkbox, Tooltip } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  type ChangeEvent,
-  memo,
-  useCallback,
-  useContext,
-  useState,
-  useTransition
-} from 'react';
+import { type ChangeEvent, useContext, useState, useTransition } from 'react';
 import type { CommentItem, ContentRef } from '../../../types/index.ts';
 import { likeComment, unlikeComment } from '../../actions/commentLikes.ts';
 import AuthContext from '../../context/AuthContext.ts';
@@ -20,7 +13,7 @@ type Props = {
   onSaved?: () => void;
 };
 
-export default memo(function LikeCommentButton({
+export default function LikeCommentButton({
   subject,
   comment,
   onSaved
@@ -31,43 +24,40 @@ export default memo(function LikeCommentButton({
   const [checked, setChecked] = useState(comment.liked ?? false);
   const [isPending, startTransition] = useTransition();
 
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      if (!authenticated) {
-        setSignInRequired(true);
-        return;
-      }
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!authenticated) {
+      setSignInRequired(true);
+      return;
+    }
 
-      const next = event.target.checked;
-      setChecked(next);
+    const next = event.target.checked;
+    setChecked(next);
 
-      startTransition(async () => {
-        try {
-          const result = next
-            ? await likeComment(subject, comment.id)
-            : await unlikeComment(subject, comment.id);
+    startTransition(async () => {
+      try {
+        const result = next
+          ? await likeComment(subject, comment.id)
+          : await unlikeComment(subject, comment.id);
 
-          if (result.success) {
-            const message = next ? 'liked!' : 'unliked';
-            enqueueSnackbar(dictionary[message], { variant: 'info' });
+        if (result.success) {
+          const message = next ? 'liked!' : 'unliked';
+          enqueueSnackbar(dictionary[message], { variant: 'info' });
 
-            if (onSaved) {
-              onSaved();
-            }
-          } else {
-            setChecked(!next);
-            enqueueSnackbar(result.error, { variant: 'error' });
+          if (onSaved) {
+            onSaved();
           }
-        } catch (_error) {
+        } else {
           setChecked(!next);
-          enqueueSnackbar(dictionary['an error occurred'], {
-            variant: 'error'
-          });
+          enqueueSnackbar(result.error, { variant: 'error' });
         }
-      });
-    },
-    [authenticated, subject, comment, setSignInRequired, dictionary, onSaved]
-  );
+      } catch (_error) {
+        setChecked(!next);
+        enqueueSnackbar(dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      }
+    });
+  };
 
   return (
     <Tooltip
@@ -83,4 +73,4 @@ export default memo(function LikeCommentButton({
       />
     </Tooltip>
   );
-});
+}

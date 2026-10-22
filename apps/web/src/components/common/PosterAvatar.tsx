@@ -1,6 +1,6 @@
 import { Person } from '@mui/icons-material';
 import { Avatar } from '@mui/material';
-import { memo, useContext } from 'react';
+import { useContext } from 'react';
 import type { Profile } from '../../../types/index.ts';
 import AuthContext from '../../context/AuthContext.ts';
 import ProfileBoundary from './ProfileBoundary.tsx';
@@ -31,10 +31,10 @@ function PosterAvatarContent({ profile }: { profile: Profile | null }) {
   return <Avatar>{profile.name?.slice(0, 1)}</Avatar>;
 }
 
-export default memo(function PosterAvatar() {
+export default function PosterAvatar() {
   return (
     <ProfileBoundary>
       {(profile) => <PosterAvatarContent profile={profile} />}
     </ProfileBoundary>
   );
-});
+}

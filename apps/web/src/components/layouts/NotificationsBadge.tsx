@@ -1,6 +1,6 @@
 import { Notifications } from '@mui/icons-material';
 import { Badge } from '@mui/material';
-import { memo, Suspense } from 'react';
+import { Suspense } from 'react';
 import useUnreadNotifications from '../../hooks/useUnreadNotifications.ts';
 
 function UnreadBadge() {
@@ -14,10 +14,10 @@ function UnreadBadge() {
   );
 }
 
-export default memo(function NotificationsBadge() {
+export default function NotificationsBadge() {
   return (
     <Suspense fallback={<Notifications />}>
       <UnreadBadge />
     </Suspense>
   );
-});
+}

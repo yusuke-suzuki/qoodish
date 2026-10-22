@@ -1,7 +1,7 @@
 'use client';
 
 import { DecoratorNode, type NodeKey } from 'lexical';
-import { type JSX, memo, useRef } from 'react';
+import { type JSX, useRef } from 'react';
 import {
   type ChapterImage,
   createSerializedImage,
@@ -16,17 +16,14 @@ type ImageViewProps = {
   image: ChapterImage;
 };
 
-const ImageNodeView = memo(function ImageNodeView({
-  nodeKey,
-  image
-}: ImageViewProps) {
+function ImageNodeView({ nodeKey, image }: ImageViewProps) {
   const imageRef = useRef<HTMLImageElement>(null);
   const { selected } = useBlockSelection(nodeKey, imageRef);
 
   return (
     <ChapterContentImage ref={imageRef} src={image.hero} selected={selected} />
   );
-});
+}
 
 export class ImageNode extends DecoratorNode<JSX.Element> {
   __image: ChapterImage;

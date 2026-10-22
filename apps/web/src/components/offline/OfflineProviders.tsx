@@ -2,7 +2,7 @@
 
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { type ReactNode, useMemo } from 'react';
+import type { ReactNode } from 'react';
 import DictionaryContext from '../../context/DictionaryContext.ts';
 import type { Dictionary } from '../../utils/getDictionary.ts';
 import { createAppTheme } from '../../utils/theme.ts';
@@ -18,7 +18,7 @@ export default function OfflineProviders({
   lang,
   dictionary
 }: Props) {
-  const theme = useMemo(() => createAppTheme(lang), [lang]);
+  const theme = createAppTheme(lang);
 
   return (
     <AppRouterCacheProvider>

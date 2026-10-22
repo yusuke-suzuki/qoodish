@@ -3,7 +3,7 @@
 import { Stack, TextField, Typography } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import { recordPastJourney } from '../../actions/journeys.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { isPastPeriod, toDatetimeLocal } from '../../utils/datetimeLocal.ts';
@@ -17,11 +17,7 @@ type Props = {
   mapId: number;
 };
 
-export default memo(function PastJourneyDialog({
-  open,
-  onClose,
-  mapId
-}: Props) {
+export default function PastJourneyDialog({ open, onClose, mapId }: Props) {
   const dictionary = useDictionary();
   const router = useRouter();
   const { lang } = useParams<{ lang: string }>();
@@ -118,4 +114,4 @@ export default memo(function PastJourneyDialog({
       </Stack>
     </AppDialog>
   );
-});
+}

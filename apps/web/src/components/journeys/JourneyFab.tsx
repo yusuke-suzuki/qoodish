@@ -1,6 +1,6 @@
 import { DirectionsWalk, Pause } from '@mui/icons-material';
 import { Box, Fab } from '@mui/material';
-import { memo, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import type { Journey } from '../../../types/index.ts';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -122,4 +122,4 @@ function JourneyFab({
   );
 }
 
-export default memo(JourneyFab);
+export default JourneyFab;

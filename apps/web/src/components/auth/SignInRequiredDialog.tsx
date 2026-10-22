@@ -11,7 +11,7 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material';
-import { memo, useContext } from 'react';
+import { useContext } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import BottomSheet from '../common/BottomSheet.tsx';
@@ -94,4 +94,4 @@ function SignInRequiredDialog() {
   );
 }
 
-export default memo(SignInRequiredDialog);
+export default SignInRequiredDialog;

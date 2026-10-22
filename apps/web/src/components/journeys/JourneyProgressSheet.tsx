@@ -24,7 +24,7 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import type {
   Image,
   Journey,
@@ -77,7 +77,7 @@ function TimelineRow({
   const visited = Boolean(item.checkin);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
 
-  const closeMenu = useCallback(() => setMenuAnchor(null), []);
+  const closeMenu = () => setMenuAnchor(null);
 
   return (
     <Box sx={{ display: 'flex', gap: 1.5 }}>
@@ -232,67 +232,54 @@ function JourneyProgressSheet({
   const dictionary = useDictionary();
   const formatLocal = useLocalDateTime();
 
-  const imagesByPin = useMemo(() => {
-    return new Map<number | null, string | undefined>(
-      pins.map((pin) => [pin.id, pin.images[0]?.avatar])
-    );
-  }, [pins]);
+  const imagesByPin = new Map<number | null, string | undefined>(
+    pins.map((pin) => [pin.id, pin.images[0]?.avatar])
+  );
 
-  const checkinsByPin = useMemo(() => {
-    const map = new Map<number | null, JourneyCheckin>();
+  const checkinsByPin = new Map<number | null, JourneyCheckin>();
 
-    for (const checkin of (journey?.checkins ?? []).toSorted((a, b) =>
-      a.checked_in_at.localeCompare(b.checked_in_at)
-    )) {
-      if (checkin.pin_id !== null && !map.has(checkin.pin_id)) {
-        map.set(checkin.pin_id, checkin);
-      }
+  for (const checkin of (journey?.checkins ?? []).toSorted((a, b) =>
+    a.checked_in_at.localeCompare(b.checked_in_at)
+  )) {
+    if (checkin.pin_id !== null && !checkinsByPin.has(checkin.pin_id)) {
+      checkinsByPin.set(checkin.pin_id, checkin);
     }
+  }
 
-    return map;
-  }, [journey]);
-
-  const plannedItems = useMemo<TimelineItem[]>(
-    () =>
-      (journey?.milestones ?? []).map((milestone: Milestone) => ({
-        key: `milestone-${milestone.id}`,
-        spot: {
-          name: milestone.name,
-          latitude: milestone.latitude,
-          longitude: milestone.longitude
-        },
-        image: imagesByPin.get(milestone.pin_id),
-        checkin:
-          milestone.pin_id === null
-            ? undefined
-            : checkinsByPin.get(milestone.pin_id),
-        pinId: milestone.pin_id,
-        milestone
-      })),
-    [journey, checkinsByPin, imagesByPin]
+  const plannedItems: TimelineItem[] = (journey?.milestones ?? []).map(
+    (milestone: Milestone) => ({
+      key: `milestone-${milestone.id}`,
+      spot: {
+        name: milestone.name,
+        latitude: milestone.latitude,
+        longitude: milestone.longitude
+      },
+      image: imagesByPin.get(milestone.pin_id),
+      checkin:
+        milestone.pin_id === null
+          ? undefined
+          : checkinsByPin.get(milestone.pin_id),
+      pinId: milestone.pin_id,
+      milestone
+    })
   );
 
-  const extraItems = useMemo<TimelineItem[]>(() => {
-    const plannedCheckinIds = new Set(
-      plannedItems.map((item) => item.checkin?.id)
-    );
-
-    return (journey?.checkins ?? [])
-      .filter((checkin) => !plannedCheckinIds.has(checkin.id))
-      .map((checkin) => ({
-        key: `checkin-${checkin.id}`,
-        spot: checkin.spot,
-        image: imagesByPin.get(checkin.pin_id),
-        checkin,
-        pinId: checkin.pin_id,
-        milestone: undefined
-      }));
-  }, [journey, plannedItems, imagesByPin]);
-
-  const items = useMemo(
-    () => [...plannedItems, ...extraItems],
-    [plannedItems, extraItems]
+  const plannedCheckinIds = new Set(
+    plannedItems.map((item) => item.checkin?.id)
   );
+
+  const extraItems: TimelineItem[] = (journey?.checkins ?? [])
+    .filter((checkin) => !plannedCheckinIds.has(checkin.id))
+    .map((checkin) => ({
+      key: `checkin-${checkin.id}`,
+      spot: checkin.spot,
+      image: imagesByPin.get(checkin.pin_id),
+      checkin,
+      pinId: checkin.pin_id,
+      milestone: undefined
+    }));
+
+  const items = [...plannedItems, ...extraItems];
 
   const visitedCount = plannedItems.filter((item) => item.checkin).length;
   const progress =
@@ -315,18 +302,15 @@ function JourneyProgressSheet({
     }
   };
 
-  const handleRemoveItem = useCallback(
-    (item: TimelineItem) => {
-      if (item.milestone) {
-        onRemoveMilestone(item.milestone);
-      }
+  const handleRemoveItem = (item: TimelineItem) => {
+    if (item.milestone) {
+      onRemoveMilestone(item.milestone);
+    }
 
-      if (item.checkin) {
-        onRemoveCheckin(item.checkin);
-      }
-    },
-    [onRemoveMilestone, onRemoveCheckin]
-  );
+    if (item.checkin) {
+      onRemoveCheckin(item.checkin);
+    }
+  };
 
   const formatTime = (value: string) => formatLocal(value, TIME_OPTIONS);
 
@@ -431,4 +415,4 @@ function JourneyProgressSheet({
   );
 }
 
-export default memo(JourneyProgressSheet);
+export default JourneyProgressSheet;

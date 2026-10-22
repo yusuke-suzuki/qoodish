@@ -7,7 +7,7 @@ import {
 } from 'firebase/auth';
 import { useParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, type ReactNode, useCallback, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 type Props = {
@@ -30,7 +30,7 @@ function SignInWithProviderButton({
 
   const [loading, setLoading] = useState(false);
 
-  const handleClick = useCallback(async () => {
+  const handleClick = async () => {
     setLoading(true);
 
     const auth = getAuth();
@@ -57,7 +57,7 @@ function SignInWithProviderButton({
     } finally {
       setLoading(false);
     }
-  }, [provider, lang, onSignInSuccess, dictionary]);
+  };
 
   return (
     <Button
@@ -73,4 +73,4 @@ function SignInWithProviderButton({
   );
 }
 
-export default memo(SignInWithProviderButton);
+export default SignInWithProviderButton;

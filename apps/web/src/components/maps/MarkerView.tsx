@@ -1,8 +1,7 @@
 import {
-  memo,
   type ReactNode,
-  useCallback,
   useEffect,
+  useEffectEvent,
   useRef,
   useState
 } from 'react';
@@ -17,7 +16,7 @@ type Props = {
   onMouseLeave?: () => void;
 };
 
-export default memo(function MarkerView({
+export default function MarkerView({
   children,
   position,
   onClick,
@@ -43,29 +42,9 @@ export default memo(function MarkerView({
     return element;
   });
 
-  const handleClick = useCallback(() => {
-    if (!onClick) {
-      return;
-    }
-
-    onClick();
-  }, [onClick]);
-
-  const handleMouseEnter = useCallback(() => {
-    if (!onMouseEnter) {
-      return;
-    }
-
-    onMouseEnter();
-  }, [onMouseEnter]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!onMouseLeave) {
-      return;
-    }
-
-    onMouseLeave();
-  }, [onMouseLeave]);
+  const handleClick = useEffectEvent(() => onClick?.());
+  const handleMouseEnter = useEffectEvent(() => onMouseEnter?.());
+  const handleMouseLeave = useEffectEvent(() => onMouseLeave?.());
 
   useEffect(() => {
     if (!googleMap || !loader) {
@@ -109,16 +88,20 @@ export default memo(function MarkerView({
     // Turning on gmpClickable to use gmp-click makes the marker swallow taps
     // around it, which stops the visitor panning the map from there, so the
     // listeners go on the content this component renders itself.
-    content.addEventListener('click', handleClick);
-    content.addEventListener('mouseenter', handleMouseEnter);
-    content.addEventListener('mouseleave', handleMouseLeave);
+    const click = () => handleClick();
+    const mouseEnter = () => handleMouseEnter();
+    const mouseLeave = () => handleMouseLeave();
+
+    content.addEventListener('click', click);
+    content.addEventListener('mouseenter', mouseEnter);
+    content.addEventListener('mouseleave', mouseLeave);
 
     return () => {
-      content.removeEventListener('click', handleClick);
-      content.removeEventListener('mouseenter', handleMouseEnter);
-      content.removeEventListener('mouseleave', handleMouseLeave);
+      content.removeEventListener('click', click);
+      content.removeEventListener('mouseenter', mouseEnter);
+      content.removeEventListener('mouseleave', mouseLeave);
     };
-  }, [content, handleClick, handleMouseEnter, handleMouseLeave]);
+  }, [content]);
 
   useEffect(() => {
     const marker = markerRef.current;
@@ -131,4 +114,4 @@ export default memo(function MarkerView({
   }, [ready, position]);
 
   return createPortal(children, content);
-});
+}
