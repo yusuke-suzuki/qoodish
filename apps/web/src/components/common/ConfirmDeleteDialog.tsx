@@ -1,7 +1,7 @@
 'use client';
 
 import { Checkbox, DialogContentText, FormControlLabel } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from './AppDialog.tsx';
 
@@ -75,4 +75,4 @@ function ConfirmDeleteDialog({
   );
 }
 
-export default memo(ConfirmDeleteDialog);
+export default ConfirmDeleteDialog;

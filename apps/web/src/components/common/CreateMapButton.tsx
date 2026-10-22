@@ -1,10 +1,10 @@
 import { AddBox } from '@mui/icons-material';
 import { Button } from '@mui/material';
-import { memo, useContext } from 'react';
+import { useContext } from 'react';
 import ShellContext from '../../context/ShellContext.tsx';
 import useDictionary from '../../hooks/useDictionary.ts';
 
-export default memo(function CreateMapButton() {
+export default function CreateMapButton() {
   const dictionary = useDictionary();
   const { openCreateMap } = useContext(ShellContext);
 
@@ -19,4 +19,4 @@ export default memo(function CreateMapButton() {
       {dictionary['draw your first map']}
     </Button>
   );
-});
+}

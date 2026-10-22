@@ -1,5 +1,4 @@
 import { Map as MapIcon } from '@mui/icons-material';
-import { memo } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import CreateMapButton from '../common/CreateMapButton.tsx';
@@ -11,7 +10,7 @@ type Props = {
   isOwnProfile: boolean;
 };
 
-export default memo(function UserMaps({ maps, isOwnProfile }: Props) {
+export default function UserMaps({ maps, isOwnProfile }: Props) {
   const dictionary = useDictionary();
 
   if (maps.length < 1) {
@@ -29,4 +28,4 @@ export default memo(function UserMaps({ maps, isOwnProfile }: Props) {
   }
 
   return <MapGridList maps={maps} />;
-});
+}

@@ -6,7 +6,7 @@ import {
   Menu,
   MenuItem
 } from '@mui/material';
-import { memo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { CommentItem, Profile } from '../../../types/index.ts';
 import useBlock from '../../hooks/useBlock.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -22,7 +22,7 @@ type Props = {
   onDeleteClick?: (comment: CommentItem) => void;
 };
 
-export default memo(function CommentMenuButton({
+export default function CommentMenuButton({
   comment,
   onReportClick,
   currentProfile,
@@ -128,4 +128,4 @@ export default memo(function CommentMenuButton({
       />
     </>
   );
-});
+}

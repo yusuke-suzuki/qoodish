@@ -47,7 +47,7 @@ import {
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import type {
   AppMap,
   Chapter,
@@ -140,43 +140,31 @@ export default function JourneyDetailView({
   const [checkins, setCheckins] = useState(journey.checkins);
   const checkinsRef = useRef(journey.checkins);
 
-  const trail = useMemo(
-    () => decodePath(journey.encoded_path),
-    [journey.encoded_path]
+  const trail = decodePath(journey.encoded_path);
+
+  const sortedCheckins = checkins.toSorted((a, b) =>
+    a.checked_in_at.localeCompare(b.checked_in_at)
   );
 
-  const sortedCheckins = useMemo(
-    () =>
-      checkins.toSorted((a, b) =>
-        a.checked_in_at.localeCompare(b.checked_in_at)
-      ),
-    [checkins]
-  );
+  const checkinSpots = visitedSpots(checkins);
 
-  const checkinSpots = useMemo(() => visitedSpots(checkins), [checkins]);
+  const mapCenter = map
+    ? { latitude: map.latitude, longitude: map.longitude }
+    : undefined;
 
-  const mapCenter = useMemo(
-    () =>
-      map ? { latitude: map.latitude, longitude: map.longitude } : undefined,
-    [map]
-  );
+  const usedPinIds = new Set(checkins.map((checkin) => checkin.pin_id));
 
-  const milestones = useMemo(() => {
-    const visitedPinIds = new Set(checkins.map((checkin) => checkin.pin_id));
-
-    return journey.milestones.map((milestone) => ({
-      id: milestone.id,
-      name: milestone.name,
-      latitude: milestone.latitude,
-      longitude: milestone.longitude,
-      visited: visitedPinIds.has(milestone.pin_id)
-    }));
-  }, [journey.milestones, checkins]);
+  const milestones = journey.milestones.map((milestone) => ({
+    id: milestone.id,
+    name: milestone.name,
+    latitude: milestone.latitude,
+    longitude: milestone.longitude,
+    visited: usedPinIds.has(milestone.pin_id)
+  }));
 
   // A reached milestone already has a check-in pin at the same place.
-  const pendingMilestones = useMemo(
-    () => milestones.filter((milestone) => !milestone.visited),
-    [milestones]
+  const pendingMilestones = milestones.filter(
+    (milestone) => !milestone.visited
   );
 
   const visitedMilestones = milestones.length - pendingMilestones.length;
@@ -184,106 +172,89 @@ export default function JourneyDetailView({
   const milestoneProgress =
     milestones.length > 0 ? (visitedMilestones / milestones.length) * 100 : 0;
 
-  const saveCheckin = useCallback(
-    async (
-      checkin: JourneyCheckin,
-      params: { image_ids?: number[]; note?: string | null }
-    ): Promise<boolean> => {
-      const { success, data, error } = await updateCheckin(
-        journey.id,
-        checkin.id,
-        params
-      );
+  const saveCheckin = async (
+    checkin: JourneyCheckin,
+    params: { image_ids?: number[]; note?: string | null }
+  ): Promise<boolean> => {
+    const { success, data, error } = await updateCheckin(
+      journey.id,
+      checkin.id,
+      params
+    );
 
-      if (!success || !data) {
-        enqueueSnackbar(error ?? dictionary['an error occurred'], {
-          variant: 'error'
-        });
-        return false;
-      }
-
-      checkinsRef.current = checkinsRef.current.map((existing) =>
-        existing.id === data.id ? data : existing
-      );
-      setCheckins(checkinsRef.current);
-      return true;
-    },
-    [journey.id, dictionary]
-  );
-
-  const handleAttachImage = useCallback(
-    async (checkin: JourneyCheckin, image: Image) => {
-      const latest =
-        checkinsRef.current.find((existing) => existing.id === checkin.id) ??
-        checkin;
-
-      await saveCheckin(checkin, {
-        image_ids: [...latest.images.map((existing) => existing.id), image.id]
+    if (!success || !data) {
+      enqueueSnackbar(error ?? dictionary['an error occurred'], {
+        variant: 'error'
       });
-    },
-    [saveCheckin]
-  );
+      return false;
+    }
 
-  const handleRemoveImage = useCallback(
-    (checkin: JourneyCheckin, imageId: number): Promise<boolean> => {
-      const latest =
-        checkinsRef.current.find((existing) => existing.id === checkin.id) ??
-        checkin;
+    checkinsRef.current = checkinsRef.current.map((existing) =>
+      existing.id === data.id ? data : existing
+    );
+    setCheckins(checkinsRef.current);
+    return true;
+  };
 
-      return saveCheckin(checkin, {
-        image_ids: latest.images
-          .filter((existing) => existing.id !== imageId)
-          .map((existing) => existing.id)
-      });
-    },
-    [saveCheckin]
-  );
+  const handleAttachImage = async (checkin: JourneyCheckin, image: Image) => {
+    const latest =
+      checkinsRef.current.find((existing) => existing.id === checkin.id) ??
+      checkin;
 
-  const handleSaveNote = useCallback(
-    (checkin: JourneyCheckin, note: string | null): Promise<boolean> => {
-      return saveCheckin(checkin, { note });
-    },
-    [saveCheckin]
-  );
+    await saveCheckin(checkin, {
+      image_ids: [...latest.images.map((existing) => existing.id), image.id]
+    });
+  };
 
-  const usedPinIds = useMemo(
-    () => new Set(checkins.map((checkin) => checkin.pin_id)),
-    [checkins]
-  );
+  const handleRemoveImage = (
+    checkin: JourneyCheckin,
+    imageId: number
+  ): Promise<boolean> => {
+    const latest =
+      checkinsRef.current.find((existing) => existing.id === checkin.id) ??
+      checkin;
 
-  const handleSelectPin = useCallback(
-    (pin: Pin) => {
-      setPickerOpen(false);
-      setPendingPin(pin);
+    return saveCheckin(checkin, {
+      image_ids: latest.images
+        .filter((existing) => existing.id !== imageId)
+        .map((existing) => existing.id)
+    });
+  };
 
-      const last = checkinsRef.current.at(-1);
-      const seed =
-        last?.checked_in_at ??
-        journey.finished_at ??
-        journey.started_at ??
-        new Date().toISOString();
+  const handleSaveNote = (
+    checkin: JourneyCheckin,
+    note: string | null
+  ): Promise<boolean> => {
+    return saveCheckin(checkin, { note });
+  };
 
-      setPendingTime(toDatetimeLocal(seed));
-    },
-    [journey.finished_at, journey.started_at]
-  );
+  const handleSelectPin = (pin: Pin) => {
+    setPickerOpen(false);
+    setPendingPin(pin);
 
-  const timeRange = useMemo(
-    () => ({
-      min: journey.started_at ? toDatetimeLocal(journey.started_at) : undefined,
-      max: journey.finished_at
-        ? toDatetimeLocal(journey.finished_at)
-        : toDatetimeLocal(new Date().toISOString())
-    }),
-    [journey.started_at, journey.finished_at]
-  );
+    const last = checkinsRef.current.at(-1);
+    const seed =
+      last?.checked_in_at ??
+      journey.finished_at ??
+      journey.started_at ??
+      new Date().toISOString();
+
+    setPendingTime(toDatetimeLocal(seed));
+  };
+
+  const timeRange = {
+    min: journey.started_at ? toDatetimeLocal(journey.started_at) : undefined,
+    max: journey.finished_at
+      ? toDatetimeLocal(journey.finished_at)
+      : toDatetimeLocal(new Date().toISOString())
+  };
 
   const pendingTimeValid =
     Boolean(pendingTime) &&
     (!timeRange.min || pendingTime >= timeRange.min) &&
     pendingTime <= timeRange.max;
 
-  const handleConfirmCheckin = useCallback(async () => {
+  const handleConfirmCheckin = async () => {
     if (!pendingPin) {
       return;
     }
@@ -308,9 +279,9 @@ export default function JourneyDetailView({
     checkinsRef.current = [...checkinsRef.current, data];
     setCheckins(checkinsRef.current);
     setPendingPin(null);
-  }, [journey.id, pendingPin, pendingTime, dictionary]);
+  };
 
-  const handleRemoveCheckin = useCallback(async () => {
+  const handleRemoveCheckin = async () => {
     if (!pendingDeleteCheckin) {
       return;
     }
@@ -332,19 +303,17 @@ export default function JourneyDetailView({
     );
     setCheckins(checkinsRef.current);
     setPendingDeleteCheckin(null);
-  }, [journey.id, pendingDeleteCheckin, dictionary]);
+  };
 
-  const trailKm = useMemo(() => {
-    const meters = trailDistanceMeters(trail);
-    return meters > 0 ? (meters / 1000).toFixed(1) : null;
-  }, [trail]);
+  const trailMeters = trailDistanceMeters(trail);
+  const trailKm = trailMeters > 0 ? (trailMeters / 1000).toFixed(1) : null;
 
   const started = Boolean(journey.started_at);
   const active = started && !journey.finished_at && !ended;
 
   // The trail is only ever held in this browser until the journey is finished,
   // so ending from another device stamps the finish without one.
-  const handleEnd = useCallback(async () => {
+  const handleEnd = async () => {
     const { success, error } = await finishJourney(
       journey.id,
       uid ? encodePath(loadTrail(uid, journey.id)) : ''
@@ -365,9 +334,9 @@ export default function JourneyDetailView({
     setEnded(true);
     setEndOpen(false);
     router.refresh();
-  }, [journey.id, uid, dictionary, router]);
+  };
 
-  const handleRecord = useCallback(async () => {
+  const handleRecord = async () => {
     if (!map) {
       return;
     }
@@ -390,9 +359,9 @@ export default function JourneyDetailView({
     }
 
     router.push(`/${lang}/chapters/${data.id}/edit`);
-  }, [map, journey, checkins, router, lang, dictionary]);
+  };
 
-  const handleDeleteConfirm = useCallback(async () => {
+  const handleDeleteConfirm = async () => {
     const { success } = await deleteJourney(journey.id);
 
     if (!success) {
@@ -405,7 +374,7 @@ export default function JourneyDetailView({
     });
     setDeleteOpen(false);
     router.push(`/${lang}/journeys`);
-  }, [journey.id, dictionary, router, lang]);
+  };
 
   const formatDay = (value: string) => formatLocal(value, DAY_OPTIONS);
 

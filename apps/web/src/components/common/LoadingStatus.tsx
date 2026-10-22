@@ -1,7 +1,6 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { memo } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 type Props = {
@@ -10,7 +9,7 @@ type Props = {
 
 // Skeletons already carry the loading state visually, so the live region
 // stays in the accessibility tree only.
-export default memo(function LoadingStatus({ loading }: Props) {
+export default function LoadingStatus({ loading }: Props) {
   const dictionary = useDictionary();
 
   return (
@@ -31,4 +30,4 @@ export default memo(function LoadingStatus({ loading }: Props) {
       {loading ? dictionary.loading : ''}
     </Box>
   );
-});
+}

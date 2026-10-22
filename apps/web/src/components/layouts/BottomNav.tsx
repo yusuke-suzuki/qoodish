@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { memo, Suspense, useContext } from 'react';
+import { Suspense, useContext } from 'react';
 import type { Profile } from '../../../types/index.ts';
 import AuthContext from '../../context/AuthContext.ts';
 import ShellContext from '../../context/ShellContext.tsx';
@@ -132,10 +132,10 @@ function BottomNavWithProfile() {
   return <BottomNavContent profile={useProfile()} />;
 }
 
-export default memo(function BottomNav() {
+export default function BottomNav() {
   return (
     <Suspense fallback={<BottomNavContent profile={null} />}>
       <BottomNavWithProfile />
     </Suspense>
   );
-});
+}

@@ -1,7 +1,7 @@
 import { AddAPhoto } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import { type ChangeEvent, memo, useId } from 'react';
+import { type ChangeEvent, useId } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { splitOversizedImages } from '../../utils/uploadImage.ts';
 
@@ -12,7 +12,7 @@ type Props = {
   color?: 'inherit' | 'disabled' | 'secondary' | 'action' | 'primary' | 'error';
 };
 
-export default memo(function AddPhotoButton({
+export default function AddPhotoButton({
   onChange,
   disabled,
   multiple,
@@ -60,4 +60,4 @@ export default memo(function AddPhotoButton({
       </label>
     </>
   );
-});
+}

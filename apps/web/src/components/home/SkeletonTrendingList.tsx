@@ -8,7 +8,6 @@ import {
   Paper,
   Skeleton
 } from '@mui/material';
-import { memo } from 'react';
 
 const SkeletonTrendingList = () => {
   return (
@@ -41,4 +40,4 @@ const SkeletonTrendingList = () => {
   );
 };
 
-export default memo(SkeletonTrendingList);
+export default SkeletonTrendingList;

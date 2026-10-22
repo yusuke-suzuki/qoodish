@@ -17,7 +17,7 @@ import {
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { type MouseEvent, memo, useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 import type { JourneySummary } from '../../../types/index.ts';
 import { deleteJourney } from '../../actions/journeys.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -206,4 +206,4 @@ function UserJourneys({
   );
 }
 
-export default memo(UserJourneys);
+export default UserJourneys;

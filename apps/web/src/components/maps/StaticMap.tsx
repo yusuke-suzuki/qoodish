@@ -1,5 +1,4 @@
 import { Box, ButtonBase, Card, CardMedia, Skeleton } from '@mui/material';
-import { memo } from 'react';
 
 type Props = {
   position: google.maps.LatLngLiteral | null;
@@ -91,4 +90,4 @@ function StaticMap({ position, width, height }: Props) {
   );
 }
 
-export default memo(StaticMap);
+export default StaticMap;

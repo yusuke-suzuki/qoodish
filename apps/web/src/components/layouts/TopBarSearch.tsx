@@ -10,7 +10,7 @@ import {
   Typography
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { memo, useDeferredValue, useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import type { SearchResult } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { useSiteSearch } from '../../hooks/useSiteSearch.ts';
@@ -111,4 +111,4 @@ function TopBarSearch() {
   );
 }
 
-export default memo(TopBarSearch);
+export default TopBarSearch;

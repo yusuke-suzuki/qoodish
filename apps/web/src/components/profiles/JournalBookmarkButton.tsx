@@ -3,7 +3,7 @@
 import { Bookmark, BookmarkBorder } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useCallback, useContext, useState, useTransition } from 'react';
+import { useContext, useState, useTransition } from 'react';
 import type { Journal } from '../../../types/index.ts';
 import {
   bookmarkJournal,
@@ -25,7 +25,7 @@ function JournalBookmarkButton({ journal, fullWidth, onSaved }: Props) {
   const [bookmarking, setBookmarking] = useState(journal.bookmarking);
   const [isPending, startTransition] = useTransition();
 
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
     if (!authenticated) {
       setSignInRequired(true);
       return;
@@ -53,14 +53,7 @@ function JournalBookmarkButton({ journal, fullWidth, onSaved }: Props) {
         enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
       }
     });
-  }, [
-    authenticated,
-    bookmarking,
-    journal.id,
-    setSignInRequired,
-    dictionary,
-    onSaved
-  ]);
+  };
 
   if (journal.editable) {
     return null;
@@ -81,4 +74,4 @@ function JournalBookmarkButton({ journal, fullWidth, onSaved }: Props) {
   );
 }
 
-export default memo(JournalBookmarkButton);
+export default JournalBookmarkButton;

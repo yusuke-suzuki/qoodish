@@ -8,13 +8,12 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import { SUPPORT_EMAIL } from '../../utils/brand.ts';
 import Logo from './Logo.tsx';
 
-export default memo(function Footer() {
+export default function Footer() {
   const dictionary = useDictionary();
   const localePath = useLocalePath();
 
@@ -99,4 +98,4 @@ export default memo(function Footer() {
       </Container>
     </Box>
   );
-});
+}

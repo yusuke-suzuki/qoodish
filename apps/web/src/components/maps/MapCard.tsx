@@ -10,7 +10,6 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
@@ -19,7 +18,7 @@ type Props = {
   map: AppMap;
 };
 
-export default memo(function MapCard({ map }: Props) {
+export default function MapCard({ map }: Props) {
   const dictionary = useDictionary();
   const localePath = useLocalePath();
 
@@ -96,4 +95,4 @@ export default memo(function MapCard({ map }: Props) {
       </CardActionArea>
     </Card>
   );
-});
+}

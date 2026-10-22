@@ -2,13 +2,7 @@
 
 import type { SerializedEditorState } from 'lexical';
 import { enqueueSnackbar } from 'notistack';
-import {
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState
-} from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { Chapter, MapFeatureCollection } from '../../types/index.ts';
 import { deleteChapter, updateChapter } from '../actions/chapters.ts';
 import useDictionary from './useDictionary.ts';
@@ -133,33 +127,24 @@ export default function useChapter(initialChapter: Chapter) {
     };
   }, []);
 
-  const mutate = useCallback((updater: (chapter: Chapter) => Chapter) => {
+  const mutate = (updater: (chapter: Chapter) => Chapter) => {
     setChapter((current) => ({
       ...updater(current),
       updated_at: new Date().toISOString()
     }));
-  }, []);
+  };
 
-  const updateTitle = useCallback(
-    (title: string) => {
-      mutate((current) => ({ ...current, title }));
-    },
-    [mutate]
-  );
+  const updateTitle = (title: string) => {
+    mutate((current) => ({ ...current, title }));
+  };
 
-  const updateContent = useCallback(
-    (content: SerializedEditorState) => {
-      mutate((current) => ({ ...current, content }));
-    },
-    [mutate]
-  );
+  const updateContent = (content: SerializedEditorState) => {
+    mutate((current) => ({ ...current, content }));
+  };
 
-  const updateMapFeatures = useCallback(
-    (map_features: MapFeatureCollection) => {
-      mutate((current) => ({ ...current, map_features }));
-    },
-    [mutate]
-  );
+  const updateMapFeatures = (map_features: MapFeatureCollection) => {
+    mutate((current) => ({ ...current, map_features }));
+  };
 
   const discardChapter = async () => {
     if (discardedRef.current) {

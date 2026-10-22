@@ -10,7 +10,6 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
@@ -77,4 +76,4 @@ const TrendingMaps = ({ maps }: Props) => {
   );
 };
 
-export default memo(TrendingMaps);
+export default TrendingMaps;

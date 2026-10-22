@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { type ChangeEvent, memo, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 const MAX_LENGTH = 30;
@@ -35,9 +35,11 @@ function PinNameForm({ onChange, defaultValue }: Props) {
     setName(input);
   };
 
+  const notifyChange = useEffectEvent(onChange);
+
   useEffect(() => {
-    onChange(name.length > MAX_LENGTH ? '' : name);
-  }, [name, onChange]);
+    notifyChange(name.length > MAX_LENGTH ? '' : name);
+  }, [name]);
 
   return (
     <TextField
@@ -53,4 +55,4 @@ function PinNameForm({ onChange, defaultValue }: Props) {
   );
 }
 
-export default memo(PinNameForm);
+export default PinNameForm;

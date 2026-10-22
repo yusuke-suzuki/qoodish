@@ -1,6 +1,5 @@
 import { SvgIcon } from '@mui/material';
 import { GoogleAuthProvider } from 'firebase/auth';
-import { memo } from 'react';
 import SignInWithProviderButton from './SignInWithProviderButton.tsx';
 
 type Props = {
@@ -69,4 +68,4 @@ function SignInWithGoogleButton({ onSignInSuccess }: Props) {
   );
 }
 
-export default memo(SignInWithGoogleButton);
+export default SignInWithGoogleButton;

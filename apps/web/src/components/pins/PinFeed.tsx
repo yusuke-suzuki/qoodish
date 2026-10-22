@@ -4,7 +4,7 @@ import { Reviews } from '@mui/icons-material';
 import { Button, Stack } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import { fetchMorePinFeed } from '../../actions/pins.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -18,7 +18,7 @@ type Props = {
   nextCursor: string | null;
 };
 
-export default memo(function PinFeed({ initialPins, nextCursor }: Props) {
+export default function PinFeed({ initialPins, nextCursor }: Props) {
   const dictionary = useDictionary();
   const { lang } = useParams<{ lang: string }>();
 
@@ -68,4 +68,4 @@ export default memo(function PinFeed({ initialPins, nextCursor }: Props) {
       </Stack>
     </>
   );
-});
+}

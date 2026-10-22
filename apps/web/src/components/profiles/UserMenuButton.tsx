@@ -8,7 +8,7 @@ import {
   Menu,
   MenuItem
 } from '@mui/material';
-import { memo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { UserProfile } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import BlockMenuItem from '../common/BlockMenuItem.tsx';
@@ -86,4 +86,4 @@ function UserMenuButton({
   );
 }
 
-export default memo(UserMenuButton);
+export default UserMenuButton;

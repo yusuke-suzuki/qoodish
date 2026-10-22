@@ -1,7 +1,7 @@
 'use client';
 
 import { TextField } from '@mui/material';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { JourneyCheckin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 
@@ -105,4 +105,4 @@ function CheckinNoteField({ checkin, onSave }: Props) {
   );
 }
 
-export default memo(CheckinNoteField);
+export default CheckinNoteField;

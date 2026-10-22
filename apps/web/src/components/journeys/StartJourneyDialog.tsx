@@ -2,7 +2,7 @@
 
 import { AddLocationAlt, HistoryEdu, MyLocation } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from '../common/AppDialog.tsx';
 
@@ -12,7 +12,7 @@ type Props = {
   onConfirm: () => void | Promise<void>;
 };
 
-export default memo(function StartJourneyDialog({
+export default function StartJourneyDialog({
   open,
   onClose,
   onConfirm
@@ -89,4 +89,4 @@ export default memo(function StartJourneyDialog({
       </List>
     </AppDialog>
   );
-});
+}

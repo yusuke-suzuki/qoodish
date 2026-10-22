@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { memo } from 'react';
 import type { Chapter } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalDateTime from '../../hooks/useLocalDateTime.ts';
@@ -85,4 +84,4 @@ function MapChapterList({ chapters }: Props) {
   );
 }
 
-export default memo(MapChapterList);
+export default MapChapterList;

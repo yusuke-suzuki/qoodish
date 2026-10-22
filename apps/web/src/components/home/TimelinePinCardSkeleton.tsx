@@ -6,9 +6,8 @@ import {
   Skeleton,
   Typography
 } from '@mui/material';
-import { memo } from 'react';
 
-export default memo(function TimelinePinCardSkeleton() {
+export default function TimelinePinCardSkeleton() {
   return (
     <Card>
       <CardHeader
@@ -30,4 +29,4 @@ export default memo(function TimelinePinCardSkeleton() {
       </CardActions>
     </Card>
   );
-});
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, SwipeableDrawer, type SwipeableDrawerProps } from '@mui/material';
-import { memo, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import DrawerPuller from './DrawerPuller.tsx';
 
 type Props = {
@@ -62,4 +62,4 @@ function BottomSheet({
   );
 }
 
-export default memo(BottomSheet);
+export default BottomSheet;

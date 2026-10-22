@@ -1,6 +1,5 @@
 import { AccountCircle } from '@mui/icons-material';
 import { Avatar } from '@mui/material';
-import { memo } from 'react';
 import type { ImageVariants } from '../../../types/index.ts';
 
 type Props = {
@@ -38,4 +37,4 @@ function ProfileAvatar({ profile, size, variant }: Props) {
   );
 }
 
-export default memo(ProfileAvatar);
+export default ProfileAvatar;

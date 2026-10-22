@@ -2,7 +2,6 @@
 
 import { Box, Link as MuiLink, Typography } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { ChapterAuthor } from '../../../types/index.ts';
 import ProfileAvatar from '../common/ProfileAvatar.tsx';
 
@@ -35,4 +34,4 @@ function ChapterAuthorHeader({ author, locale }: Props) {
   );
 }
 
-export default memo(ChapterAuthorHeader);
+export default ChapterAuthorHeader;

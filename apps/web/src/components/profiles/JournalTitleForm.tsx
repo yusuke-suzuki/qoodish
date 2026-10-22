@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { type ChangeEvent, memo, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 const MAX_LENGTH = 50;
@@ -33,9 +33,11 @@ function JournalTitleForm({ onChange, defaultValue }: Props) {
 
   // Reports undefined while invalid so the caller can block saving a title the
   // API would reject.
+  const notifyChange = useEffectEvent(onChange);
+
   useEffect(() => {
-    onChange(!title || title.length > MAX_LENGTH ? undefined : title);
-  }, [title, onChange]);
+    notifyChange(!title || title.length > MAX_LENGTH ? undefined : title);
+  }, [title]);
 
   return (
     <TextField
@@ -51,4 +53,4 @@ function JournalTitleForm({ onChange, defaultValue }: Props) {
   );
 }
 
-export default memo(JournalTitleForm);
+export default JournalTitleForm;

@@ -1,13 +1,6 @@
 import { Box } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  type FormEvent,
-  memo,
-  useCallback,
-  useMemo,
-  useState,
-  useTransition
-} from 'react';
+import { type FormEvent, useState, useTransition } from 'react';
 import type { AppMap, Pin, PinProperty } from '../../../types/index.ts';
 import { updatePin } from '../../actions/pins.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -31,7 +24,7 @@ type Props = {
   pinProperties: PinProperty[];
 };
 
-export default memo(function EditPinDialog({
+export default function EditPinDialog({
   open,
   onClose,
   onSaved,
@@ -50,88 +43,69 @@ export default memo(function EditPinDialog({
     null
   );
 
-  const disabled = useMemo(() => {
-    return !(name && comment && position) || isUploading;
-  }, [name, comment, position, isUploading]);
+  const disabled = !(name && comment && position) || isUploading;
 
   const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      if (!currentPin || !position) {
-        enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
-        return;
-      }
+    if (!currentPin || !position) {
+      enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
+      return;
+    }
 
-      startTransition(async () => {
-        try {
-          const result = await updatePin(currentPin.id, {
-            name,
-            comment,
-            latitude: position.lat,
-            longitude: position.lng,
-            image_ids: uploadedImages.map((image) => image.id),
-            property_option_ids: offeredOptionIds(pinProperties, optionIds)
+    startTransition(async () => {
+      try {
+        const result = await updatePin(currentPin.id, {
+          name,
+          comment,
+          latitude: position.lat,
+          longitude: position.lng,
+          image_ids: uploadedImages.map((image) => image.id),
+          property_option_ids: offeredOptionIds(pinProperties, optionIds)
+        });
+
+        if (result.success) {
+          enqueueSnackbar(dictionary['edit pin success'], {
+            variant: 'success'
           });
 
-          if (result.success) {
-            enqueueSnackbar(dictionary['edit pin success'], {
-              variant: 'success'
-            });
-
-            onClose();
-            onSaved();
-            return;
-          }
-
-          enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
-            variant: 'error'
-          });
-        } catch (_error) {
-          enqueueSnackbar(dictionary['an error occurred'], {
-            variant: 'error'
-          });
+          onClose();
+          onSaved();
+          return;
         }
-      });
-    },
-    [
-      currentPin,
-      position,
-      uploadedImages,
-      name,
-      comment,
-      pinProperties,
-      optionIds,
-      dictionary,
-      onClose,
-      onSaved
-    ]
-  );
 
-  const handleExited = useCallback(() => {
+        enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      } catch (_error) {
+        enqueueSnackbar(dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      }
+    });
+  };
+
+  const handleExited = () => {
     setName('');
     setComment('');
     setOptionIds([]);
     reset();
     setPosition(null);
-  }, [reset]);
+  };
 
-  const handleImagesChange = useCallback(
-    async (files: File[]) => {
-      try {
-        await upload(files);
-      } catch (error) {
-        enqueueSnackbar(uploadFailureMessage(error, dictionary), {
-          variant: 'error'
-        });
-      }
-    },
-    [upload, dictionary]
-  );
+  const handleImagesChange = async (files: File[]) => {
+    try {
+      await upload(files);
+    } catch (error) {
+      enqueueSnackbar(uploadFailureMessage(error, dictionary), {
+        variant: 'error'
+      });
+    }
+  };
 
-  const handleEnter = useCallback(() => {
+  const handleEnter = () => {
     if (!currentPin) {
       return;
     }
@@ -140,21 +114,15 @@ export default memo(function EditPinDialog({
     setOptionIds(
       offeredOptionIds(pinProperties, currentPin.property_option_ids)
     );
-  }, [currentPin, pinProperties, reset]);
+  };
 
   const defaultLatitude = currentPin?.latitude;
   const defaultLongitude = currentPin?.longitude;
 
-  const defaultPosition = useMemo(() => {
-    if (defaultLatitude === undefined || defaultLongitude === undefined) {
-      return null;
-    }
-
-    return {
-      lat: defaultLatitude,
-      lng: defaultLongitude
-    };
-  }, [defaultLatitude, defaultLongitude]);
+  const defaultPosition =
+    defaultLatitude === undefined || defaultLongitude === undefined
+      ? null
+      : { lat: defaultLatitude, lng: defaultLongitude };
 
   return (
     <AppDialog
@@ -204,4 +172,4 @@ export default memo(function EditPinDialog({
       <PhotoPreviewList items={items} onDelete={removeAt} />
     </AppDialog>
   );
-});
+}

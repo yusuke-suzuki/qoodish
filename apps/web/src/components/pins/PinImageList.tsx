@@ -1,5 +1,4 @@
 import { Box, ButtonBase, ImageList, ImageListItem } from '@mui/material';
-import { memo } from 'react';
 import type { Pin } from '../../../types/index.ts';
 
 type Props = {
@@ -51,4 +50,4 @@ function PinImageList({ pin }: Props) {
   );
 }
 
-export default memo(PinImageList);
+export default PinImageList;

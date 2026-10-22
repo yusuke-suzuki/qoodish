@@ -20,7 +20,6 @@ import {
 import {
   type CSSProperties,
   type FormEvent,
-  memo,
   type ReactNode,
   useId
 } from 'react';
@@ -208,4 +207,4 @@ function AppDialog({
   );
 }
 
-export default memo(AppDialog);
+export default AppDialog;

@@ -11,7 +11,6 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { memo } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import type { PhotoItem } from '../../hooks/usePhotoUploads.ts';
 
@@ -20,7 +19,7 @@ type Props = {
   onDelete: (index: number) => void;
 };
 
-export default memo(function PhotoPreviewList({ items, onDelete }: Props) {
+export default function PhotoPreviewList({ items, onDelete }: Props) {
   const dictionary = useDictionary();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -77,4 +76,4 @@ export default memo(function PhotoPreviewList({ items, onDelete }: Props) {
       })}
     </ImageList>
   );
-});
+}

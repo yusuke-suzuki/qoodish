@@ -1,7 +1,6 @@
 'use client';
 
 import { Grid } from '@mui/material';
-import { memo } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import MapCard from './MapCard.tsx';
 
@@ -28,4 +27,4 @@ function MapGridList({ maps, cols }: Props) {
   );
 }
 
-export default memo(MapGridList);
+export default MapGridList;

@@ -1,14 +1,7 @@
 import { Bookmark } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  memo,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  useTransition
-} from 'react';
+import { useContext, useState, useTransition } from 'react';
 import type { AppMap, Profile } from '../../../types/index.ts';
 import { removeBookmark } from '../../actions/mapBookmarks.ts';
 import AuthContext from '../../context/AuthContext.ts';
@@ -27,11 +20,9 @@ function RemoveBookmarkButton({ map, currentProfile, onSaved }: Props) {
   const [bookmarking, setBookmarking] = useState(map?.bookmarking ?? false);
   const [isPending, startTransition] = useTransition();
 
-  const isAuthor = useMemo(() => {
-    return currentProfile?.id === map?.author.id;
-  }, [map, currentProfile]);
+  const isAuthor = currentProfile?.id === map?.author.id;
 
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
     if (!map) {
       return;
     }
@@ -62,7 +53,7 @@ function RemoveBookmarkButton({ map, currentProfile, onSaved }: Props) {
         enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
       }
     });
-  }, [map, authenticated, setSignInRequired, dictionary, onSaved]);
+  };
 
   return (
     <Button
@@ -80,4 +71,4 @@ function RemoveBookmarkButton({ map, currentProfile, onSaved }: Props) {
   );
 }
 
-export default memo(RemoveBookmarkButton);
+export default RemoveBookmarkButton;

@@ -2,7 +2,6 @@
 
 import { keyframes } from '@emotion/react';
 import { Box } from '@mui/material';
-import { memo } from 'react';
 import { FOOTPRINT_PATH_RIGHT } from '../../utils/journeyTrailIcons.ts';
 
 const STEP_DELAY = 0.18;
@@ -91,4 +90,4 @@ function WalkingFootprints({ count = 5, size = 18 }: Props) {
   );
 }
 
-export default memo(WalkingFootprints);
+export default WalkingFootprints;

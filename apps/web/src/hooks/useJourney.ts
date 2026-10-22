@@ -156,10 +156,10 @@ export default function useJourney({
   const trailSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const trailDirtyRef = useRef(false);
 
-  const commitJourney = useCallback((next: Journey | null) => {
+  const commitJourney = (next: Journey | null) => {
     journeyRef.current = next;
     setJourney(next);
-  }, []);
+  };
 
   const discardTrailSave = useCallback(() => {
     if (trailSaveRef.current !== null) {
@@ -182,19 +182,16 @@ export default function useJourney({
     }
   }, [uid, discardTrailSave]);
 
-  const commitTrail = useCallback(
-    (points: JourneyPathPoint[]) => {
-      trailRef.current = points;
-      setTrail(points);
+  const commitTrail = (points: JourneyPathPoint[]) => {
+    trailRef.current = points;
+    setTrail(points);
 
-      trailDirtyRef.current = true;
+    trailDirtyRef.current = true;
 
-      if (trailSaveRef.current === null) {
-        trailSaveRef.current = setTimeout(flushTrail, TRAIL_SAVE_INTERVAL_MS);
-      }
-    },
-    [flushTrail]
-  );
+    if (trailSaveRef.current === null) {
+      trailSaveRef.current = setTimeout(flushTrail, TRAIL_SAVE_INTERVAL_MS);
+    }
+  };
 
   useEffect(() => {
     const flush = () => {
@@ -262,54 +259,48 @@ export default function useJourney({
     }
   }, [uid]);
 
-  const commitCheckin = useCallback(
-    (journeyId: number, next: JourneyCheckin) => {
-      const latest = journeyRef.current;
+  const commitCheckin = (journeyId: number, next: JourneyCheckin) => {
+    const latest = journeyRef.current;
 
-      if (!latest || latest.id !== journeyId) {
-        return;
-      }
+    if (!latest || latest.id !== journeyId) {
+      return;
+    }
 
-      commitJourney(withReplacedCheckin(latest, next));
-    },
-    [commitJourney]
-  );
+    commitJourney(withReplacedCheckin(latest, next));
+  };
 
-  const mutateCheckin = useCallback(
-    async (
-      checkin: JourneyCheckin,
-      params: { image_ids?: number[]; note?: string | null }
-    ): Promise<boolean> => {
-      const current = journeyRef.current;
+  const mutateCheckin = async (
+    checkin: JourneyCheckin,
+    params: { image_ids?: number[]; note?: string | null }
+  ): Promise<boolean> => {
+    const current = journeyRef.current;
 
-      if (!current) {
-        return false;
-      }
+    if (!current) {
+      return false;
+    }
 
-      const { success, data, error } = await updateCheckin(
-        current.id,
-        checkin.id,
-        params
-      );
+    const { success, data, error } = await updateCheckin(
+      current.id,
+      checkin.id,
+      params
+    );
 
-      if (!success || !data) {
-        onError(error ?? null);
-        return false;
-      }
+    if (!success || !data) {
+      onError(error ?? null);
+      return false;
+    }
 
-      commitCheckin(current.id, data);
-      return true;
-    },
-    [commitCheckin, onError]
-  );
+    commitCheckin(current.id, data);
+    return true;
+  };
 
-  const findLatestCheckin = useCallback((checkin: JourneyCheckin) => {
+  const findLatestCheckin = (checkin: JourneyCheckin) => {
     return (
       journeyRef.current?.checkins.find(
         (existing) => existing.id === checkin.id
       ) ?? checkin
     );
-  }, []);
+  };
 
   const attachCheckinImage = async (checkin: JourneyCheckin, image: Image) => {
     const latest = findLatestCheckin(checkin);
@@ -337,41 +328,38 @@ export default function useJourney({
     return mutateCheckin(checkin, { note });
   };
 
-  const performCheckin = useCallback(
-    async (pin: Pin) => {
-      const current = journeyRef.current;
+  const performCheckin = async (pin: Pin) => {
+    const current = journeyRef.current;
 
-      if (!current || pendingCheckinsRef.current.has(pin.id)) {
-        return;
-      }
+    if (!current || pendingCheckinsRef.current.has(pin.id)) {
+      return;
+    }
 
-      pendingCheckinsRef.current.add(pin.id);
-      departuresRef.current = withoutDeparture(departuresRef.current, pin.id);
+    pendingCheckinsRef.current.add(pin.id);
+    departuresRef.current = withoutDeparture(departuresRef.current, pin.id);
 
-      const { success, data } = await addCheckin(current.id, pin.id);
+    const { success, data } = await addCheckin(current.id, pin.id);
 
-      pendingCheckinsRef.current.delete(pin.id);
+    pendingCheckinsRef.current.delete(pin.id);
 
-      if (!success || !data) {
-        return;
-      }
+    if (!success || !data) {
+      return;
+    }
 
-      const latest = journeyRef.current;
+    const latest = journeyRef.current;
 
-      if (!latest || latest.id !== current.id) {
-        return;
-      }
+    if (!latest || latest.id !== current.id) {
+      return;
+    }
 
-      commitJourney({ ...latest, checkins: [...latest.checkins, data] });
+    commitJourney({ ...latest, checkins: [...latest.checkins, data] });
 
-      if ('vibrate' in navigator) {
-        navigator.vibrate(CHECKIN_VIBRATION_MS);
-      }
+    if ('vibrate' in navigator) {
+      navigator.vibrate(CHECKIN_VIBRATION_MS);
+    }
 
-      onCheckin(pin);
-    },
-    [commitJourney, onCheckin]
-  );
+    onCheckin(pin);
+  };
 
   const processPosition = (position: GeolocationPosition) => {
     onPosition(position);
@@ -457,20 +445,17 @@ export default function useJourney({
 
   // Losing the permission mid-journey must not cost the traveller their
   // milestones and check-ins, so recording only pauses.
-  const handleError = useCallback(
-    (error: GeolocationPositionError) => {
-      // The watch stays live until the effect cleanup runs, so a second
-      // error can arrive before it is torn down. The ref settles at once
-      // where the state would not.
-      if (pausedRef.current || error.code !== error.PERMISSION_DENIED) {
-        return;
-      }
+  const handleError = useEffectEvent((error: GeolocationPositionError) => {
+    // The watch stays live until the effect cleanup runs, so a second
+    // error can arrive before it is torn down. The ref settles at once
+    // where the state would not.
+    if (pausedRef.current || error.code !== error.PERMISSION_DENIED) {
+      return;
+    }
 
-      commitPaused(true);
-      onPaused('permission');
-    },
-    [commitPaused, onPaused]
-  );
+    commitPaused(true);
+    onPaused('permission');
+  });
 
   const recording = isRecording(canRecord, journey, paused);
 
@@ -485,6 +470,8 @@ export default function useJourney({
     return () => document.removeEventListener('visibilitychange', sync);
   }, []);
 
+  const notifyPaused = useEffectEvent(onPaused);
+
   // A journey left running overnight would keep the device fixing positions
   // for nothing, so a long gap without a fix stops it until the traveller
   // sets off again.
@@ -496,7 +483,7 @@ export default function useJourney({
     const check = () => {
       if (isInactive(lastPositionAtRef.current, Date.now())) {
         commitPaused(true);
-        onPaused('inactivity');
+        notifyPaused('inactivity');
       }
     };
 
@@ -505,7 +492,9 @@ export default function useJourney({
     const intervalId = setInterval(check, INACTIVITY_CHECK_INTERVAL_MS);
 
     return () => clearInterval(intervalId);
-  }, [visible, recording, commitPaused, onPaused]);
+  }, [visible, recording, commitPaused]);
+
+  const notifyLocationError = useEffectEvent(onLocationError);
 
   useEffect(() => {
     if (!uid || !watching) {
@@ -513,7 +502,7 @@ export default function useJourney({
     }
 
     if (!('geolocation' in navigator)) {
-      onLocationError();
+      notifyLocationError();
       return;
     }
 
@@ -522,7 +511,7 @@ export default function useJourney({
     if (highAccuracy && !stationary) {
       const watchId = navigator.geolocation.watchPosition(
         (position) => handlePosition(position),
-        handleError,
+        (error) => handleError(error),
         HIGH_ACCURACY_OPTIONS
       );
 
@@ -565,22 +554,21 @@ export default function useJourney({
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [uid, watching, highAccuracy, stationary, handleError, onLocationError]);
+  }, [uid, watching, highAccuracy, stationary]);
 
-  const requestPosition =
-    useCallback((): Promise<GeolocationPosition | null> => {
-      if (!('geolocation' in navigator)) {
-        return Promise.resolve(null);
-      }
+  const requestPosition = (): Promise<GeolocationPosition | null> => {
+    if (!('geolocation' in navigator)) {
+      return Promise.resolve(null);
+    }
 
-      return new Promise((resolve) => {
-        navigator.geolocation.getCurrentPosition(
-          (fix) => resolve(fix),
-          () => resolve(null),
-          { ...HIGH_ACCURACY_OPTIONS, timeout: INITIAL_POSITION_TIMEOUT_MS }
-        );
-      });
-    }, []);
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (fix) => resolve(fix),
+        () => resolve(null),
+        { ...HIGH_ACCURACY_OPTIONS, timeout: INITIAL_POSITION_TIMEOUT_MS }
+      );
+    });
+  };
 
   const pause = () => commitPaused(true);
 
@@ -599,7 +587,7 @@ export default function useJourney({
     return true;
   };
 
-  const ensureJourney = useCallback(async (): Promise<Journey | null> => {
+  const ensureJourney = async (): Promise<Journey | null> => {
     const current = journeyRef.current;
 
     if (current) {
@@ -616,7 +604,7 @@ export default function useJourney({
     commitJourney(data);
 
     return data;
-  }, [map.id, commitJourney, onError]);
+  };
 
   const addMilestone = async (pin: Pin): Promise<boolean> => {
     if (!authenticated || !uid) {

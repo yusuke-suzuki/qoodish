@@ -1,7 +1,7 @@
 import { Alert, Button, Stack } from '@mui/material';
 import { getAuth, sendSignInLinkToEmail } from 'firebase/auth';
 import { useParams } from 'next/navigation';
-import { type FormEvent, memo, useCallback, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import EmailField from '../common/EmailField.tsx';
 
@@ -13,66 +13,60 @@ function SignInWithEmailLinkButton() {
   const [emailValid, setEmailValid] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const handleEmailChange = useCallback((value: string, isValid: boolean) => {
+  const handleEmailChange = (value: string, isValid: boolean) => {
     setEmail(value);
     setEmailValid(isValid);
-  }, []);
+  };
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const basePath = `/${lang ?? 'en'}`;
 
-  const getErrorMessage = useCallback(
-    (errorCode: string): string => {
-      switch (errorCode) {
-        case 'auth/invalid-email':
-          return dictionary['email link error invalid email'];
-        case 'auth/too-many-requests':
-          return dictionary['email link error too many requests'];
-        case 'auth/operation-not-allowed':
-          return dictionary['email link error operation not allowed'];
-        case 'auth/expired-action-code':
-          return dictionary['email link error expired'];
-        case 'auth/invalid-action-code':
-          return dictionary['email link error invalid link'];
-        case 'auth/network-request-failed':
-          return dictionary['email link error network request failed'];
-        default:
-          return dictionary['an error occurred'];
-      }
-    },
-    [dictionary]
-  );
+  const getErrorMessage = (errorCode: string): string => {
+    switch (errorCode) {
+      case 'auth/invalid-email':
+        return dictionary['email link error invalid email'];
+      case 'auth/too-many-requests':
+        return dictionary['email link error too many requests'];
+      case 'auth/operation-not-allowed':
+        return dictionary['email link error operation not allowed'];
+      case 'auth/expired-action-code':
+        return dictionary['email link error expired'];
+      case 'auth/invalid-action-code':
+        return dictionary['email link error invalid link'];
+      case 'auth/network-request-failed':
+        return dictionary['email link error network request failed'];
+      default:
+        return dictionary['an error occurred'];
+    }
+  };
 
-  const handleSendLink = useCallback(
-    async (e: FormEvent) => {
-      e.preventDefault();
-      setLoading(true);
-      setError(null);
+  const handleSendLink = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-      const auth = getAuth();
-      auth.languageCode = lang;
+    const auth = getAuth();
+    auth.languageCode = lang;
 
-      const actionCodeSettings = {
-        url: `${window.location.origin}${basePath}`,
-        handleCodeInApp: true,
-        linkDomain: window.location.hostname
-      };
+    const actionCodeSettings = {
+      url: `${window.location.origin}${basePath}`,
+      handleCodeInApp: true,
+      linkDomain: window.location.hostname
+    };
 
-      try {
-        await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-        window.localStorage.setItem('emailForSignIn', email);
-        setSent(true);
-      } catch (err) {
-        console.error(err);
-        const errorMessage = getErrorMessage((err as { code: string }).code);
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [email, lang, basePath, getErrorMessage]
-  );
+    try {
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      window.localStorage.setItem('emailForSignIn', email);
+      setSent(true);
+    } catch (err) {
+      console.error(err);
+      const errorMessage = getErrorMessage((err as { code: string }).code);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (sent) {
     return (
@@ -113,4 +107,4 @@ function SignInWithEmailLinkButton() {
   );
 }
 
-export default memo(SignInWithEmailLinkButton);
+export default SignInWithEmailLinkButton;

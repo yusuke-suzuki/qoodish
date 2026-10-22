@@ -9,7 +9,6 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
@@ -26,7 +25,7 @@ type Props = {
   onBlocked: (authorId: number) => void;
 };
 
-export default memo(function TimelinePinCard({
+export default function TimelinePinCard({
   pin,
   onReportClick,
   onMuted,
@@ -78,4 +77,4 @@ export default memo(function TimelinePinCard({
       </CardActions>
     </Card>
   );
-});
+}

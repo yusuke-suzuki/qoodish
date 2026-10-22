@@ -1,7 +1,6 @@
 import { Avatar } from '@mui/material';
-import { memo } from 'react';
 
-export default memo(function LogoAvatar() {
+export default function LogoAvatar() {
   return (
     <Avatar
       sx={{
@@ -17,4 +16,4 @@ export default memo(function LogoAvatar() {
       Q
     </Avatar>
   );
-});
+}

@@ -3,7 +3,7 @@
 import { Button, Card, CardContent, List, Typography } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { BlockedAccount } from '../../../types/index.ts';
 import { fetchMoreBlockedAccounts } from '../../actions/blocks.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -100,4 +100,4 @@ function BlockedAccountsCard({ accounts, nextCursor }: Props) {
   );
 }
 
-export default memo(BlockedAccountsCard);
+export default BlockedAccountsCard;

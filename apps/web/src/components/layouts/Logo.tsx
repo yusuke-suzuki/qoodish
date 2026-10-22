@@ -1,5 +1,4 @@
 import { Typography } from '@mui/material';
-import { memo } from 'react';
 
 type Props = {
   color?:
@@ -20,7 +19,7 @@ type Props = {
 //
 // A span, not the heading the size once implied: the mark names the site in
 // the chrome, and an h4 above a page's own h1 is a heading of nothing.
-export default memo(function Logo({ color }: Props) {
+export default function Logo({ color }: Props) {
   return (
     <Typography
       variant="h5"
@@ -36,4 +35,4 @@ export default memo(function Logo({ color }: Props) {
       Qoodish
     </Typography>
   );
-});
+}

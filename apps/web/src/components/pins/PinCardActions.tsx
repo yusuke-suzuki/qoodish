@@ -1,5 +1,4 @@
 import { CardActions } from '@mui/material';
-import { memo, useMemo } from 'react';
 import type { ContentRef, Pin } from '../../../types/index.ts';
 import CommentForm from '../common/CommentForm.tsx';
 import LikePinButton from './LikePinButton.tsx';
@@ -10,12 +9,9 @@ type Props = {
 };
 
 const PinCardActions = ({ pin, onCommentAdded }: Props) => {
-  const subject = useMemo<ContentRef>(
-    () => ({ type: 'pin', id: pin.id }),
-    [pin.id]
-  );
+  const subject: ContentRef = { type: 'pin', id: pin.id };
 
-  const likeButton = useMemo(() => <LikePinButton pin={pin} />, [pin]);
+  const likeButton = <LikePinButton pin={pin} />;
 
   return (
     <CardActions sx={{ p: 2 }}>
@@ -28,4 +24,4 @@ const PinCardActions = ({ pin, onCommentAdded }: Props) => {
   );
 };
 
-export default memo(PinCardActions);
+export default PinCardActions;

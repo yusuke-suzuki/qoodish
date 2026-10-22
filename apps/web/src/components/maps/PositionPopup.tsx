@@ -7,7 +7,7 @@ import {
   ListItemIcon,
   ListItemText
 } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import MapPopup from './MapPopup.tsx';
 
@@ -92,4 +92,4 @@ function PositionPopup({
   );
 }
 
-export default memo(PositionPopup);
+export default PositionPopup;

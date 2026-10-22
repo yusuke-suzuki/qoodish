@@ -1,7 +1,7 @@
 import { HistoryEdu, Place } from '@mui/icons-material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Tab } from '@mui/material';
-import { memo, type SyntheticEvent, useState } from 'react';
+import { type SyntheticEvent, useState } from 'react';
 import type { Chapter, Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import MapChapterList from './MapChapterList.tsx';
@@ -54,4 +54,4 @@ function MapDetailTabs({ pins, chapters, onPinClick }: Props) {
   );
 }
 
-export default memo(MapDetailTabs);
+export default MapDetailTabs;

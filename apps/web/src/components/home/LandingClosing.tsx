@@ -2,13 +2,13 @@
 
 import { Button, Container, Divider, Stack } from '@mui/material';
 import Link from 'next/link';
-import { memo, useContext } from 'react';
+import { useContext } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import LandingSection from './LandingSection.tsx';
 
-export default memo(function LandingClosing() {
+export default function LandingClosing() {
   const { setSignInRequired } = useContext(AuthContext);
   const dictionary = useDictionary();
   const localePath = useLocalePath();
@@ -49,4 +49,4 @@ export default memo(function LandingClosing() {
       </LandingSection>
     </>
   );
-});
+}

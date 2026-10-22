@@ -3,7 +3,7 @@
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import type {
   AppMap,
   Chapter,
@@ -218,10 +218,7 @@ export default function MapDetailView({
   const lng = searchParams.get('lng');
   const zoom = searchParams.get('zoom');
 
-  const center = useMemo(
-    () => (lat && lng ? { lat: Number(lat), lng: Number(lng) } : null),
-    [lat, lng]
-  );
+  const center = lat && lng ? { lat: Number(lat), lng: Number(lng) } : null;
   const currentZoom = zoom ? Number(zoom) : undefined;
 
   const [reportDialogOpen, setReportDialogOpen] = useState(false);

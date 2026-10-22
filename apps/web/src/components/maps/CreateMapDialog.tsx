@@ -6,14 +6,7 @@ import {
   Typography
 } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  type FormEvent,
-  memo,
-  useCallback,
-  useMemo,
-  useState,
-  useTransition
-} from 'react';
+import { type FormEvent, useState, useTransition } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import { createMap } from '../../actions/maps.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -32,11 +25,7 @@ type Props = {
   onSaved: (map: AppMap) => void;
 };
 
-export default memo(function CreateMapDialog({
-  open,
-  onClose,
-  onSaved
-}: Props) {
+export default function CreateMapDialog({ open, onClose, onSaved }: Props) {
   const dictionary = useDictionary();
 
   const [name, setName] = useState('');
@@ -54,107 +43,85 @@ export default memo(function CreateMapDialog({
     null
   );
 
-  const disabled = useMemo(() => {
-    return !(name && description && position) || isUploading;
-  }, [name, description, position, isUploading]);
+  const disabled = !(name && description && position) || isUploading;
 
-  const handleImagesChange = useCallback(
-    async (files: File[]) => {
-      if (files.length < 1) {
-        return;
-      }
-      reset();
-      try {
-        await upload([files[0]]);
-      } catch (error) {
-        enqueueSnackbar(uploadFailureMessage(error, dictionary), {
-          variant: 'error'
-        });
-      }
-    },
-    [reset, upload, dictionary]
-  );
+  const handleImagesChange = async (files: File[]) => {
+    if (files.length < 1) {
+      return;
+    }
+    reset();
+    try {
+      await upload([files[0]]);
+    } catch (error) {
+      enqueueSnackbar(uploadFailureMessage(error, dictionary), {
+        variant: 'error'
+      });
+    }
+  };
 
-  const handleMapOptionsChange = useCallback(
-    (options: { isPrivate: boolean }) => {
-      setIsPrivate(options.isPrivate);
-    },
-    []
-  );
+  const handleMapOptionsChange = (options: { isPrivate: boolean }) => {
+    setIsPrivate(options.isPrivate);
+  };
 
   const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      if (!position) {
-        enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
-        return;
-      }
+    if (!position) {
+      enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
+      return;
+    }
 
-      startTransition(async () => {
-        try {
-          const result = await createMap({
-            name,
-            description,
-            latitude: position.lat,
-            longitude: position.lng,
-            private: isPrivate,
-            image_ids:
-              uploadedImages.length > 0
-                ? uploadedImages.map((image) => image.id)
-                : undefined
+    startTransition(async () => {
+      try {
+        const result = await createMap({
+          name,
+          description,
+          latitude: position.lat,
+          longitude: position.lng,
+          private: isPrivate,
+          image_ids:
+            uploadedImages.length > 0
+              ? uploadedImages.map((image) => image.id)
+              : undefined
+        });
+
+        if (result.success) {
+          enqueueSnackbar(dictionary['create map success'], {
+            variant: 'success'
           });
 
-          if (result.success) {
-            enqueueSnackbar(dictionary['create map success'], {
-              variant: 'success'
-            });
-
-            onClose();
-            if (result.data) {
-              onSaved(result.data);
-            }
-            return;
+          onClose();
+          if (result.data) {
+            onSaved(result.data);
           }
-
-          enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
-            variant: 'error'
-          });
-        } catch (_error) {
-          enqueueSnackbar(dictionary['an error occurred'], {
-            variant: 'error'
-          });
+          return;
         }
-      });
-    },
-    [
-      position,
-      uploadedImages,
-      name,
-      description,
-      isPrivate,
-      dictionary,
-      onClose,
-      onSaved
-    ]
-  );
 
-  const handleExited = useCallback(() => {
+        enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      } catch (_error) {
+        enqueueSnackbar(dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      }
+    });
+  };
+
+  const handleExited = () => {
     setName('');
     setDescription('');
     reset();
     setPosition(null);
     setIsPrivate(false);
-  }, [reset]);
+  };
 
-  const defaultCenter = useMemo(() => {
-    return {
-      lat: 0,
-      lng: 0
-    };
-  }, []);
+  const defaultCenter = {
+    lat: 0,
+    lng: 0
+  };
 
   return (
     <AppDialog
@@ -232,4 +199,4 @@ export default memo(function CreateMapDialog({
       </Box>
     </AppDialog>
   );
-});
+}

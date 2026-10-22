@@ -1,5 +1,5 @@
 import { Box, ButtonBase, CardMedia, Stack } from '@mui/material';
-import { memo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 
@@ -107,4 +107,4 @@ function PinImageCarousel({ pin }: Props) {
   );
 }
 
-export default memo(PinImageCarousel);
+export default PinImageCarousel;

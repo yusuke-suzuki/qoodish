@@ -9,7 +9,7 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import type { CommentItem, ContentRef } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import useRelativeTime from '../../hooks/useRelativeTime.ts';
@@ -128,4 +128,4 @@ const CommentList = ({ subject, comments, onDeleted, onLiked }: Props) => {
   );
 };
 
-export default memo(CommentList);
+export default CommentList;

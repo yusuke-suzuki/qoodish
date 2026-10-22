@@ -1,13 +1,13 @@
 import { Box } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { type ElementType, memo } from 'react';
+import type { ElementType } from 'react';
 
 type Props = {
   icon: ElementType;
   sx?: SxProps<Theme>;
 };
 
-export default memo(function MediaPlaceholder({ icon: Icon, sx }: Props) {
+export default function MediaPlaceholder({ icon: Icon, sx }: Props) {
   return (
     <Box
       sx={[
@@ -23,4 +23,4 @@ export default memo(function MediaPlaceholder({ icon: Icon, sx }: Props) {
       <Icon color="disabled" fontSize="large" />
     </Box>
   );
-});
+}

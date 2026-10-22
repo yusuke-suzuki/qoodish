@@ -7,7 +7,6 @@ import {
   ListItemIcon,
   ListItemText
 } from '@mui/material';
-import { memo } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from '../common/AppDialog.tsx';
@@ -21,7 +20,7 @@ type Props = {
   usedPinIds: Set<number | null>;
 };
 
-export default memo(function PinPickerDialog({
+export default function PinPickerDialog({
   open,
   onClose,
   onSelect,
@@ -82,4 +81,4 @@ export default memo(function PinPickerDialog({
       )}
     </AppDialog>
   );
-});
+}

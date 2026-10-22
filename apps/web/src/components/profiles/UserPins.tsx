@@ -1,7 +1,7 @@
 import { Reviews } from '@mui/icons-material';
 import { Button, Stack } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import { fetchMoreMyPins, fetchMoreUserPins } from '../../actions/pins.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -17,7 +17,7 @@ type Props = {
   isOwnProfile: boolean;
 };
 
-export default memo(function UserPins({
+export default function UserPins({
   userId,
   initialPins,
   nextCursor,
@@ -71,4 +71,4 @@ export default memo(function UserPins({
       </Stack>
     </>
   );
-});
+}

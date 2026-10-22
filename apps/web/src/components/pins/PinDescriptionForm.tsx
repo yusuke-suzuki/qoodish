@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { type ChangeEvent, memo, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 const MAX_LENGTH = 500;
@@ -33,9 +33,11 @@ function PinDescriptionForm({ onChange, defaultValue }: Props) {
     setComment(input);
   };
 
+  const notifyChange = useEffectEvent(onChange);
+
   useEffect(() => {
-    onChange(comment);
-  }, [comment, onChange]);
+    notifyChange(comment);
+  }, [comment]);
 
   return (
     <TextField
@@ -53,4 +55,4 @@ function PinDescriptionForm({ onChange, defaultValue }: Props) {
   );
 }
 
-export default memo(PinDescriptionForm);
+export default PinDescriptionForm;

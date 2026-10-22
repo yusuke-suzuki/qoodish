@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { type ChangeEvent, memo, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 const MAX_LENGTH = 30;
@@ -9,7 +9,7 @@ type Props = {
   defaultValue?: string | null;
 };
 
-export default memo(function MapNameForm({ onChange, defaultValue }: Props) {
+export default function MapNameForm({ onChange, defaultValue }: Props) {
   const dictionary = useDictionary();
 
   const [name, setName] = useState(defaultValue ?? '');
@@ -33,9 +33,11 @@ export default memo(function MapNameForm({ onChange, defaultValue }: Props) {
     setName(input);
   };
 
+  const notifyChange = useEffectEvent(onChange);
+
   useEffect(() => {
-    onChange(name);
-  }, [name, onChange]);
+    notifyChange(name);
+  }, [name]);
 
   return (
     <TextField
@@ -49,4 +51,4 @@ export default memo(function MapNameForm({ onChange, defaultValue }: Props) {
       variant="outlined"
     />
   );
-});
+}

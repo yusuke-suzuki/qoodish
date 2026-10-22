@@ -11,14 +11,13 @@ import {
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import { PHOTOS } from '../../utils/photos.ts';
 import SignInButtons from '../auth/SignInButtons.tsx';
 import HeroBackground from '../common/HeroBackground.tsx';
 
-export default memo(function LandingHero() {
+export default function LandingHero() {
   const dictionary = useDictionary();
   const localePath = useLocalePath();
 
@@ -97,4 +96,4 @@ export default memo(function LandingHero() {
       </Container>
     </HeroBackground>
   );
-});
+}

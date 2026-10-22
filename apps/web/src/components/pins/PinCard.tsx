@@ -3,7 +3,6 @@
 import { PhotoLibrary, Place } from '@mui/icons-material';
 import { Box, ButtonBase, Typography } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import MediaPlaceholder from '../common/MediaPlaceholder.tsx';
@@ -12,7 +11,7 @@ type Props = {
   pin: Pin;
 };
 
-export default memo(function PinCard({ pin }: Props) {
+export default function PinCard({ pin }: Props) {
   const localePath = useLocalePath();
 
   const [image] = pin.images;
@@ -73,4 +72,4 @@ export default memo(function PinCard({ pin }: Props) {
       </Typography>
     </ButtonBase>
   );
-});
+}

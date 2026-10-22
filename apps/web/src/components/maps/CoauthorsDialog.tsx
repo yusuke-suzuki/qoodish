@@ -14,7 +14,7 @@ import {
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import type { AppMap, Coauthor } from '../../../types/index.ts';
 import { removeCoauthor } from '../../actions/coauthors.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -114,4 +114,4 @@ function CoauthorsDialog({ open, onClose, map, coauthors }: Props) {
   );
 }
 
-export default memo(CoauthorsDialog);
+export default CoauthorsDialog;

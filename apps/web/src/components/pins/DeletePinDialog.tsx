@@ -1,5 +1,4 @@
 import { enqueueSnackbar } from 'notistack';
-import { memo, useCallback } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import { deletePin } from '../../actions/pins.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -15,7 +14,7 @@ type Props = {
 const DeletePinDialog = ({ pin, open, onClose, onDeleted }: Props) => {
   const dictionary = useDictionary();
 
-  const handleConfirm = useCallback(async () => {
+  const handleConfirm = async () => {
     if (!pin) {
       enqueueSnackbar(dictionary['delete pin failed'], { variant: 'error' });
       return;
@@ -40,7 +39,7 @@ const DeletePinDialog = ({ pin, open, onClose, onDeleted }: Props) => {
     } catch (_error) {
       enqueueSnackbar(dictionary['delete pin failed'], { variant: 'error' });
     }
-  }, [pin, dictionary, onClose, onDeleted]);
+  };
 
   return (
     <ConfirmDeleteDialog
@@ -52,4 +51,4 @@ const DeletePinDialog = ({ pin, open, onClose, onDeleted }: Props) => {
   );
 };
 
-export default memo(DeletePinDialog);
+export default DeletePinDialog;

@@ -2,7 +2,6 @@ import { Close } from '@mui/icons-material';
 import { Box, IconButton, Paper } from '@mui/material';
 import {
   type KeyboardEvent,
-  memo,
   type ReactNode,
   Suspense,
   use,
@@ -161,4 +160,4 @@ function MapPopup(props: Props) {
   );
 }
 
-export default memo(MapPopup);
+export default MapPopup;

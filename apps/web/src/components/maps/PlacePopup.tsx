@@ -1,6 +1,6 @@
 import { Add } from '@mui/icons-material';
 import { Box, Button, Typography } from '@mui/material';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import MapPopup from './MapPopup.tsx';
 
@@ -82,4 +82,4 @@ function PlacePopup({
   );
 }
 
-export default memo(PlacePopup);
+export default PlacePopup;

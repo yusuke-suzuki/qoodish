@@ -2,7 +2,6 @@
 
 import { Box, Divider, Link as MuiLink, Typography } from '@mui/material';
 import Link from 'next/link';
-import { memo } from 'react';
 import type { ChapterAuthor, Journal } from '../../../types/index.ts';
 import useCountLabel from '../../hooks/useCountLabel.ts';
 import ProfileAvatar from '../common/ProfileAvatar.tsx';
@@ -69,4 +68,4 @@ function ChapterAuthorCard({ author, journal, locale, pageCount }: Props) {
   );
 }
 
-export default memo(ChapterAuthorCard);
+export default ChapterAuthorCard;

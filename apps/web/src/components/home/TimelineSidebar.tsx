@@ -1,7 +1,6 @@
 'use client';
 
 import { Divider, Stack } from '@mui/material';
-import { memo } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import RecommendMaps from './RecommendMaps.tsx';
 import TrendingMaps from './TrendingMaps.tsx';
@@ -27,4 +26,4 @@ function TimelineSidebar({ popularMaps, recommendMaps }: Props) {
   );
 }
 
-export default memo(TimelineSidebar);
+export default TimelineSidebar;

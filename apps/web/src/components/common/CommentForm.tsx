@@ -1,13 +1,6 @@
 import { Box, Button, Stack, TextField } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  memo,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useState,
-  useTransition
-} from 'react';
+import { type ReactNode, useContext, useState, useTransition } from 'react';
 import type { ContentRef } from '../../../types/index.ts';
 import { createComment } from '../../actions/comments.ts';
 import AuthContext from '../../context/AuthContext.ts';
@@ -29,7 +22,7 @@ const CommentForm = ({ subject, onCommentAdded, collapsedAction }: Props) => {
 
   const dictionary = useDictionary();
 
-  const handleSendClick = useCallback(() => {
+  const handleSendClick = () => {
     if (!authenticated) {
       setSignInRequired(true);
       return;
@@ -52,14 +45,7 @@ const CommentForm = ({ subject, onCommentAdded, collapsedAction }: Props) => {
         enqueueSnackbar(dictionary['comment failed'], { variant: 'error' });
       }
     });
-  }, [
-    authenticated,
-    subject,
-    comment,
-    onCommentAdded,
-    setSignInRequired,
-    dictionary
-  ]);
+  };
 
   return (
     <Stack width="100%" spacing={1}>
@@ -124,4 +110,4 @@ const CommentForm = ({ subject, onCommentAdded, collapsedAction }: Props) => {
   );
 };
 
-export default memo(CommentForm);
+export default CommentForm;

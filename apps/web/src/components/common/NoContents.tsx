@@ -1,5 +1,5 @@
 import { Icon, Stack, Typography, useTheme } from '@mui/material';
-import { type ElementType, memo, type ReactNode } from 'react';
+import type { ElementType, ReactNode } from 'react';
 
 type Props = {
   icon: ElementType;
@@ -7,7 +7,7 @@ type Props = {
   action?: ReactNode;
 };
 
-export default memo(function NoContents({ icon, message, action }: Props) {
+export default function NoContents({ icon, message, action }: Props) {
   const theme = useTheme();
 
   return (
@@ -42,4 +42,4 @@ export default memo(function NoContents({ icon, message, action }: Props) {
       )}
     </Stack>
   );
-});
+}

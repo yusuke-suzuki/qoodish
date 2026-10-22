@@ -1,5 +1,4 @@
 import { enqueueSnackbar } from 'notistack';
-import { memo, useCallback } from 'react';
 import type { CommentItem, ContentRef } from '../../../types/index.ts';
 import { deleteComment } from '../../actions/comments.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -22,7 +21,7 @@ const DeleteCommentDialog = ({
 }: Props) => {
   const dictionary = useDictionary();
 
-  const handleConfirm = useCallback(async () => {
+  const handleConfirm = async () => {
     if (!comment) {
       enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
       return;
@@ -47,7 +46,7 @@ const DeleteCommentDialog = ({
     } catch (_error) {
       enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
     }
-  }, [subject, comment, dictionary, onClose, onDeleted]);
+  };
 
   return (
     <ConfirmDialog
@@ -62,4 +61,4 @@ const DeleteCommentDialog = ({
   );
 };
 
-export default memo(DeleteCommentDialog);
+export default DeleteCommentDialog;

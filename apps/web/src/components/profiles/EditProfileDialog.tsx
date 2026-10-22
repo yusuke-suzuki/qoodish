@@ -6,14 +6,7 @@ import {
   Typography
 } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  type FormEvent,
-  memo,
-  useCallback,
-  useMemo,
-  useState,
-  useTransition
-} from 'react';
+import { type FormEvent, useState, useTransition } from 'react';
 import type { Journal, PublicUser } from '../../../types/index.ts';
 import { updateJournal } from '../../actions/journals.ts';
 import { updateProfile } from '../../actions/users.ts';
@@ -34,7 +27,7 @@ type Props = {
   onSaved: () => void;
 };
 
-export default memo(function EditProfileDialog({
+export default function EditProfileDialog({
   currentProfile,
   journal,
   open,
@@ -51,9 +44,7 @@ export default memo(function EditProfileDialog({
   const { items, isUploading, uploadedImages, upload, reset } =
     usePhotoUploads();
 
-  const disabled = useMemo(() => {
-    return !name || (Boolean(journal) && !journalTitle) || isUploading;
-  }, [name, journal, journalTitle, isUploading]);
+  const disabled = !name || (Boolean(journal) && !journalTitle) || isUploading;
 
   const previewItem = items[0];
   const newThumbnailUrl =
@@ -62,101 +53,85 @@ export default memo(function EditProfileDialog({
       : (previewItem?.image.card ?? null);
   const thumbnailUrl = newThumbnailUrl ?? currentProfile?.image?.card ?? null;
 
-  const handleImagesChange = useCallback(
-    async (files: File[]) => {
-      if (files.length < 1) {
-        return;
-      }
-      reset();
-      try {
-        await upload([files[0]]);
-      } catch (error) {
-        enqueueSnackbar(uploadFailureMessage(error, dictionary), {
-          variant: 'error'
-        });
-      }
-    },
-    [reset, upload, dictionary]
-  );
+  const handleImagesChange = async (files: File[]) => {
+    if (files.length < 1) {
+      return;
+    }
+    reset();
+    try {
+      await upload([files[0]]);
+    } catch (error) {
+      enqueueSnackbar(uploadFailureMessage(error, dictionary), {
+        variant: 'error'
+      });
+    }
+  };
 
   const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      if (!currentProfile || !name) {
-        enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
-        return;
-      }
+    if (!currentProfile || !name) {
+      enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
+      return;
+    }
 
-      startTransition(async () => {
-        try {
-          const result = await updateProfile({
-            name,
-            biography,
-            image_ids:
-              uploadedImages.length > 0
-                ? uploadedImages.map((image) => image.id)
-                : undefined
-          });
+    startTransition(async () => {
+      try {
+        const result = await updateProfile({
+          name,
+          biography,
+          image_ids:
+            uploadedImages.length > 0
+              ? uploadedImages.map((image) => image.id)
+              : undefined
+        });
 
-          if (!result.success) {
-            enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
-              variant: 'error'
-            });
-            return;
-          }
-
-          // The profile is already persisted at this point, so a failing
-          // journal update reports itself but must not withhold the refresh.
-          if (journal) {
-            const journalResult = await updateJournal({
-              title: journalTitle
-            });
-
-            if (!journalResult.success) {
-              enqueueSnackbar(
-                journalResult.error ?? dictionary['an error occurred'],
-                { variant: 'error' }
-              );
-              onSaved();
-              return;
-            }
-          }
-
-          enqueueSnackbar(dictionary['edit profile success'], {
-            variant: 'success'
-          });
-
-          onClose();
-          onSaved();
-        } catch (_error) {
-          enqueueSnackbar(dictionary['an error occurred'], {
+        if (!result.success) {
+          enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
             variant: 'error'
           });
+          return;
         }
-      });
-    },
-    [
-      currentProfile,
-      journal,
-      journalTitle,
-      uploadedImages,
-      name,
-      biography,
-      dictionary,
-      onClose,
-      onSaved
-    ]
-  );
 
-  const handleExited = useCallback(() => {
+        // The profile is already persisted at this point, so a failing
+        // journal update reports itself but must not withhold the refresh.
+        if (journal) {
+          const journalResult = await updateJournal({
+            title: journalTitle
+          });
+
+          if (!journalResult.success) {
+            enqueueSnackbar(
+              journalResult.error ?? dictionary['an error occurred'],
+              { variant: 'error' }
+            );
+            onSaved();
+            return;
+          }
+        }
+
+        enqueueSnackbar(dictionary['edit profile success'], {
+          variant: 'success'
+        });
+
+        onClose();
+        onSaved();
+      } catch (_error) {
+        enqueueSnackbar(dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      }
+    });
+  };
+
+  const handleExited = () => {
     setName(undefined);
     setBiography(undefined);
     setJournalTitle(undefined);
     reset();
-  }, [reset]);
+  };
 
   return (
     <AppDialog
@@ -233,4 +208,4 @@ export default memo(function EditProfileDialog({
       )}
     </AppDialog>
   );
-});
+}

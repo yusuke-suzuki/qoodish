@@ -15,7 +15,7 @@ import {
   useTheme
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { memo, useDeferredValue, useRef, useState } from 'react';
+import { useDeferredValue, useRef, useState } from 'react';
 import type { SearchResult } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { useSiteSearch } from '../../hooks/useSiteSearch.ts';
@@ -170,4 +170,4 @@ const SearchDialog = ({ open, onClose }: Props) => {
   );
 };
 
-export default memo(SearchDialog);
+export default SearchDialog;

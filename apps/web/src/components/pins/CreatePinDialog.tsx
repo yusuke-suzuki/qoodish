@@ -1,13 +1,6 @@
 import { Box } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import {
-  type FormEvent,
-  memo,
-  useCallback,
-  useMemo,
-  useState,
-  useTransition
-} from 'react';
+import { type FormEvent, useState, useTransition } from 'react';
 import type { AppMap, PinProperty } from '../../../types/index.ts';
 import { createPin } from '../../actions/pins.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -33,7 +26,7 @@ type Props = {
   defaultName: string | null;
 };
 
-export default memo(function CreatePinDialog({
+export default function CreatePinDialog({
   open,
   onClose,
   onExited,
@@ -54,67 +47,51 @@ export default memo(function CreatePinDialog({
     null
   );
 
-  const disabled = useMemo(() => {
-    return !(name && comment && map && position) || isUploading;
-  }, [name, comment, map, position, isUploading]);
+  const disabled = !(name && comment && map && position) || isUploading;
 
   const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      if (!map || !position) {
-        enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
-        return;
-      }
+    if (!map || !position) {
+      enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
+      return;
+    }
 
-      startTransition(async () => {
-        try {
-          const result = await createPin(map.id, {
-            name,
-            comment,
-            latitude: position.lat,
-            longitude: position.lng,
-            image_ids: uploadedImages.map((image) => image.id),
-            property_option_ids: offeredOptionIds(pinProperties, optionIds)
+    startTransition(async () => {
+      try {
+        const result = await createPin(map.id, {
+          name,
+          comment,
+          latitude: position.lat,
+          longitude: position.lng,
+          image_ids: uploadedImages.map((image) => image.id),
+          property_option_ids: offeredOptionIds(pinProperties, optionIds)
+        });
+
+        if (result.success) {
+          enqueueSnackbar(dictionary['create pin success'], {
+            variant: 'success'
           });
 
-          if (result.success) {
-            enqueueSnackbar(dictionary['create pin success'], {
-              variant: 'success'
-            });
-
-            onClose();
-            onSaved();
-            return;
-          }
-
-          enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
-            variant: 'error'
-          });
-        } catch (_error) {
-          enqueueSnackbar(dictionary['an error occurred'], {
-            variant: 'error'
-          });
+          onClose();
+          onSaved();
+          return;
         }
-      });
-    },
-    [
-      map,
-      position,
-      uploadedImages,
-      name,
-      comment,
-      pinProperties,
-      optionIds,
-      dictionary,
-      onClose,
-      onSaved
-    ]
-  );
 
-  const handleExited = useCallback(() => {
+        enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      } catch (_error) {
+        enqueueSnackbar(dictionary['an error occurred'], {
+          variant: 'error'
+        });
+      }
+    });
+  };
+
+  const handleExited = () => {
     setName('');
     setComment('');
     setOptionIds([]);
@@ -124,20 +101,17 @@ export default memo(function CreatePinDialog({
     if (onExited) {
       onExited();
     }
-  }, [onExited, reset]);
+  };
 
-  const handleImagesChange = useCallback(
-    async (files: File[]) => {
-      try {
-        await upload(files);
-      } catch (error) {
-        enqueueSnackbar(uploadFailureMessage(error, dictionary), {
-          variant: 'error'
-        });
-      }
-    },
-    [upload, dictionary]
-  );
+  const handleImagesChange = async (files: File[]) => {
+    try {
+      await upload(files);
+    } catch (error) {
+      enqueueSnackbar(uploadFailureMessage(error, dictionary), {
+        variant: 'error'
+      });
+    }
+  };
 
   return (
     <AppDialog
@@ -183,4 +157,4 @@ export default memo(function CreatePinDialog({
       <PhotoPreviewList items={items} onDelete={removeAt} />
     </AppDialog>
   );
-});
+}

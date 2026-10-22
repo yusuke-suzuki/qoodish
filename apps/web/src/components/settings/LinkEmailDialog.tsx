@@ -1,7 +1,7 @@
 import { Alert, DialogContentText } from '@mui/material';
 import { type AuthError, getAuth, sendSignInLinkToEmail } from 'firebase/auth';
 import { useParams } from 'next/navigation';
-import { memo, useCallback, useState } from 'react';
+import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from '../common/AppDialog.tsx';
 import EmailField from '../common/EmailField.tsx';
@@ -23,30 +23,27 @@ function LinkEmailDialog({ open, onClose }: Props) {
 
   const basePath = `/${lang ?? 'en'}`;
 
-  const handleEmailChange = useCallback((value: string, isValid: boolean) => {
+  const handleEmailChange = (value: string, isValid: boolean) => {
     setEmail(value);
     setEmailValid(isValid);
-  }, []);
+  };
 
-  const getErrorMessage = useCallback(
-    (errorCode: string): string => {
-      switch (errorCode) {
-        case 'auth/invalid-email':
-          return dictionary['email link error invalid email'];
-        case 'auth/too-many-requests':
-          return dictionary['email link error too many requests'];
-        case 'auth/operation-not-allowed':
-          return dictionary['email link error operation not allowed'];
-        case 'auth/network-request-failed':
-          return dictionary['email link error network request failed'];
-        default:
-          return dictionary['an error occurred'];
-      }
-    },
-    [dictionary]
-  );
+  const getErrorMessage = (errorCode: string): string => {
+    switch (errorCode) {
+      case 'auth/invalid-email':
+        return dictionary['email link error invalid email'];
+      case 'auth/too-many-requests':
+        return dictionary['email link error too many requests'];
+      case 'auth/operation-not-allowed':
+        return dictionary['email link error operation not allowed'];
+      case 'auth/network-request-failed':
+        return dictionary['email link error network request failed'];
+      default:
+        return dictionary['an error occurred'];
+    }
+  };
 
-  const handleSend = useCallback(async () => {
+  const handleSend = async () => {
     setLoading(true);
     setError(null);
 
@@ -70,14 +67,14 @@ function LinkEmailDialog({ open, onClose }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [email, lang, basePath, getErrorMessage]);
+  };
 
-  const handleExited = useCallback(() => {
+  const handleExited = () => {
     setEmail('');
     setEmailValid(true);
     setSent(false);
     setError(null);
-  }, []);
+  };
 
   return (
     <AppDialog
@@ -130,4 +127,4 @@ function LinkEmailDialog({ open, onClose }: Props) {
   );
 }
 
-export default memo(LinkEmailDialog);
+export default LinkEmailDialog;

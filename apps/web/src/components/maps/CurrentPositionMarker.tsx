@@ -16,7 +16,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { memo, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Profile } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
@@ -243,4 +243,4 @@ function CurrentPositionMarker({
   );
 }
 
-export default memo(CurrentPositionMarker);
+export default CurrentPositionMarker;

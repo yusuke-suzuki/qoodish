@@ -18,7 +18,7 @@ import type {
   LexicalEditor,
   SerializedEditorState
 } from 'lexical';
-import { memo, type RefObject } from 'react';
+import type { RefObject } from 'react';
 import { validateUrl } from '../../utils/chapterContent.ts';
 import ChapterFloatingToolbar from './ChapterFloatingToolbar.tsx';
 import ChapterSlashMenu from './ChapterSlashMenu.tsx';
@@ -102,4 +102,4 @@ function ChapterContentEditor({
   );
 }
 
-export default memo(ChapterContentEditor);
+export default ChapterContentEditor;
