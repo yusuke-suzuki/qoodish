@@ -73,6 +73,7 @@ export const ja: Messages = {
   images_per_checkin_reached_limit:
     'チェックインごとの画像数の上限に達しました。',
   checkin_note_exceeded: 'メモが長すぎます。(最大: 500 文字)',
+  checkin_time_invalid: 'チェックイン時刻が正しくありません。',
   checkin_time_outside_journey_period: 'チェックイン時刻が旅の期間外です。',
 
   chapter_title_required: 'チャプターのタイトルを入力してください。',
