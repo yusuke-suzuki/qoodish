@@ -31,7 +31,6 @@ import {
   reviseUntilCurrent,
   scalar,
   selected,
-  triggerRaised,
   unrevisedRecord
 } from './db/client.ts';
 import {
@@ -69,7 +68,6 @@ const ENCODED_PATH_LIMIT = 1_000_000;
 const CHECKIN_NOTE_LIMIT = 500;
 const CHECKIN_IMAGE_LIMIT = 4;
 const IMAGES_PER_INSERT = 10;
-const CHECKIN_INTERVAL_VIOLATION = 'journey_checkin_interval';
 const CLIENT_CLOCK_SKEW_MS = 5 * 60 * 1000;
 
 const qb = new QueryBuilder();
@@ -849,41 +847,27 @@ export async function recordCheckin(
       .where(eq(journeyCheckins.journeyId, journey.id))
   );
 
-  const [inserted] = await withinCheckinInterval(() =>
-    db.batch([
-      db
-        .insert(journeyCheckins)
-        .values({
-          ...content,
-          origin: changes.origin,
-          journeyId: journey.id,
-          createdAt: now,
-          updatedAt: now
-        })
-        .returning({ id: journeyCheckins.id }),
-      ...checkinRevisionStatements(db, {
-        checkinId,
-        editorId,
-        content,
-        imageIds,
-        now
+  const [inserted] = await db.batch([
+    db
+      .insert(journeyCheckins)
+      .values({
+        ...content,
+        origin: changes.origin,
+        journeyId: journey.id,
+        createdAt: now,
+        updatedAt: now
       })
-    ])
-  );
+      .returning({ id: journeyCheckins.id }),
+    ...checkinRevisionStatements(db, {
+      checkinId,
+      editorId,
+      content,
+      imageIds,
+      now
+    })
+  ]);
 
   return first(inserted).id;
-}
-
-async function withinCheckinInterval<T>(write: () => Promise<T>): Promise<T> {
-  try {
-    return await write();
-  } catch (error) {
-    if (triggerRaised(error, CHECKIN_INTERVAL_VIOLATION)) {
-      throw ApiError.invalid(['duplicate_checkin']);
-    }
-
-    throw error;
-  }
 }
 
 export async function recordedCheckin(
@@ -966,21 +950,19 @@ async function writeCheckinRevision(
 
   const now = currentTimestamp();
 
-  await withinCheckinInterval(() =>
-    db.batch([
-      db
-        .update(journeyCheckins)
-        .set({ ...content, updatedAt: now })
-        .where(eq(journeyCheckins.id, checkin.id)),
-      ...checkinRevisionStatements(db, {
-        checkinId: unrevisedRecord(db, journeyCheckins, checkin),
-        editorId,
-        content,
-        imageIds,
-        now
-      })
-    ])
-  );
+  await db.batch([
+    db
+      .update(journeyCheckins)
+      .set({ ...content, updatedAt: now })
+      .where(eq(journeyCheckins.id, checkin.id)),
+    ...checkinRevisionStatements(db, {
+      checkinId: unrevisedRecord(db, journeyCheckins, checkin),
+      editorId,
+      content,
+      imageIds,
+      now
+    })
+  ]);
 }
 
 async function revisedSpot(

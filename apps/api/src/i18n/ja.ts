@@ -67,7 +67,6 @@ export const ja: Messages = {
   journey_period_invalid: '旅の開始日時は終了日時より前にしてください。',
   journey_period_in_future: '旅の終了日時に未来の日時は指定できません。',
   duplicate_milestone: 'このピンは既にマイルストーンに追加されています。',
-  duplicate_checkin: 'このピンには近い時刻にチェックイン済みです。',
   pin_not_on_journey_map: 'このピンは旅の地図に属していません。',
   tracked_checkin_pin_fixed: '自動チェックインのピンは変更できません。',
   images_per_checkin_reached_limit:

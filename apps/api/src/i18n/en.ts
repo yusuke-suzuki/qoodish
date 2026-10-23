@@ -68,8 +68,6 @@ export const en = {
   journey_period_invalid: 'The journey must start before it finishes.',
   journey_period_in_future: 'The journey cannot finish in the future.',
   duplicate_milestone: 'The pin is already added as a milestone.',
-  duplicate_checkin:
-    'The journey has already checked in at this pin around this time.',
   pin_not_on_journey_map: 'The pin does not belong to the map of the journey.',
   tracked_checkin_pin_fixed:
     'The pin of an automatic checkin cannot be changed.',
