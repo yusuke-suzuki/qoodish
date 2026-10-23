@@ -71,6 +71,8 @@ export const en = {
   duplicate_checkin:
     'The journey has already checked in at this pin around this time.',
   pin_not_on_journey_map: 'The pin does not belong to the map of the journey.',
+  tracked_checkin_pin_fixed:
+    'The pin of an automatic checkin cannot be changed.',
   images_per_checkin_reached_limit:
     'The limit of images per checkin has been reached.',
   checkin_note_exceeded: 'The note is too long. (Max: 500)',

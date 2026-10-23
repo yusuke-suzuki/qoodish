@@ -12,6 +12,7 @@ export function buildCheckin(
     checked_in_at: checkedInAt,
     note: null,
     images: [],
+    origin: 'tracked',
     ...overrides
   };
 }

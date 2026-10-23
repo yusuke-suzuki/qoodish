@@ -623,6 +623,9 @@ export const journeyCheckins = sqliteTable(
     longitude: real('longitude').notNull(),
     name: text('name').notNull(),
     note: text('note'),
+    origin: text('origin', { enum: ['tracked', 'manual'] })
+      .notNull()
+      .default('tracked'),
     pinId: integer('pin_id').references(() => pins.id),
     status: text('status').notNull().default('recorded'),
     updatedAt: text('updated_at').notNull()

@@ -230,7 +230,8 @@ describe('journeys', () => {
           spot: { name: `Spot ${id}`, latitude: 35.5, longitude: 139.5 },
           note: `Note ${id}`,
           images: id === 3 ? [{ id: checkinImage, ...variants('spot') }] : [],
-          checked_in_at: id === 3 ? at(5, 5) : at(5, 10)
+          checked_in_at: id === 3 ? at(5, 5) : at(5, 10),
+          origin: 'tracked'
         })),
         encoded_path: '_p~iF~ps|U',
         chapter_id: ids.noodleStory,
@@ -1285,7 +1286,8 @@ describe('journey writes', () => {
       spot: { name: 'Feed 0', latitude: 35.7, longitude: 139.7 },
       note: 'First\nvisit',
       images: [{ id: checkinImage, ...variants('spot') }],
-      checked_in_at: expect.any(String)
+      checked_in_at: expect.any(String),
+      origin: 'tracked'
     });
 
     const revisions = await checkinRevisionsOf(feedCheckin);
@@ -1418,7 +1420,8 @@ describe('journey writes', () => {
       spot: { name: 'Miso Ramen', latitude: 35.1, longitude: 139.1 },
       note: null,
       images: [],
-      checked_in_at: '2026-01-05T12:00:00.000000Z'
+      checked_in_at: '2026-01-05T12:00:00.000000Z',
+      origin: 'manual'
     });
   });
 
@@ -1577,6 +1580,19 @@ describe('journey writes', () => {
     expect(
       (await send('PUT', path, 'alice', { pin_id: shioPin })).body
     ).toMatchObject({ pin_id: shioPin, spot: { name: 'Shio Ramen' } });
+  });
+
+  it('keeps the pin of an automatic checkin', async () => {
+    const path = `/me/journeys/${cafeJourney}/checkins/${feedCheckin}`;
+    const revisionCount = (await checkinRevisionsOf(feedCheckin)).length;
+
+    expect(await send('PUT', path, 'alice', { pin_id: feedPin(1) })).toEqual(
+      invalid('The pin of an automatic checkin cannot be changed.')
+    );
+    expect(
+      await send('PATCH', path, 'alice', { pin_id: feedPin(0) })
+    ).toMatchObject({ status: 200, body: { pin_id: feedPin(0) } });
+    expect(await checkinRevisionsOf(feedCheckin)).toHaveLength(revisionCount);
   });
 
   it('replaces the images and note, leaving the earlier revision as it was', async () => {

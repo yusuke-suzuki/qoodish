@@ -177,7 +177,8 @@ function checkinOf(
         ? undefined
         : imagesByRevision.get(checkin.currentRevisionId)) ?? []
     ).map((item) => image(item.id, item.url)),
-    checked_in_at: checkin.checkedInAt
+    checked_in_at: checkin.checkedInAt,
+    origin: checkin.origin
   };
 }
 
@@ -823,7 +824,8 @@ export async function recordCheckin(
   }
 
   const now = currentTimestamp();
-  const checkedInAt = changes.checked_in_at ?? now;
+  const declaredAt = changes.checked_in_at ?? null;
+  const checkedInAt = declaredAt ?? now;
   const editorId = viewer.id;
 
   assertValid([
@@ -851,6 +853,7 @@ export async function recordCheckin(
         .insert(journeyCheckins)
         .values({
           ...content,
+          origin: declaredAt === null ? 'tracked' : 'manual',
           journeyId: journey.id,
           createdAt: now,
           updatedAt: now
@@ -983,10 +986,12 @@ async function revisedSpot(
   viewer: Viewer,
   {
     journey,
+    checkin,
     current,
     submitted
   }: {
     journey: JourneyRecord;
+    checkin: CheckinRow;
     current: CheckinSpot;
     submitted: number | string | undefined;
   }
@@ -1003,6 +1008,10 @@ async function revisedSpot(
 
   if (pinId === current.pinId) {
     return current;
+  }
+
+  if (checkin.origin === 'tracked') {
+    throw ApiError.invalid(['tracked_checkin_pin_fixed']);
   }
 
   const [pin] = await referenceablePinQuery(db, viewer, pinId);
@@ -1045,6 +1054,7 @@ export function reviseCheckin(
 
       const spot = await revisedSpot(db, viewer, {
         journey,
+        checkin,
         current,
         submitted: changes.pin_id
       });
