@@ -74,20 +74,6 @@ export function constraintViolated(
   return false;
 }
 
-export function triggerRaised(error: unknown, reason: string): boolean {
-  for (
-    let current: unknown = error;
-    current instanceof Error;
-    current = current.cause
-  ) {
-    if (current.message.includes(reason)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 export function unrevisedRecord(
   db: Database,
   table: AnySQLiteTable & {

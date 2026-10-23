@@ -1321,11 +1321,6 @@ describe('journey writes', () => {
 
     bobImage = inserted?.id ?? 0;
 
-    expect(await checkIn({ pin_id: feedPin(0) })).toEqual(
-      invalid(
-        'The journey has already checked in at this pin around this time.'
-      )
-    );
     expect(await checkIn({ pin_id: ids.secretPin })).toEqual(
       invalid('The pin does not belong to the map of the journey.')
     );
@@ -1348,44 +1343,17 @@ describe('journey writes', () => {
     expect((await checkIn({})).status).toBe(404);
   });
 
-  it('answers 422 to the loser of two concurrent checkins at one pin', async () => {
-    const responses = await Promise.all(
-      [0, 1].map(() =>
-        send('POST', `/me/journeys/${cafeJourney}/checkins`, 'alice', {
-          pin_id: feedPin(5)
-        })
-      )
-    );
-    const recorded = responses.find((response) => response.status === 200);
+  it('records an automatic revisit to a pin at any time', async () => {
+    const path = `/me/journeys/${cafeJourney}/checkins`;
+    const revisit = await send('POST', path, 'alice', { pin_id: feedPin(0) });
 
-    expect(responses.map((response) => response.status).sort()).toEqual([
-      200, 422
-    ]);
-    expect(responses.find((response) => response.status === 422)).toEqual(
-      invalid(
-        'The journey has already checked in at this pin around this time.'
-      )
-    );
+    expect(revisit).toMatchObject({
+      status: 200,
+      body: { pin_id: feedPin(0), origin: 'tracked' }
+    });
+    expect(revisit.body.id).not.toBe(feedCheckin);
     expect(
-      await db()
-        .select({ id: journeyCheckins.id })
-        .from(journeyCheckins)
-        .where(
-          and(
-            eq(journeyCheckins.journeyId, cafeJourney),
-            eq(journeyCheckins.pinId, feedPin(5))
-          )
-        )
-    ).toEqual([{ id: recorded?.body.id }]);
-    expect(await checkinRevisionsOf(recorded?.body.id)).toHaveLength(1);
-    expect(
-      (
-        await send(
-          'DELETE',
-          `/me/journeys/${cafeJourney}/checkins/${recorded?.body.id}`,
-          'alice'
-        )
-      ).status
+      (await send('DELETE', `${path}/${revisit.body.id}`, 'alice')).status
     ).toBe(204);
   });
 
@@ -1453,47 +1421,31 @@ describe('journey writes', () => {
     expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(2);
   });
 
-  it('records a revisit to a pin only 2 hours apart from its other checkins', async () => {
+  it('records a manual revisit to a pin at any time', async () => {
     const pinId = (await checkinRow(retroactiveCheckin))?.pinId;
-    const checkIn = (checkedInAt: string) =>
-      send('POST', '/me/journeys/1/checkins', 'alice', {
-        pin_id: pinId,
-        checked_in_at: checkedInAt
-      });
-    const tooClose = invalid(
-      'The journey has already checked in at this pin around this time.'
-    );
-
-    expect(await checkIn('2026-01-05 14:29:59')).toEqual(tooClose);
-    expect(await checkIn('2026-01-05 10:30:01')).toEqual(tooClose);
-
-    const revisit = await checkIn('2026-01-05 14:30:00');
+    const revisit = await send('POST', '/me/journeys/1/checkins', 'alice', {
+      pin_id: pinId,
+      checked_in_at: '2026-01-05 12:45:00'
+    });
 
     expect(revisit).toMatchObject({
       status: 200,
-      body: { pin_id: pinId, checked_in_at: '2026-01-05T14:30:00.000000Z' }
+      body: { pin_id: pinId, checked_in_at: '2026-01-05T12:45:00.000000Z' }
     });
 
     const path = `/me/journeys/1/checkins/${revisit.body.id}`;
 
     expect(
-      await send('PUT', path, 'alice', { checked_in_at: '2026-01-05 13:00:00' })
-    ).toEqual(tooClose);
-    expect(await checkinRevisionsOf(revisit.body.id)).toHaveLength(1);
-    expect((await send('PATCH', path, 'alice', { note: 'Again' })).status).toBe(
-      200
-    );
-    expect((await send('DELETE', path, 'alice')).status).toBe(204);
-    expect(await checkinRow(revisit.body.id)).toMatchObject({
-      status: 'deleted',
-      pinId
+      await send('PUT', path, 'alice', { checked_in_at: '2026-01-05 12:30:00' })
+    ).toMatchObject({
+      status: 200,
+      body: { checked_in_at: '2026-01-05T12:30:00.000000Z' }
     });
-    expect((await checkIn('2026-01-05 15:00:00')).status).toBe(200);
+    expect((await send('DELETE', path, 'alice')).status).toBe(204);
   });
 
   it('moves a checkin to another pin of the journey map as a new revision', async () => {
     const path = `/me/journeys/1/checkins/${retroactiveCheckin}`;
-    const misoPin = (await checkinRow(retroactiveCheckin))?.pinId;
     const shio = await send('POST', `/maps/${ids.ramen}/pins`, 'alice', {
       name: 'Shio Ramen',
       comment: 'Light',
@@ -1536,29 +1488,9 @@ describe('journey writes', () => {
     expect((await send('PUT', path, 'alice', { pin_id: 'abc' })).status).toBe(
       404
     );
-
-    const nearby = await send('POST', '/me/journeys/1/checkins', 'alice', {
-      pin_id: misoPin,
-      checked_in_at: '2026-01-05 13:00:00'
-    });
-
-    expect(await send('PUT', path, 'alice', { pin_id: misoPin })).toEqual(
-      invalid(
-        'The journey has already checked in at this pin around this time.'
-      )
-    );
     expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(
       revisionCount + 1
     );
-    expect(
-      (
-        await send(
-          'DELETE',
-          `/me/journeys/1/checkins/${nearby.body.id}`,
-          'alice'
-        )
-      ).status
-    ).toBe(204);
   });
 
   it('chooses a pin again for a checkin whose pin was deleted', async () => {
@@ -1703,8 +1635,8 @@ describe('journey writes', () => {
         .where(inArray(journeyCheckinRevisions.journeyCheckinId, checkinIds))
     ).map((row) => row.id);
 
-    expect(checkinIds).toHaveLength(7);
-    expect(revisionIds).toHaveLength(12);
+    expect(checkinIds).toHaveLength(5);
+    expect(revisionIds).toHaveLength(9);
     expect((await send('DELETE', '/me/journeys/1', 'bob')).status).toBe(404);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(204);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(404);
