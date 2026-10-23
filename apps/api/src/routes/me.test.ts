@@ -1595,6 +1595,25 @@ describe('journey writes', () => {
     expect(await checkinRevisionsOf(feedCheckin)).toHaveLength(revisionCount);
   });
 
+  it('answers 422 for a checkin time it cannot read', async () => {
+    const notTime = invalid('The checkin time is not a valid time.');
+
+    expect(
+      await send('POST', `/me/journeys/${cafeJourney}/checkins`, 'alice', {
+        pin_id: feedPin(2),
+        checked_in_at: 'yesterday'
+      })
+    ).toEqual(notTime);
+    expect(
+      await send(
+        'PATCH',
+        `/me/journeys/1/checkins/${retroactiveCheckin}`,
+        'alice',
+        { checked_in_at: 12 }
+      )
+    ).toEqual(notTime);
+  });
+
   it('replaces the images and note, leaving the earlier revision as it was', async () => {
     const path = `/me/journeys/${cafeJourney}/checkins/${feedCheckin}`;
     const { status, body } = await send('PUT', path, 'alice', {

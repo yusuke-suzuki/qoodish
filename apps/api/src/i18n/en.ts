@@ -76,6 +76,7 @@ export const en = {
   images_per_checkin_reached_limit:
     'The limit of images per checkin has been reached.',
   checkin_note_exceeded: 'The note is too long. (Max: 500)',
+  checkin_time_invalid: 'The checkin time is not a valid time.',
   checkin_time_outside_journey_period:
     'The checkin time is outside the journey period.',
 

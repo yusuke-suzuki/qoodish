@@ -294,6 +294,25 @@ const pinId = z
   .optional()
   .transform(optionalId);
 
+function timestamp(error: MessageKey) {
+  return z.string({ error }).transform((value, ctx) => {
+    const parsed = parseTimestamp(value);
+
+    if (parsed === null) {
+      ctx.addIssue({ code: 'custom', input: value, message: error });
+      return z.NEVER;
+    }
+
+    return parsed;
+  });
+}
+
+function checkinOrigin(
+  checkedInAt: string | null | undefined
+): CheckinRow['origin'] {
+  return typeof checkedInAt === 'string' ? 'manual' : 'tracked';
+}
+
 const checkinFields = {
   note: z
     .string()
@@ -303,13 +322,7 @@ const checkinFields = {
     })
     .nullable()
     .optional(),
-  checked_in_at: z
-    .string()
-    .nullable()
-    .optional()
-    .transform((value) =>
-      typeof value === 'string' ? parseTimestamp(value) : value
-    ),
+  checked_in_at: timestamp('checkin_time_invalid').nullable().optional(),
   image_ids: imageIds({
     max: CHECKIN_IMAGE_LIMIT,
     error: 'images_per_checkin_reached_limit'
@@ -318,7 +331,12 @@ const checkinFields = {
 
 export const milestoneInput = z.object({ pin_id: pinId });
 
-export const newCheckinInput = z.object({ pin_id: pinId, ...checkinFields });
+export const newCheckinInput = z
+  .object({ pin_id: pinId, ...checkinFields })
+  .transform((input) => ({
+    ...input,
+    origin: checkinOrigin(input.checked_in_at)
+  }));
 
 export const checkinInput = z.object({
   pin_id: z.union([z.number(), z.string()]).optional(),
@@ -347,22 +365,7 @@ function unfinishedJourneyOf(userId: number, mapId: SQLWrapper) {
     );
 }
 
-const journeyTime = z
-  .string({ error: 'journey_period_invalid' })
-  .transform((value, ctx) => {
-    const parsed = parseTimestamp(value);
-
-    if (parsed === null) {
-      ctx.addIssue({
-        code: 'custom',
-        input: value,
-        message: 'journey_period_invalid'
-      });
-      return z.NEVER;
-    }
-
-    return parsed;
-  });
+const journeyTime = timestamp('journey_period_invalid');
 
 export type JourneyPeriod = { startedAt: string; finishedAt: string };
 
@@ -824,8 +827,7 @@ export async function recordCheckin(
   }
 
   const now = currentTimestamp();
-  const declaredAt = changes.checked_in_at ?? null;
-  const checkedInAt = declaredAt ?? now;
+  const checkedInAt = changes.checked_in_at ?? now;
   const editorId = viewer.id;
 
   assertValid([
@@ -853,7 +855,7 @@ export async function recordCheckin(
         .insert(journeyCheckins)
         .values({
           ...content,
-          origin: declaredAt === null ? 'tracked' : 'manual',
+          origin: changes.origin,
           journeyId: journey.id,
           createdAt: now,
           updatedAt: now
