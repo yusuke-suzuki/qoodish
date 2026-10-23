@@ -625,15 +625,17 @@ export default function JourneyDetailView({
                         </Typography>
                       </Box>
 
-                      {map && pins.length > 0 && (
-                        <IconButton
-                          size="small"
-                          aria-label={dictionary['change pin']}
-                          onClick={() => setRepinning(checkin)}
-                        >
-                          <EditLocationAlt fontSize="small" />
-                        </IconButton>
-                      )}
+                      {checkin.origin === 'manual' &&
+                        map &&
+                        pins.length > 0 && (
+                          <IconButton
+                            size="small"
+                            aria-label={dictionary['change pin']}
+                            onClick={() => setRepinning(checkin)}
+                          >
+                            <EditLocationAlt fontSize="small" />
+                          </IconButton>
+                        )}
 
                       <IconButton
                         size="small"
