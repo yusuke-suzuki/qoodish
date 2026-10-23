@@ -1,0 +1,1 @@
+ALTER TABLE `journey_checkins` ADD `origin` text DEFAULT 'tracked' NOT NULL;

@@ -20,6 +20,7 @@ export type JourneyCheckin = {
   note: string | null;
   images: Image[];
   checked_in_at: IsoTimestamp;
+  origin: 'tracked' | 'manual';
 };
 
 type JourneyAttributes = {

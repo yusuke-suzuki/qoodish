@@ -69,6 +69,7 @@ export const ja: Messages = {
   duplicate_milestone: 'このピンは既にマイルストーンに追加されています。',
   duplicate_checkin: 'このピンには近い時刻にチェックイン済みです。',
   pin_not_on_journey_map: 'このピンは旅の地図に属していません。',
+  tracked_checkin_pin_fixed: '自動チェックインのピンは変更できません。',
   images_per_checkin_reached_limit:
     'チェックインごとの画像数の上限に達しました。',
   checkin_note_exceeded: 'メモが長すぎます。(最大: 500 文字)',
