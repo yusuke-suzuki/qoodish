@@ -433,7 +433,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
   };
 
   const navigation = recorded ? undefined : (
-    <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
+    <>
       <Button
         fullWidth
         size="large"
@@ -460,7 +460,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
           ? dictionary.next
           : dictionary['record past journey confirm']}
       </Button>
-    </Stack>
+    </>
   );
 
   const selectedPhotoCount = drafts.reduce(
