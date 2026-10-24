@@ -357,6 +357,8 @@
   "photos to checkins": "{photos} 枚の写真から {checkins} 件のチェックインを作成します。",
   "choose journey photos": "旅の写真を選んでください (複数選択可)。",
   "checkins from capture times": "写真の撮影日時をもとにチェックインを自動で作成します。",
+  "choose map": "地図を選ぶ",
+  "choose photos and pins": "写真とピンを選ぶ",
   "choose photos": "写真を選ぶ",
   "choose other photos": "写真を選び直す",
   "exclude checkin": "このチェックインを除外",

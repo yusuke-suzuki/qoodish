@@ -12,7 +12,6 @@ import {
   type DialogProps,
   DialogTitle,
   IconButton,
-  LinearProgress,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -58,8 +57,6 @@ type Props = {
   /** Extra actions on the left of the action row. Stay at the bottom in full screen. */
   secondaryActions?: ReactNode;
   actions?: ReactNode;
-  /** Completion in percent, drawn as a bar under the title. */
-  progress?: number;
   /** Take over the whole window below the sm breakpoint (600px). */
   fullScreenOnMobile?: boolean;
   maxWidth?: DialogProps['maxWidth'];
@@ -83,7 +80,6 @@ function AppDialog({
   cancelLabel,
   secondaryActions,
   actions,
-  progress,
   fullScreenOnMobile,
   maxWidth,
   dividers,
@@ -157,15 +153,6 @@ function AppDialog({
         </AppBar>
       ) : (
         <DialogTitle id={titleId}>{title}</DialogTitle>
-      )}
-
-      {progress !== undefined && (
-        <LinearProgress
-          variant="determinate"
-          color="secondary"
-          value={progress}
-          aria-labelledby={titleId}
-        />
       )}
 
       <DialogContent
