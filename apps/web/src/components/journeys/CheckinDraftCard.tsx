@@ -1,12 +1,17 @@
 'use client';
 
-import { AddLocationAlt, CheckCircle, Place } from '@mui/icons-material';
+import {
+  AddLocationAlt,
+  Delete,
+  Place,
+  RestoreFromTrash
+} from '@mui/icons-material';
 import {
   Avatar,
   Box,
   Button,
-  ButtonBase,
   Chip,
+  IconButton,
   Paper,
   Stack,
   Typography
@@ -37,10 +42,12 @@ export type PreviewPhoto = KeyedPhoto & {
 
 type Props = {
   draft: CheckinDraft<PreviewPhoto>;
-  pin: Pin | null;
+  pin?: Pin | null;
   disabled: boolean;
   onTogglePhoto: (photoKey: string) => void;
-  onChoosePin: () => void;
+  onRemove: () => void;
+  /** Without it the card is a preview and offers no pin. */
+  onChoosePin?: () => void;
 };
 
 export default function CheckinDraftCard({
@@ -48,6 +55,7 @@ export default function CheckinDraftCard({
   pin,
   disabled,
   onTogglePhoto,
+  onRemove,
   onChoosePin
 }: Props) {
   const dictionary = useDictionary();
@@ -70,21 +78,29 @@ export default function CheckinDraftCard({
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
       <Stack spacing={1.5}>
-        <Typography variant="subtitle2">{timeRange}</Typography>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <Typography variant="subtitle2">{timeRange}</Typography>
+          <IconButton
+            edge="end"
+            size="small"
+            disabled={disabled}
+            aria-label={dictionary['exclude checkin']}
+            onClick={onRemove}
+          >
+            <Delete fontSize="small" />
+          </IconButton>
+        </Stack>
 
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
           {draft.photos.map((photo) => {
             const selected = draft.selected.includes(photo.key);
 
             return (
-              <ButtonBase
-                key={photo.key}
-                disabled={disabled}
-                aria-pressed={selected}
-                aria-label={photo.file.name}
-                onClick={() => onTogglePhoto(photo.key)}
-                sx={{ position: 'relative', borderRadius: 1 }}
-              >
+              <Box key={photo.key} sx={{ position: 'relative' }}>
                 <Avatar
                   variant="rounded"
                   src={photo.previewUrl}
@@ -96,25 +112,34 @@ export default function CheckinDraftCard({
                     opacity: selected ? 1 : 0.4
                   }}
                 />
-                {selected && (
-                  <CheckCircle
-                    color="secondary"
-                    fontSize="small"
-                    sx={{
-                      position: 'absolute',
-                      top: 4,
-                      right: 4,
-                      bgcolor: 'background.paper',
-                      borderRadius: '50%'
-                    }}
-                  />
-                )}
-              </ButtonBase>
+                <IconButton
+                  size="small"
+                  disabled={disabled}
+                  aria-label={
+                    selected
+                      ? dictionary['exclude photo']
+                      : dictionary['include photo']
+                  }
+                  onClick={() => onTogglePhoto(photo.key)}
+                  sx={{
+                    position: 'absolute',
+                    top: 2,
+                    right: 2,
+                    bgcolor: 'background.paper'
+                  }}
+                >
+                  {selected ? (
+                    <Delete fontSize="small" />
+                  ) : (
+                    <RestoreFromTrash fontSize="small" />
+                  )}
+                </IconButton>
+              </Box>
             );
           })}
         </Box>
 
-        {pin ? (
+        {!onChoosePin ? null : pin ? (
           <Box>
             <Chip
               icon={<Place />}

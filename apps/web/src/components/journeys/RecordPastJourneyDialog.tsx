@@ -14,7 +14,6 @@ import {
   Chip,
   CircularProgress,
   LinearProgress,
-  MobileStepper,
   Stack,
   Typography
 } from '@mui/material';
@@ -283,6 +282,10 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
     updateDraft(index, (draft) => ({ ...draft, selected }));
   };
 
+  const handleRemoveDraft = (index: number) => {
+    setDrafts((current) => current.toSpliced(index, 1));
+  };
+
   const handleSelectPin = (pin: Pin) => {
     if (pickingIndex !== null) {
       setDrafts((current) => withPin(current, pickingIndex, pin.id));
@@ -416,54 +419,63 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
     handleRecord();
   };
 
-  const stepper = recorded ? undefined : (
-    <MobileStepper
-      variant="dots"
-      steps={LAST_STEP + 1}
-      position="static"
-      activeStep={step}
-      sx={{ flex: 1, bgcolor: 'transparent' }}
-      backButton={
-        step > 0 ? (
-          <Button
-            color="inherit"
-            disabled={busy}
-            startIcon={<KeyboardArrowLeft />}
-            onClick={() => setStep(step - 1)}
-          >
-            {dictionary.back}
-          </Button>
-        ) : (
-          <Button color="inherit" disabled={busy} onClick={handleClose}>
-            {dictionary.cancel}
-          </Button>
-        )
-      }
-      nextButton={
-        step < LAST_STEP ? (
-          <Button
-            color="secondary"
-            disabled={busy || !canProceed}
-            endIcon={<KeyboardArrowRight />}
-            onClick={handleNext}
-          >
-            {dictionary.next}
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="secondary"
-            disableElevation
-            disabled={busy || !canProceed}
-            loading={phase === 'recording'}
-            onClick={handleNext}
-          >
-            {dictionary['record past journey confirm']}
-          </Button>
-        )
-      }
-    />
+  const handleBack = () => {
+    if (step > 0) {
+      setStep(step - 1);
+      return;
+    }
+
+    handleClose();
+  };
+
+  const navigation = recorded ? undefined : (
+    <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
+      <Button
+        fullWidth
+        size="large"
+        variant="outlined"
+        color="inherit"
+        disabled={busy}
+        startIcon={step > 0 ? <KeyboardArrowLeft /> : undefined}
+        onClick={handleBack}
+      >
+        {step > 0 ? dictionary.back : dictionary.cancel}
+      </Button>
+      <Button
+        fullWidth
+        size="large"
+        variant="contained"
+        color="secondary"
+        disableElevation
+        disabled={busy || !canProceed}
+        loading={phase === 'recording'}
+        endIcon={step < LAST_STEP ? <KeyboardArrowRight /> : undefined}
+        onClick={handleNext}
+      >
+        {step < LAST_STEP
+          ? dictionary.next
+          : dictionary['record past journey confirm']}
+      </Button>
+    </Stack>
   );
+
+  const selectedPhotoCount = drafts.reduce(
+    (count, draft) => count + draft.selected.length,
+    0
+  );
+
+  const draftCards = (withPins: boolean) =>
+    drafts.map((draft, index) => (
+      <CheckinDraftCard
+        key={draft.photos[0].key}
+        draft={draft}
+        pin={draft.pinId === null ? null : (pinsById.get(draft.pinId) ?? null)}
+        disabled={busy}
+        onTogglePhoto={(photoKey) => handleTogglePhoto(index, photoKey)}
+        onRemove={() => handleRemoveDraft(index)}
+        onChoosePin={withPins ? () => setPickingIndex(index) : undefined}
+      />
+    ));
 
   const mapChip = map && (
     <Box>
@@ -493,7 +505,8 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
           : undefined
       }
       cancelLabel={recorded ? dictionary.close : undefined}
-      actions={stepper}
+      actions={navigation}
+      progress={recorded ? undefined : ((step + 1) / (LAST_STEP + 1)) * 100}
       onEnter={handleEnter}
       onExited={handleExited}
     >
@@ -545,20 +558,25 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
           <Button
             component="label"
             htmlFor={inputId}
-            variant="contained"
+            variant={drafts.length > 0 ? 'outlined' : 'contained'}
             color="secondary"
             disableElevation
             startIcon={<AddPhotoAlternate />}
             loading={phase === 'reading'}
           >
-            {dictionary['choose photos']}
+            {drafts.length > 0
+              ? dictionary['choose other photos']
+              : dictionary['choose photos']}
           </Button>
           {drafts.length > 0 && phase !== 'reading' && (
-            <Typography variant="body2" color="text.secondary">
-              {dictionary['photos to checkins']
-                .replace('{photos}', String(photos.length))
-                .replace('{checkins}', String(drafts.length))}
-            </Typography>
+            <>
+              <Typography variant="body2" color="text.secondary">
+                {dictionary['photos to checkins']
+                  .replace('{photos}', String(selectedPhotoCount))
+                  .replace('{checkins}', String(drafts.length))}
+              </Typography>
+              {draftCards(false)}
+            </>
           )}
         </Stack>
       ) : (
@@ -568,20 +586,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
             {dictionary['choose checkin pins']}
           </Typography>
 
-          {drafts.map((draft, index) => (
-            <CheckinDraftCard
-              key={draft.photos[0].key}
-              draft={draft}
-              pin={
-                draft.pinId === null
-                  ? null
-                  : (pinsById.get(draft.pinId) ?? null)
-              }
-              disabled={busy}
-              onTogglePhoto={(photoKey) => handleTogglePhoto(index, photoKey)}
-              onChoosePin={() => setPickingIndex(index)}
-            />
-          ))}
+          {draftCards(true)}
 
           {phase === 'recording' && (
             <Box>
