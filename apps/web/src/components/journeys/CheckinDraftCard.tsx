@@ -1,12 +1,11 @@
 'use client';
 
-import { AddLocationAlt, CheckCircle, Place } from '@mui/icons-material';
+import { AddLocationAlt, Delete, Place } from '@mui/icons-material';
 import {
-  Avatar,
   Box,
   Button,
-  ButtonBase,
   Chip,
+  IconButton,
   Paper,
   Stack,
   Typography
@@ -15,8 +14,7 @@ import type { Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalDateTime from '../../hooks/useLocalDateTime.ts';
 import type { CheckinDraft, KeyedPhoto } from '../../utils/checkinDrafts.ts';
-
-const THUMBNAIL_SIZE = 72;
+import RemovableThumbnail from './RemovableThumbnail.tsx';
 
 const DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
   month: 'short',
@@ -39,7 +37,8 @@ type Props = {
   draft: CheckinDraft<PreviewPhoto>;
   pin: Pin | null;
   disabled: boolean;
-  onTogglePhoto: (photoKey: string) => void;
+  onRemovePhoto: (photoKey: string) => void;
+  onRemove: () => void;
   onChoosePin: () => void;
 };
 
@@ -47,12 +46,18 @@ export default function CheckinDraftCard({
   draft,
   pin,
   disabled,
-  onTogglePhoto,
+  onRemovePhoto,
+  onRemove,
   onChoosePin
 }: Props) {
   const dictionary = useDictionary();
   const formatLocal = useLocalDateTime();
 
+  // Photos past the check-in limit stay out of view, as they will not be
+  // attached; they still date the check-in.
+  const selectedPhotos = draft.photos.filter((photo) =>
+    draft.selected.includes(photo.key)
+  );
   const first = draft.photos[0];
   const last = draft.photos.at(-1) ?? first;
   const startedAt = new Date(first.capturedAt).toISOString();
@@ -70,49 +75,36 @@ export default function CheckinDraftCard({
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
       <Stack spacing={1.5}>
-        <Typography variant="subtitle2">{timeRange}</Typography>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <Typography variant="subtitle2">{timeRange}</Typography>
+          <IconButton
+            size="small"
+            disabled={disabled}
+            aria-label={dictionary['exclude checkin']}
+            onClick={onRemove}
+          >
+            <Delete fontSize="small" />
+          </IconButton>
+        </Stack>
 
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {draft.photos.map((photo) => {
-            const selected = draft.selected.includes(photo.key);
-
-            return (
-              <ButtonBase
+        {selectedPhotos.length > 0 && (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
+            {selectedPhotos.map((photo) => (
+              <RemovableThumbnail
                 key={photo.key}
+                src={photo.previewUrl}
+                alt={photo.file.name}
+                removeLabel={dictionary['exclude photo']}
                 disabled={disabled}
-                aria-pressed={selected}
-                aria-label={photo.file.name}
-                onClick={() => onTogglePhoto(photo.key)}
-                sx={{ position: 'relative', borderRadius: 1 }}
-              >
-                <Avatar
-                  variant="rounded"
-                  src={photo.previewUrl}
-                  alt={photo.file.name}
-                  slotProps={{ img: { loading: 'lazy', decoding: 'async' } }}
-                  sx={{
-                    width: THUMBNAIL_SIZE,
-                    height: THUMBNAIL_SIZE,
-                    opacity: selected ? 1 : 0.4
-                  }}
-                />
-                {selected && (
-                  <CheckCircle
-                    color="secondary"
-                    fontSize="small"
-                    sx={{
-                      position: 'absolute',
-                      top: 4,
-                      right: 4,
-                      bgcolor: 'background.paper',
-                      borderRadius: '50%'
-                    }}
-                  />
-                )}
-              </ButtonBase>
-            );
-          })}
-        </Box>
+                onRemove={() => onRemovePhoto(photo.key)}
+              />
+            ))}
+          </Box>
+        )}
 
         {pin ? (
           <Box>
