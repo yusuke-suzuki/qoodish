@@ -410,6 +410,10 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
     recordable
   ][step];
 
+  // Count a step as done once its input is complete, so the bar starts empty
+  // and fills as the user makes progress rather than on entering a step.
+  const completion = ((step + (canProceed ? 1 : 0)) / (LAST_STEP + 1)) * 100;
+
   const handleNext = () => {
     if (step < LAST_STEP) {
       setStep(step + 1);
@@ -506,7 +510,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
       }
       cancelLabel={recorded ? dictionary.close : undefined}
       actions={navigation}
-      progress={recorded ? undefined : ((step + 1) / (LAST_STEP + 1)) * 100}
+      progress={recorded ? undefined : completion}
       onEnter={handleEnter}
       onExited={handleExited}
     >
