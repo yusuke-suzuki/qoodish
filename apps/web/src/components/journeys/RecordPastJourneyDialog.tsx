@@ -58,7 +58,7 @@ type Props = {
 
 const NO_PROGRESS: Progress = { done: 0, total: 0 };
 
-const LAST_STEP = 2;
+const LAST_STEP = 1;
 
 function Loading() {
   return (
@@ -395,7 +395,6 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
 
   const canProceed = [
     map !== null && pins !== null && pins.length > 0,
-    drafts.length > 0,
     recordable
   ][step];
 
@@ -457,7 +456,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
     0
   );
 
-  const draftCards = (withPins: boolean) =>
+  const draftCards = () =>
     drafts.map((draft, index) => (
       <CheckinDraftCard
         key={draft.photos[0].key}
@@ -466,7 +465,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
         disabled={busy}
         onRemovePhoto={(photoKey) => handleRemovePhoto(index, photoKey)}
         onRemove={() => handleRemoveDraft(index)}
-        onChoosePin={withPins ? () => setPickingIndex(index) : undefined}
+        onChoosePin={() => setPickingIndex(index)}
       />
     ));
 
@@ -537,7 +536,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
             {map && pins === null && <Loading />}
           </Stack>
         )
-      ) : step === 1 ? (
+      ) : (
         <Stack spacing={2}>
           {mapChip}
           <Box>
@@ -555,6 +554,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
             color="secondary"
             disableElevation
             startIcon={<AddPhotoAlternate />}
+            disabled={phase === 'recording'}
             loading={phase === 'reading'}
           >
             {drafts.length > 0
@@ -563,23 +563,19 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
           </Button>
           {drafts.length > 0 && phase !== 'reading' && (
             <>
-              <Typography variant="body2" color="text.secondary">
-                {dictionary['photos to checkins']
-                  .replace('{photos}', String(selectedPhotoCount))
-                  .replace('{checkins}', String(drafts.length))}
-              </Typography>
-              {draftCards(false)}
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  {dictionary['photos to checkins']
+                    .replace('{photos}', String(selectedPhotoCount))
+                    .replace('{checkins}', String(drafts.length))}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {dictionary['choose checkin pins']}
+                </Typography>
+              </Box>
+              {draftCards()}
             </>
           )}
-        </Stack>
-      ) : (
-        <Stack spacing={2}>
-          {mapChip}
-          <Typography variant="body2">
-            {dictionary['choose checkin pins']}
-          </Typography>
-
-          {draftCards(true)}
 
           {phase === 'recording' && (
             <Box>

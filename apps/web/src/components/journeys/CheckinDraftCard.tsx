@@ -35,12 +35,11 @@ export type PreviewPhoto = KeyedPhoto & {
 
 type Props = {
   draft: CheckinDraft<PreviewPhoto>;
-  pin?: Pin | null;
+  pin: Pin | null;
   disabled: boolean;
   onRemovePhoto: (photoKey: string) => void;
   onRemove: () => void;
-  /** Without it the card is a preview and offers no pin. */
-  onChoosePin?: () => void;
+  onChoosePin: () => void;
 };
 
 export default function CheckinDraftCard({
@@ -107,7 +106,7 @@ export default function CheckinDraftCard({
           </Box>
         )}
 
-        {!onChoosePin ? null : pin ? (
+        {pin ? (
           <Box>
             <Chip
               icon={<Place />}
