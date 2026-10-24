@@ -7,7 +7,6 @@ import {
   groupPhotos,
   journeyPeriod,
   SAME_VISIT_MS,
-  toggledSelection,
   withPin
 } from './checkinDrafts.ts';
 
@@ -142,25 +141,5 @@ describe('withPin', () => {
 
     assert.equal(SAME_VISIT_MS, 120 * MINUTE_MS);
     assert.deepEqual(drafts, [first, { ...third, pinId: 1 }]);
-  });
-});
-
-describe('toggledSelection', () => {
-  const draft = draftCheckin(
-    ['a', 'b', 'c', 'd', 'e', 'f'].map((key, index) => photo(key, index))
-  );
-
-  it('deselects a selected photo', () => {
-    assert.deepEqual(toggledSelection(draft, 'b'), ['a', 'c', 'd']);
-  });
-
-  it('selects a photo in capture order while there is room', () => {
-    const roomy = { ...draft, selected: ['a', 'f'] };
-
-    assert.deepEqual(toggledSelection(roomy, 'c'), ['a', 'c', 'f']);
-  });
-
-  it('refuses a photo beyond the check-in limit', () => {
-    assert.equal(toggledSelection(draft, 'e'), null);
   });
 });

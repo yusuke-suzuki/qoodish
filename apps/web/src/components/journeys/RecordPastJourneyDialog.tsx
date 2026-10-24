@@ -25,13 +25,11 @@ import { addCheckin, recordPastJourney } from '../../actions/journeys.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import {
-  CHECKIN_IMAGE_LIMIT,
   type CheckinDraft,
   CLOCK_SKEW_MS,
   draftCheckin,
   groupPhotos,
   journeyPeriod,
-  toggledSelection,
   withPin
 } from '../../utils/checkinDrafts.ts';
 import { fetchMapPins, fetchRelatedMaps } from '../../utils/maps.ts';
@@ -266,20 +264,11 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
     );
   };
 
-  const handleTogglePhoto = (index: number, photoKey: string) => {
-    const selected = toggledSelection(drafts[index], photoKey);
-
-    if (!selected) {
-      enqueueSnackbar(
-        dictionary['checkin photo limit'].replace(
-          '{limit}',
-          String(CHECKIN_IMAGE_LIMIT)
-        )
-      );
-      return;
-    }
-
-    updateDraft(index, (draft) => ({ ...draft, selected }));
+  const handleRemovePhoto = (index: number, photoKey: string) => {
+    updateDraft(index, (draft) => ({
+      ...draft,
+      selected: draft.selected.filter((key) => key !== photoKey)
+    }));
   };
 
   const handleRemoveDraft = (index: number) => {
@@ -475,7 +464,7 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
         draft={draft}
         pin={draft.pinId === null ? null : (pinsById.get(draft.pinId) ?? null)}
         disabled={busy}
-        onTogglePhoto={(photoKey) => handleTogglePhoto(index, photoKey)}
+        onRemovePhoto={(photoKey) => handleRemovePhoto(index, photoKey)}
         onRemove={() => handleRemoveDraft(index)}
         onChoosePin={withPins ? () => setPickingIndex(index) : undefined}
       />
