@@ -1,21 +1,17 @@
 'use client';
 
-import {
-  AddPhotoAlternate,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  Map as MapIcon
-} from '@mui/icons-material';
+import { AddPhotoAlternate } from '@mui/icons-material';
+import { Timeline, timelineItemClasses } from '@mui/lab';
 import {
   Alert,
-  Avatar,
   Box,
   Button,
-  Chip,
-  CircularProgress,
   LinearProgress,
-  MobileStepper,
   Stack,
+  Step,
+  StepContent,
+  StepLabel,
+  Stepper,
   Typography
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -26,13 +22,11 @@ import { addCheckin, recordPastJourney } from '../../actions/journeys.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import {
-  CHECKIN_IMAGE_LIMIT,
   type CheckinDraft,
   CLOCK_SKEW_MS,
   draftCheckin,
   groupPhotos,
   journeyPeriod,
-  toggledSelection,
   withPin
 } from '../../utils/checkinDrafts.ts';
 import { fetchMapPins, fetchRelatedMaps } from '../../utils/maps.ts';
@@ -42,10 +36,8 @@ import {
   uploadImageWhenAllowed
 } from '../../utils/uploadImage.ts';
 import AppDialog from '../common/AppDialog.tsx';
-import LoadingStatus from '../common/LoadingStatus.tsx';
-import CheckinDraftCard, { type PreviewPhoto } from './CheckinDraftCard.tsx';
+import CheckinDraftItem, { type PreviewPhoto } from './CheckinDraftItem.tsx';
 import MapPicker from './MapPicker.tsx';
-import PinPickerDialog from './PinPickerDialog.tsx';
 
 type Phase = 'choosing' | 'reading' | 'reviewing' | 'recording' | 'recorded';
 
@@ -61,17 +53,6 @@ type Props = {
 
 const NO_PROGRESS: Progress = { done: 0, total: 0 };
 
-const LAST_STEP = 2;
-
-function Loading() {
-  return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-      <LoadingStatus loading />
-      <CircularProgress color="secondary" />
-    </Box>
-  );
-}
-
 export default function RecordPastJourneyDialog({ open, onClose }: Props) {
   const dictionary = useDictionary();
   const localePath = useLocalePath();
@@ -85,7 +66,6 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
   const [phase, setPhase] = useState<Phase>('choosing');
   const [photos, setPhotos] = useState<PreviewPhoto[]>([]);
   const [drafts, setDrafts] = useState<CheckinDraft<PreviewPhoto>[]>([]);
-  const [pickingIndex, setPickingIndex] = useState<number | null>(null);
   const [progress, setProgress] = useState<Progress>(NO_PROGRESS);
   const [journeyId, setJourneyId] = useState<number | null>(null);
   const [unrecorded, setUnrecorded] = useState(0);
@@ -122,11 +102,8 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
 
   const pinsById = new Map((pins ?? []).map((pin) => [pin.id, pin]));
 
-  const chosenPinIds = new Set(
-    drafts
-      .filter((_, index) => index !== pickingIndex)
-      .map((draft) => draft.pinId)
-  );
+  const pinIdsOtherThan = (index: number) =>
+    new Set(drafts.filter((_, i) => i !== index).map((draft) => draft.pinId));
 
   const recordable =
     drafts.length > 0 && drafts.every((draft) => draft.pinId !== null);
@@ -185,7 +162,6 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
     setPhase('choosing');
     setPhotos([]);
     setDrafts([]);
-    setPickingIndex(null);
     setProgress(NO_PROGRESS);
     setJourneyId(null);
     setUnrecorded(0);
@@ -267,28 +243,19 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
     );
   };
 
-  const handleTogglePhoto = (index: number, photoKey: string) => {
-    const selected = toggledSelection(drafts[index], photoKey);
-
-    if (!selected) {
-      enqueueSnackbar(
-        dictionary['checkin photo limit'].replace(
-          '{limit}',
-          String(CHECKIN_IMAGE_LIMIT)
-        )
-      );
-      return;
-    }
-
-    updateDraft(index, (draft) => ({ ...draft, selected }));
+  const handleRemovePhoto = (index: number, photoKey: string) => {
+    updateDraft(index, (draft) => ({
+      ...draft,
+      selected: draft.selected.filter((key) => key !== photoKey)
+    }));
   };
 
-  const handleSelectPin = (pin: Pin) => {
-    if (pickingIndex !== null) {
-      setDrafts((current) => withPin(current, pickingIndex, pin.id));
-    }
+  const handleRemoveDraft = (index: number) => {
+    setDrafts((current) => current.toSpliced(index, 1));
+  };
 
-    setPickingIndex(null);
+  const handleSelectPin = (index: number, pin: Pin) => {
+    setDrafts((current) => withPin(current, index, pin.id));
   };
 
   const handleOpenJourney = () => {
@@ -401,82 +368,26 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
   const busy = phase === 'reading' || phase === 'recording';
   const recorded = phase === 'recorded';
 
-  const canProceed = [
-    map !== null && pins !== null && pins.length > 0,
-    drafts.length > 0,
-    recordable
-  ][step];
-
-  const handleNext = () => {
-    if (step < LAST_STEP) {
-      setStep(step + 1);
-      return;
-    }
-
-    handleRecord();
-  };
-
-  const stepper = recorded ? undefined : (
-    <MobileStepper
-      variant="dots"
-      steps={LAST_STEP + 1}
-      position="static"
-      activeStep={step}
-      sx={{ flex: 1, bgcolor: 'transparent' }}
-      backButton={
-        step > 0 ? (
-          <Button
-            color="inherit"
-            disabled={busy}
-            startIcon={<KeyboardArrowLeft />}
-            onClick={() => setStep(step - 1)}
-          >
-            {dictionary.back}
-          </Button>
-        ) : (
-          <Button color="inherit" disabled={busy} onClick={handleClose}>
-            {dictionary.cancel}
-          </Button>
-        )
-      }
-      nextButton={
-        step < LAST_STEP ? (
-          <Button
-            color="secondary"
-            disabled={busy || !canProceed}
-            endIcon={<KeyboardArrowRight />}
-            onClick={handleNext}
-          >
-            {dictionary.next}
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="secondary"
-            disableElevation
-            disabled={busy || !canProceed}
-            loading={phase === 'recording'}
-            onClick={handleNext}
-          >
-            {dictionary['record past journey confirm']}
-          </Button>
-        )
-      }
-    />
+  const selectedPhotoCount = drafts.reduce(
+    (count, draft) => count + draft.selected.length,
+    0
   );
 
-  const mapChip = map && (
-    <Box>
-      <Chip
-        avatar={
-          <Avatar src={map.image?.avatar} alt={map.name}>
-            <MapIcon fontSize="small" />
-          </Avatar>
-        }
-        label={map.name}
+  const draftItems = () =>
+    drafts.map((draft, index) => (
+      <CheckinDraftItem
+        key={draft.photos[0].key}
+        draft={draft}
+        pin={draft.pinId === null ? null : (pinsById.get(draft.pinId) ?? null)}
+        disabled={busy}
+        isLast={index === drafts.length - 1}
+        onRemovePhoto={(photoKey) => handleRemovePhoto(index, photoKey)}
+        onRemove={() => handleRemoveDraft(index)}
+        pins={pins ?? []}
+        usedPinIds={pinIdsOtherThan(index)}
+        onSelectPin={(pin) => handleSelectPin(index, pin)}
       />
-    </Box>
-  );
+    ));
 
   return (
     <AppDialog
@@ -493,7 +404,6 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
           : undefined
       }
       cancelLabel={recorded ? dictionary.close : undefined}
-      actions={stepper}
       onEnter={handleEnter}
       onExited={handleExited}
     >
@@ -513,104 +423,139 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
             String(unrecorded)
           )}
         </Alert>
-      ) : step === 0 ? (
-        maps === null ? (
-          <Loading />
-        ) : (
-          <Stack spacing={2}>
-            {maps.length > 0 && (
-              <Typography variant="body2">
-                {dictionary['which map did you travel with']}
-              </Typography>
-            )}
-            <MapPicker
-              maps={maps}
-              selectedId={map?.id ?? null}
-              onSelect={handleSelectMap}
-            />
-            {map && pins === null && <Loading />}
-          </Stack>
-        )
-      ) : step === 1 ? (
-        <Stack spacing={2}>
-          {mapChip}
-          <Box>
-            <Typography variant="body2">
-              {dictionary['choose journey photos']}
-            </Typography>
-            <Typography variant="body2">
-              {dictionary['checkins from capture times']}
-            </Typography>
-          </Box>
-          <Button
-            component="label"
-            htmlFor={inputId}
-            variant="contained"
-            color="secondary"
-            disableElevation
-            startIcon={<AddPhotoAlternate />}
-            loading={phase === 'reading'}
-          >
-            {dictionary['choose photos']}
-          </Button>
-          {drafts.length > 0 && phase !== 'reading' && (
-            <Typography variant="body2" color="text.secondary">
-              {dictionary['photos to checkins']
-                .replace('{photos}', String(photos.length))
-                .replace('{checkins}', String(drafts.length))}
-            </Typography>
-          )}
-        </Stack>
       ) : (
-        <Stack spacing={2}>
-          {mapChip}
-          <Typography variant="body2">
-            {dictionary['choose checkin pins']}
-          </Typography>
-
-          {drafts.map((draft, index) => (
-            <CheckinDraftCard
-              key={draft.photos[0].key}
-              draft={draft}
-              pin={
-                draft.pinId === null
-                  ? null
-                  : (pinsById.get(draft.pinId) ?? null)
+        <Stepper activeStep={step} orientation="vertical">
+          <Step>
+            <StepLabel
+              optional={
+                step > 0 &&
+                map && <Typography variant="caption">{map.name}</Typography>
               }
-              disabled={busy}
-              onTogglePhoto={(photoKey) => handleTogglePhoto(index, photoKey)}
-              onChoosePin={() => setPickingIndex(index)}
-            />
-          ))}
+            >
+              {dictionary['choose map']}
+            </StepLabel>
+            <StepContent>
+              <Stack spacing={2}>
+                <MapPicker
+                  maps={maps}
+                  selected={map}
+                  onSelect={handleSelectMap}
+                />
+                <Box>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    disableElevation
+                    disabled={!map || !pins || pins.length < 1}
+                    loading={map !== null && pins === null}
+                    onClick={() => setStep(1)}
+                  >
+                    {dictionary.next}
+                  </Button>
+                </Box>
+              </Stack>
+            </StepContent>
+          </Step>
 
-          {phase === 'recording' && (
-            <Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {dictionary['recording checkins']
-                  .replace('{done}', String(progress.done))
-                  .replace('{total}', String(progress.total))}
-              </Typography>
-              <LinearProgress
-                variant="determinate"
-                color="secondary"
-                value={
-                  progress.total > 0
-                    ? (progress.done / progress.total) * 100
-                    : 0
-                }
-              />
-            </Box>
-          )}
-        </Stack>
+          <Step>
+            <StepLabel>{dictionary['choose photos and pins']}</StepLabel>
+            <StepContent>
+              <Stack spacing={2}>
+                <Box>
+                  <Typography variant="body2">
+                    {dictionary['choose journey photos']}
+                  </Typography>
+                  <Typography variant="body2">
+                    {dictionary['checkins from capture times']}
+                  </Typography>
+                </Box>
+                <Button
+                  component="label"
+                  htmlFor={inputId}
+                  variant={drafts.length > 0 ? 'outlined' : 'contained'}
+                  color="secondary"
+                  disableElevation
+                  startIcon={<AddPhotoAlternate />}
+                  disabled={phase === 'recording'}
+                  loading={phase === 'reading'}
+                >
+                  {drafts.length > 0
+                    ? dictionary['choose other photos']
+                    : dictionary['choose photos']}
+                </Button>
+                {drafts.length > 0 && phase !== 'reading' && (
+                  <>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        {dictionary['photos to checkins']
+                          .replace('{photos}', String(selectedPhotoCount))
+                          .replace('{checkins}', String(drafts.length))}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {dictionary['choose checkin pins']}
+                      </Typography>
+                    </Box>
+                    <Timeline
+                      sx={{
+                        p: 0,
+                        [`& .${timelineItemClasses.root}:before`]: {
+                          flex: 0,
+                          padding: 0
+                        }
+                      }}
+                    >
+                      {draftItems()}
+                    </Timeline>
+                  </>
+                )}
+
+                {phase === 'recording' && (
+                  <Box>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
+                      {dictionary['recording checkins']
+                        .replace('{done}', String(progress.done))
+                        .replace('{total}', String(progress.total))}
+                    </Typography>
+                    <LinearProgress
+                      variant="determinate"
+                      color="secondary"
+                      value={
+                        progress.total > 0
+                          ? (progress.done / progress.total) * 100
+                          : 0
+                      }
+                    />
+                  </Box>
+                )}
+
+                <Stack direction="row" spacing={1}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    disableElevation
+                    disabled={busy || !recordable}
+                    loading={phase === 'recording'}
+                    onClick={handleRecord}
+                  >
+                    {dictionary['record past journey confirm']}
+                  </Button>
+                  <Button
+                    color="inherit"
+                    disabled={busy}
+                    onClick={() => setStep(0)}
+                  >
+                    {dictionary.back}
+                  </Button>
+                </Stack>
+              </Stack>
+            </StepContent>
+          </Step>
+        </Stepper>
       )}
-
-      <PinPickerDialog
-        open={pickingIndex !== null}
-        onClose={() => setPickingIndex(null)}
-        onSelect={handleSelectPin}
-        pins={pins ?? []}
-        usedPinIds={chosenPinIds}
-      />
     </AppDialog>
   );
 }

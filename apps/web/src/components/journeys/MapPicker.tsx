@@ -1,11 +1,11 @@
 import { Map as MapIcon } from '@mui/icons-material';
 import {
+  Autocomplete,
   Avatar,
-  List,
+  ListItem,
   ListItemAvatar,
-  ListItemButton,
   ListItemText,
-  Paper
+  TextField
 } from '@mui/material';
 import type { CountedMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
@@ -13,15 +13,16 @@ import DiscoverButton from '../common/DiscoverButton.tsx';
 import NoContents from '../common/NoContents.tsx';
 
 type Props = {
-  maps: CountedMap[];
-  selectedId: number | null;
+  /** null while the maps are still loading. */
+  maps: CountedMap[] | null;
+  selected: CountedMap | null;
   onSelect: (map: CountedMap) => void;
 };
 
-export default function MapPicker({ maps, selectedId, onSelect }: Props) {
+export default function MapPicker({ maps, selected, onSelect }: Props) {
   const dictionary = useDictionary();
 
-  if (maps.length < 1) {
+  if (maps !== null && maps.length < 1) {
     return (
       <NoContents
         icon={MapIcon}
@@ -31,35 +32,46 @@ export default function MapPicker({ maps, selectedId, onSelect }: Props) {
     );
   }
 
+  // A single field keeps the step's Next button in view however many maps
+  // there are, and typing narrows them down.
   return (
-    <Paper variant="outlined">
-      <List disablePadding>
-        {maps.map((map, index) => (
-          <ListItemButton
-            key={map.id}
-            selected={map.id === selectedId}
-            disabled={map.pins_count < 1}
-            onClick={() => onSelect(map)}
-            divider={index < maps.length - 1}
-          >
-            <ListItemAvatar>
-              <Avatar variant="rounded" alt={map.name} src={map.image?.avatar}>
-                <MapIcon />
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText
-              primary={map.name}
-              secondary={
-                map.pins_count < 1 ? dictionary['no pins yet'] : map.author.name
-              }
-              slotProps={{
-                primary: { noWrap: true },
-                secondary: { noWrap: true }
-              }}
-            />
-          </ListItemButton>
-        ))}
-      </List>
-    </Paper>
+    <Autocomplete
+      fullWidth
+      disableClearable={selected !== null}
+      options={maps ?? []}
+      loading={maps === null}
+      loadingText={dictionary.loading}
+      noOptionsText={dictionary['map not found']}
+      value={selected}
+      onChange={(_, map) => {
+        if (map) {
+          onSelect(map);
+        }
+      }}
+      getOptionKey={(map) => map.id}
+      getOptionLabel={(map) => map.name}
+      getOptionDisabled={(map) => map.pins_count < 1}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
+      renderOption={({ key, ...optionProps }, map) => (
+        <ListItem key={key} {...optionProps}>
+          <ListItemAvatar>
+            <Avatar variant="rounded" alt={map.name} src={map.image?.avatar}>
+              <MapIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText
+            primary={map.name}
+            secondary={
+              map.pins_count < 1 ? dictionary['no pins yet'] : map.author.name
+            }
+            slotProps={{
+              primary: { noWrap: true },
+              secondary: { noWrap: true }
+            }}
+          />
+        </ListItem>
+      )}
+      renderInput={(params) => <TextField {...params} label={dictionary.map} />}
+    />
   );
 }

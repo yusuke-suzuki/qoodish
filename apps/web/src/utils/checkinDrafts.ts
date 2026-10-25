@@ -88,24 +88,6 @@ export function withPin<T extends KeyedPhoto>(
   return updated;
 }
 
-export function toggledSelection<T extends KeyedPhoto>(
-  draft: CheckinDraft<T>,
-  key: string
-): string[] | null {
-  if (draft.selected.includes(key)) {
-    return draft.selected.filter((selected) => selected !== key);
-  }
-
-  if (draft.selected.length >= CHECKIN_IMAGE_LIMIT) {
-    return null;
-  }
-
-  const selected = new Set([...draft.selected, key]);
-  return draft.photos
-    .filter((photo) => selected.has(photo.key))
-    .map((photo) => photo.key);
-}
-
 export function groupPhotos<T extends DatedPhoto>(
   photos: T[],
   gapMs: number = CHECKIN_GAP_MS

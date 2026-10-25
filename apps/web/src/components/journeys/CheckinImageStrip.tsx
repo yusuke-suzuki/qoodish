@@ -1,8 +1,7 @@
 'use client';
 
-import { AddPhotoAlternate, Close } from '@mui/icons-material';
+import { AddPhotoAlternate } from '@mui/icons-material';
 import {
-  Avatar,
   Box,
   Button,
   CircularProgress,
@@ -19,8 +18,7 @@ import uploadImage, {
   splitOversizedImages,
   uploadFailureMessage
 } from '../../utils/uploadImage.ts';
-
-const IMAGE_SIZE = 96;
+import RemovableThumbnail, { THUMBNAIL_SIZE } from './RemovableThumbnail.tsx';
 
 type Props = {
   checkin: JourneyCheckin;
@@ -86,30 +84,13 @@ function CheckinImageStrip({ checkin, onAttach, onRemove }: Props) {
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
       {checkin.images.map((image) => (
-        <Box key={image.id} sx={{ position: 'relative' }}>
-          <Avatar
-            variant="rounded"
-            src={image.card}
-            alt={checkin.spot.name}
-            sx={{ width: IMAGE_SIZE, height: IMAGE_SIZE }}
-          />
-          <IconButton
-            size="small"
-            aria-label={dictionary.delete}
-            onClick={() => setPendingDelete(image.id)}
-            sx={{
-              position: 'absolute',
-              top: -8,
-              right: -8,
-              p: 0.25,
-              bgcolor: 'background.paper',
-              boxShadow: 1,
-              '&:hover': { bgcolor: 'background.paper' }
-            }}
-          >
-            <Close sx={{ fontSize: 14 }} />
-          </IconButton>
-        </Box>
+        <RemovableThumbnail
+          key={image.id}
+          src={image.card}
+          alt={checkin.spot.name}
+          removeLabel={dictionary.delete}
+          onRemove={() => setPendingDelete(image.id)}
+        />
       ))}
 
       <input
@@ -126,8 +107,8 @@ function CheckinImageStrip({ checkin, onAttach, onRemove }: Props) {
           aria-label={dictionary['add images']}
           disabled={uploading}
           sx={{
-            width: IMAGE_SIZE,
-            height: IMAGE_SIZE,
+            width: THUMBNAIL_SIZE,
+            height: THUMBNAIL_SIZE,
             borderRadius: 1,
             border: '1px dashed',
             borderColor: 'divider'
