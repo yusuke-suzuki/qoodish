@@ -22,6 +22,7 @@ import { addCheckin, recordPastJourney } from '../../actions/journeys.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import {
+  CHECKIN_IMAGE_LIMIT,
   type CheckinDraft,
   CLOCK_SKEW_MS,
   draftCheckin,
@@ -107,6 +108,14 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
 
   const recordable =
     drafts.length > 0 && drafts.every((draft) => draft.pinId !== null);
+
+  // Counted from every photo in a draft rather than from its selection, so
+  // photos the user excluded on purpose are not reported as left out.
+  const overLimitPhotoCount = drafts.reduce(
+    (count, draft) =>
+      count + Math.max(0, draft.photos.length - CHECKIN_IMAGE_LIMIT),
+    0
+  );
 
   const handleEnter = async () => {
     try {
@@ -495,6 +504,13 @@ export default function RecordPastJourneyDialog({ open, onClose }: Props) {
                         {dictionary['choose checkin pins']}
                       </Typography>
                     </Box>
+                    {overLimitPhotoCount > 0 && (
+                      <Alert severity="warning">
+                        {dictionary['photos over checkin limit']
+                          .replace('{limit}', String(CHECKIN_IMAGE_LIMIT))
+                          .replace('{count}', String(overLimitPhotoCount))}
+                      </Alert>
+                    )}
                     <Timeline
                       sx={{
                         p: 0,

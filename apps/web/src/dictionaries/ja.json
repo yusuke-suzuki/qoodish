@@ -365,6 +365,7 @@
   "exclude checkin": "このチェックインを除外",
   "exclude photo": "この写真を除外",
   "choose checkin pins": "チェックインごとにピンを選んでください。",
+  "photos over checkin limit": "チェックインに添付できる写真は {limit} 枚までのため、{count} 枚の写真は添付されません。",
   "photos not attached": "{count} 枚の写真を添付できませんでした。旅の記録から再度追加してください。",
   "photos without capture time": "{count} 枚の写真は撮影日時を正しく読み取れないため取り込めませんでした。",
   "no photos with capture time": "撮影日時を正しく読み取れる写真がありませんでした。カメラで撮影した写真を選んでください。",
