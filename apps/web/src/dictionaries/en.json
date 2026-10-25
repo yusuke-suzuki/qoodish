@@ -374,6 +374,7 @@
   "exclude checkin": "Exclude this check-in",
   "exclude photo": "Exclude this photo",
   "choose checkin pins": "Choose a pin for each check-in.",
+  "photos over checkin limit": "A check-in takes up to {limit} photos, so {count} photos will not be attached.",
   "photos not attached": "Photos that could not be attached: {count}. Open the journey to add them again.",
   "photos without capture time": "Photos left out without a valid capture time: {count}",
   "no photos with capture time": "None of the photos have a valid capture time. Choose photos taken with a camera.",
