@@ -281,6 +281,7 @@
   "button invite": "共著者に招く",
   "button current location": "現在地へ移動",
   "current position": "現在地",
+  "reset map heading": "地図を北向きに戻す",
   "page not found": "ページが見つかりません",
   "page not found description": "壊れたリンクをたどったか、このサイトに存在しないURLを入力したようです。",
   "back to our site": "サイトに戻る",
