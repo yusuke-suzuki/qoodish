@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import SignInRequired from '../../../../components/auth/SignInRequired.tsx';
-import CoauthorshipInvitationList from '../../../../components/coauthors/CoauthorshipInvitationList.tsx';
+import CoauthorshipInvitationsView from '../../../../components/coauthors/CoauthorshipInvitationsView.tsx';
 import { getServerAuthState } from '../../../../lib/auth.ts';
 import { getCoauthorshipInvitations } from '../../../../lib/coauthorshipInvitations.ts';
 import { getDictionary } from '../../../../utils/getDictionary.ts';
@@ -32,7 +32,10 @@ export default async function InvitationsPage({ params }: Props) {
     return <SignInRequired title={getDictionary(lang).invites} />;
   }
 
-  const invitations = await getCoauthorshipInvitations(lang);
+  const [pending, accepted] = await Promise.all([
+    getCoauthorshipInvitations(lang, 'pending'),
+    getCoauthorshipInvitations(lang, 'accepted')
+  ]);
 
-  return <CoauthorshipInvitationList invitations={invitations} />;
+  return <CoauthorshipInvitationsView pending={pending} accepted={accepted} />;
 }
