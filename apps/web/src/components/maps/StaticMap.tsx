@@ -1,4 +1,4 @@
-import { Box, ButtonBase, Card, CardMedia, Skeleton } from '@mui/material';
+import { ButtonBase, Card, CardMedia, Skeleton } from '@mui/material';
 
 type Props = {
   position: google.maps.LatLngLiteral | null;
@@ -51,6 +51,13 @@ function staticMapUrl(
   return url.toString();
 }
 
+const imageSx = {
+  display: 'block',
+  objectFit: 'cover',
+  width: '100%',
+  height: '100%'
+} as const;
+
 function StaticMap({ position, width, height }: Props) {
   if (!position) {
     return <Skeleton variant="rectangular" width={width} height={height} />;
@@ -64,27 +71,33 @@ function StaticMap({ position, width, height }: Props) {
         target="_blank"
         rel="noreferrer"
       >
-        <Box
-          component="picture"
-          sx={{ display: 'block', width: '100%', height: '100%' }}
-        >
-          <source
-            media="(prefers-color-scheme: dark)"
-            srcSet={staticMapUrl(position, width, height, NIGHT_MODE_STYLES)}
-          />
-          <CardMedia
-            component="img"
-            image={staticMapUrl(position, width, height)}
-            width={width}
-            height={height}
-            loading="lazy"
-            sx={{
-              objectFit: 'cover',
-              width: '100%',
-              height: '100%'
-            }}
-          />
-        </Box>
+        {/* Both images are rendered and CSS shows the one for the current
+            scheme: a <picture> source can only follow the system setting,
+            not the reader's choice. A lazy image that is not displayed is
+            never fetched. */}
+        <CardMedia
+          component="img"
+          image={staticMapUrl(position, width, height)}
+          width={width}
+          height={height}
+          loading="lazy"
+          sx={(theme) => ({
+            ...imageSx,
+            ...theme.applyStyles('dark', { display: 'none' })
+          })}
+        />
+        <CardMedia
+          component="img"
+          image={staticMapUrl(position, width, height, NIGHT_MODE_STYLES)}
+          width={width}
+          height={height}
+          loading="lazy"
+          sx={(theme) => ({
+            ...imageSx,
+            display: 'none',
+            ...theme.applyStyles('dark', { display: 'block' })
+          })}
+        />
       </ButtonBase>
     </Card>
   );

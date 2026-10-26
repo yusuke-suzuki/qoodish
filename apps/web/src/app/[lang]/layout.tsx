@@ -1,3 +1,4 @@
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -113,7 +114,8 @@ export default async function RootLayout({ children, params }: Props) {
   );
 
   return (
-    <html lang={lang} className={fontVariables}>
+    // InitColorSchemeScript adds the color scheme class before hydration.
+    <html lang={lang} className={fontVariables} suppressHydrationWarning>
       <head>
         <link href="https://www.googleapis.com" rel="preconnect dns-prefetch" />
         <link
@@ -133,6 +135,7 @@ export default async function RootLayout({ children, params }: Props) {
         />
       </head>
       <body>
+        <InitColorSchemeScript attribute="class" />
         <Providers
           lang={lang}
           dictionary={dict}

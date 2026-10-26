@@ -27,6 +27,7 @@ import { SUPPORT_EMAIL } from '../../utils/brand.ts';
 import ProfileAvatar from '../common/ProfileAvatar.tsx';
 import LocaleMenuButton from './LocaleMenuButton.tsx';
 import Logo from './Logo.tsx';
+import ThemeMenuButton from './ThemeMenuButton.tsx';
 
 type Props = {
   open: boolean;
@@ -166,6 +167,7 @@ function NavDrawerContent({
           </ListItemButton>
         )}
         <LocaleMenuButton variant="list" onNavigate={onClose} />
+        <ThemeMenuButton variant="list" onSelect={onClose} />
         <ListItemButton
           dense
           onClick={onClose}
