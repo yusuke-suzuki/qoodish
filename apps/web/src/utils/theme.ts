@@ -74,6 +74,17 @@ export function createAppTheme(lang: string) {
         }
       },
       components: {
+        MuiCssBaseline: {
+          // CssBaseline paints only the body, and leaves the root transparent
+          // for the browser to fill. Mobile browsers fill what lies beyond the
+          // body (the overscroll area and the strip under the toolbar or the
+          // home indicator) from the root, so it came out white in dark mode.
+          styleOverrides: (theme) => ({
+            html: {
+              backgroundColor: (theme.vars ?? theme).palette.background.default
+            }
+          })
+        },
         MuiCard: {
           // The page and the card share one surface, so a card needs an edge
           // rather than a shadow to be told from it.
