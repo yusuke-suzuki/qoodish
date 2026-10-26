@@ -5,6 +5,7 @@ import { useGoogleMap } from '../../hooks/useGoogleMap.ts';
 import CurrentPositionButton from './CurrentPositionButton.tsx';
 import MapControl from './MapControl.tsx';
 import PlaceAutocomplete from './PlaceAutocomplete.tsx';
+import ResetHeadingButton from './ResetHeadingButton.tsx';
 
 type Props = {
   filter?: ReactNode;
@@ -93,6 +94,7 @@ function CustomMapControls({ filter, onPlaceChange }: Props) {
       <MapControl controlPosition={buttonPosition}>
         {/* The Maps API gives its own controls a 10px margin. */}
         <Stack spacing={2} sx={{ p: '10px' }}>
+          <ResetHeadingButton />
           <CurrentPositionButton />
         </Stack>
       </MapControl>

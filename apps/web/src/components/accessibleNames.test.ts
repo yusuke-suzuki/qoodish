@@ -8,7 +8,12 @@ const ROOT = join(import.meta.dirname, '..');
 // Controls that show an icon alone. Each opening tag has to carry a name a
 // screen reader can announce and a tooltip a touch device can show, unless
 // it renders a visible label of its own.
-const ICON_ONLY_CONTROLS = ['IconButton', 'BottomNavigationAction', 'Fab'];
+const ICON_ONLY_CONTROLS = [
+  'IconButton',
+  'BottomNavigationAction',
+  'Fab',
+  'MapControlButton'
+];
 
 function listSourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
