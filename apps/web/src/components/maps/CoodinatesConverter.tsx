@@ -87,9 +87,14 @@ function CoodinatesConverter({ onChange, defaultValue }: Props) {
         </Box>
       </MapControl>
 
+      {/* The dragged position becomes the default too, so that a map rebuilt
+          for a new theme puts the marker back where it was dropped. */}
       <DraggableMarker
         defaultPosition={defaultPosition}
-        onLatLngChanged={setCenter}
+        onLatLngChanged={(latLng) => {
+          setDefaultPosition(latLng);
+          setCenter(latLng);
+        }}
       />
     </>
   );

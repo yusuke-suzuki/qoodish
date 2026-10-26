@@ -23,6 +23,7 @@ import LocaleMenuButton from './LocaleMenuButton.tsx';
 import Logo from './Logo.tsx';
 import NavDrawer from './NavDrawer.tsx';
 import NotificationsBadge from './NotificationsBadge.tsx';
+import ThemeMenuButton from './ThemeMenuButton.tsx';
 import TopBarSearch from './TopBarSearch.tsx';
 
 function TopBarContent() {
@@ -143,6 +144,7 @@ function TopBarContent() {
             )}
 
             <Box sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
+              <ThemeMenuButton variant="bar" />
               <LocaleMenuButton variant="bar" />
             </Box>
 

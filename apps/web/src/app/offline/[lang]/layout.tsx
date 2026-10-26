@@ -1,3 +1,4 @@
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import OfflineProviders from '../../../components/offline/OfflineProviders.tsx';
@@ -37,8 +38,10 @@ export default async function OfflineLayout({ children, params }: Props) {
   const { lang } = await params;
 
   return (
-    <html lang={lang} className={fontVariables}>
+    // InitColorSchemeScript adds the color scheme class before hydration.
+    <html lang={lang} className={fontVariables} suppressHydrationWarning>
       <body>
+        <InitColorSchemeScript attribute="class" />
         <OfflineProviders lang={lang} dictionary={getDictionary(lang)}>
           {children}
         </OfflineProviders>

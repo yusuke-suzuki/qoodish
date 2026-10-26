@@ -1,5 +1,11 @@
 import { Loader } from '@googlemaps/js-api-loader';
-import { Box, type SxProps, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  type SxProps,
+  useColorScheme,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { useParams } from 'next/navigation';
 import {
   type ReactNode,
@@ -71,6 +77,27 @@ function GoogleMaps({
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
 
+  // The Maps API takes a color scheme only when a map is constructed, so a
+  // change of theme builds the map again, in a fresh element, from the
+  // camera the old one stood at.
+  const { colorScheme } = useColorScheme();
+  const [builtScheme, setBuiltScheme] = useState<'light' | 'dark' | null>(null);
+  const [generation, setGeneration] = useState(0);
+  const [carriedCamera, setCarriedCamera] =
+    useState<google.maps.CameraOptions | null>(null);
+
+  if (googleMap && colorScheme && builtScheme && colorScheme !== builtScheme) {
+    setCarriedCamera({
+      center: googleMap.getCenter()?.toJSON(),
+      zoom: googleMap.getZoom(),
+      heading: googleMap.getHeading(),
+      tilt: googleMap.getTilt()
+    });
+    setBuiltScheme(null);
+    setGoogleMap(null);
+    setGeneration((current) => current + 1);
+  }
+
   const initGoogleMaps = useCallback(async () => {
     if (!mapRef.current) {
       return;
@@ -79,14 +106,20 @@ function GoogleMaps({
     const { Map: GoogleMap } = await loader.importLibrary('maps');
     const { ColorScheme, ControlPosition } = await loader.importLibrary('core');
 
-    // ColorScheme.FOLLOW_SYSTEM paints the first frames light before switching.
-    const prefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)'
-    ).matches;
+    // The scheme the reader chose, which may differ from the system's, so
+    // ColorScheme.FOLLOW_SYSTEM would not do. useColorScheme reports nothing
+    // until the provider has mounted, but InitColorSchemeScript has put the
+    // class on the root by then.
+    const dark =
+      (colorScheme ??
+        (document.documentElement.classList.contains('dark')
+          ? 'dark'
+          : 'light')) === 'dark';
 
     const map = new GoogleMap(mapRef.current as HTMLElement, {
-      colorScheme: prefersDark ? ColorScheme.DARK : ColorScheme.LIGHT,
+      colorScheme: dark ? ColorScheme.DARK : ColorScheme.LIGHT,
       zoom: 17,
+      ...carriedCamera,
       zoomControl: !!mdUp,
       zoomControlOptions: {
         position: ControlPosition.LEFT_BOTTOM
@@ -103,8 +136,10 @@ function GoogleMaps({
       ...mapOptions
     });
 
+    setCarriedCamera(null);
+    setBuiltScheme(dark ? 'dark' : 'light');
     setGoogleMap(map);
-  }, [mapId, mapOptions, mdUp, loader]);
+  }, [mapId, mapOptions, mdUp, loader, carriedCamera, colorScheme]);
 
   useEffect(() => {
     if (!googleMap && mapRef.current && loader) {
@@ -159,14 +194,27 @@ function GoogleMaps({
   const centerLat = center?.lat;
   const centerLng = center?.lng;
 
+  // Applied once per value rather than once per map, so that a map rebuilt
+  // for a new theme keeps the camera it carried over instead of jumping back.
+  const appliedCenterRef = useRef<string | null>(null);
+  const appliedZoomRef = useRef<number | null>(null);
+
   useEffect(() => {
-    if (googleMap && centerLat !== undefined && centerLng !== undefined) {
+    if (!googleMap || centerLat === undefined || centerLng === undefined) {
+      return;
+    }
+
+    const key = `${centerLat},${centerLng}`;
+
+    if (appliedCenterRef.current !== key) {
+      appliedCenterRef.current = key;
       googleMap.panTo({ lat: centerLat, lng: centerLng });
     }
   }, [googleMap, centerLat, centerLng]);
 
   useEffect(() => {
-    if (googleMap && zoom) {
+    if (googleMap && zoom && appliedZoomRef.current !== zoom) {
+      appliedZoomRef.current = zoom;
       googleMap.setZoom(zoom);
     }
   }, [googleMap, zoom]);
@@ -180,7 +228,7 @@ function GoogleMaps({
 
   return (
     <Box>
-      <Box ref={mapRef} sx={sx} />
+      <Box key={generation} ref={mapRef} sx={sx} />
 
       <GoogleMapsContext.Provider value={contextValue}>
         {children}

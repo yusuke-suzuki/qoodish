@@ -8,7 +8,9 @@ export function createAppTheme(lang: string) {
 
   return createTheme(
     {
-      cssVariables: true,
+      // A class rather than the media query, so that the reader's choice in
+      // ThemeMenuButton can override the system setting.
+      cssVariables: { colorSchemeSelector: 'class' },
       colorSchemes: {
         light: {
           palette: {
