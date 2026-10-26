@@ -165,6 +165,19 @@ describe('GET /me/coauthorship_invitations', () => {
       ]
     });
   });
+
+  it('hides an accepted invitation to a private map it no longer coauthors', async () => {
+    // Bob accepted the invitation to Secret Spots but is not its coauthor.
+    expect(
+      await get('/me/coauthorship_invitations?status=accepted', 'bob')
+    ).toEqual({ status: 200, body: [] });
+  });
+
+  it('rejects a status it does not list', async () => {
+    expect(
+      (await get('/me/coauthorship_invitations?status=declined', 'bob')).status
+    ).toBe(400);
+  });
 });
 
 describe('journeys', () => {
@@ -774,6 +787,12 @@ describe('POST /me/coauthorship_invitations/:id/accept and /decline', () => {
     expect(
       (await send('GET', `/me/coauthorship_invitations`, 'bob')).body
     ).toEqual([]);
+    expect(
+      (await send('GET', '/me/coauthorship_invitations?status=accepted', 'bob'))
+        .body
+    ).toContainEqual(
+      expect.objectContaining({ id: pending.id, status: 'accepted' })
+    );
     expect(await coauthorsOf(ids.ramen)).toEqual(
       expect.arrayContaining([ids.bob, ids.carol])
     );

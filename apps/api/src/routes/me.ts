@@ -33,7 +33,7 @@ import {
 import {
   answerInvitation,
   invitation,
-  pendingInvitations
+  receivedInvitations
 } from '../coauthorship-invitations.ts';
 import type { Database } from '../db/client.ts';
 import {
@@ -76,7 +76,7 @@ import { readNotification } from '../notifications.ts';
 import { discardPin, pinInput, revisePin, viewerPins } from '../pins.ts';
 import { first } from '../routing.ts';
 import { profileInput, updateProfile } from '../users.ts';
-import { id, jsonBody, pathParams } from '../validation.ts';
+import { id, jsonBody, pathParams, queryParams } from '../validation.ts';
 import {
   bookmarkedBy,
   publicMap,
@@ -326,10 +326,19 @@ app.delete('/chapters/:id', idParams, async (c) => {
   return c.body(null, 204);
 });
 
-app.get('/coauthorship_invitations', async (c) =>
-  c.json<CoauthorshipInvitation[]>(
-    await pendingInvitations(c.get('db'), c.get('viewer').id)
-  )
+app.get(
+  '/coauthorship_invitations',
+  queryParams(
+    z.object({ status: z.enum(['pending', 'accepted']).default('pending') })
+  ),
+  async (c) =>
+    c.json<CoauthorshipInvitation[]>(
+      await receivedInvitations(
+        c.get('db'),
+        c.get('viewer'),
+        c.req.valid('query').status
+      )
+    )
 );
 
 app.post(

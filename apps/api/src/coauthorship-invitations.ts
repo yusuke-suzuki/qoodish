@@ -41,7 +41,12 @@ import {
 import { recordNotification } from './notifications.ts';
 import { first } from './routing.ts';
 import { userSummary, usersQuery } from './users.ts';
-import { editableMap, noBlockBetween, type Viewer } from './visibility.ts';
+import {
+  editableMap,
+  noBlockBetween,
+  referenceableMap,
+  type Viewer
+} from './visibility.ts';
 import { enqueueWebPush, type WebPushMessage } from './web-push.ts';
 
 const STATUSES: readonly CoauthorshipInvitationStatus[] = [
@@ -152,15 +157,20 @@ async function invitationsWhere(
   });
 }
 
-export function pendingInvitations(
+export function receivedInvitations(
   db: Database,
-  userId: number
+  viewer: Viewer,
+  status: 'pending' | 'accepted'
 ): Promise<CoauthorshipInvitation[]> {
   return invitationsWhere(
     db,
     and(
-      eq(coauthorshipInvitations.inviteeId, userId),
-      eq(coauthorshipInvitations.status, PENDING)
+      eq(coauthorshipInvitations.inviteeId, viewer.id),
+      eq(coauthorshipInvitations.status, STATUSES.indexOf(status)),
+      // A pending invitation is how the invitee learns of a private map, but
+      // an accepted one outlives the coauthorship: once removed, the invitee
+      // must no longer read the map through it.
+      status === 'accepted' ? referenceableMap(viewer) : undefined
     )
   );
 }
