@@ -121,7 +121,11 @@ function PinDrawer({
           />
 
           <CardContent sx={{ pt: 0 }}>
-            <Typography variant="body2" component="p">
+            <Typography
+              variant="body2"
+              component="p"
+              sx={{ whiteSpace: 'pre-wrap' }}
+            >
               {pin?.comment}
             </Typography>
             {pin && (

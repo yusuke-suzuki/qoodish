@@ -70,7 +70,10 @@ function ChapterMapCard({
               </MuiLink>
 
               {map.description && (
-                <Typography variant="body2" sx={{ mt: 1 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 1, whiteSpace: 'pre-wrap' }}
+                >
                   {map.description}
                 </Typography>
               )}

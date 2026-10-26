@@ -117,7 +117,9 @@ function UserProfile({
               </Typography>
 
               {profile.biography && (
-                <Typography variant="body1">{profile.biography}</Typography>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                  {profile.biography}
+                </Typography>
               )}
 
               <Stack

@@ -66,7 +66,11 @@ export default function PinDetail({ pin, map, pinProperties }: Props) {
             {pin.name}
           </Typography>
 
-          <Typography component="p" gutterBottom>
+          <Typography
+            component="p"
+            gutterBottom
+            sx={{ whiteSpace: 'pre-wrap' }}
+          >
             {pin.comment}
           </Typography>
 

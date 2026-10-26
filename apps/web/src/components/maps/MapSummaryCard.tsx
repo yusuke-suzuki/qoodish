@@ -112,7 +112,9 @@ export default function MapSummaryCard({
       />
       <CardContent sx={{ pt: 0, pb: map?.editable ? 2 : 0 }}>
         {map ? (
-          <Typography variant="body1">{map.description}</Typography>
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+            {map.description}
+          </Typography>
         ) : (
           <>
             <Skeleton />
