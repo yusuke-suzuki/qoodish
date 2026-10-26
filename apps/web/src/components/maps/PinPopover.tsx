@@ -95,7 +95,11 @@ function PinPopover({
           <Typography variant="h6" gutterBottom>
             {pin?.name}
           </Typography>
-          <Typography variant="body2" component="p">
+          <Typography
+            variant="body2"
+            component="p"
+            sx={{ whiteSpace: 'pre-wrap' }}
+          >
             {pin?.comment}
           </Typography>
           {pin && <PinPropertyValues pin={pin} pinProperties={pinProperties} />}

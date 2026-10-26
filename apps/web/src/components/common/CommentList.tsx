@@ -81,7 +81,9 @@ const CommentList = ({ subject, comments, onDeleted, onLiked }: Props) => {
               }
               secondary={
                 <>
-                  {comment.body}
+                  <Box component="span" sx={{ whiteSpace: 'pre-wrap' }}>
+                    {comment.body}
+                  </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <LikeCommentButton
                       subject={subject}
