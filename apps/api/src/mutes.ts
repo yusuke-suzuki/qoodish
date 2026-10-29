@@ -59,22 +59,6 @@ export async function unmuteUser(
   { muterId, mutedId }: { muterId: number; mutedId: number }
 ): Promise<void> {
   await db
-    .insert(unmutes)
-    .select(
-      db
-        .select({
-          id: generatedId(),
-          createdAt: selected(currentTimestamp(), 'created_at'),
-          muteId: mutes.id
-        })
-        .from(mutes)
-        .where(
-          and(
-            eq(mutes.muterId, muterId),
-            eq(mutes.mutedId, mutedId),
-            activeMute(db)
-          )
-        )
-    )
-    .onConflictDoNothing();
+    .delete(mutes)
+    .where(and(eq(mutes.muterId, muterId), eq(mutes.mutedId, mutedId)));
 }
