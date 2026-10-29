@@ -11,8 +11,7 @@ import {
   journalRevisions,
   mapRevisions,
   mutes,
-  unblocks,
-  unmutes
+  unblocks
 } from '../db/schema.ts';
 import { get, idsOf, send } from '../test/client.ts';
 import { accountOf } from '../test/records.ts';
@@ -245,7 +244,7 @@ describe('POST/DELETE /users/:userId/block', () => {
     });
   });
 
-  it('lifts the block by recording an unblock', async () => {
+  it('lifts the block by deleting it', async () => {
     const lifted = await send('DELETE', `/users/${ids.bob}/block`, 'alice');
     const again = await send('DELETE', `/users/${ids.bob}/block`, 'alice');
     const never = await send('DELETE', `/users/${ids.carol}/block`, 'alice');
@@ -253,7 +252,39 @@ describe('POST/DELETE /users/:userId/block', () => {
     expect(lifted).toMatchObject({ status: 200, body: { blocking: false } });
     expect(again.body.blocking).toBe(false);
     expect(never).toMatchObject({ status: 200, body: { blocking: false } });
-    expect(await db().select().from(unblocks)).toHaveLength(1);
+    expect(
+      await db()
+        .select()
+        .from(blocks)
+        .where(
+          and(eq(blocks.blockerId, ids.alice), eq(blocks.blockedId, ids.bob))
+        )
+    ).toEqual([]);
+  });
+
+  it('deletes a block lifted by an unblock along with it', async () => {
+    const [legacy] = await db()
+      .insert(blocks)
+      .values({ blockerId: ids.alice, blockedId: ids.carol, createdAt: at(31) })
+      .returning({ id: blocks.id });
+
+    await db()
+      .insert(unblocks)
+      .values({ blockId: legacy.id, createdAt: at(32) });
+    const blocking = await send('POST', `/users/${ids.carol}/block`, 'alice');
+
+    await send('DELETE', `/users/${ids.carol}/block`, 'alice');
+
+    expect(blocking.body.blocking).toBe(true);
+    expect(
+      await db()
+        .select()
+        .from(blocks)
+        .where(
+          and(eq(blocks.blockerId, ids.alice), eq(blocks.blockedId, ids.carol))
+        )
+    ).toEqual([]);
+    expect(await db().select().from(unblocks)).toEqual([]);
   });
 
   it('answers 422 on the user themselves and 404 on an unknown user', async () => {
@@ -268,18 +299,19 @@ describe('POST/DELETE /users/:userId/block', () => {
 });
 
 describe('POST/DELETE /users/:userId/mute', () => {
-  it('mutes a user once and lifts the mute by recording an unmute', async () => {
+  it('mutes a user once and lifts the mute by deleting it', async () => {
     const muted = await send('POST', `/users/${ids.bob}/mute`, 'carol');
 
     await send('POST', `/users/${ids.bob}/mute`, 'carol');
 
+    const mutesWhileMuted = await db().select().from(mutes);
     const lifted = await send('DELETE', `/users/${ids.bob}/mute`, 'carol');
     const self = await send('POST', `/users/${ids.carol}/mute`, 'carol');
 
     expect(muted).toMatchObject({ status: 200, body: { muting: true } });
-    expect(await db().select().from(mutes)).toHaveLength(1);
+    expect(mutesWhileMuted).toHaveLength(1);
     expect(lifted.body.muting).toBe(false);
-    expect(await db().select().from(unmutes)).toHaveLength(1);
+    expect(await db().select().from(mutes)).toEqual([]);
     expect(self).toMatchObject({
       status: 422,
       body: { detail: 'Account is your own and cannot be muted.' }

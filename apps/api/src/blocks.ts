@@ -7,7 +7,7 @@ import {
   generatedId,
   selected
 } from './db/client.ts';
-import { blocks, unblocks, users } from './db/schema.ts';
+import { blocks, users } from './db/schema.ts';
 import { ApiError } from './errors.ts';
 import { removeCoauthorshipsBetween } from './maps.ts';
 import { activeBlock } from './visibility.ts';
@@ -62,22 +62,8 @@ export async function unblockUser(
   { blockerId, blockedId }: { blockerId: number; blockedId: number }
 ): Promise<void> {
   await db
-    .insert(unblocks)
-    .select(
-      db
-        .select({
-          id: generatedId(),
-          blockId: blocks.id,
-          createdAt: selected(currentTimestamp(), 'created_at')
-        })
-        .from(blocks)
-        .where(
-          and(
-            eq(blocks.blockerId, blockerId),
-            eq(blocks.blockedId, blockedId),
-            activeBlock(db)
-          )
-        )
-    )
-    .onConflictDoNothing();
+    .delete(blocks)
+    .where(
+      and(eq(blocks.blockerId, blockerId), eq(blocks.blockedId, blockedId))
+    );
 }
