@@ -6,6 +6,7 @@ import {
   coauthorshipInvitations,
   images,
   journalBookmarks,
+  journeyCheckinImages,
   journeyCheckinRevisionImages,
   journeyCheckinRevisions,
   journeyCheckins,
@@ -149,6 +150,11 @@ export async function seedMe(binding: D1Database): Promise<void> {
   await db
     .insert(journeyCheckinRevisionImages)
     .values({ journeyCheckinRevisionId: 1, imageId: checkinImage, ...stamp });
+  await db.insert(journeyCheckinImages).values({
+    journeyCheckinId: 3,
+    imageId: checkinImage,
+    createdAt: stamp.createdAt
+  });
   await db
     .update(journeyCheckins)
     .set({ currentRevisionId: 1 })

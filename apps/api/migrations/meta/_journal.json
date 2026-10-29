@@ -71,6 +71,13 @@
       "when": 1793293932655,
       "tag": "0009_drop_unblocks_and_unmutes",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1793294194700,
+      "tag": "0010_checkin_images",
+      "breakpoints": true
     }
   ]
 }

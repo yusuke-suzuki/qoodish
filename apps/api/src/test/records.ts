@@ -6,6 +6,7 @@ import {
   chapterRevisions,
   commentRevisions,
   journals,
+  journeyCheckinImages,
   journeyCheckinRevisionImages,
   journeyCheckinRevisions,
   maps,
@@ -115,6 +116,16 @@ export async function checkinRevisionsOf(checkinId: number) {
       .filter((image) => image.journeyCheckinRevisionId === revision.id)
       .map((image) => image.imageId)
   }));
+}
+
+export async function checkinImageIdsOf(checkinId: number) {
+  const rows = await db()
+    .select({ imageId: journeyCheckinImages.imageId })
+    .from(journeyCheckinImages)
+    .where(eq(journeyCheckinImages.journeyCheckinId, checkinId))
+    .orderBy(asc(journeyCheckinImages.imageId));
+
+  return rows.map((row) => row.imageId);
 }
 
 export async function commentRevisionsOf(commentId: number) {
