@@ -11,7 +11,8 @@ import {
   journalRevisions,
   mapRevisions,
   mutes,
-  unblocks
+  unblocks,
+  unmutes
 } from '../db/schema.ts';
 import { get, idsOf, send } from '../test/client.ts';
 import { accountOf } from '../test/records.ts';
@@ -317,6 +318,29 @@ describe('POST/DELETE /users/:userId/mute', () => {
       body: { detail: 'Account is your own and cannot be muted.' }
     });
     expect((await send('POST', '/users/999/mute', 'carol')).status).toBe(404);
+  });
+
+  it('deletes a mute lifted by an unmute along with it', async () => {
+    const [legacy] = await db()
+      .insert(mutes)
+      .values({ muterId: ids.carol, mutedId: ids.alice, createdAt: at(31) })
+      .returning({ id: mutes.id });
+
+    await db()
+      .insert(unmutes)
+      .values({ muteId: legacy.id, createdAt: at(32) });
+    const muting = await send('POST', `/users/${ids.alice}/mute`, 'carol');
+
+    await send('DELETE', `/users/${ids.alice}/mute`, 'carol');
+
+    expect(muting.body.muting).toBe(true);
+    expect(
+      await db()
+        .select()
+        .from(mutes)
+        .where(and(eq(mutes.muterId, ids.carol), eq(mutes.mutedId, ids.alice)))
+    ).toEqual([]);
+    expect(await db().select().from(unmutes)).toEqual([]);
   });
 });
 
