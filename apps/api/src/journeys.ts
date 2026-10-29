@@ -36,6 +36,7 @@ import {
 import {
   chapters,
   images,
+  journeyCheckinImages,
   journeyCheckinRevisionImages,
   journeyCheckinRevisions,
   journeyCheckins,
@@ -549,6 +550,9 @@ export function journeyDependentsDeletion(
       .delete(journeyCheckinRevisions)
       .where(inArray(journeyCheckinRevisions.journeyCheckinId, checkinIds)),
     db
+      .delete(journeyCheckinImages)
+      .where(inArray(journeyCheckinImages.journeyCheckinId, checkinIds)),
+    db
       .delete(journeyCheckins)
       .where(inArray(journeyCheckins.journeyId, journeyIds)),
     db.delete(milestones).where(inArray(milestones.journeyId, journeyIds)),
@@ -556,13 +560,18 @@ export function journeyDependentsDeletion(
   ] as const;
 }
 
-export function checkinRevisionImagesOfImagesDeletion(
+export function checkinImagesOfImagesDeletion(
   db: Database,
   imageIds: SQLWrapper
 ) {
-  return db
-    .delete(journeyCheckinRevisionImages)
-    .where(inArray(journeyCheckinRevisionImages.imageId, imageIds));
+  return [
+    db
+      .delete(journeyCheckinRevisionImages)
+      .where(inArray(journeyCheckinRevisionImages.imageId, imageIds)),
+    db
+      .delete(journeyCheckinImages)
+      .where(inArray(journeyCheckinImages.imageId, imageIds))
+  ] as const;
 }
 
 export function journeysDeletion(db: Database, journeyIds: SQLWrapper) {
@@ -789,6 +798,18 @@ function checkinRevisionStatements(
           imageId,
           createdAt: now,
           updatedAt: now
+        }))
+      )
+    ),
+    db
+      .delete(journeyCheckinImages)
+      .where(eq(journeyCheckinImages.journeyCheckinId, checkinId)),
+    ...chunks(imageIds, IMAGES_PER_INSERT).map((ids) =>
+      db.insert(journeyCheckinImages).values(
+        ids.map((imageId) => ({
+          journeyCheckinId: checkinId,
+          imageId,
+          createdAt: now
         }))
       )
     ),
