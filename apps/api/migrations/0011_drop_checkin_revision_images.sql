@@ -1,0 +1,1 @@
+DROP TABLE `journey_checkin_revision_images`;
