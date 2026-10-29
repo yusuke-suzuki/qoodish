@@ -4,16 +4,7 @@ import type {
   Profile,
   WebPushPreferences
 } from '@qoodish/api-contract';
-import {
-  and,
-  desc,
-  eq,
-  inArray,
-  lt,
-  max,
-  notExists,
-  type SQL
-} from 'drizzle-orm';
+import { and, desc, eq, inArray, lt, max, type SQL } from 'drizzle-orm';
 import { z } from 'zod';
 import { currentTimestamp, type Database, inIds } from './db/client.ts';
 import {
@@ -21,17 +12,17 @@ import {
   devices,
   images,
   mutes,
-  unblocks,
-  unmutes,
   userPreferences,
   users
 } from './db/schema.ts';
+import { activeMute } from './mutes.ts';
 import {
   chapterAuthor,
   profileAttributes,
   profileQuery,
   userColumns
 } from './users.ts';
+import { activeBlock } from './visibility.ts';
 
 const ACCOUNTS_PER_PAGE = 50;
 
@@ -236,15 +227,7 @@ export function blockedAccounts(
       accountId: blocks.blockedId,
       recordId: blocks.id,
       table: blocks,
-      condition: and(
-        eq(blocks.blockerId, userId),
-        notExists(
-          db
-            .select({ id: unblocks.id })
-            .from(unblocks)
-            .where(eq(unblocks.blockId, blocks.id))
-        )
-      )
+      condition: and(eq(blocks.blockerId, userId), activeBlock(db))
     },
     cursor
   );
@@ -261,15 +244,7 @@ export function mutedAccounts(
       accountId: mutes.mutedId,
       recordId: mutes.id,
       table: mutes,
-      condition: and(
-        eq(mutes.muterId, userId),
-        notExists(
-          db
-            .select({ id: unmutes.id })
-            .from(unmutes)
-            .where(eq(unmutes.muteId, mutes.id))
-        )
-      )
+      condition: and(eq(mutes.muterId, userId), activeMute(db))
     },
     cursor
   );
