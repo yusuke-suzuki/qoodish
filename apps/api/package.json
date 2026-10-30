@@ -9,7 +9,10 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "cf d1 migrations apply 80c87870-73f2-4f5e-b057-d9296600418a --local --persist-to .cloudflare/state",
     "db:migrate:dev": "cf d1 migrations apply 80c87870-73f2-4f5e-b057-d9296600418a",
-    "db:migrate:prod": "cf d1 migrations apply 7d615fd7-7907-407b-b5fc-de93a6cb1d55"
+    "db:migrate:prod": "cf d1 migrations apply 7d615fd7-7907-407b-b5fc-de93a6cb1d55",
+    "db:script:local": "cf d1 raw 80c87870-73f2-4f5e-b057-d9296600418a --local --persist-to .cloudflare/state --sql",
+    "db:script:dev": "cf d1 raw 80c87870-73f2-4f5e-b057-d9296600418a --sql",
+    "db:script:prod": "cf d1 raw 7d615fd7-7907-407b-b5fc-de93a6cb1d55 --sql"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.9.1",

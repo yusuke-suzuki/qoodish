@@ -41,7 +41,7 @@ The Qoodish API: a Hono app on Cloudflare Workers that keeps its records in D1 t
 ## 5. Migrations and Deployment
 
 - The schema lives in `src/db/schema.ts`. Generate migrations with `pnpm db:generate`. For what Drizzle cannot express, such as FTS5 tables and triggers, generate an empty migration with `pnpm db:generate --custom` and write its SQL.
-- Migrations contain schema changes only. Change existing data with a separate script, never inside a migration.
+- Migrations contain schema changes only. Change existing data with a SQL script under `scripts/`, never inside a migration or with SQL typed by hand. The script has a test beside it that runs it against the test database with `runScript` (`src/test/scripts.ts`), and leaves the data as it found it when run again. Run it as `README.md` shows once what it relies on is live, and remove it in the pull request that would make running it again wrong, or else in the one after it has run.
 - A migration may be edited while its PR is open, but never after it has been merged: D1 records applied migrations by name and never reruns one, so add a new migration instead.
 - The previous version keeps serving after a migration applies, so a migration must leave it working: add and backfill first, read the result in the same deploy or a later one, and never remove or rename what the running version still reads.
 - Removing a column or a table takes two deploys. First remove every reference to it (schema, queries, routes, scripts, fixtures and tests) and deploy. Only after that deploy is live, drop it with a migration in a separate PR.
