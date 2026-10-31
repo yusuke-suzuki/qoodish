@@ -1,4 +1,4 @@
-import { and, eq, notExists } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { removeBookmarksBetween } from './bookmarks.ts';
 import { declineInvitationsBetween } from './coauthorship-invitations.ts';
 import {
@@ -10,7 +10,6 @@ import {
 import { blocks, users } from './db/schema.ts';
 import { ApiError } from './errors.ts';
 import { removeCoauthorshipsBetween } from './maps.ts';
-import { activeBlock } from './visibility.ts';
 
 export async function blockUser(
   db: Database,
@@ -24,33 +23,20 @@ export async function blockUser(
   const pair = [blockerId, blockedId] as const;
 
   await db.batch([
-    db.insert(blocks).select(
-      db
-        .select({
-          id: generatedId(),
-          blockedId: users.id,
-          blockerId: selected(blockerId, 'blocker_id'),
-          createdAt: selected(now, 'created_at')
-        })
-        .from(users)
-        .where(
-          and(
-            eq(users.id, blockedId),
-            notExists(
-              db
-                .select({ id: blocks.id })
-                .from(blocks)
-                .where(
-                  and(
-                    eq(blocks.blockerId, blockerId),
-                    eq(blocks.blockedId, blockedId),
-                    activeBlock(db)
-                  )
-                )
-            )
-          )
-        )
-    ),
+    db
+      .insert(blocks)
+      .select(
+        db
+          .select({
+            id: generatedId(),
+            blockedId: users.id,
+            blockerId: selected(blockerId, 'blocker_id'),
+            createdAt: selected(now, 'created_at')
+          })
+          .from(users)
+          .where(eq(users.id, blockedId))
+      )
+      .onConflictDoNothing(),
     ...removeBookmarksBetween(db, pair),
     removeCoauthorshipsBetween(db, pair),
     declineInvitationsBetween(db, pair, now)
