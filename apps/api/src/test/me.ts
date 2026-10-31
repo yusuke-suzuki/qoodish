@@ -155,10 +155,6 @@ export async function seedMe(binding: D1Database): Promise<void> {
     imageId: checkinImage,
     createdAt: stamp.createdAt
   });
-  await db
-    .update(journeyCheckins)
-    .set({ currentRevisionId: 1 })
-    .where(eq(journeyCheckins.id, 3));
 
   const notification = (
     id: number,

@@ -12,6 +12,7 @@ import {
   mapRevisions,
   maps,
   notifications,
+  pinProperties,
   pinPropertyRevisions,
   pins
 } from '../db/schema.ts';
@@ -685,7 +686,7 @@ describe('DELETE /maps/:mapId/coauthors/:userId', () => {
 });
 
 describe('pin properties', () => {
-  it('records, revises and discards a property and its options', async () => {
+  it('records, edits and discards a property and its options', async () => {
     const base = `/maps/${ids.ramen}/pin_properties`;
     const created = await send('POST', base, 'alice', {
       name: ' Spice ',
@@ -704,10 +705,10 @@ describe('pin properties', () => {
     const revisedOption = await send('PATCH', optionPath, 'alice', {
       position: 2
     });
-    const revisions = await db()
+    const [property] = await db()
       .select()
-      .from(pinPropertyRevisions)
-      .where(eq(pinPropertyRevisions.pinPropertyId, created.body.id));
+      .from(pinProperties)
+      .where(eq(pinProperties.id, created.body.id));
 
     expect(created).toMatchObject({
       status: 200,
@@ -716,7 +717,13 @@ describe('pin properties', () => {
     expect(renamed.body).toMatchObject({ name: 'Heat', multiple: true });
     expect(option.body).toMatchObject({ name: 'Mild', position: 0 });
     expect(revisedOption.body).toMatchObject({ name: 'Mild', position: 2 });
-    expect(revisions.map(({ name }) => name)).toEqual(['Spice', 'Heat']);
+    expect(property).toMatchObject({ name: 'Heat', multiple: true });
+    expect(
+      await db()
+        .select()
+        .from(pinPropertyRevisions)
+        .where(eq(pinPropertyRevisions.pinPropertyId, created.body.id))
+    ).toEqual([]);
 
     expect((await send('DELETE', optionPath, 'alice')).status).toBe(204);
     expect((await send('PUT', propertyPath, 'alice', {})).body.options).toEqual(

@@ -24,14 +24,13 @@ import { QueryBuilder } from 'drizzle-orm/sqlite-core';
 import { z } from 'zod';
 import { detachJourneys } from './chapters.ts';
 import {
+  changedColumns,
   chunks,
   currentTimestamp,
   type Database,
   generatedId,
-  reviseUntilCurrent,
   scalar,
-  selected,
-  unrevisedRecord
+  selected
 } from './db/client.ts';
 import {
   chapters,
@@ -92,7 +91,7 @@ type CheckinContent = CheckinSpot & {
   status: 'recorded' | 'deleted';
 };
 
-type RevisionImage = { revisionId: number; id: number; url: string };
+type CheckinImage = { checkinId: number; id: number; url: string };
 
 const journeyColumns = {
   id: journeys.id,
@@ -140,19 +139,22 @@ function milestoneOf(milestone: typeof milestones.$inferSelect): Milestone {
   };
 }
 
-function checkinImagesQuery(db: Database, revisionIds: SQLWrapper) {
+function checkinImagesQuery(db: Database, condition: SQL | undefined) {
   return db
     .select({
-      revisionId: journeyCheckinRevisionImages.journeyCheckinRevisionId,
+      checkinId: journeyCheckinImages.journeyCheckinId,
       id: images.id,
       url: images.url
     })
-    .from(journeyCheckinRevisionImages)
-    .innerJoin(images, eq(images.id, journeyCheckinRevisionImages.imageId))
+    .from(journeyCheckinImages)
+    .innerJoin(images, eq(images.id, journeyCheckinImages.imageId))
     .where(
       inArray(
-        journeyCheckinRevisionImages.journeyCheckinRevisionId,
-        revisionIds
+        journeyCheckinImages.journeyCheckinId,
+        db
+          .select({ id: journeyCheckins.id })
+          .from(journeyCheckins)
+          .where(condition)
       )
     )
     .orderBy(asc(images.id));
@@ -160,7 +162,7 @@ function checkinImagesQuery(db: Database, revisionIds: SQLWrapper) {
 
 function checkinOf(
   checkin: CheckinRow,
-  imagesByRevision: Map<number, RevisionImage[]>
+  imagesByCheckin: Map<number, CheckinImage[]>
 ): JourneyCheckin {
   return {
     id: checkin.id,
@@ -171,21 +173,12 @@ function checkinOf(
       longitude: checkin.longitude
     },
     note: checkin.note,
-    images: (
-      (checkin.currentRevisionId === null
-        ? undefined
-        : imagesByRevision.get(checkin.currentRevisionId)) ?? []
-    ).map((item) => image(item.id, item.url)),
+    images: (imagesByCheckin.get(checkin.id) ?? []).map((item) =>
+      image(item.id, item.url)
+    ),
     checked_in_at: checkin.checkedInAt,
     origin: checkin.origin
   };
-}
-
-function currentRevisionsOf(db: Database, condition: SQL | undefined) {
-  return db
-    .select({ id: journeyCheckins.currentRevisionId })
-    .from(journeyCheckins)
-    .where(condition);
 }
 
 export async function journeySummaries(
@@ -245,12 +238,9 @@ export async function journeyDetail(
       .from(journeyCheckins)
       .where(recordedCheckins)
       .orderBy(asc(journeyCheckins.checkedInAt), asc(journeyCheckins.id)),
-    checkinImagesQuery(db, currentRevisionsOf(db, recordedCheckins))
+    checkinImagesQuery(db, recordedCheckins)
   ]);
-  const imagesByRevision = Map.groupBy(
-    checkinImages,
-    (item) => item.revisionId
-  );
+  const imagesByCheckin = Map.groupBy(checkinImages, (item) => item.checkinId);
 
   return {
     id: row.id,
@@ -258,9 +248,7 @@ export async function journeyDetail(
     started_at: row.startedAt,
     finished_at: row.finishedAt,
     milestones: milestoneRows.map(milestoneOf),
-    checkins: checkinRows.map((checkin) =>
-      checkinOf(checkin, imagesByRevision)
-    ),
+    checkins: checkinRows.map((checkin) => checkinOf(checkin, imagesByCheckin)),
     encoded_path:
       row.encodedPath === null
         ? null
@@ -279,12 +267,12 @@ export async function journeyCheckin(
   const condition = eq(journeyCheckins.id, checkinId);
   const [rows, checkinImages] = await db.batch([
     db.select().from(journeyCheckins).where(condition),
-    checkinImagesQuery(db, currentRevisionsOf(db, condition))
+    checkinImagesQuery(db, condition)
   ]);
 
   return checkinOf(
     first(rows),
-    Map.groupBy(checkinImages, (item) => item.revisionId)
+    Map.groupBy(checkinImages, (item) => item.checkinId)
   );
 }
 
@@ -760,64 +748,23 @@ function assertWithinPeriod(
   assertValid(periodErrors(journey, checkedInAt));
 }
 
-function checkinRevisionStatements(
+function checkinImagesInsertion(
   db: Database,
   {
     checkinId,
-    editorId,
-    content,
     imageIds,
     now
-  }: {
-    checkinId: number | SQL;
-    editorId: number;
-    content: CheckinContent;
-    imageIds: readonly number[];
-    now: string;
-  }
+  }: { checkinId: number | SQL; imageIds: readonly number[]; now: string }
 ) {
-  const revisionId = scalar(
-    db
-      .select({ id: max(journeyCheckinRevisions.id).as('id') })
-      .from(journeyCheckinRevisions)
-      .where(eq(journeyCheckinRevisions.journeyCheckinId, checkinId))
+  return chunks(imageIds, IMAGES_PER_INSERT).map((ids) =>
+    db.insert(journeyCheckinImages).values(
+      ids.map((imageId) => ({
+        journeyCheckinId: checkinId,
+        imageId,
+        createdAt: now
+      }))
+    )
   );
-
-  return [
-    db.insert(journeyCheckinRevisions).values({
-      ...content,
-      journeyCheckinId: checkinId,
-      userId: editorId,
-      createdAt: now,
-      updatedAt: now
-    }),
-    ...chunks(imageIds, IMAGES_PER_INSERT).map((ids) =>
-      db.insert(journeyCheckinRevisionImages).values(
-        ids.map((imageId) => ({
-          journeyCheckinRevisionId: revisionId,
-          imageId,
-          createdAt: now,
-          updatedAt: now
-        }))
-      )
-    ),
-    db
-      .delete(journeyCheckinImages)
-      .where(eq(journeyCheckinImages.journeyCheckinId, checkinId)),
-    ...chunks(imageIds, IMAGES_PER_INSERT).map((ids) =>
-      db.insert(journeyCheckinImages).values(
-        ids.map((imageId) => ({
-          journeyCheckinId: checkinId,
-          imageId,
-          createdAt: now
-        }))
-      )
-    ),
-    db
-      .update(journeyCheckins)
-      .set({ currentRevisionId: revisionId })
-      .where(eq(journeyCheckins.id, checkinId))
-  ] as const;
 }
 
 export async function recordCheckin(
@@ -879,13 +826,7 @@ export async function recordCheckin(
         updatedAt: now
       })
       .returning({ id: journeyCheckins.id }),
-    ...checkinRevisionStatements(db, {
-      checkinId,
-      editorId,
-      content,
-      imageIds,
-      now
-    })
+    ...checkinImagesInsertion(db, { checkinId, imageIds, now })
   ]);
 
   return first(inserted).id;
@@ -913,20 +854,11 @@ async function currentCheckinImageIds(
   db: Database,
   checkin: CheckinRow
 ): Promise<number[]> {
-  if (checkin.currentRevisionId === null) {
-    return [];
-  }
-
   const rows = await db
-    .select({ id: journeyCheckinRevisionImages.imageId })
-    .from(journeyCheckinRevisionImages)
-    .where(
-      eq(
-        journeyCheckinRevisionImages.journeyCheckinRevisionId,
-        checkin.currentRevisionId
-      )
-    )
-    .orderBy(asc(journeyCheckinRevisionImages.imageId));
+    .select({ id: journeyCheckinImages.imageId })
+    .from(journeyCheckinImages)
+    .where(eq(journeyCheckinImages.journeyCheckinId, checkin.id))
+    .orderBy(asc(journeyCheckinImages.imageId));
 
   return rows.map((row) => row.id);
 }
@@ -943,47 +875,73 @@ function currentCheckinContent(checkin: CheckinRow): CheckinContent {
   };
 }
 
-async function writeCheckinRevision(
+type SubmittedImages = { imageIds: number[]; editorId: number };
+
+async function replacedImages(
+  db: Database,
+  checkin: CheckinRow,
+  submitted: SubmittedImages | undefined
+): Promise<number[] | undefined> {
+  if (
+    submitted === undefined ||
+    sameIds(submitted.imageIds, await currentCheckinImageIds(db, checkin))
+  ) {
+    return undefined;
+  }
+
+  assertValid(
+    await unownedImageErrors(db, submitted.imageIds, submitted.editorId)
+  );
+
+  return submitted.imageIds;
+}
+
+async function writeCheckin(
   db: Database,
   checkin: CheckinRow,
   {
-    editorId,
     content,
     submitted
   }: {
-    editorId: number;
     content: CheckinContent;
-    submitted?: number[];
+    submitted?: SubmittedImages;
   }
 ): Promise<void> {
   const current = currentCheckinContent(checkin);
-  const carried = await currentCheckinImageIds(db, checkin);
-  const imageIds = submitted ?? carried;
-  const changed = (Object.keys(content) as (keyof CheckinContent)[]).some(
-    (key) => content[key] !== current[key]
-  );
+  const { pinId, name, latitude, longitude, ...details } = content;
+  const changes = {
+    ...changedColumns(current, details),
+    ...(pinId === current.pinId ? {} : { pinId, name, latitude, longitude })
+  };
+  const replacement = await replacedImages(db, checkin, submitted);
 
-  if (!changed && sameIds(imageIds, carried)) {
+  if (Object.keys(changes).length === 0 && replacement === undefined) {
     return;
   }
 
-  assertValid(await unownedImageErrors(db, submitted ?? [], editorId));
-
   const now = currentTimestamp();
 
-  await db.batch([
+  const [updated] = await db.batch([
     db
       .update(journeyCheckins)
-      .set({ ...content, updatedAt: now })
-      .where(eq(journeyCheckins.id, checkin.id)),
-    ...checkinRevisionStatements(db, {
-      checkinId: unrevisedRecord(db, journeyCheckins, checkin),
-      editorId,
-      content,
-      imageIds,
-      now
-    })
+      .set({ ...changes, updatedAt: now })
+      .where(and(eq(journeyCheckins.id, checkin.id), recorded))
+      .returning({ id: journeyCheckins.id }),
+    ...(replacement === undefined
+      ? []
+      : [
+          db
+            .delete(journeyCheckinImages)
+            .where(eq(journeyCheckinImages.journeyCheckinId, checkin.id)),
+          ...checkinImagesInsertion(db, {
+            checkinId: checkin.id,
+            imageIds: replacement,
+            now
+          })
+        ])
   ]);
+
+  first(updated);
 }
 
 async function revisedSpot(
@@ -1030,9 +988,9 @@ async function revisedSpot(
   return spotOf(pin);
 }
 
-export function reviseCheckin(
+export async function reviseCheckin(
   db: Database,
-  read: () => Promise<CheckinRow>,
+  checkin: CheckinRow,
   {
     journey,
     viewer,
@@ -1043,55 +1001,42 @@ export function reviseCheckin(
     changes: z.output<typeof checkinInput>;
   }
 ): Promise<void> {
-  return reviseUntilCurrent(
-    journeyCheckinRevisions.journeyCheckinId,
-    async () => {
-      const checkin = await read();
-      const current = currentCheckinContent(checkin);
-      const checkedInAt =
-        changes.checked_in_at === undefined
-          ? current.checkedInAt
-          : changes.checked_in_at;
+  const current = currentCheckinContent(checkin);
+  const checkedInAt =
+    changes.checked_in_at === undefined
+      ? current.checkedInAt
+      : changes.checked_in_at;
 
-      if (checkedInAt !== current.checkedInAt) {
-        assertWithinPeriod(journey, checkedInAt);
-      }
+  if (checkedInAt !== current.checkedInAt) {
+    assertWithinPeriod(journey, checkedInAt);
+  }
 
-      const spot = await revisedSpot(db, viewer, {
-        journey,
-        checkin,
-        current,
-        submitted: changes.pin_id
-      });
+  const spot = await revisedSpot(db, viewer, {
+    journey,
+    checkin,
+    current,
+    submitted: changes.pin_id
+  });
 
-      await writeCheckinRevision(db, checkin, {
-        editorId: viewer.id,
-        content: {
-          ...current,
-          ...spot,
-          note: changes.note === undefined ? current.note : changes.note,
-          checkedInAt
-        },
-        submitted: changes.image_ids
-      });
-    }
-  );
+  await writeCheckin(db, checkin, {
+    content: {
+      ...current,
+      ...spot,
+      note: changes.note === undefined ? current.note : changes.note,
+      checkedInAt
+    },
+    submitted:
+      changes.image_ids === undefined
+        ? undefined
+        : { imageIds: changes.image_ids, editorId: viewer.id }
+  });
 }
 
-export function discardCheckin(
+export async function discardCheckin(
   db: Database,
-  read: () => Promise<CheckinRow>,
-  editorId: number
+  checkin: CheckinRow
 ): Promise<void> {
-  return reviseUntilCurrent(
-    journeyCheckinRevisions.journeyCheckinId,
-    async () => {
-      const checkin = await read();
-
-      await writeCheckinRevision(db, checkin, {
-        editorId,
-        content: { ...currentCheckinContent(checkin), status: 'deleted' }
-      });
-    }
-  );
+  await writeCheckin(db, checkin, {
+    content: { ...currentCheckinContent(checkin), status: 'deleted' }
+  });
 }
