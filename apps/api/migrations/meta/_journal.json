@@ -57,6 +57,13 @@
       "when": 1792772242403,
       "tag": "0007_drop_checkin_interval",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1793293347907,
+      "tag": "0008_unique_block_pairs",
+      "breakpoints": true
     }
   ]
 }

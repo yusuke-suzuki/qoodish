@@ -22,7 +22,6 @@ import {
 import { comments, images, mutes, notifications, users } from './db/schema.ts';
 import type { Env } from './env.ts';
 import { variantUrl } from './images.ts';
-import { activeMute } from './mutes.ts';
 import { clickAction } from './notifications.ts';
 import { noBlockBetween } from './visibility.ts';
 
@@ -156,8 +155,7 @@ async function pushedNotifications(
             .where(
               and(
                 eq(mutes.muterId, notifications.recipientId),
-                eq(mutes.mutedId, notifications.notifierId),
-                activeMute(db)
+                eq(mutes.mutedId, notifications.notifierId)
               )
             )
         )
