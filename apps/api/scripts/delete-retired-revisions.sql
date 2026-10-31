@@ -1,4 +1,0 @@
-DELETE FROM journey_checkin_revision_images;
-DELETE FROM journey_checkin_revisions;
-DELETE FROM pin_property_option_revisions;
-DELETE FROM pin_property_revisions;

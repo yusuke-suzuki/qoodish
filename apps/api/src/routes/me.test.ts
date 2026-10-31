@@ -16,8 +16,6 @@ import {
   journalRevisions,
   journals,
   journeyCheckinImages,
-  journeyCheckinRevisionImages,
-  journeyCheckinRevisions,
   journeyCheckins,
   journeys,
   mapRevisions,
@@ -40,7 +38,6 @@ import {
   accountOf,
   chapterRevisionsOf,
   checkinImageIdsOf,
-  checkinRevisionsOf,
   pinRevisionsOf
 } from '../test/records.ts';
 import { alice, bob, notFound, variants } from '../test/serialized.ts';
@@ -1317,7 +1314,6 @@ describe('journey writes', () => {
       status: 'recorded'
     });
     expect(await checkinImageIdsOf(feedCheckin)).toEqual([checkinImage]);
-    expect(await checkinRevisionsOf(feedCheckin)).toEqual([]);
   });
 
   it('rejects a checkin that breaks a rule of the previous API', async () => {
@@ -1432,7 +1428,6 @@ describe('journey writes', () => {
       invalid('The checkin time is outside the journey period.')
     );
     expect(await checkinRow(retroactiveCheckin)).toEqual(updated);
-    expect(await checkinRevisionsOf(retroactiveCheckin)).toEqual([]);
   });
 
   it('records a manual revisit to a pin at any time', async () => {
@@ -1630,15 +1625,8 @@ describe('journey writes', () => {
         .from(journeyCheckins)
         .where(eq(journeyCheckins.journeyId, 1))
     ).map((row) => row.id);
-    const revisionIds = (
-      await db()
-        .select({ id: journeyCheckinRevisions.id })
-        .from(journeyCheckinRevisions)
-        .where(inArray(journeyCheckinRevisions.journeyCheckinId, checkinIds))
-    ).map((row) => row.id);
 
     expect(checkinIds).toHaveLength(5);
-    expect(revisionIds).toHaveLength(1);
     expect((await send('DELETE', '/me/journeys/1', 'bob')).status).toBe(404);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(204);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(404);
@@ -1650,23 +1638,6 @@ describe('journey writes', () => {
         .select()
         .from(journeyCheckins)
         .where(eq(journeyCheckins.journeyId, 1))
-    ).toEqual([]);
-    expect(
-      await db()
-        .select()
-        .from(journeyCheckinRevisions)
-        .where(inArray(journeyCheckinRevisions.journeyCheckinId, checkinIds))
-    ).toEqual([]);
-    expect(
-      await db()
-        .select()
-        .from(journeyCheckinRevisionImages)
-        .where(
-          inArray(
-            journeyCheckinRevisionImages.journeyCheckinRevisionId,
-            revisionIds
-          )
-        )
     ).toEqual([]);
     expect(
       await db()
@@ -1757,15 +1728,6 @@ describe('DELETE /me/account', () => {
       .get();
 
     fixture.bobCheckinOnRamen = bobCheckin.id;
-
-    await db()
-      .insert(journeyCheckinRevisions)
-      .values({
-        journeyCheckinId: bobCheckin.id,
-        userId: ids.bob,
-        ...bobStop,
-        ...stamp
-      });
 
     await db()
       .insert(pinRevisions)
@@ -2014,7 +1976,6 @@ describe('DELETE /me/account', () => {
       othersOnRamen,
       [bobJourney],
       [bobCheckin],
-      [bobCheckinRevision],
       [bobChapter],
       [aliceEditOfCafe],
       [aliceReport],
@@ -2036,18 +1997,6 @@ describe('DELETE /me/account', () => {
         .select({ pinId: journeyCheckins.pinId, name: journeyCheckins.name })
         .from(journeyCheckins)
         .where(eq(journeyCheckins.id, fixture.bobCheckinOnRamen)),
-      db()
-        .select({
-          pinId: journeyCheckinRevisions.pinId,
-          name: journeyCheckinRevisions.name
-        })
-        .from(journeyCheckinRevisions)
-        .where(
-          eq(
-            journeyCheckinRevisions.journeyCheckinId,
-            fixture.bobCheckinOnRamen
-          )
-        ),
       db()
         .select({ mapId: chapters.mapId })
         .from(chapters)
@@ -2074,7 +2023,6 @@ describe('DELETE /me/account', () => {
     expect(othersOnRamen).toEqual([]);
     expect(bobJourney).toEqual({ mapId: null });
     expect(bobCheckin).toEqual({ pinId: null, name: 'Bob Stall' });
-    expect(bobCheckinRevision).toEqual({ pinId: null, name: 'Bob Stall' });
     expect(bobChapter).toEqual({ mapId: null });
     expect(aliceEditOfCafe).toEqual({ userId: null });
     expect(aliceReport).toEqual({ reporterId: null });
