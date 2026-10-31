@@ -7,8 +7,6 @@ import {
   images,
   journalBookmarks,
   journeyCheckinImages,
-  journeyCheckinRevisionImages,
-  journeyCheckinRevisions,
   journeyCheckins,
   journeys,
   milestones,
@@ -133,23 +131,12 @@ export async function seedMe(binding: D1Database): Promise<void> {
       checkin(2, at(5, 1), 'deleted'),
       checkin(3, at(5, 5))
     ]);
-  await db.insert(journeyCheckinRevisions).values({
-    id: 1,
-    journeyCheckinId: 3,
-    userId: ids.alice,
-    checkedInAt: at(5, 5),
-    note: 'Note 3',
-    ...stamp
-  });
   await db.insert(images).values({
     id: checkinImage,
     userId: ids.alice,
     url: `${IMAGE_BASE}/spot/public`,
     ...stamp
   });
-  await db
-    .insert(journeyCheckinRevisionImages)
-    .values({ journeyCheckinRevisionId: 1, imageId: checkinImage, ...stamp });
   await db.insert(journeyCheckinImages).values({
     journeyCheckinId: 3,
     imageId: checkinImage,

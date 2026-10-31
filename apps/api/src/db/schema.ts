@@ -672,31 +672,6 @@ export const journeyCheckinRevisions = sqliteTable(
   ]
 );
 
-export const journeyCheckinRevisionImages = sqliteTable(
-  'journey_checkin_revision_images',
-  {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    createdAt: text('created_at').notNull(),
-    imageId: integer('image_id')
-      .notNull()
-      .references(() => images.id),
-    journeyCheckinRevisionId: integer('journey_checkin_revision_id')
-      .notNull()
-      .references(() => journeyCheckinRevisions.id),
-    updatedAt: text('updated_at').notNull()
-  },
-  (t) => [
-    uniqueIndex('index_checkin_revision_images_on_revision_id_and_image_id').on(
-      t.journeyCheckinRevisionId,
-      t.imageId
-    ),
-    index('index_journey_checkin_revision_images_on_image_id').on(t.imageId),
-    index('idx_on_journey_checkin_revision_id_79ea77d6c2').on(
-      t.journeyCheckinRevisionId
-    )
-  ]
-);
-
 export const journals = sqliteTable(
   'journals',
   {
