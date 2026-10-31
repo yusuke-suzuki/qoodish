@@ -390,7 +390,6 @@ app.post(
     const map = await editableMapRow(db, viewer, c.req.valid('param').mapId);
     const propertyId = await createPinProperty(db, {
       mapId: map.id,
-      editorId: viewer.id,
       changes: c.req.valid('json')
     });
 
@@ -410,12 +409,11 @@ app.on(
 
     await revisePinProperty(
       db,
-      () =>
-        editablePinProperty(db, {
-          id: params.id,
-          mapId: editableMapId(db, viewer, params.mapId)
-        }),
-      { editorId: viewer.id, changes: c.req.valid('json') }
+      await editablePinProperty(db, {
+        id: params.id,
+        mapId: editableMapId(db, viewer, params.mapId)
+      }),
+      { changes: c.req.valid('json') }
     );
 
     return c.json<PinProperty>(await pinPropertyDetail(db, params.id));
@@ -429,12 +427,11 @@ app.delete('/:mapId/pin_properties/:id', propertyParams, async (c) => {
 
   await revisePinProperty(
     db,
-    () =>
-      editablePinProperty(db, {
-        id: params.id,
-        mapId: editableMapId(db, viewer, params.mapId)
-      }),
-    { editorId: viewer.id, status: 'deleted' }
+    await editablePinProperty(db, {
+      id: params.id,
+      mapId: editableMapId(db, viewer, params.mapId)
+    }),
+    { status: 'deleted' }
   );
 
   return c.body(null, 204);
@@ -471,7 +468,6 @@ app.post(
     const property = await optionsProperty(db, viewer, c.req.valid('param'));
     const optionId = await createPinPropertyOption(db, {
       propertyId: property.id,
-      editorId: viewer.id,
       changes: c.req.valid('json')
     });
 
@@ -493,11 +489,8 @@ app.on(
 
     await revisePinPropertyOption(
       db,
-      () => editableOption(db, viewer, params),
-      {
-        editorId: viewer.id,
-        changes: c.req.valid('json')
-      }
+      await editableOption(db, viewer, params),
+      { changes: c.req.valid('json') }
     );
 
     return c.json<PinPropertyOption>(
@@ -516,11 +509,8 @@ app.delete(
 
     await revisePinPropertyOption(
       db,
-      () => editableOption(db, viewer, params),
-      {
-        editorId: viewer.id,
-        status: 'deleted'
-      }
+      await editableOption(db, viewer, params),
+      { status: 'deleted' }
     );
 
     return c.body(null, 204);

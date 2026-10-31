@@ -1284,7 +1284,7 @@ describe('journey writes', () => {
     ).toBe(204);
   });
 
-  it('records a checkin with its first revision and images', async () => {
+  it('records a checkin with its images and no revision', async () => {
     const checkIn = (body: unknown, uid = 'alice') =>
       send('POST', `/me/journeys/${cafeJourney}/checkins`, uid, body);
 
@@ -1311,21 +1311,13 @@ describe('journey writes', () => {
       origin: 'tracked'
     });
 
-    const revisions = await checkinRevisionsOf(feedCheckin);
-
-    expect(revisions).toMatchObject([
-      {
-        userId: ids.alice,
-        note: 'First\nvisit',
-        checkedInAt: body.checked_in_at,
-        status: 'recorded',
-        imageIds: [checkinImage]
-      }
-    ]);
-    expect((await checkinRow(feedCheckin))?.currentRevisionId).toBe(
-      revisions[0]?.id
-    );
+    expect(await checkinRow(feedCheckin)).toMatchObject({
+      note: 'First\nvisit',
+      checkedInAt: body.checked_in_at,
+      status: 'recorded'
+    });
     expect(await checkinImageIdsOf(feedCheckin)).toEqual([checkinImage]);
+    expect(await checkinRevisionsOf(feedCheckin)).toEqual([]);
   });
 
   it('rejects a checkin that breaks a rule of the previous API', async () => {
@@ -1415,17 +1407,17 @@ describe('journey writes', () => {
     });
   });
 
-  it('revises a checkin as a new revision, only when it changes', async () => {
+  it('updates a checkin in place, only when it changes', async () => {
     const path = `/me/journeys/1/checkins/${retroactiveCheckin}`;
     const revised = await send('PUT', path, 'alice', {
       checked_in_at: '2026-01-05T21:30:00+09:00'
     });
+    const updated = await checkinRow(retroactiveCheckin);
 
     expect(revised).toMatchObject({
       status: 200,
       body: { checked_in_at: '2026-01-05T12:30:00.000000Z' }
     });
-    expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(2);
     expect(
       (
         await send('PATCH', path, 'alice', {
@@ -1433,14 +1425,14 @@ describe('journey writes', () => {
         })
       ).status
     ).toBe(200);
-    expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(2);
     expect(
       await send('PUT', path, 'alice', { checked_in_at: '2026-01-06 00:00:01' })
     ).toEqual(invalid('The checkin time is outside the journey period.'));
     expect(await send('PUT', path, 'alice', { checked_in_at: null })).toEqual(
       invalid('The checkin time is outside the journey period.')
     );
-    expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(2);
+    expect(await checkinRow(retroactiveCheckin)).toEqual(updated);
+    expect(await checkinRevisionsOf(retroactiveCheckin)).toEqual([]);
   });
 
   it('records a manual revisit to a pin at any time', async () => {
@@ -1466,7 +1458,7 @@ describe('journey writes', () => {
     expect((await send('DELETE', path, 'alice')).status).toBe(204);
   });
 
-  it('moves a checkin to another pin of the journey map as a new revision', async () => {
+  it('moves a checkin to another pin of the journey map', async () => {
     const path = `/me/journeys/1/checkins/${retroactiveCheckin}`;
     const shio = await send('POST', `/maps/${ids.ramen}/pins`, 'alice', {
       name: 'Shio Ramen',
@@ -1474,9 +1466,9 @@ describe('journey writes', () => {
       latitude: 35.2,
       longitude: 139.2
     });
-    const revisionCount = (await checkinRevisionsOf(retroactiveCheckin)).length;
 
     const moved = await send('PUT', path, 'alice', { pin_id: shio.body.id });
+    const movedRow = await checkinRow(retroactiveCheckin);
 
     expect(moved).toMatchObject({
       status: 200,
@@ -1486,20 +1478,15 @@ describe('journey writes', () => {
         checked_in_at: '2026-01-05T12:30:00.000000Z'
       }
     });
-    expect((await checkinRevisionsOf(retroactiveCheckin)).at(-1)).toMatchObject(
-      {
-        pinId: shio.body.id,
-        name: 'Shio Ramen',
-        latitude: 35.2,
-        longitude: 139.2
-      }
-    );
+    expect(movedRow).toMatchObject({
+      pinId: shio.body.id,
+      name: 'Shio Ramen',
+      latitude: 35.2,
+      longitude: 139.2
+    });
     expect(
       (await send('PATCH', path, 'alice', { pin_id: `${shio.body.id}` })).status
     ).toBe(200);
-    expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(
-      revisionCount + 1
-    );
 
     expect(await send('PUT', path, 'alice', { pin_id: ids.secretPin })).toEqual(
       invalid('The pin does not belong to the map of the journey.')
@@ -1510,9 +1497,7 @@ describe('journey writes', () => {
     expect((await send('PUT', path, 'alice', { pin_id: 'abc' })).status).toBe(
       404
     );
-    expect(await checkinRevisionsOf(retroactiveCheckin)).toHaveLength(
-      revisionCount + 1
-    );
+    expect(await checkinRow(retroactiveCheckin)).toEqual(movedRow);
   });
 
   it('chooses a pin again for a checkin whose pin was deleted', async () => {
@@ -1538,7 +1523,7 @@ describe('journey writes', () => {
 
   it('keeps the pin of an automatic checkin', async () => {
     const path = `/me/journeys/${cafeJourney}/checkins/${feedCheckin}`;
-    const revisionCount = (await checkinRevisionsOf(feedCheckin)).length;
+    const before = await checkinRow(feedCheckin);
 
     expect(await send('PUT', path, 'alice', { pin_id: feedPin(1) })).toEqual(
       invalid('The pin of an automatic checkin cannot be changed.')
@@ -1546,7 +1531,7 @@ describe('journey writes', () => {
     expect(
       await send('PATCH', path, 'alice', { pin_id: feedPin(0) })
     ).toMatchObject({ status: 200, body: { pin_id: feedPin(0) } });
-    expect(await checkinRevisionsOf(feedCheckin)).toHaveLength(revisionCount);
+    expect(await checkinRow(feedCheckin)).toEqual(before);
   });
 
   it('answers 422 for a checkin time it cannot read', async () => {
@@ -1568,7 +1553,7 @@ describe('journey writes', () => {
     ).toEqual(notTime);
   });
 
-  it('replaces the images and note, leaving the earlier revision as it was', async () => {
+  it('replaces the images and note', async () => {
     const path = `/me/journeys/${cafeJourney}/checkins/${feedCheckin}`;
     const { status, body } = await send('PUT', path, 'alice', {
       note: 'Edited',
@@ -1580,10 +1565,7 @@ describe('journey writes', () => {
       note: 'Edited',
       images: [{ id: ids.shoyuImage, ...variants('shoyu') }]
     });
-    expect(await checkinRevisionsOf(feedCheckin)).toMatchObject([
-      { note: 'First\nvisit', imageIds: [checkinImage] },
-      { note: 'Edited', imageIds: [ids.shoyuImage] }
-    ]);
+    expect(await checkinRow(feedCheckin)).toMatchObject({ note: 'Edited' });
     expect(await checkinImageIdsOf(feedCheckin)).toEqual([ids.shoyuImage]);
     expect(
       await send('PATCH', path, 'alice', { image_ids: [bobImage] })
@@ -1591,7 +1573,8 @@ describe('journey writes', () => {
     expect(
       await send('PATCH', path, 'alice', { note: 'b'.repeat(501) })
     ).toEqual(invalid('The note is too long. (Max: 500)'));
-    expect(await checkinRevisionsOf(feedCheckin)).toHaveLength(2);
+    expect(await checkinRow(feedCheckin)).toMatchObject({ note: 'Edited' });
+    expect(await checkinImageIdsOf(feedCheckin)).toEqual([ids.shoyuImage]);
     expect((await send('PUT', path, 'bob', { note: 'Mine' })).status).toBe(404);
     expect(
       (
@@ -1609,7 +1592,7 @@ describe('journey writes', () => {
     ).toBe(404);
   });
 
-  it('discards a checkin as a revision, keeping its pin without blocking a new checkin', async () => {
+  it('discards a checkin, keeping its pin without blocking a new checkin', async () => {
     const path = `/me/journeys/${cafeJourney}/checkins/${feedCheckin}`;
 
     expect((await send('DELETE', path, 'bob')).status).toBe(404);
@@ -1621,11 +1604,7 @@ describe('journey writes', () => {
       name: 'Feed 0',
       note: 'Edited'
     });
-    expect((await checkinRevisionsOf(feedCheckin)).at(-1)).toMatchObject({
-      status: 'deleted',
-      userId: ids.alice,
-      imageIds: [ids.shoyuImage]
-    });
+    expect(await checkinImageIdsOf(feedCheckin)).toEqual([ids.shoyuImage]);
     expect(
       (await get(`/me/journeys/${cafeJourney}`, 'alice')).body.checkins
     ).toEqual([]);
@@ -1659,7 +1638,7 @@ describe('journey writes', () => {
     ).map((row) => row.id);
 
     expect(checkinIds).toHaveLength(5);
-    expect(revisionIds).toHaveLength(9);
+    expect(revisionIds).toHaveLength(1);
     expect((await send('DELETE', '/me/journeys/1', 'bob')).status).toBe(404);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(204);
     expect((await send('DELETE', '/me/journeys/1', 'alice')).status).toBe(404);

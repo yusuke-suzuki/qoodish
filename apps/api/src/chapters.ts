@@ -22,6 +22,7 @@ import {
 } from 'drizzle-orm';
 import { z } from 'zod';
 import {
+  changedColumns,
   constraintViolated,
   currentTimestamp,
   type Database,
@@ -591,17 +592,6 @@ export async function createChapter(
   }
 }
 
-function changedContent(
-  current: RevisionContent,
-  revised: RevisionContent
-): Partial<RevisionContent> {
-  return Object.fromEntries(
-    Object.entries(revised).filter(
-      ([key, value]) => current[key as keyof RevisionContent] !== value
-    )
-  );
-}
-
 async function writeChapterRevision(
   db: Database,
   chapter: ChapterRow,
@@ -647,7 +637,7 @@ async function writeChapterRevision(
   ]);
   const carried = carriedRows.map((row) => row.id);
   const imageIds = submittedImageIds ?? carried;
-  const changes = changedContent(current, revised);
+  const changes = changedColumns(current, revised);
 
   if (Object.keys(changes).length === 0 && sameIds(imageIds, carried)) {
     return [];

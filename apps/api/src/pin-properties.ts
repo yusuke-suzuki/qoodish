@@ -2,22 +2,12 @@ import type {
   PinProperty,
   PinPropertyOption as PinPropertyOptionShape
 } from '@qoodish/api-contract';
-import {
-  and,
-  asc,
-  eq,
-  inArray,
-  max,
-  type SQL,
-  type SQLWrapper
-} from 'drizzle-orm';
+import { and, asc, eq, inArray, type SQL, type SQLWrapper } from 'drizzle-orm';
 import { z } from 'zod';
 import {
+  changedColumns,
   currentTimestamp,
-  type Database,
-  reviseUntilCurrent,
-  scalar,
-  unrevisedRecord
+  type Database
 } from './db/client.ts';
 import {
   pinProperties,
@@ -95,92 +85,19 @@ function contentOf(row: PropertyRow | OptionRow): NamedContent {
   };
 }
 
-function revised(current: NamedContent, next: NamedContent): boolean {
-  return (
-    current.name !== next.name ||
-    current.position !== next.position ||
-    current.status !== next.status
-  );
-}
+type NamedEdit = { changes?: NamedChanges; status?: Status };
 
-function nextContent(current: NamedContent, changes: NamedChanges) {
-  return {
-    ...current,
-    name: changes.name ?? current.name,
-    position: changes.position ?? current.position
-  };
-}
+function changedContent(
+  row: PropertyRow | OptionRow,
+  { changes, status }: NamedEdit
+): Partial<NamedContent> {
+  const current = contentOf(row);
 
-function propertyRevisionStatements(
-  db: Database,
-  {
-    propertyId,
-    editorId,
-    content,
-    now
-  }: {
-    propertyId: number | SQL;
-    editorId: number;
-    content: NamedContent;
-    now: string;
-  }
-) {
-  return [
-    db.insert(pinPropertyRevisions).values({
-      ...content,
-      pinPropertyId: propertyId,
-      userId: editorId,
-      createdAt: now,
-      updatedAt: now
-    }),
-    db
-      .update(pinProperties)
-      .set({
-        currentRevisionId: scalar(
-          db
-            .select({ id: max(pinPropertyRevisions.id).as('id') })
-            .from(pinPropertyRevisions)
-            .where(eq(pinPropertyRevisions.pinPropertyId, propertyId))
-        )
-      })
-      .where(eq(pinProperties.id, propertyId))
-  ] as const;
-}
-
-function optionRevisionStatements(
-  db: Database,
-  {
-    optionId,
-    editorId,
-    content,
-    now
-  }: {
-    optionId: number | SQL;
-    editorId: number;
-    content: NamedContent;
-    now: string;
-  }
-) {
-  return [
-    db.insert(pinPropertyOptionRevisions).values({
-      ...content,
-      pinPropertyOptionId: optionId,
-      userId: editorId,
-      createdAt: now,
-      updatedAt: now
-    }),
-    db
-      .update(pinPropertyOptions)
-      .set({
-        currentRevisionId: scalar(
-          db
-            .select({ id: max(pinPropertyOptionRevisions.id).as('id') })
-            .from(pinPropertyOptionRevisions)
-            .where(eq(pinPropertyOptionRevisions.pinPropertyOptionId, optionId))
-        )
-      })
-      .where(eq(pinPropertyOptions.id, optionId))
-  ] as const;
+  return changedColumns(current, {
+    name: changes?.name ?? current.name,
+    position: changes?.position ?? current.position,
+    status: status ?? current.status
+  });
 }
 
 export async function editablePinProperty(
@@ -223,163 +140,99 @@ export async function createPinProperty(
   db: Database,
   {
     mapId,
-    editorId,
     changes
-  }: {
-    mapId: number;
-    editorId: number;
-    changes: z.output<typeof newPinPropertyInput>;
-  }
+  }: { mapId: number; changes: z.output<typeof newPinPropertyInput> }
 ): Promise<number> {
-  const content: NamedContent = {
-    name: changes.name,
-    position: changes.position ?? 0,
-    status: 'published'
-  };
-
   const now = currentTimestamp();
-  const propertyId = scalar(
-    db
-      .select({ id: max(pinProperties.id).as('id') })
-      .from(pinProperties)
-      .where(eq(pinProperties.mapId, mapId))
-  );
-  const results = await db.batch([
-    db.insert(pinProperties).values({
-      ...content,
-      mapId,
+  const created = await db
+    .insert(pinProperties)
+    .values({
+      name: changes.name,
+      position: changes.position ?? 0,
       multiple: changes.multiple ?? false,
+      status: 'published',
+      mapId,
       createdAt: now,
       updatedAt: now
-    }),
-    ...propertyRevisionStatements(db, { propertyId, editorId, content, now }),
-    db
-      .select({ id: pinProperties.id })
-      .from(pinProperties)
-      .where(eq(pinProperties.id, propertyId))
-  ]);
+    })
+    .returning({ id: pinProperties.id });
 
-  return first(results[results.length - 1] as { id: number }[]).id;
+  return first(created).id;
 }
 
-export function revisePinProperty(
+export async function revisePinProperty(
   db: Database,
-  read: () => Promise<PropertyRow>,
-  {
-    editorId,
-    changes,
-    status
-  }: { editorId: number; changes?: NamedChanges; status?: Status }
+  property: PropertyRow,
+  edit: NamedEdit
 ): Promise<void> {
-  return reviseUntilCurrent(pinPropertyRevisions.pinPropertyId, async () => {
-    const property = await read();
-    const current = contentOf(property);
-    const content = {
-      ...nextContent(current, changes ?? {}),
-      status: status ?? current.status
-    };
+  const changes = changedContent(property, edit);
 
-    if (!revised(current, content)) {
-      return;
-    }
+  if (Object.keys(changes).length === 0) {
+    return;
+  }
 
-    const now = currentTimestamp();
-
-    await db.batch([
-      db
-        .update(pinProperties)
-        .set({ ...content, updatedAt: now })
-        .where(eq(pinProperties.id, property.id)),
-      ...propertyRevisionStatements(db, {
-        propertyId: unrevisedRecord(db, pinProperties, property),
-        editorId,
-        content,
-        now
-      })
-    ]);
-  });
+  first(
+    await db
+      .update(pinProperties)
+      .set({ ...changes, updatedAt: currentTimestamp() })
+      .where(
+        and(
+          eq(pinProperties.id, property.id),
+          eq(pinProperties.status, 'published')
+        )
+      )
+      .returning({ id: pinProperties.id })
+  );
 }
 
 export async function createPinPropertyOption(
   db: Database,
   {
     propertyId,
-    editorId,
     changes
   }: {
     propertyId: number;
-    editorId: number;
     changes: z.output<typeof newPinPropertyOptionInput>;
   }
 ): Promise<number> {
-  const content: NamedContent = {
-    name: changes.name,
-    position: changes.position ?? 0,
-    status: 'published'
-  };
-
   const now = currentTimestamp();
-  const optionId = scalar(
-    db
-      .select({ id: max(pinPropertyOptions.id).as('id') })
-      .from(pinPropertyOptions)
-      .where(eq(pinPropertyOptions.pinPropertyId, propertyId))
-  );
-  const results = await db.batch([
-    db.insert(pinPropertyOptions).values({
-      ...content,
+  const created = await db
+    .insert(pinPropertyOptions)
+    .values({
+      name: changes.name,
+      position: changes.position ?? 0,
+      status: 'published',
       pinPropertyId: propertyId,
       createdAt: now,
       updatedAt: now
-    }),
-    ...optionRevisionStatements(db, { optionId, editorId, content, now }),
-    db
-      .select({ id: pinPropertyOptions.id })
-      .from(pinPropertyOptions)
-      .where(eq(pinPropertyOptions.id, optionId))
-  ]);
+    })
+    .returning({ id: pinPropertyOptions.id });
 
-  return first(results[results.length - 1] as { id: number }[]).id;
+  return first(created).id;
 }
 
-export function revisePinPropertyOption(
+export async function revisePinPropertyOption(
   db: Database,
-  read: () => Promise<OptionRow>,
-  {
-    editorId,
-    changes,
-    status
-  }: { editorId: number; changes?: NamedChanges; status?: Status }
+  option: OptionRow,
+  edit: NamedEdit
 ): Promise<void> {
-  return reviseUntilCurrent(
-    pinPropertyOptionRevisions.pinPropertyOptionId,
-    async () => {
-      const option = await read();
-      const current = contentOf(option);
-      const content = {
-        ...nextContent(current, changes ?? {}),
-        status: status ?? current.status
-      };
+  const changes = changedContent(option, edit);
 
-      if (!revised(current, content)) {
-        return;
-      }
+  if (Object.keys(changes).length === 0) {
+    return;
+  }
 
-      const now = currentTimestamp();
-
-      await db.batch([
-        db
-          .update(pinPropertyOptions)
-          .set({ ...content, updatedAt: now })
-          .where(eq(pinPropertyOptions.id, option.id)),
-        ...optionRevisionStatements(db, {
-          optionId: unrevisedRecord(db, pinPropertyOptions, option),
-          editorId,
-          content,
-          now
-        })
-      ]);
-    }
+  first(
+    await db
+      .update(pinPropertyOptions)
+      .set({ ...changes, updatedAt: currentTimestamp() })
+      .where(
+        and(
+          eq(pinPropertyOptions.id, option.id),
+          eq(pinPropertyOptions.status, 'published')
+        )
+      )
+      .returning({ id: pinPropertyOptions.id })
   );
 }
 
