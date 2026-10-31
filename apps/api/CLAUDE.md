@@ -45,6 +45,7 @@ The Qoodish API: a Hono app on Cloudflare Workers that keeps its records in D1 t
 - A migration may be edited while its PR is open, but never after it has been merged: D1 records applied migrations by name and never reruns one, so add a new migration instead.
 - The previous version keeps serving after a migration applies, so a migration must leave it working: add and backfill first, read the result in the same deploy or a later one, and never remove or rename what the running version still reads.
 - Removing a column or a table takes two deploys. First remove every reference to it (schema, queries, routes, scripts, fixtures and tests) and deploy. Only after that deploy is live, drop it with a migration in a separate PR.
+- D1 cannot turn foreign keys off, so a table that other rows reference cannot be rebuilt: the rebuild Drizzle generates for it, which dropping a column with a foreign key also needs, fails or cascades deletes into the referencing rows. Leave such a column, and the table it references, declared in the schema and unused instead, as with `current_revision_id` of checkins and pin tags.
 
 ## 6. Compatibility
 
