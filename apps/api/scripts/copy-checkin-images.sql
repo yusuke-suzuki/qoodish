@@ -1,0 +1,6 @@
+DELETE FROM journey_checkin_images;
+INSERT INTO journey_checkin_images (journey_checkin_id, image_id, created_at)
+SELECT journey_checkins.id, journey_checkin_revision_images.image_id, journey_checkin_revision_images.created_at
+FROM journey_checkins
+INNER JOIN journey_checkin_revision_images
+  ON journey_checkin_revision_images.journey_checkin_revision_id = journey_checkins.current_revision_id;
