@@ -7,7 +7,6 @@ import {
   maps,
   mutes,
   pins,
-  unblocks,
   users
 } from '../db/schema.ts';
 import { at, CHAPTER_CONTENT, ids, MAP_FEATURES } from './world.ts';
@@ -67,13 +66,6 @@ export async function seedRelations(binding: D1Database): Promise<void> {
   await db
     .insert(blocks)
     .values({ blockerId: dave.id, blockedId: ids.alice, createdAt: at(2) });
-
-  const [lifted] = await db
-    .insert(blocks)
-    .values({ blockerId: ids.alice, blockedId: ids.carol, createdAt: at(2) })
-    .returning({ id: blocks.id });
-
-  await db.insert(unblocks).values({ blockId: lifted.id, createdAt: at(3) });
   await db
     .insert(mutes)
     .values({ muterId: ids.alice, mutedId: ids.bob, createdAt: at(2) });

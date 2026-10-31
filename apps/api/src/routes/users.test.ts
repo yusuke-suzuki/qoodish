@@ -10,9 +10,7 @@ import {
   journalBookmarks,
   journalRevisions,
   mapRevisions,
-  mutes,
-  unblocks,
-  unmutes
+  mutes
 } from '../db/schema.ts';
 import { get, idsOf, send } from '../test/client.ts';
 import { accountOf } from '../test/records.ts';
@@ -263,20 +261,13 @@ describe('POST/DELETE /users/:userId/block', () => {
     ).toEqual([]);
   });
 
-  it('deletes a block lifted by an unblock along with it', async () => {
-    const [legacy] = await db()
-      .insert(blocks)
-      .values({ blockerId: ids.alice, blockedId: ids.carol, createdAt: at(31) })
-      .returning({ id: blocks.id });
+  it('keeps one block when the same pair is blocked at once', async () => {
+    const answers = await Promise.all([
+      send('POST', `/users/${ids.carol}/block`, 'alice'),
+      send('POST', `/users/${ids.carol}/block`, 'alice')
+    ]);
 
-    await db()
-      .insert(unblocks)
-      .values({ blockId: legacy.id, createdAt: at(32) });
-    const blocking = await send('POST', `/users/${ids.carol}/block`, 'alice');
-
-    await send('DELETE', `/users/${ids.carol}/block`, 'alice');
-
-    expect(blocking.body.blocking).toBe(true);
+    expect(answers.map((answer) => answer.status)).toEqual([200, 200]);
     expect(
       await db()
         .select()
@@ -284,8 +275,9 @@ describe('POST/DELETE /users/:userId/block', () => {
         .where(
           and(eq(blocks.blockerId, ids.alice), eq(blocks.blockedId, ids.carol))
         )
-    ).toEqual([]);
-    expect(await db().select().from(unblocks)).toEqual([]);
+    ).toHaveLength(1);
+
+    await send('DELETE', `/users/${ids.carol}/block`, 'alice');
   });
 
   it('answers 422 on the user themselves and 404 on an unknown user', async () => {
@@ -320,27 +312,21 @@ describe('POST/DELETE /users/:userId/mute', () => {
     expect((await send('POST', '/users/999/mute', 'carol')).status).toBe(404);
   });
 
-  it('deletes a mute lifted by an unmute along with it', async () => {
-    const [legacy] = await db()
-      .insert(mutes)
-      .values({ muterId: ids.carol, mutedId: ids.alice, createdAt: at(31) })
-      .returning({ id: mutes.id });
+  it('keeps one mute when the same pair is muted at once', async () => {
+    const answers = await Promise.all([
+      send('POST', `/users/${ids.alice}/mute`, 'carol'),
+      send('POST', `/users/${ids.alice}/mute`, 'carol')
+    ]);
 
-    await db()
-      .insert(unmutes)
-      .values({ muteId: legacy.id, createdAt: at(32) });
-    const muting = await send('POST', `/users/${ids.alice}/mute`, 'carol');
-
-    await send('DELETE', `/users/${ids.alice}/mute`, 'carol');
-
-    expect(muting.body.muting).toBe(true);
+    expect(answers.map((answer) => answer.status)).toEqual([200, 200]);
     expect(
       await db()
         .select()
         .from(mutes)
         .where(and(eq(mutes.muterId, ids.carol), eq(mutes.mutedId, ids.alice)))
-    ).toEqual([]);
-    expect(await db().select().from(unmutes)).toEqual([]);
+    ).toHaveLength(1);
+
+    await send('DELETE', `/users/${ids.alice}/mute`, 'carol');
   });
 });
 

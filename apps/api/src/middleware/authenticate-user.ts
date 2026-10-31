@@ -1,11 +1,10 @@
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { createMiddleware } from 'hono/factory';
 import type { AppEnv } from '../app.ts';
 import type { Database } from '../db/client.ts';
 import { blocks, mutes, users } from '../db/schema.ts';
 import { ApiError } from '../errors.ts';
-import { activeMute } from '../mutes.ts';
-import { activeBlock, type Viewer } from '../visibility.ts';
+import type { Viewer } from '../visibility.ts';
 
 export type ViewerEnv = {
   Bindings: AppEnv['Bindings'];
@@ -22,17 +21,17 @@ export async function loadViewer(
       .select({ id: blocks.blockedId })
       .from(blocks)
       .innerJoin(users, eq(users.id, blocks.blockerId))
-      .where(and(eq(users.uid, uid), activeBlock(db))),
+      .where(eq(users.uid, uid)),
     db
       .select({ id: blocks.blockerId })
       .from(blocks)
       .innerJoin(users, eq(users.id, blocks.blockedId))
-      .where(and(eq(users.uid, uid), activeBlock(db))),
+      .where(eq(users.uid, uid)),
     db
       .select({ id: mutes.mutedId })
       .from(mutes)
       .innerJoin(users, eq(users.id, mutes.muterId))
-      .where(and(eq(users.uid, uid), activeMute(db)))
+      .where(eq(users.uid, uid))
   ]);
 
   if (!user) {
