@@ -13,7 +13,6 @@ import {
   maps,
   notifications,
   pinProperties,
-  pinPropertyRevisions,
   pins
 } from '../db/schema.ts';
 import { get, idsOf, send } from '../test/client.ts';
@@ -718,12 +717,6 @@ describe('pin properties', () => {
     expect(option.body).toMatchObject({ name: 'Mild', position: 0 });
     expect(revisedOption.body).toMatchObject({ name: 'Mild', position: 2 });
     expect(property).toMatchObject({ name: 'Heat', multiple: true });
-    expect(
-      await db()
-        .select()
-        .from(pinPropertyRevisions)
-        .where(eq(pinPropertyRevisions.pinPropertyId, created.body.id))
-    ).toEqual([]);
 
     expect((await send('DELETE', optionPath, 'alice')).status).toBe(204);
     expect((await send('PUT', propertyPath, 'alice', {})).body.options).toEqual(

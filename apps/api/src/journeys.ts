@@ -36,8 +36,6 @@ import {
   chapters,
   images,
   journeyCheckinImages,
-  journeyCheckinRevisionImages,
-  journeyCheckinRevisions,
   journeyCheckins,
   journeys,
   maps,
@@ -520,23 +518,8 @@ export function journeyDependentsDeletion(
     .select({ id: journeyCheckins.id })
     .from(journeyCheckins)
     .where(inArray(journeyCheckins.journeyId, journeyIds));
-  const revisionIds = db
-    .select({ id: journeyCheckinRevisions.id })
-    .from(journeyCheckinRevisions)
-    .where(inArray(journeyCheckinRevisions.journeyCheckinId, checkinIds));
 
   return [
-    db
-      .delete(journeyCheckinRevisionImages)
-      .where(
-        inArray(
-          journeyCheckinRevisionImages.journeyCheckinRevisionId,
-          revisionIds
-        )
-      ),
-    db
-      .delete(journeyCheckinRevisions)
-      .where(inArray(journeyCheckinRevisions.journeyCheckinId, checkinIds)),
     db
       .delete(journeyCheckinImages)
       .where(inArray(journeyCheckinImages.journeyCheckinId, checkinIds)),
@@ -552,14 +535,9 @@ export function checkinImagesOfImagesDeletion(
   db: Database,
   imageIds: SQLWrapper
 ) {
-  return [
-    db
-      .delete(journeyCheckinRevisionImages)
-      .where(inArray(journeyCheckinRevisionImages.imageId, imageIds)),
-    db
-      .delete(journeyCheckinImages)
-      .where(inArray(journeyCheckinImages.imageId, imageIds))
-  ] as const;
+  return db
+    .delete(journeyCheckinImages)
+    .where(inArray(journeyCheckinImages.imageId, imageIds));
 }
 
 export function journeysDeletion(db: Database, journeyIds: SQLWrapper) {
@@ -575,11 +553,7 @@ export function detachJourneysFromPins(db: Database, pinIds: SQLWrapper) {
     db
       .update(journeyCheckins)
       .set({ pinId: null })
-      .where(inArray(journeyCheckins.pinId, pinIds)),
-    db
-      .update(journeyCheckinRevisions)
-      .set({ pinId: null })
-      .where(inArray(journeyCheckinRevisions.pinId, pinIds))
+      .where(inArray(journeyCheckins.pinId, pinIds))
   ] as const;
 }
 

@@ -9,12 +9,7 @@ import {
   currentTimestamp,
   type Database
 } from './db/client.ts';
-import {
-  pinProperties,
-  pinPropertyOptionRevisions,
-  pinPropertyOptions,
-  pinPropertyRevisions
-} from './db/schema.ts';
+import { pinProperties, pinPropertyOptions } from './db/schema.ts';
 import { ApiError } from './errors.ts';
 import type { MessageKey } from './i18n/index.ts';
 import { first } from './routing.ts';
@@ -286,23 +281,10 @@ export async function pinPropertyOptionDetail(
 }
 
 export function pinPropertiesDeletion(db: Database, propertyIds: SQLWrapper) {
-  const optionIds = db
-    .select({ id: pinPropertyOptions.id })
-    .from(pinPropertyOptions)
-    .where(inArray(pinPropertyOptions.pinPropertyId, propertyIds));
-
   return [
-    db
-      .delete(pinPropertyOptionRevisions)
-      .where(
-        inArray(pinPropertyOptionRevisions.pinPropertyOptionId, optionIds)
-      ),
     db
       .delete(pinPropertyOptions)
       .where(inArray(pinPropertyOptions.pinPropertyId, propertyIds)),
-    db
-      .delete(pinPropertyRevisions)
-      .where(inArray(pinPropertyRevisions.pinPropertyId, propertyIds)),
     db.delete(pinProperties).where(inArray(pinProperties.id, propertyIds))
   ] as const;
 }
