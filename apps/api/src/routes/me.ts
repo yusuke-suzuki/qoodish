@@ -481,7 +481,7 @@ app.on(
 
     await reviseCheckin(
       db,
-      () => recordedCheckin(db, { journeyId: journey.id, checkinId }),
+      await recordedCheckin(db, { journeyId: journey.id, checkinId }),
       { journey, viewer, changes: c.req.valid('json') }
     );
 
@@ -500,8 +500,7 @@ app.delete(
 
     await discardCheckin(
       db,
-      () => recordedCheckin(db, { journeyId: journey.id, checkinId }),
-      viewer.id
+      await recordedCheckin(db, { journeyId: journey.id, checkinId })
     );
 
     return c.body(null, 204);
