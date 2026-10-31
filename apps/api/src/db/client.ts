@@ -50,6 +50,17 @@ export function chunks<Item>(items: readonly Item[], size: number): Item[][] {
   );
 }
 
+export function changedColumns<Row extends object>(
+  current: Row,
+  next: Partial<Row>
+): Partial<Row> {
+  return Object.fromEntries(
+    Object.entries(next).filter(
+      ([key, value]) => current[key as keyof Row] !== value
+    )
+  ) as Partial<Row>;
+}
+
 export function constraintViolated(
   error: unknown,
   constraint: 'UNIQUE' | 'NOT NULL',
