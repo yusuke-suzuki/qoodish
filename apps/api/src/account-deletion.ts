@@ -155,7 +155,7 @@ function accountDeletion(
     mapRevisionImagesOfImagesDeletion(db, ownedImages),
     pinRevisionImagesOfImagesDeletion(db, ownedImages),
     chapterRevisionImagesOfImagesDeletion(db, ownedImages),
-    ...checkinImagesOfImagesDeletion(db, ownedImages),
+    checkinImagesOfImagesDeletion(db, ownedImages),
     imagesDeletion(db, ownedImages, deletedImageIds),
     preferencesOfUserDeletion(db, userId),
     notificationsOfUserDeletion(db, userId),
