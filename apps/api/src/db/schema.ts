@@ -121,23 +121,11 @@ export const blocks = sqliteTable(
   },
   (t) => [
     index('index_blocks_on_blocked_id').on(t.blockedId),
-    index('index_blocks_on_blocker_id_and_blocked_id').on(
+    uniqueIndex('index_blocks_on_blocker_id_and_blocked_id').on(
       t.blockerId,
       t.blockedId
     )
   ]
-);
-
-export const unblocks = sqliteTable(
-  'unblocks',
-  {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    blockId: integer('block_id')
-      .notNull()
-      .references(() => blocks.id, { onDelete: 'cascade' }),
-    createdAt: text('created_at').notNull()
-  },
-  (t) => [uniqueIndex('index_unblocks_on_block_id').on(t.blockId)]
 );
 
 export const mutes = sqliteTable(
@@ -154,20 +142,8 @@ export const mutes = sqliteTable(
   },
   (t) => [
     index('index_mutes_on_muted_id').on(t.mutedId),
-    index('index_mutes_on_muter_id_and_muted_id').on(t.muterId, t.mutedId)
+    uniqueIndex('index_mutes_on_muter_id_and_muted_id').on(t.muterId, t.mutedId)
   ]
-);
-
-export const unmutes = sqliteTable(
-  'unmutes',
-  {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    createdAt: text('created_at').notNull(),
-    muteId: integer('mute_id')
-      .notNull()
-      .references(() => mutes.id, { onDelete: 'cascade' })
-  },
-  (t) => [uniqueIndex('index_unmutes_on_mute_id').on(t.muteId)]
 );
 
 export const maps = sqliteTable(

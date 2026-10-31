@@ -13,7 +13,6 @@ import {
   milestones,
   mutes,
   notifications,
-  unblocks,
   userPreferences,
   users
 } from '../db/schema.ts';
@@ -59,11 +58,9 @@ export async function seedMe(binding: D1Database): Promise<void> {
       ...stamp
     }
   ]);
-  await db.insert(blocks).values([
-    { id: 1, blockerId: ids.alice, blockedId: dave, createdAt: at(2) },
-    { id: 2, blockerId: ids.alice, blockedId: ids.carol, createdAt: at(2) }
-  ]);
-  await db.insert(unblocks).values({ blockId: 2, createdAt: at(3) });
+  await db
+    .insert(blocks)
+    .values({ id: 1, blockerId: ids.alice, blockedId: dave, createdAt: at(2) });
   await db
     .insert(mutes)
     .values({ muterId: ids.carol, mutedId: ids.bob, createdAt: at(2) });

@@ -15,14 +15,12 @@ import {
   userPreferences,
   users
 } from './db/schema.ts';
-import { activeMute } from './mutes.ts';
 import {
   chapterAuthor,
   profileAttributes,
   profileQuery,
   userColumns
 } from './users.ts';
-import { activeBlock } from './visibility.ts';
 
 const ACCOUNTS_PER_PAGE = 50;
 
@@ -194,19 +192,22 @@ async function accountsPage(
     accountId: typeof blocks.blockedId | typeof mutes.mutedId;
     recordId: typeof blocks.id | typeof mutes.id;
     table: typeof blocks | typeof mutes;
-    condition: SQL | undefined;
+    condition: SQL;
   },
   cursor: number | null
 ): Promise<ApiCursorPage<ModeratedAccount>> {
   const rows = await db
-    .select({ ...userColumns, latestId: max(query.recordId).as('latest_id') })
+    .select({ ...userColumns, latestId: query.recordId })
     .from(query.table)
     .innerJoin(users, eq(users.id, query.accountId))
     .leftJoin(images, eq(images.id, users.imageId))
-    .where(query.condition)
-    .groupBy(query.accountId)
-    .having(cursor === null ? undefined : lt(max(query.recordId), cursor))
-    .orderBy(desc(max(query.recordId)))
+    .where(
+      and(
+        query.condition,
+        cursor === null ? undefined : lt(query.recordId, cursor)
+      )
+    )
+    .orderBy(desc(query.recordId))
     .limit(ACCOUNTS_PER_PAGE);
 
   return {
@@ -227,7 +228,7 @@ export function blockedAccounts(
       accountId: blocks.blockedId,
       recordId: blocks.id,
       table: blocks,
-      condition: and(eq(blocks.blockerId, userId), activeBlock(db))
+      condition: eq(blocks.blockerId, userId)
     },
     cursor
   );
@@ -244,7 +245,7 @@ export function mutedAccounts(
       accountId: mutes.mutedId,
       recordId: mutes.id,
       table: mutes,
-      condition: and(eq(mutes.muterId, userId), activeMute(db))
+      condition: eq(mutes.muterId, userId)
     },
     cursor
   );
