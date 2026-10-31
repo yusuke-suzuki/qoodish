@@ -20,8 +20,7 @@ import {
   coauthorships,
   maps,
   moderationDecisions,
-  pins,
-  unblocks
+  pins
 } from './db/schema.ts';
 
 export type ModeratableType = 'Map' | 'Pin' | 'Chapter' | 'Comment';
@@ -33,15 +32,6 @@ export type Viewer = {
   muting: ReadonlySet<number>;
 };
 
-export function activeBlock(db: Database): SQL {
-  return notExists(
-    db
-      .select({ id: unblocks.id })
-      .from(unblocks)
-      .where(eq(unblocks.blockId, blocks.id))
-  );
-}
-
 export function noBlockBetween(
   db: Database,
   userColumn: SQLiteColumn,
@@ -52,12 +42,9 @@ export function noBlockBetween(
       .select({ id: blocks.id })
       .from(blocks)
       .where(
-        and(
-          activeBlock(db),
-          or(
-            and(eq(blocks.blockerId, userColumn), eq(blocks.blockedId, userId)),
-            and(eq(blocks.blockerId, userId), eq(blocks.blockedId, userColumn))
-          )
+        or(
+          and(eq(blocks.blockerId, userColumn), eq(blocks.blockedId, userId)),
+          and(eq(blocks.blockerId, userId), eq(blocks.blockedId, userColumn))
         )
       )
   );
