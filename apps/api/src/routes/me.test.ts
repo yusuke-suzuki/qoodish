@@ -15,6 +15,7 @@ import {
   journalBookmarks,
   journalRevisions,
   journals,
+  journeyCheckinImages,
   journeyCheckinRevisionImages,
   journeyCheckinRevisions,
   journeyCheckins,
@@ -38,6 +39,7 @@ import { checkinImage, seedMe } from '../test/me.ts';
 import {
   accountOf,
   chapterRevisionsOf,
+  checkinImageIdsOf,
   checkinRevisionsOf,
   pinRevisionsOf
 } from '../test/records.ts';
@@ -1323,6 +1325,7 @@ describe('journey writes', () => {
     expect((await checkinRow(feedCheckin))?.currentRevisionId).toBe(
       revisions[0]?.id
     );
+    expect(await checkinImageIdsOf(feedCheckin)).toEqual([checkinImage]);
   });
 
   it('rejects a checkin that breaks a rule of the previous API', async () => {
@@ -1581,6 +1584,7 @@ describe('journey writes', () => {
       { note: 'First\nvisit', imageIds: [checkinImage] },
       { note: 'Edited', imageIds: [ids.shoyuImage] }
     ]);
+    expect(await checkinImageIdsOf(feedCheckin)).toEqual([ids.shoyuImage]);
     expect(
       await send('PATCH', path, 'alice', { image_ids: [bobImage] })
     ).toEqual(invalid('The image was not uploaded by you.'));
@@ -1684,6 +1688,12 @@ describe('journey writes', () => {
             revisionIds
           )
         )
+    ).toEqual([]);
+    expect(
+      await db()
+        .select()
+        .from(journeyCheckinImages)
+        .where(inArray(journeyCheckinImages.journeyCheckinId, checkinIds))
     ).toEqual([]);
     expect(
       await db()

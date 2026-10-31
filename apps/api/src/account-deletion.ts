@@ -37,7 +37,7 @@ import type { Env } from './env.ts';
 import { imagesDeletion } from './images.ts';
 import { journalsDeletion } from './journals.ts';
 import {
-  checkinRevisionImagesOfImagesDeletion,
+  checkinImagesOfImagesDeletion,
   detachJourneysFromMaps,
   detachJourneysFromPins,
   journeyDependentsDeletion,
@@ -155,7 +155,7 @@ function accountDeletion(
     mapRevisionImagesOfImagesDeletion(db, ownedImages),
     pinRevisionImagesOfImagesDeletion(db, ownedImages),
     chapterRevisionImagesOfImagesDeletion(db, ownedImages),
-    checkinRevisionImagesOfImagesDeletion(db, ownedImages),
+    ...checkinImagesOfImagesDeletion(db, ownedImages),
     imagesDeletion(db, ownedImages, deletedImageIds),
     preferencesOfUserDeletion(db, userId),
     notificationsOfUserDeletion(db, userId),
