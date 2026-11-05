@@ -6,7 +6,7 @@ export const SITE_ORIGIN = 'https://qoodish.com';
 // A crawler caches a card by its URL, so each file name carries a hash of
 // its content: a regenerated card has to be saved under a new name.
 const OG_IMAGE_PATHS = {
-  en: '/og/en-01ebddd5.jpg',
+  en: '/og/en-1e1cd9f0.jpg',
   ja: '/og/ja-7e65411a.jpg'
 } as const;
 
