@@ -48,24 +48,6 @@ export function createAppTheme(lang: string) {
       typography: {
         fontFamily:
           'var(--font-shippori-mincho), "Hiragino Mincho ProN", "Yu Mincho", serif',
-        h1: {
-          fontFamily: 'var(--font-cinzel), var(--font-shippori-mincho), serif'
-        },
-        h2: {
-          fontFamily: 'var(--font-cinzel), var(--font-shippori-mincho), serif'
-        },
-        h3: {
-          fontFamily: 'var(--font-cinzel), var(--font-shippori-mincho), serif'
-        },
-        h4: {
-          fontFamily: 'var(--font-cinzel), var(--font-shippori-mincho), serif'
-        },
-        h5: {
-          fontFamily: 'var(--font-cinzel), var(--font-shippori-mincho), serif'
-        },
-        h6: {
-          fontFamily: 'var(--font-cinzel), var(--font-shippori-mincho), serif'
-        },
         body1: {
           lineHeight: 1.9,
           letterSpacing: '0.01em'
