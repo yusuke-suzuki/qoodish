@@ -1,12 +1,12 @@
 import { raw } from 'hono/html';
 import type { Child } from 'hono/jsx';
 import { type Asset, assetViewport } from '../assets.ts';
-import { dictionaryFor, type Locale } from '../i18n/index.ts';
+import { dictionaryFor } from '../i18n/index.ts';
 
 const BRAND_COLOR = '#ffb300';
 
 const FONTS_URL =
-  'https://fonts.googleapis.com/css2?family=Cinzel:wght@400&family=Lobster&family=Shippori+Mincho:wght@400';
+  'https://fonts.googleapis.com/css2?family=Lobster&family=Shippori+Mincho:wght@400';
 
 const OG_PHOTO_URL =
   'https://imagedelivery.net/ij3ygWRDWuATHKgheHKS5A/9d7ef63c-55df-4334-c310-04c13463b800/ogp';
@@ -16,10 +16,7 @@ const HERO_SCRIM =
 
 const GLYPH_RATIO = 0.625;
 
-const TAGLINE_FONTS: Record<Locale, string> = {
-  en: 'Cinzel',
-  ja: '"Shippori Mincho"'
-};
+const TAGLINE_FONT = '"Shippori Mincho"';
 
 export const READY_SELECTOR = 'html[data-ready]';
 
@@ -142,7 +139,7 @@ function OgImage({ asset }: { asset: Extract<Asset, { kind: 'ogImage' }> }) {
         <p
           style={{
             margin: '0',
-            'font-family': `${TAGLINE_FONTS[asset.locale]}, serif`,
+            'font-family': `${TAGLINE_FONT}, serif`,
             'font-size': '56px',
             'line-height': '1.4'
           }}
@@ -162,7 +159,7 @@ function fontsUsedBy(asset: Asset): FontUse[] {
   return [
     { family: 'Lobster', text: 'Qoodish' },
     {
-      family: TAGLINE_FONTS[asset.locale],
+      family: TAGLINE_FONT,
       text: dictionaryFor(asset.locale).ogTagline
     }
   ];
