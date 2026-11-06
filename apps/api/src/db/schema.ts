@@ -410,44 +410,9 @@ export const pinProperties = sqliteTable(
     multiple: integer('multiple', { mode: 'boolean' }).notNull().default(false),
     status: text('status').notNull().default('published'),
     createdAt: text('created_at').notNull(),
-    updatedAt: text('updated_at').notNull(),
-    currentRevisionId: integer('current_revision_id').references(
-      (): AnySQLiteColumn => pinPropertyRevisions.id,
-      { onDelete: 'set null' }
-    )
-  },
-  (t) => [
-    index('index_pin_properties_on_map_id').on(t.mapId),
-    index('index_pin_properties_on_current_revision_id').on(t.currentRevisionId)
-  ]
-);
-
-export const pinPropertyRevisions = sqliteTable(
-  'pin_property_revisions',
-  {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    pinPropertyId: integer('pin_property_id')
-      .notNull()
-      .references(() => pinProperties.id),
-    userId: integer('user_id').references(() => users.id, {
-      onDelete: 'set null'
-    }),
-    name: text('name').notNull(),
-    position: integer('position').notNull(),
-    status: text('status').notNull().default('published'),
-    createdAt: text('created_at').notNull(),
     updatedAt: text('updated_at').notNull()
   },
-  (t) => [
-    index('index_pin_property_revisions_on_pin_property_id').on(
-      t.pinPropertyId
-    ),
-    index('index_pin_property_revisions_on_user_id').on(t.userId),
-    index('index_pin_property_revisions_on_pin_property_id_and_id').on(
-      t.pinPropertyId,
-      t.id
-    )
-  ]
+  (t) => [index('index_pin_properties_on_map_id').on(t.mapId)]
 );
 
 export const pinPropertyOptions = sqliteTable(
@@ -461,45 +426,10 @@ export const pinPropertyOptions = sqliteTable(
     position: integer('position').notNull().default(0),
     status: text('status').notNull().default('published'),
     createdAt: text('created_at').notNull(),
-    updatedAt: text('updated_at').notNull(),
-    currentRevisionId: integer('current_revision_id').references(
-      (): AnySQLiteColumn => pinPropertyOptionRevisions.id,
-      { onDelete: 'set null' }
-    )
-  },
-  (t) => [
-    index('index_pin_property_options_on_pin_property_id').on(t.pinPropertyId),
-    index('index_pin_property_options_on_current_revision_id').on(
-      t.currentRevisionId
-    )
-  ]
-);
-
-export const pinPropertyOptionRevisions = sqliteTable(
-  'pin_property_option_revisions',
-  {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    pinPropertyOptionId: integer('pin_property_option_id')
-      .notNull()
-      .references(() => pinPropertyOptions.id),
-    userId: integer('user_id').references(() => users.id, {
-      onDelete: 'set null'
-    }),
-    name: text('name').notNull(),
-    position: integer('position').notNull(),
-    status: text('status').notNull().default('published'),
-    createdAt: text('created_at').notNull(),
     updatedAt: text('updated_at').notNull()
   },
   (t) => [
-    index('index_pin_property_option_revisions_on_pin_property_option_id').on(
-      t.pinPropertyOptionId
-    ),
-    index('index_pin_property_option_revisions_on_user_id').on(t.userId),
-    index('idx_on_pin_property_option_id_id_cd060b3bcd').on(
-      t.pinPropertyOptionId,
-      t.id
-    )
+    index('index_pin_property_options_on_pin_property_id').on(t.pinPropertyId)
   ]
 );
 
@@ -588,10 +518,6 @@ export const journeyCheckins = sqliteTable(
     id: integer('id').primaryKey({ autoIncrement: true }),
     checkedInAt: text('checked_in_at').notNull(),
     createdAt: text('created_at').notNull(),
-    currentRevisionId: integer('current_revision_id').references(
-      (): AnySQLiteColumn => journeyCheckinRevisions.id,
-      { onDelete: 'set null' }
-    ),
     journeyId: integer('journey_id')
       .notNull()
       .references(() => journeys.id),
@@ -610,9 +536,6 @@ export const journeyCheckins = sqliteTable(
     index('index_journey_checkins_on_journey_id_and_pin_id').on(
       t.journeyId,
       t.pinId
-    ),
-    index('index_journey_checkins_on_current_revision_id').on(
-      t.currentRevisionId
     ),
     index('index_journey_checkins_on_pin_id').on(t.pinId)
   ]
@@ -636,39 +559,6 @@ export const journeyCheckinImages = sqliteTable(
       t.imageId
     ),
     index('index_journey_checkin_images_on_image_id').on(t.imageId)
-  ]
-);
-
-export const journeyCheckinRevisions = sqliteTable(
-  'journey_checkin_revisions',
-  {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    checkedInAt: text('checked_in_at').notNull(),
-    createdAt: text('created_at').notNull(),
-    journeyCheckinId: integer('journey_checkin_id')
-      .notNull()
-      .references(() => journeyCheckins.id),
-    latitude: real('latitude'),
-    longitude: real('longitude'),
-    name: text('name'),
-    note: text('note'),
-    pinId: integer('pin_id').references(() => pins.id),
-    status: text('status').notNull().default('recorded'),
-    updatedAt: text('updated_at').notNull(),
-    userId: integer('user_id')
-      .notNull()
-      .references(() => users.id)
-  },
-  (t) => [
-    index('index_journey_checkin_revisions_on_journey_checkin_id_and_id').on(
-      t.journeyCheckinId,
-      t.id
-    ),
-    index('index_journey_checkin_revisions_on_journey_checkin_id').on(
-      t.journeyCheckinId
-    ),
-    index('index_journey_checkin_revisions_on_pin_id').on(t.pinId),
-    index('index_journey_checkin_revisions_on_user_id').on(t.userId)
   ]
 );
 

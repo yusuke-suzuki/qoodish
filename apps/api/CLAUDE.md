@@ -45,7 +45,15 @@ The Qoodish API: a Hono app on Cloudflare Workers that keeps its records in D1 t
 - A migration may be edited while its PR is open, but never after it has been merged: D1 records applied migrations by name and never reruns one, so add a new migration instead.
 - The previous version keeps serving after a migration applies, so a migration must leave it working: add and backfill first, read the result in the same deploy or a later one, and never remove or rename what the running version still reads.
 - Removing a column or a table takes two deploys. First remove every reference to it (schema, queries, routes, scripts, fixtures and tests) and deploy. Only after that deploy is live, drop it with a migration in a separate PR.
-- D1 cannot turn foreign keys off, so a table that other rows reference cannot be rebuilt: the rebuild Drizzle generates for it, which dropping a column with a foreign key also needs, fails or cascades deletes into the referencing rows. Leave such a column, and the table it references, declared in the schema and unused instead, as with `current_revision_id` of checkins and pin tags.
+- D1 cannot turn foreign keys off, so the rebuild Drizzle generates for a table that other rows reference (which dropping a column with a foreign key also needs) fails, or cascades deletes into the referencing rows, when it drops the old table. Rewrite that migration so that, within its single file:
+    - it copies the referencing rows into tables without foreign keys and empties them before dropping the old table, and copies them back after renaming the new one. Emptying a table fires its own foreign keys too, so treat the rows that reference those rows the same way, down to tables nothing references;
+    - it copies every row it will restore before it empties any table, because emptying one also sets to null the references that other rows, including those of the rebuilt table itself, hold to it;
+    - it creates a table that references the rebuilt one only after the rename, since a foreign key resolves by name;
+    - it recreates the triggers of the old table, which dropping it drops along with its indexes;
+    - it saves the `sqlite_sequence` entry of each table it drops and restores it afterwards, so that an id deleted before the rebuild is not reused;
+    - it drops the copies before it ends.
+
+  This is the one migration that moves existing rows: it returns every row as it found it, as Drizzle's own rebuild does. Test it against rows in every table it empties, including references that emptying a table sets to null and an id deleted above the highest remaining one, and test each recreated trigger.
 
 ## 6. Compatibility
 
