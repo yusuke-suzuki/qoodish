@@ -11,7 +11,17 @@ pnpm test
 pnpm typecheck
 ```
 
-Routes outside `/guest/*`, `/admin/*` and the health checks need a Firebase ID token of the dev project in `Authorization: Bearer <token>`. `/admin/*` needs a Cloudflare Access assertion in `Cf-Access-Jwt-Assertion` instead. `GET /me/journeys/:id` also needs the `ENCRYPTION_PRIMARY_KEY` and `ENCRYPTION_KEY_DERIVATION_SALT` secrets to decrypt the journey's path. Delivering the Web Push of a new notification needs `GOOGLE_PRIVATE_KEY`, the private key of the dev service account named by `GOOGLE_CLIENT_EMAIL`. `POST /images` needs the `CLOUDFLARE_IMAGES_API_TOKEN` secret, an API token with Cloudflare Images edit permission, to request a direct upload URL.
+## Routes
+
+| Paths | For | Authentication |
+|---|---|---|
+| `/`, `/healthcheck` | Health checks | None |
+| `/guest/*`, `/guest/v2/*` | Public content, read without signing in | None |
+| `/me`, `/v2/me` | The signed-in user's own account and content: profile, preferences, account deletion, push devices, notifications, own maps, pins, chapters and journeys, coauthorship invitations, bookmarks, blocks and mutes | A Firebase ID token in `Authorization: Bearer <token>`, of a user who has signed in before |
+| `/users`, `/maps`, `/pins`, `/chapters`, `/journals`, `/images`, `/reports`, and the rest of `/v2/*` | Content and other users, read and written as the signed-in user | A Firebase ID token in `Authorization: Bearer <token>`, of a user who has signed in before. `POST /users`, which signs the user in, needs only the token. |
+| `/admin/*` | Staff, through `apps/admin` | A Cloudflare Access assertion in `Cf-Access-Jwt-Assertion` |
+
+Paths without a version prefix are v1.
 
 ## Data model
 
