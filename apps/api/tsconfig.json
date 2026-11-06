@@ -15,6 +15,7 @@
   "include": [
     "src/**/*.ts",
     "scripts/**/*.ts",
+    "migrations/**/*.ts",
     "cloudflare.config.ts",
     "environments.ts",
     "vite.config.ts",
