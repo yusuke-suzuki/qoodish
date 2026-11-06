@@ -7,7 +7,7 @@ import {
 import * as schema from './schema.ts';
 
 const DATA_MODEL_DIAGRAM =
-  /(## Data model\n[\s\S]*?```mermaid\n)[\s\S]*?(\n```)/;
+  /(## Data model\n(?:(?!\n#)[\s\S])*?```mermaid\n)[\s\S]*?(\n```)/;
 
 type TableConfig = ReturnType<typeof getTableConfig>;
 
@@ -53,9 +53,18 @@ function relationships(config: TableConfig): string[] {
       const { columns, foreignTable } = fk.reference();
       const parent = columns.every((column) => column.notNull) ? '||' : '|o';
       const child = isUnique(config, columns) ? 'o|' : 'o{';
+      const line = columns.every(
+        (column) =>
+          column.primary ||
+          config.primaryKeys.some((key) =>
+            key.columns.some((keyColumn) => keyColumn.name === column.name)
+          )
+      )
+        ? '--'
+        : '..';
       const label = columns.map((column) => column.name).join(', ');
 
-      return `  ${getTableName(foreignTable)} ${parent}--${child} ${config.name} : "${label}"`;
+      return `  ${getTableName(foreignTable)} ${parent}${line}${child} ${config.name} : "${label}"`;
     })
     .sort(byCodeUnit);
 }
