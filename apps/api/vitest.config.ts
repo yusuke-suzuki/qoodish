@@ -27,7 +27,10 @@ export default defineConfig(async () => {
         miniflare: {
           compatibilityDate: '2026-07-01',
           compatibilityFlags: ['nodejs_compat'],
-          d1Databases: { DB: DEVELOPMENT.databaseName },
+          d1Databases: {
+            DB: DEVELOPMENT.databaseName,
+            MIGRATION_DB: 'migration-test'
+          },
           queueProducers: {
             WEB_PUSH_QUEUE: DEVELOPMENT.webPushQueue,
             MAIL_QUEUE: DEVELOPMENT.mailQueue

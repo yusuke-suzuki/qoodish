@@ -85,6 +85,13 @@
       "when": 1793296787386,
       "tag": "0011_drop_checkin_revision_images",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1793894632828,
+      "tag": "0012_drop_retired_revisions",
+      "breakpoints": true
     }
   ]
 }
