@@ -49,10 +49,6 @@ erDiagram
   users ||..o| journals : "user_id"
   images ||..o{ journey_checkin_images : "image_id"
   journey_checkins ||..o{ journey_checkin_images : "journey_checkin_id"
-  journey_checkins ||..o{ journey_checkin_revisions : "journey_checkin_id"
-  pins |o..o{ journey_checkin_revisions : "pin_id"
-  users ||..o{ journey_checkin_revisions : "user_id"
-  journey_checkin_revisions |o..o{ journey_checkins : "current_revision_id"
   journeys ||..o{ journey_checkins : "journey_id"
   pins |o..o{ journey_checkins : "pin_id"
   maps |o..o{ journeys : "map_id"
@@ -71,13 +67,7 @@ erDiagram
   users ||..o{ mutes : "muted_id"
   users ||..o{ mutes : "muter_id"
   maps ||..o{ pin_properties : "map_id"
-  pin_property_revisions |o..o{ pin_properties : "current_revision_id"
-  pin_property_options ||..o{ pin_property_option_revisions : "pin_property_option_id"
-  users |o..o{ pin_property_option_revisions : "user_id"
   pin_properties ||..o{ pin_property_options : "pin_property_id"
-  pin_property_option_revisions |o..o{ pin_property_options : "current_revision_id"
-  pin_properties ||..o{ pin_property_revisions : "pin_property_id"
-  users |o..o{ pin_property_revisions : "user_id"
   images ||..o{ pin_revision_images : "image_id"
   pin_revisions ||..o{ pin_revision_images : "pin_revision_id"
   pin_property_options ||..o{ pin_revision_property_options : "pin_property_option_id"
@@ -226,25 +216,10 @@ erDiagram
     integer image_id FK
     integer journey_checkin_id FK
   }
-  journey_checkin_revisions {
-    integer id PK
-    text checked_in_at
-    text created_at
-    integer journey_checkin_id FK
-    real latitude
-    real longitude
-    text name
-    text note
-    integer pin_id FK
-    text status
-    text updated_at
-    integer user_id FK
-  }
   journey_checkins {
     integer id PK
     text checked_in_at
     text created_at
-    integer current_revision_id FK
     integer journey_id FK
     real latitude
     real longitude
@@ -354,32 +329,10 @@ erDiagram
     text status
     text created_at
     text updated_at
-    integer current_revision_id FK
-  }
-  pin_property_option_revisions {
-    integer id PK
-    integer pin_property_option_id FK
-    integer user_id FK
-    text name
-    integer position
-    text status
-    text created_at
-    text updated_at
   }
   pin_property_options {
     integer id PK
     integer pin_property_id FK
-    text name
-    integer position
-    text status
-    text created_at
-    text updated_at
-    integer current_revision_id FK
-  }
-  pin_property_revisions {
-    integer id PK
-    integer pin_property_id FK
-    integer user_id FK
     text name
     integer position
     text status
