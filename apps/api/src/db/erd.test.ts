@@ -16,4 +16,12 @@ describe('withDiagram', () => {
     expect(result.startsWith(other)).toBe(true);
     expect(result).toContain('erDiagram\n  ');
   });
+
+  it('does not reach past the "## Data model" section for a diagram', () => {
+    expect(() =>
+      withDiagram(
+        '## Data model\n\nNo diagram yet.\n\n## Flow\n\n```mermaid\nflowchart LR\n```\n'
+      )
+    ).toThrow('no mermaid block under "## Data model"');
+  });
 });
