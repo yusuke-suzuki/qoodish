@@ -544,5 +544,7 @@
   "emoji category activities": "Activities",
   "emoji category travel": "Travel",
   "emoji category symbols": "Symbols",
-  "custom color": "Another color"
+  "custom color": "Another color",
+  "edit pin tags": "Edit tags",
+  "edit pin tags success": "Tags updated."
 }

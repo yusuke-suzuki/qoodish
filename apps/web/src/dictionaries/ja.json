@@ -534,5 +534,7 @@
   "emoji category activities": "遊び・趣味",
   "emoji category travel": "移動",
   "emoji category symbols": "記号",
-  "custom color": "その他の色"
+  "custom color": "その他の色",
+  "edit pin tags": "タグを編集",
+  "edit pin tags success": "タグを更新しました。"
 }

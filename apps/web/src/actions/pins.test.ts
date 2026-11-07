@@ -140,6 +140,36 @@ describe('updatePin', () => {
   });
 });
 
+describe('updatePinPropertyOptions', () => {
+  it('retags the pin on its map and refreshes its map and author', async () => {
+    const { updatePinPropertyOptions } = await actions();
+    respondWith(pin);
+
+    const result = await updatePinPropertyOptions(2, 3, [11, 12]);
+
+    assert.deepEqual(result, { success: true, data: pin });
+    assert.deepEqual(apiRequests(), [
+      {
+        path: '/maps/2/pins/3/property_options',
+        method: 'PUT',
+        body: { property_option_ids: [11, 12] }
+      }
+    ]);
+    assert.deepEqual(revalidatedTags(), ['pin:3', 'pins', 'map:2', 'user:9']);
+  });
+
+  it('reports the API error without refreshing', async () => {
+    const { updatePinPropertyOptions } = await actions();
+    failWith();
+
+    assert.deepEqual(await updatePinPropertyOptions(2, 3, []), {
+      success: false,
+      error: 'Forbidden'
+    });
+    assert.deepEqual(revalidatedTags(), []);
+  });
+});
+
 describe('deletePin', () => {
   it('deletes the pin and refreshes its map and author', async () => {
     const { deletePin } = await actions();
