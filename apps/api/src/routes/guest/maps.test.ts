@@ -172,6 +172,8 @@ describe('GET /guest/maps/:id/*', () => {
           name: 'Taste',
           multiple: true,
           position: 1,
+          icon: null,
+          color: null,
           options: [{ id: ids.salty, name: 'Salty', position: 0 }]
         }
       ]

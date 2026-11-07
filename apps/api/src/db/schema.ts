@@ -408,6 +408,8 @@ export const pinProperties = sqliteTable(
     name: text('name').notNull(),
     position: integer('position').notNull().default(0),
     multiple: integer('multiple', { mode: 'boolean' }).notNull().default(false),
+    icon: text('icon'),
+    color: text('color'),
     status: text('status').notNull().default('published'),
     createdAt: text('created_at').notNull(),
     updatedAt: text('updated_at').notNull()
