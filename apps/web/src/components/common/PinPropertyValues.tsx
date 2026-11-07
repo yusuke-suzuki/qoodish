@@ -1,6 +1,7 @@
-import { Sell } from '@mui/icons-material';
-import { Chip, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import type { Pin, PinProperty } from '../../../types/index.ts';
+import PinPropertyIcon from './PinPropertyIcon.tsx';
+import TagChip from './TagChip.tsx';
 
 type Props = {
   pin: Pin;
@@ -27,11 +28,12 @@ export default function PinPropertyValues({ pin, pinProperties }: Props) {
       sx={{ my: 1 }}
     >
       {values.map(({ property, option }) => (
-        <Chip
+        <TagChip
           key={option.id}
-          icon={<Sell />}
+          icon={<PinPropertyIcon icon={property.icon} />}
           label={option.name}
           title={property.name}
+          tagColor={property.color}
           size="small"
         />
       ))}

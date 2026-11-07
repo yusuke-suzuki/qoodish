@@ -10,6 +10,11 @@ type ActionResult = {
   error?: string;
 };
 
+type Appearance = {
+  icon: string | null;
+  color: string | null;
+};
+
 async function mutateMap(
   mapId: number,
   path: string,
@@ -31,7 +36,10 @@ async function mutateMap(
 
 export async function createPinProperty(
   mapId: number,
-  { options, ...params }: { name: string; multiple: boolean; options: string[] }
+  {
+    options,
+    ...params
+  }: Appearance & { name: string; multiple: boolean; options: string[] }
 ): Promise<ActionResult> {
   const { data, error } = await apiFetch<PinProperty>(
     `/maps/${mapId}/pin_properties`,
@@ -61,7 +69,7 @@ export async function createPinProperty(
 export async function updatePinProperty(
   mapId: number,
   propertyId: number,
-  params: { name: string }
+  params: { name: string } | Appearance
 ): Promise<ActionResult> {
   return mutateMap(mapId, `/${propertyId}`, {
     method: 'PUT',
