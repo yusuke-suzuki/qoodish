@@ -18,6 +18,7 @@ import ProfileBoundary from '../common/ProfileBoundary.tsx';
 import ReportDialog from '../common/ReportDialog.tsx';
 import DeletePinDialog from './DeletePinDialog.tsx';
 import EditPinDialog from './EditPinDialog.tsx';
+import EditPinTagsDialog from './EditPinTagsDialog.tsx';
 import PinCardActions from './PinCardActions.tsx';
 import PinCardHeader from './PinCardHeader.tsx';
 import PinImageList from './PinImageList.tsx';
@@ -37,6 +38,7 @@ export default function PinDetail({ pin, map, pinProperties }: Props) {
 
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [tagsDialogOpen, setTagsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const subject: ContentRef = { type: 'pin', id: pin.id };
@@ -54,6 +56,9 @@ export default function PinDetail({ pin, map, pinProperties }: Props) {
                   currentProfile={profile}
                   onReportClick={() => setReportDialogOpen(true)}
                   onEditClick={() => setEditDialogOpen(true)}
+                  onEditTagsClick={
+                    map?.editable ? () => setTagsDialogOpen(true) : undefined
+                  }
                   onDeleteClick={() => setDeleteDialogOpen(true)}
                   hideDetail
                 />
@@ -107,6 +112,15 @@ export default function PinDetail({ pin, map, pinProperties }: Props) {
       <EditPinDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
+        currentPin={pin}
+        map={map}
+        pinProperties={pinProperties}
+        onSaved={router.refresh}
+      />
+
+      <EditPinTagsDialog
+        open={tagsDialogOpen}
+        onClose={() => setTagsDialogOpen(false)}
         currentPin={pin}
         map={map}
         pinProperties={pinProperties}

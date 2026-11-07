@@ -16,6 +16,7 @@ import ProfileBoundary from '../common/ProfileBoundary.tsx';
 import ReportDialog from '../common/ReportDialog.tsx';
 import DeletePinDialog from '../pins/DeletePinDialog.tsx';
 import EditPinDialog from '../pins/EditPinDialog.tsx';
+import EditPinTagsDialog from '../pins/EditPinTagsDialog.tsx';
 import LikePinButton from '../pins/LikePinButton.tsx';
 import PinCardHeader from '../pins/PinCardHeader.tsx';
 import PinImageCarousel from '../pins/PinImageCarousel.tsx';
@@ -48,6 +49,7 @@ function PinPopover({
   const localePath = useLocalePath();
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [tagsDialogOpen, setTagsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
@@ -84,6 +86,9 @@ function PinPopover({
                   currentProfile={profile}
                   onReportClick={() => setReportDialogOpen(true)}
                   onEditClick={() => setEditDialogOpen(true)}
+                  onEditTagsClick={
+                    map?.editable ? () => setTagsDialogOpen(true) : undefined
+                  }
                   onDeleteClick={() => setDeleteDialogOpen(true)}
                 />
               )}
@@ -122,6 +127,15 @@ function PinPopover({
       <EditPinDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
+        currentPin={pin}
+        map={map}
+        pinProperties={pinProperties}
+        onSaved={onSaved}
+      />
+
+      <EditPinTagsDialog
+        open={tagsDialogOpen}
+        onClose={() => setTagsDialogOpen(false)}
         currentPin={pin}
         map={map}
         pinProperties={pinProperties}

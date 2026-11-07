@@ -521,5 +521,7 @@
   "pin property icon invalid": "Enter just one emoji or character",
   "pin property color": "Color",
   "no color": "No color",
-  "pin property appearance": "Change icon and color"
+  "pin property appearance": "Change icon and color",
+  "edit pin tags": "Edit tags",
+  "edit pin tags success": "Tags updated."
 }
