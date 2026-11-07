@@ -45,6 +45,7 @@ import {
 import { ApiError } from './errors.ts';
 import type { MessageKey } from './i18n/index.ts';
 import { primaryImage, sameIds, unownedImageErrors } from './images.ts';
+import { propertyShape } from './pin-properties.ts';
 import { first } from './routing.ts';
 import { truncate, withoutCarriageReturns } from './text.ts';
 import {
@@ -532,17 +533,9 @@ export async function pinPropertiesOf(
     (option) => option.pinPropertyId
   );
 
-  return properties.map((property) => ({
-    id: property.id,
-    name: property.name,
-    multiple: property.multiple,
-    position: property.position,
-    options: (optionsByProperty.get(property.id) ?? []).map((option) => ({
-      id: option.id,
-      name: option.name,
-      position: option.position
-    }))
-  }));
+  return properties.map((property) =>
+    propertyShape(property, optionsByProperty.get(property.id) ?? [])
+  );
 }
 
 export async function guestMaps(

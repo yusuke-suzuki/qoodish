@@ -336,6 +336,8 @@ erDiagram
     text name
     integer position
     integer multiple
+    text icon
+    text color
     text status
     text created_at
     text updated_at

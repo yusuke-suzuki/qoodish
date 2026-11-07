@@ -9,5 +9,7 @@ export type PinProperty = {
   name: string;
   multiple: boolean;
   position: number;
+  icon: string | null;
+  color: string | null;
   options: PinPropertyOption[];
 };
