@@ -292,6 +292,10 @@ export const pinInput = z
   })
   .transform(withChoices);
 
+export const pinPropertyOptionsInput = z
+  .object({ property_option_ids: pinChoices.property_option_ids.unwrap() })
+  .transform(withChoices);
+
 async function propertyOptionErrors(
   db: Database,
   { optionIds, mapId }: { optionIds: readonly number[]; mapId: number }

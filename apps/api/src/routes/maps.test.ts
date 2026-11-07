@@ -393,6 +393,106 @@ describe('pins with many tag options', () => {
   });
 });
 
+describe('PUT /maps/:mapId/pins/:id/property_options', () => {
+  async function taggablePin() {
+    const property = await send(
+      'POST',
+      `/maps/${ids.ramen}/pin_properties`,
+      'alice',
+      { name: 'Noodles', multiple: true }
+    );
+    const optionsPath = `/maps/${ids.ramen}/pin_properties/${property.body.id}/options`;
+    const thin = await send('POST', optionsPath, 'alice', { name: 'Thin' });
+    const thick = await send('POST', optionsPath, 'alice', { name: 'Thick' });
+    const pin = await send('POST', `/maps/${ids.ramen}/pins`, 'alice', {
+      name: 'Tsukemen',
+      comment: 'Dipping noodles',
+      latitude: 35.6,
+      longitude: 139.6,
+      image_ids: [ids.shoyuImage],
+      property_option_ids: [thin.body.id]
+    });
+
+    return {
+      path: `/maps/${ids.ramen}/pins/${pin.body.id}/property_options`,
+      pinId: pin.body.id as number,
+      thin: thin.body.id as number,
+      thick: thick.body.id as number
+    };
+  }
+
+  it("lets a coauthor change the tags of the author's pin, keeping the rest", async () => {
+    const { path, pinId, thin, thick } = await taggablePin();
+    const retagged = await send('PUT', path, 'carol', {
+      property_option_ids: [thick]
+    });
+    const cleared = await send('PUT', path, 'carol', {
+      property_option_ids: []
+    });
+    const revisions = await pinRevisionsOf(pinId);
+
+    expect(retagged).toMatchObject({
+      status: 200,
+      body: {
+        name: 'Tsukemen',
+        property_option_ids: [thick],
+        images: [{ id: ids.shoyuImage }],
+        editable: false
+      }
+    });
+    expect(cleared.body.property_option_ids).toEqual([]);
+    expect(
+      revisions.map(({ userId, imageIds, propertyOptionIds }) => ({
+        userId,
+        imageIds,
+        propertyOptionIds
+      }))
+    ).toEqual([
+      {
+        userId: ids.alice,
+        imageIds: [ids.shoyuImage],
+        propertyOptionIds: [thin]
+      },
+      {
+        userId: ids.carol,
+        imageIds: [ids.shoyuImage],
+        propertyOptionIds: [thick]
+      },
+      { userId: ids.carol, imageIds: [ids.shoyuImage], propertyOptionIds: [] }
+    ]);
+  });
+
+  it('answers 404 for a user who cannot edit the map or a pin not published on it, and 422 for a retired tag', async () => {
+    const { path } = await taggablePin();
+    const outsider = await send('PUT', path, 'bob', {
+      property_option_ids: []
+    });
+    const retired = await send('PUT', path, 'carol', {
+      property_option_ids: [ids.sweet]
+    });
+    const missing = await send('PUT', path, 'carol', {});
+    const [elsewhere, deleted] = await Promise.all(
+      [ids.latte, ids.deletedPin].map(async (pinId) =>
+        send(
+          'PUT',
+          `/maps/${ids.ramen}/pins/${pinId}/property_options`,
+          'carol',
+          { property_option_ids: [] }
+        )
+      )
+    );
+
+    expect(outsider.status).toBe(404);
+    expect(elsewhere.status).toBe(404);
+    expect(deleted.status).toBe(404);
+    expect(retired).toMatchObject({
+      status: 422,
+      body: { detail: 'Some of the tags chosen cannot be used on this pin.' }
+    });
+    expect(missing.status).toBe(400);
+  });
+});
+
 describe('POST /maps', () => {
   it('records a map with its first revision', async () => {
     const { status, body } = await send('POST', '/maps', 'bob', {

@@ -59,7 +59,13 @@ import {
   revisePinProperty,
   revisePinPropertyOption
 } from '../pin-properties.ts';
-import { createPin, newPinInput, viewerPins } from '../pins.ts';
+import {
+  createPin,
+  newPinInput,
+  pinPropertyOptionsInput,
+  revisePin,
+  viewerPins
+} from '../pins.ts';
 import { first } from '../routing.ts';
 import { findUser } from '../users.ts';
 import { id, jsonBody, optionalId, pathParams } from '../validation.ts';
@@ -74,7 +80,7 @@ import {
 const mapParams = pathParams(z.object({ mapId: id }));
 const idParams = pathParams(z.object({ id }));
 const coauthorParams = pathParams(z.object({ mapId: id, userId: id }));
-const propertyParams = pathParams(z.object({ mapId: id, id }));
+const mapItemParams = pathParams(z.object({ mapId: id, id }));
 const optionsParams = pathParams(z.object({ mapId: id, propertyId: id }));
 const optionParams = pathParams(z.object({ mapId: id, propertyId: id, id }));
 
@@ -380,6 +386,34 @@ app.post('/:mapId/journeys', mapParams, async (c) => {
   );
 });
 
+app.put(
+  '/:mapId/pins/:id/property_options',
+  mapItemParams,
+  jsonBody(pinPropertyOptionsInput),
+  async (c) => {
+    const db = c.get('db');
+    const viewer = c.get('viewer');
+    const params = c.req.valid('param');
+    const pinOnEditableMap = and(
+      referenceablePin(viewer),
+      eq(pins.id, params.id),
+      eq(pins.mapId, editableMapId(db, viewer, params.mapId))
+    );
+
+    await revisePin(
+      db,
+      async () => first(await db.select().from(pins).where(pinOnEditableMap)),
+      { editorId: viewer.id, changes: c.req.valid('json') }
+    );
+
+    const revised = first(
+      await db.select().from(pins).where(eq(pins.id, params.id))
+    );
+
+    return c.json<Pin>(first(await viewerPins(db, viewer, [revised])));
+  }
+);
+
 app.post(
   '/:mapId/pin_properties',
   mapParams,
@@ -400,7 +434,7 @@ app.post(
 app.on(
   ['PUT', 'PATCH'],
   '/:mapId/pin_properties/:id',
-  propertyParams,
+  mapItemParams,
   jsonBody(pinPropertyInput),
   async (c) => {
     const db = c.get('db');
@@ -420,7 +454,7 @@ app.on(
   }
 );
 
-app.delete('/:mapId/pin_properties/:id', propertyParams, async (c) => {
+app.delete('/:mapId/pin_properties/:id', mapItemParams, async (c) => {
   const db = c.get('db');
   const viewer = c.get('viewer');
   const params = c.req.valid('param');
