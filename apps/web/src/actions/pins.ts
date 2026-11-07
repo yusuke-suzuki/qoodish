@@ -93,6 +93,33 @@ export async function updatePin(
   return { success: true, data };
 }
 
+export async function updatePinPropertyOptions(
+  mapId: number,
+  pinId: number,
+  propertyOptionIds: number[]
+): Promise<ActionResult<Pin>> {
+  const { data, error } = await apiFetch<Pin>(
+    `/maps/${mapId}/pins/${pinId}/property_options`,
+    {
+      method: 'PUT',
+      body: JSON.stringify({ property_option_ids: propertyOptionIds })
+    }
+  );
+
+  if (error) {
+    return { success: false, error };
+  }
+
+  revalidateTags([
+    pinTag(pinId),
+    PINS_TAG,
+    mapTag(mapId),
+    data && userTag(data.author.id)
+  ]);
+
+  return { success: true, data };
+}
+
 export async function deletePin(
   pinId: number,
   mapId?: number,

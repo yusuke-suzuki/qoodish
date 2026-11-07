@@ -510,5 +510,7 @@
   "pin property icon helper": "絵文字か文字を 1 つ入力",
   "pin property color": "色",
   "no color": "色なし",
-  "pin property appearance": "アイコンと色を変更"
+  "pin property appearance": "アイコンと色を変更",
+  "edit pin tags": "タグを編集",
+  "edit pin tags success": "タグを更新しました。"
 }
