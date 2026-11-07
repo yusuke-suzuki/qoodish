@@ -505,5 +505,11 @@
   "add options with enter": "Enter で選択肢を追加",
   "pin property option name": "選択肢の名前",
   "sure to delete pin property option": "この選択肢を削除しますか？",
-  "delete pin property option detail": "この選択肢は、設定されているすべてのピンから外されます。"
+  "delete pin property option detail": "この選択肢は、設定されているすべてのピンから外されます。",
+  "pin property icon": "アイコン",
+  "pin property icon helper": "絵文字か文字を 1 つ入力",
+  "pin property icon invalid": "絵文字か文字を 1 つだけ入力してください",
+  "pin property color": "色",
+  "no color": "色なし",
+  "pin property appearance": "アイコンと色を変更"
 }

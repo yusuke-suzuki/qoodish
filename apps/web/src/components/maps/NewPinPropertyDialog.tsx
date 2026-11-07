@@ -15,9 +15,15 @@ import { type FormEvent, useState, useTransition } from 'react';
 import { createPinProperty } from '../../actions/pinProperties.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from '../common/AppDialog.tsx';
+import PinPropertyAppearanceFields, {
+  appearanceInvalid,
+  type PinPropertyAppearance
+} from './PinPropertyAppearanceFields.tsx';
 import PinPropertyTypeIcon from './PinPropertyTypeIcon.tsx';
 
 const MAX_LENGTH = 30;
+
+const NO_APPEARANCE: PinPropertyAppearance = { icon: null, color: null };
 
 type Props = {
   open: boolean;
@@ -37,6 +43,8 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
 
   const [name, setName] = useState('');
   const [multiple, setMultiple] = useState(false);
+  const [appearance, setAppearance] =
+    useState<PinPropertyAppearance>(NO_APPEARANCE);
   const [options, setOptions] = useState<string[]>([]);
   const [optionInput, setOptionInput] = useState('');
   const [isPending, startTransition] = useTransition();
@@ -55,6 +63,7 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
       const result = await createPinProperty(mapId, {
         name: trimmed,
         multiple,
+        ...appearance,
         options: submittedOptions
       });
 
@@ -74,6 +83,7 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
   const handleExited = () => {
     setName('');
     setMultiple(false);
+    setAppearance(NO_APPEARANCE);
     setOptions([]);
     setOptionInput('');
   };
@@ -92,7 +102,8 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
       confirmAction={{
         label: dictionary.add,
         type: 'submit',
-        disabled: !trimmed || tooLong || optionTooLong,
+        disabled:
+          !trimmed || tooLong || optionTooLong || appearanceInvalid(appearance),
         loading: isPending
       }}
     >
@@ -106,6 +117,12 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
         fullWidth
         margin="normal"
         autoFocus
+      />
+      <PinPropertyAppearanceFields
+        name={trimmed}
+        value={appearance}
+        disabled={isPending}
+        onChange={setAppearance}
       />
       <FormControl component="fieldset" fullWidth margin="normal">
         <FormLabel component="legend" sx={{ mb: 1 }}>

@@ -515,5 +515,11 @@
   "add options with enter": "Press Enter to add an option",
   "pin property option name": "Option name",
   "sure to delete pin property option": "Delete this option?",
-  "delete pin property option detail": "It will be removed from every pin it is set on."
+  "delete pin property option detail": "It will be removed from every pin it is set on.",
+  "pin property icon": "Icon",
+  "pin property icon helper": "One emoji or character",
+  "pin property icon invalid": "Enter just one emoji or character",
+  "pin property color": "Color",
+  "no color": "No color",
+  "pin property appearance": "Change icon and color"
 }
