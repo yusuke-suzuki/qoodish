@@ -1,13 +1,5 @@
-import { Add, Check, Sell } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Chip,
-  FormControl,
-  FormLabel,
-  Stack,
-  Typography
-} from '@mui/material';
+import { Add, Check } from '@mui/icons-material';
+import { Box, Button, Stack, Tooltip, Typography } from '@mui/material';
 import { useId, useState } from 'react';
 import type {
   AppMap,
@@ -16,6 +8,8 @@ import type {
 } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { chooseOptions } from '../../utils/pinPropertyOptions.ts';
+import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
+import TagChip from '../common/TagChip.tsx';
 import NewPinPropertyDialog from '../maps/NewPinPropertyDialog.tsx';
 
 type FieldProps = {
@@ -47,28 +41,39 @@ function PinPropertyField({ property, value, disabled, onChange }: FieldProps) {
   };
 
   return (
-    <FormControl
-      component="fieldset"
-      fullWidth
-      margin="normal"
-      disabled={disabled}
+    <Stack
+      role="group"
+      aria-label={property.name}
+      direction="row"
+      alignItems="center"
+      spacing={1}
     >
-      <FormLabel
-        component="legend"
-        sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+      <Tooltip title={property.name}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexShrink: 0,
+            color: disabled ? 'text.disabled' : 'text.secondary'
+          }}
+        >
+          <PinPropertyIcon icon={property.icon} />
+        </Box>
+      </Tooltip>
+      <Stack
+        direction="row"
+        spacing={1}
+        useFlexGap
+        sx={{ flex: 1, minWidth: 0, overflowX: 'auto', py: 0.5 }}
       >
-        <Sell fontSize="small" />
-        {property.name}
-      </FormLabel>
-      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
         {property.options.map((option) => {
           const chosen = chosenIds.includes(option.id);
 
           return (
-            <Chip
+            <TagChip
               key={option.id}
               label={option.name}
               icon={chosen ? <Check /> : undefined}
+              tagColor={property.color}
               color={chosen ? 'secondary' : 'default'}
               variant={chosen ? 'filled' : 'outlined'}
               aria-pressed={chosen}
@@ -78,7 +83,7 @@ function PinPropertyField({ property, value, disabled, onChange }: FieldProps) {
           );
         })}
       </Stack>
-    </FormControl>
+    </Stack>
   );
 }
 
@@ -135,15 +140,17 @@ export default function PinPropertyOptionsField({
         )}
       </Stack>
 
-      {offeredProperties.map((property) => (
-        <PinPropertyField
-          key={property.id}
-          property={property}
-          value={value}
-          disabled={disabled}
-          onChange={onChange}
-        />
-      ))}
+      <Stack spacing={1} sx={{ mt: 1 }}>
+        {offeredProperties.map((property) => (
+          <PinPropertyField
+            key={property.id}
+            property={property}
+            value={value}
+            disabled={disabled}
+            onChange={onChange}
+          />
+        ))}
+      </Stack>
 
       {map?.editable && (
         <NewPinPropertyDialog

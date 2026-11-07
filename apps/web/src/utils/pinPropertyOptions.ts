@@ -29,6 +29,14 @@ export function matchesOptions(
   });
 }
 
+const graphemeSegmenter = new Intl.Segmenter(undefined, {
+  granularity: 'grapheme'
+});
+
+export function isSingleGrapheme(text: string): boolean {
+  return [...graphemeSegmenter.segment(text)].length === 1;
+}
+
 export function offeredOptionIds(
   pinProperties: PinProperty[],
   optionIds: number[]

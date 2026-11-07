@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 import type { PinProperty } from '../../types/index.ts';
 import {
   chooseOptions,
+  isSingleGrapheme,
   matchesOptions,
   offeredOptionIds
 } from './pinPropertyOptions.ts';
@@ -72,5 +73,17 @@ describe('offeredOptionIds', () => {
       offeredOptionIds([payment, genre], [11, 99, 22]),
       [11, 22]
     );
+  });
+});
+
+describe('isSingleGrapheme', () => {
+  it('counts an emoji built from several code points as one character', () => {
+    assert.equal(isSingleGrapheme('👨‍👩‍👧'), true);
+    assert.equal(isSingleGrapheme('味'), true);
+  });
+
+  it('rejects an empty text and more than one character', () => {
+    assert.equal(isSingleGrapheme(''), false);
+    assert.equal(isSingleGrapheme('🍜🍣'), false);
   });
 });
