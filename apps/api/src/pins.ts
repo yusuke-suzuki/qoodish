@@ -292,6 +292,10 @@ export const pinInput = z
   })
   .transform(withChoices);
 
+export const pinPropertyOptionsInput = z.object({
+  property_option_ids: pinChoices.property_option_ids.unwrap()
+});
+
 async function propertyOptionErrors(
   db: Database,
   { optionIds, mapId }: { optionIds: readonly number[]; mapId: number }
@@ -587,6 +591,25 @@ export function revisePin(
         imageIds: changes.imageIds,
         propertyOptionIds: changes.propertyOptionIds
       }
+    });
+  });
+}
+
+export function revisePinPropertyOptions(
+  db: Database,
+  read: () => Promise<PinRow>,
+  {
+    editorId,
+    propertyOptionIds
+  }: { editorId: number; propertyOptionIds: number[] }
+): Promise<void> {
+  return reviseUntilCurrent(pinRevisions.pinId, async () => {
+    const pin = await read();
+
+    await writePinRevision(db, pin, {
+      editorId,
+      content: currentPinContent(pin),
+      submitted: { propertyOptionIds }
     });
   });
 }

@@ -59,7 +59,13 @@ import {
   revisePinProperty,
   revisePinPropertyOption
 } from '../pin-properties.ts';
-import { createPin, newPinInput, viewerPins } from '../pins.ts';
+import {
+  createPin,
+  newPinInput,
+  pinPropertyOptionsInput,
+  revisePinPropertyOptions,
+  viewerPins
+} from '../pins.ts';
 import { first } from '../routing.ts';
 import { findUser } from '../users.ts';
 import { id, jsonBody, optionalId, pathParams } from '../validation.ts';
@@ -74,6 +80,7 @@ import {
 const mapParams = pathParams(z.object({ mapId: id }));
 const idParams = pathParams(z.object({ id }));
 const coauthorParams = pathParams(z.object({ mapId: id, userId: id }));
+const pinParams = pathParams(z.object({ mapId: id, id }));
 const propertyParams = pathParams(z.object({ mapId: id, id }));
 const optionsParams = pathParams(z.object({ mapId: id, propertyId: id }));
 const optionParams = pathParams(z.object({ mapId: id, propertyId: id, id }));
@@ -379,6 +386,37 @@ app.post('/:mapId/journeys', mapParams, async (c) => {
     )
   );
 });
+
+app.put(
+  '/:mapId/pins/:id/property_options',
+  pinParams,
+  jsonBody(pinPropertyOptionsInput),
+  async (c) => {
+    const db = c.get('db');
+    const viewer = c.get('viewer');
+    const params = c.req.valid('param');
+    const pinOnEditableMap = and(
+      referenceablePin(viewer),
+      eq(pins.id, params.id),
+      eq(pins.mapId, editableMapId(db, viewer, params.mapId))
+    );
+
+    await revisePinPropertyOptions(
+      db,
+      async () => first(await db.select().from(pins).where(pinOnEditableMap)),
+      {
+        editorId: viewer.id,
+        propertyOptionIds: c.req.valid('json').property_option_ids
+      }
+    );
+
+    const revised = first(
+      await db.select().from(pins).where(eq(pins.id, params.id))
+    );
+
+    return c.json<Pin>(first(await viewerPins(db, viewer, [revised])));
+  }
+);
 
 app.post(
   '/:mapId/pin_properties',
