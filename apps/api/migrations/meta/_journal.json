@@ -92,6 +92,13 @@
       "when": 1793894632828,
       "tag": "0012_drop_retired_revisions",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1794063735803,
+      "tag": "0013_pin_property_appearance",
+      "breakpoints": true
     }
   ]
 }

@@ -13,7 +13,7 @@ import { pinProperties, pinPropertyOptions } from './db/schema.ts';
 import { ApiError } from './errors.ts';
 import type { MessageKey } from './i18n/index.ts';
 import { first } from './routing.ts';
-import { characters } from './text.ts';
+import { characters, graphemes } from './text.ts';
 import { position } from './validation.ts';
 
 const NAME_LIMIT = 30;
@@ -42,15 +42,35 @@ const optionName = tagName({
   exceed: 'pin_property_option_name_exceed'
 });
 
+const ICON_LENGTH_LIMIT = 32;
+
+const propertyIcon = z
+  .string({ error: 'pin_property_icon_invalid' })
+  .trim()
+  .refine((icon) => graphemes(icon) === 1 && icon.length <= ICON_LENGTH_LIMIT, {
+    error: 'pin_property_icon_invalid'
+  })
+  .nullable();
+
+const propertyColor = z
+  .string({ error: 'pin_property_color_invalid' })
+  .regex(/^#[0-9a-f]{6}$/i, { error: 'pin_property_color_invalid' })
+  .transform((color) => color.toLowerCase())
+  .nullable();
+
 export const newPinPropertyInput = z.object({
   name: propertyName,
   position: position.optional(),
-  multiple: z.boolean().optional()
+  multiple: z.boolean().optional(),
+  icon: propertyIcon.optional(),
+  color: propertyColor.optional()
 });
 
 export const pinPropertyInput = z.object({
   name: propertyName.optional(),
-  position: position.optional()
+  position: position.optional(),
+  icon: propertyIcon.optional(),
+  color: propertyColor.optional()
 });
 
 export const newPinPropertyOptionInput = z.object({
@@ -82,6 +102,13 @@ function contentOf(row: PropertyRow | OptionRow): NamedContent {
 
 type NamedEdit = { changes?: NamedChanges; status?: Status };
 
+type Appearance = { icon: string | null; color: string | null };
+
+type PropertyEdit = {
+  changes?: NamedChanges & Partial<Appearance>;
+  status?: Status;
+};
+
 function changedContent(
   row: PropertyRow | OptionRow,
   { changes, status }: NamedEdit
@@ -93,6 +120,22 @@ function changedContent(
     position: changes?.position ?? current.position,
     status: status ?? current.status
   });
+}
+
+function changedPropertyContent(
+  property: PropertyRow,
+  edit: PropertyEdit
+): Partial<NamedContent & Appearance> {
+  const current = { icon: property.icon, color: property.color };
+
+  return {
+    ...changedContent(property, edit),
+    ...changedColumns(current, {
+      icon: edit.changes?.icon === undefined ? current.icon : edit.changes.icon,
+      color:
+        edit.changes?.color === undefined ? current.color : edit.changes.color
+    })
+  };
 }
 
 export async function editablePinProperty(
@@ -145,6 +188,8 @@ export async function createPinProperty(
       name: changes.name,
       position: changes.position ?? 0,
       multiple: changes.multiple ?? false,
+      icon: changes.icon ?? null,
+      color: changes.color ?? null,
       status: 'published',
       mapId,
       createdAt: now,
@@ -158,9 +203,9 @@ export async function createPinProperty(
 export async function revisePinProperty(
   db: Database,
   property: PropertyRow,
-  edit: NamedEdit
+  edit: PropertyEdit
 ): Promise<void> {
-  const changes = changedContent(property, edit);
+  const changes = changedPropertyContent(property, edit);
 
   if (Object.keys(changes).length === 0) {
     return;
@@ -253,11 +298,20 @@ export async function pinPropertyDetail(
     throw new ApiError('NotFound');
   }
 
+  return propertyShape(property, options);
+}
+
+export function propertyShape(
+  property: PropertyRow,
+  options: readonly OptionRow[]
+): PinProperty {
   return {
     id: property.id,
     name: property.name,
     multiple: property.multiple,
     position: property.position,
+    icon: property.icon,
+    color: property.color,
     options: options.map(optionShape)
   };
 }

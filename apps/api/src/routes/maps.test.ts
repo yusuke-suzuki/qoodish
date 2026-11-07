@@ -752,6 +752,50 @@ describe('pin properties', () => {
     expect(foreign.status).toBe(404);
   });
 
+  it('records, changes and clears the icon and color of a property', async () => {
+    const base = `/maps/${ids.ramen}/pin_properties`;
+    const created = await send('POST', base, 'alice', {
+      name: 'Mood',
+      icon: ' 👨‍👩‍👧 ',
+      color: '#1E88E5'
+    });
+    const propertyPath = `${base}/${created.body.id}`;
+    const recolored = await send('PATCH', propertyPath, 'alice', {
+      color: '#43a047'
+    });
+    const cleared = await send('PATCH', propertyPath, 'alice', {
+      icon: null,
+      color: null
+    });
+    const plain = await send('POST', base, 'alice', { name: 'Plain' });
+
+    expect(created.body).toMatchObject({ icon: '👨‍👩‍👧', color: '#1e88e5' });
+    expect(recolored.body).toMatchObject({ icon: '👨‍👩‍👧', color: '#43a047' });
+    expect(cleared.body).toMatchObject({ icon: null, color: null });
+    expect(plain.body).toMatchObject({ icon: null, color: null });
+  });
+
+  it('answers 422 for an icon of more than one character or a malformed color', async () => {
+    const base = `/maps/${ids.ramen}/pin_properties`;
+    const [wordy, empty, named, short] = await Promise.all([
+      send('POST', base, 'alice', { name: 'Wordy', icon: '🍜🍣' }),
+      send('POST', base, 'alice', { name: 'Empty', icon: '' }),
+      send('POST', base, 'alice', { name: 'Named', color: 'red' }),
+      send('POST', base, 'alice', { name: 'Short', color: '#fff' })
+    ]);
+
+    expect(wordy).toMatchObject({
+      status: 422,
+      body: { detail: 'Tag icon is invalid.' }
+    });
+    expect(empty.status).toBe(422);
+    expect(named).toMatchObject({
+      status: 422,
+      body: { detail: 'Tag color is invalid.' }
+    });
+    expect(short.status).toBe(422);
+  });
+
   it('answers 400 for a position that is not a whole number', async () => {
     const rejected = await Promise.all(
       [null, '', -1, 1.5, true].map(

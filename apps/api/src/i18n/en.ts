@@ -96,6 +96,8 @@ export const en = {
   pin_property_name_exceed: 'Tag name is too long. (Max: 30)',
   pin_property_option_name_required: 'Option name is required.',
   pin_property_option_name_exceed: 'Option name is too long. (Max: 30)',
+  pin_property_icon_invalid: 'Tag icon is invalid.',
+  pin_property_color_invalid: 'Tag color is invalid.',
 
   journal_title_required: 'Journal title is required.',
   journal_title_exceed: 'Journal title is too long. (Max: 50)',

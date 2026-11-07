@@ -92,6 +92,8 @@ export const ja: Messages = {
   pin_property_name_exceed: 'タグの名前が長すぎます。(最大: 30 文字)',
   pin_property_option_name_required: '選択肢の名前を入力してください。',
   pin_property_option_name_exceed: '選択肢の名前が長すぎます。(最大: 30 文字)',
+  pin_property_icon_invalid: 'タグのアイコンが正しくありません。',
+  pin_property_color_invalid: 'タグの色が正しくありません。',
 
   journal_title_required: '手帳のタイトルを入力してください。',
   journal_title_exceed: '手帳のタイトルが長すぎます。(最大: 50 文字)',
