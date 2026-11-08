@@ -32,15 +32,8 @@ async function mutateMap(
 
 export async function createPinProperty(
   mapId: number,
-  {
-    options,
-    ...params
-  }: PinPropertyAppearance & {
-    name: string;
-    multiple: boolean;
-    options: string[];
-  }
-): Promise<ActionResult> {
+  params: PinPropertyAppearance & { name: string; multiple: boolean }
+): Promise<ActionResult & { id?: number }> {
   const { data, error } = await apiFetch<PinProperty>(
     `/maps/${mapId}/pin_properties`,
     { method: 'POST', body: JSON.stringify(params) }
@@ -52,18 +45,7 @@ export async function createPinProperty(
 
   revalidateTags([mapTag(mapId)]);
 
-  for (const name of options) {
-    const { error: optionError } = await apiFetch(
-      `/maps/${mapId}/pin_properties/${data.id}/options`,
-      { method: 'POST', body: JSON.stringify({ name }) }
-    );
-
-    if (optionError) {
-      return { success: true, error: optionError };
-    }
-  }
-
-  return { success: true };
+  return { success: true, id: data.id };
 }
 
 export async function updatePinProperty(

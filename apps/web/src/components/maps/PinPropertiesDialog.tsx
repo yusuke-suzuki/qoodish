@@ -6,17 +6,19 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography
+  Menu,
+  MenuItem
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
-import { useState } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import type {
   AppMap,
   PinProperty,
   PinPropertyOption
 } from '../../../types/index.ts';
 import {
+  createPinProperty,
   createPinPropertyOption,
   deletePinProperty,
   deletePinPropertyOption,
@@ -26,8 +28,14 @@ import {
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from '../common/AppDialog.tsx';
 import ConfirmDialog from '../common/ConfirmDialog.tsx';
-import NewPinPropertyDialog from './NewPinPropertyDialog.tsx';
+import NewPinPropertyListItem, {
+  draftCommittable,
+  draftOptionNames,
+  EMPTY_DRAFT,
+  type PinPropertyDraft
+} from './NewPinPropertyListItem.tsx';
 import PinPropertyListItem from './PinPropertyListItem.tsx';
+import PinPropertyTypeIcon from './PinPropertyTypeIcon.tsx';
 
 type DeleteTarget =
   | { kind: 'property'; property: PinProperty }
@@ -51,7 +59,21 @@ export default function PinPropertiesDialog({
 
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState<PinPropertyDraft | null>(null);
+  const [createdId, setCreatedId] = useState<number | null>(null);
+  const [isCreating, startCreating] = useTransition();
+  const committingRef = useRef(false);
+  const [typeMenuAnchor, setTypeMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
+  const [chosenMultiple, setChosenMultiple] = useState<boolean | null>(null);
+
+  const draftShown =
+    draft !== null &&
+    !(
+      createdId !== null &&
+      pinProperties.some((property) => property.id === createdId)
+    );
 
   const openDelete = (target: DeleteTarget) => {
     setDeleteTarget(target);
@@ -70,6 +92,80 @@ export default function PinPropertiesDialog({
     }
 
     return result.success;
+  };
+
+  const commitDraft = () => {
+    if (
+      !draft ||
+      !draftCommittable(draft) ||
+      createdId !== null ||
+      committingRef.current
+    ) {
+      return;
+    }
+
+    committingRef.current = true;
+
+    const { options, optionInput, ...tag } = draft;
+    const optionNames = draftOptionNames(draft);
+
+    startCreating(async () => {
+      try {
+        const result = await createPinProperty(map.id, {
+          ...tag,
+          name: tag.name.trim()
+        });
+
+        if (!result.success || result.id === undefined) {
+          enqueueSnackbar(result.error ?? dictionary['an error occurred'], {
+            variant: 'error'
+          });
+          return;
+        }
+
+        for (const name of optionNames) {
+          const option = await createPinPropertyOption(map.id, result.id, {
+            name
+          });
+
+          if (option.error) {
+            enqueueSnackbar(option.error, { variant: 'error' });
+          }
+        }
+
+        setCreatedId(result.id);
+        router.refresh();
+      } catch (_error) {
+        enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
+      } finally {
+        committingRef.current = false;
+      }
+    });
+  };
+
+  const chooseType = (multiple: boolean) => {
+    setChosenMultiple(multiple);
+    setTypeMenuAnchor(null);
+  };
+
+  const startChosenDraft = () => {
+    if (chosenMultiple === null) {
+      return;
+    }
+
+    setCreatedId(null);
+    setDraft({ ...EMPTY_DRAFT, multiple: chosenMultiple });
+    setChosenMultiple(null);
+  };
+
+  const handleClose = () => {
+    commitDraft();
+    onClose();
+  };
+
+  const handleExited = () => {
+    setDraft(null);
+    setCreatedId(null);
   };
 
   const handleDelete = async () => {
@@ -95,15 +191,13 @@ export default function PinPropertiesDialog({
     <>
       <AppDialog
         open={open}
-        onClose={onClose}
+        onClose={handleClose}
+        onExited={handleExited}
         title={dictionary['pin properties']}
         fullScreenOnMobile
         dividers
         cancelLabel={dictionary.close}
       >
-        <Typography color="text.secondary">
-          {dictionary['pin properties description']}
-        </Typography>
         <List disablePadding>
           {pinProperties.map((property) => (
             <PinPropertyListItem
@@ -136,20 +230,55 @@ export default function PinPropertiesDialog({
               }
             />
           ))}
-          <ListItemButton onClick={() => setCreating(true)} sx={{ px: 0 }}>
-            <ListItemIcon>
-              <Add />
-            </ListItemIcon>
-            <ListItemText primary={dictionary['add pin property']} />
-          </ListItemButton>
+          {draftShown ? (
+            <NewPinPropertyListItem
+              draft={draft}
+              disabled={isCreating || createdId !== null}
+              onChange={(update) =>
+                setDraft((current) => current && update(current))
+              }
+              onCommit={commitDraft}
+              onCancel={() => setDraft(null)}
+            />
+          ) : (
+            <ListItemButton
+              aria-haspopup="true"
+              aria-expanded={Boolean(typeMenuAnchor)}
+              onClick={(event) => setTypeMenuAnchor(event.currentTarget)}
+              sx={{ px: 0 }}
+            >
+              <ListItemIcon>
+                <Add />
+              </ListItemIcon>
+              <ListItemText primary={dictionary['add pin property']} />
+            </ListItemButton>
+          )}
         </List>
+        <Menu
+          anchorEl={typeMenuAnchor}
+          open={Boolean(typeMenuAnchor)}
+          onClose={() => setTypeMenuAnchor(null)}
+          slotProps={{ transition: { onExited: startChosenDraft } }}
+        >
+          {[false, true].map((multiple) => (
+            <MenuItem
+              key={String(multiple)}
+              onClick={() => chooseType(multiple)}
+            >
+              <ListItemIcon>
+                <PinPropertyTypeIcon multiple={multiple} fontSize="small" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  multiple
+                    ? dictionary['multi select']
+                    : dictionary['single select']
+                }
+              />
+            </MenuItem>
+          ))}
+        </Menu>
       </AppDialog>
-
-      <NewPinPropertyDialog
-        open={creating}
-        onClose={() => setCreating(false)}
-        mapId={map.id}
-      />
 
       <ConfirmDialog
         open={deleteOpen}
