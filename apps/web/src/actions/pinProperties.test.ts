@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
 import {
-  apiFetch,
   apiRequests,
   failWith,
   resetServerActionMocks,
@@ -14,7 +13,7 @@ const actions = () => import('./pinProperties.ts');
 beforeEach(resetServerActionMocks);
 
 describe('createPinProperty', () => {
-  it('defines the property with its options and refreshes the map', async () => {
+  it('defines the property, refreshes the map and returns its id', async () => {
     const { createPinProperty } = await actions();
     respondWith({ id: 5 });
 
@@ -22,11 +21,10 @@ describe('createPinProperty', () => {
       name: 'Payment',
       multiple: true,
       icon: '💴',
-      color: '#43a047',
-      options: ['Cash only', 'PayPay']
+      color: '#43a047'
     });
 
-    assert.deepEqual(result, { success: true });
+    assert.deepEqual(result, { success: true, id: 5 });
     assert.deepEqual(apiRequests(), [
       {
         path: '/maps/2/pin_properties',
@@ -37,16 +35,6 @@ describe('createPinProperty', () => {
           icon: '💴',
           color: '#43a047'
         }
-      },
-      {
-        path: '/maps/2/pin_properties/5/options',
-        method: 'POST',
-        body: { name: 'Cash only' }
-      },
-      {
-        path: '/maps/2/pin_properties/5/options',
-        method: 'POST',
-        body: { name: 'PayPay' }
       }
     ]);
     assert.deepEqual(revalidatedTags(), ['map:2']);
@@ -61,37 +49,14 @@ describe('createPinProperty', () => {
         name: '',
         multiple: false,
         icon: null,
-        color: null,
-        options: ['Cash only']
+        color: null
       }),
       {
         success: false,
         error: 'Name is required'
       }
     );
-    assert.equal(apiFetch.mock.callCount(), 1);
     assert.deepEqual(revalidatedTags(), []);
-  });
-
-  it('keeps the created property when an option fails', async () => {
-    const { createPinProperty } = await actions();
-    apiFetch.mock.mockImplementation(async (path) =>
-      path.endsWith('/options')
-        ? { data: null, error: 'Name is too long', status: 422 }
-        : { data: { id: 5 }, error: null, status: 200 }
-    );
-
-    const result = await createPinProperty(2, {
-      name: 'Payment',
-      multiple: true,
-      icon: null,
-      color: null,
-      options: ['Cash only', 'PayPay']
-    });
-
-    assert.deepEqual(result, { success: true, error: 'Name is too long' });
-    assert.equal(apiFetch.mock.callCount(), 2);
-    assert.deepEqual(revalidatedTags(), ['map:2']);
   });
 });
 
