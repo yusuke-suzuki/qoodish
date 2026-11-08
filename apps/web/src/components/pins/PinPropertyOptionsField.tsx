@@ -1,4 +1,3 @@
-import { Add } from '@mui/icons-material';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useId, useState } from 'react';
 import type {
@@ -10,7 +9,7 @@ import useDictionary from '../../hooks/useDictionary.ts';
 import { chooseOptions } from '../../utils/pinPropertyOptions.ts';
 import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 import TagChip from '../common/TagChip.tsx';
-import NewPinPropertyDialog from '../maps/NewPinPropertyDialog.tsx';
+import PinPropertiesDialog from '../maps/PinPropertiesDialog.tsx';
 
 type FieldProps = {
   property: PinProperty;
@@ -97,7 +96,7 @@ export default function PinPropertyOptionsField({
   const dictionary = useDictionary();
   const headingId = useId();
 
-  const [creating, setCreating] = useState(false);
+  const [managing, setManaging] = useState(false);
 
   const offeredProperties = pinProperties.filter(
     (property) => property.options.length > 0
@@ -122,12 +121,10 @@ export default function PinPropertyOptionsField({
           <Button
             size="small"
             color="secondary"
-            startIcon={<Add />}
-            aria-label={dictionary['add pin property']}
-            onClick={() => setCreating(true)}
+            onClick={() => setManaging(true)}
             disabled={disabled}
           >
-            {dictionary.add}
+            {dictionary['pin properties']}
           </Button>
         )}
       </Stack>
@@ -145,10 +142,11 @@ export default function PinPropertyOptionsField({
       </Stack>
 
       {map?.editable && (
-        <NewPinPropertyDialog
-          open={creating}
-          onClose={() => setCreating(false)}
-          mapId={map.id}
+        <PinPropertiesDialog
+          open={managing}
+          onClose={() => setManaging(false)}
+          map={map}
+          pinProperties={pinProperties}
         />
       )}
     </Box>
