@@ -1,7 +1,7 @@
 'use client';
 
 import { Autocomplete, Chip, TextField } from '@mui/material';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import type { PinPropertyOption } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 
@@ -23,28 +23,45 @@ export default function PinPropertyOptionsInput({
   const dictionary = useDictionary();
 
   const [input, setInput] = useState('');
-  const [isPending, startTransition] = useTransition();
+  const [pendingNames, setPendingNames] = useState<string[]>([]);
+  const [shownOptions, setShownOptions] = useState(options);
+
+  if (options !== shownOptions) {
+    setShownOptions(options);
+    setPendingNames((names) =>
+      names.filter((name) => !options.some((option) => option.name === name))
+    );
+  }
 
   const trimmed = input.trim();
   const tooLong = trimmed.length > MAX_LENGTH;
 
-  const create = (name: string) => {
+  const create = async (name: string) => {
     const newName = name.trim();
 
-    if (isPending || !newName || newName.length > MAX_LENGTH) {
+    if (!newName || newName.length > MAX_LENGTH) {
       return;
     }
 
-    if (options.some((option) => option.name === newName)) {
-      setInput('');
+    setInput('');
+
+    if (
+      options.some((option) => option.name === newName) ||
+      pendingNames.includes(newName)
+    ) {
       return;
     }
 
-    startTransition(async () => {
-      if (await onCreate(newName)) {
-        setInput('');
-      }
-    });
+    setPendingNames((names) => [...names, newName]);
+
+    const created = await onCreate(newName).catch(() => false);
+
+    if (!created) {
+      setPendingNames((names) =>
+        names.filter((pending) => pending !== newName)
+      );
+      setInput((current) => current || newName);
+    }
   };
 
   return (
@@ -53,7 +70,7 @@ export default function PinPropertyOptionsInput({
       freeSolo
       disableClearable
       options={[]}
-      value={options}
+      value={[...options, ...pendingNames]}
       getOptionLabel={(option) =>
         typeof option === 'string' ? option : option.name
       }
@@ -78,7 +95,15 @@ export default function PinPropertyOptionsInput({
         value.map((option, index) => {
           const { key, ...itemProps } = getItemProps({ index });
 
-          return typeof option === 'string' ? null : (
+          return typeof option === 'string' ? (
+            <Chip
+              key={key}
+              {...itemProps}
+              label={option}
+              onDelete={undefined}
+              disabled
+            />
+          ) : (
             <Chip
               key={key}
               {...itemProps}
