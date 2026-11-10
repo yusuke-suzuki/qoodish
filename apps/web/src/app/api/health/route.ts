@@ -1,9 +1,4 @@
-import { NextResponse } from 'next/server';
-
-// A static render would freeze the response at build time and a cached one
-// would keep answering for the previous deploy, so both are ruled out here or
-// the post-deploy workflow could never see the new commit arrive.
-export const dynamic = 'force-dynamic';
+import { connection, NextResponse } from 'next/server';
 
 async function checkApi(): Promise<'ok' | 'failed'> {
   try {
@@ -22,6 +17,11 @@ async function checkApi(): Promise<'ok' | 'failed'> {
 // endpoint without parsing the body, while the body keeps the SHA the
 // post-deploy workflow reads even during an API outage.
 export async function GET() {
+  // A static render would freeze the response at build time and a cached one
+  // would keep answering for the previous deploy, so the post-deploy workflow
+  // could never see the new commit arrive.
+  await connection();
+
   const api = await checkApi();
 
   return NextResponse.json(
