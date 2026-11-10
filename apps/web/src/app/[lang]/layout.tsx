@@ -2,32 +2,27 @@ import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
-import type {
-  CursorPage,
-  Notification,
-  Profile
-} from '../../../types/index.ts';
 import JsonLd from '../../components/common/JsonLd.tsx';
-import MaintenanceNotice from '../../components/common/MaintenanceNotice.tsx';
+import MaintenanceStatus from '../../components/common/MaintenanceStatus.tsx';
 import Shell from '../../components/layouts/Shell.tsx';
 import ShellProvider from '../../components/layouts/ShellProvider.tsx';
-import TermsRevisionNotice from '../../components/legal/TermsRevisionNotice.tsx';
-import { getServerAuthState } from '../../lib/auth.ts';
-import { getMaintenance, maintenanceMessage } from '../../lib/maintenance.ts';
-import { getMyProfile, getNotifications } from '../../lib/users.ts';
 import { THEME_COLOR } from '../../utils/brand.ts';
 import { getDictionary } from '../../utils/getDictionary.ts';
-import { pendingTermsRevision } from '../../utils/getLegalDocument.ts';
-import { isLocale } from '../../utils/locales.ts';
+import { isLocale, LOCALES } from '../../utils/locales.ts';
 import { defaultOgImage, ogImages, SITE_ORIGIN } from '../../utils/metadata.ts';
 import { siteStructuredData } from '../../utils/structuredData.ts';
 import { fontVariables } from '../fonts.ts';
 import Providers from './Providers.tsx';
+import SessionProviders from './SessionProviders.tsx';
 
 type Props = {
   children: ReactNode;
   params: Promise<{ lang: string }>;
 };
+
+export function generateStaticParams() {
+  return LOCALES.map((lang) => ({ lang }));
+}
 
 export const viewport: Viewport = {
   themeColor: THEME_COLOR,
@@ -93,25 +88,6 @@ export default async function RootLayout({ children, params }: Props) {
   }
 
   const dict = getDictionary(lang);
-  const maintenancePromise = getMaintenance();
-  const { authenticated, pending, uid, token } = await getServerAuthState();
-  const profilePromise = authenticated
-    ? getMyProfile(lang, token)
-    : Promise.resolve<Profile | null>(null);
-  // The bell is chrome, drawn above every error boundary: an outage there
-  // must cost the unread count, not the page.
-  const noNotifications: CursorPage<Notification> = {
-    items: [],
-    nextCursor: null
-  };
-  const unreadNotificationsPromise = authenticated
-    ? getNotifications(lang, { read: false }).catch(() => noNotifications)
-    : Promise.resolve(noNotifications);
-  const maintenanceNotice = maintenanceMessage(
-    await maintenancePromise,
-    lang,
-    dict
-  );
 
   return (
     // InitColorSchemeScript adds the color scheme class before hydration.
@@ -136,20 +112,13 @@ export default async function RootLayout({ children, params }: Props) {
       </head>
       <body>
         <InitColorSchemeScript attribute="class" />
-        <Providers
-          lang={lang}
-          dictionary={dict}
-          serverAuthenticated={authenticated}
-          serverPending={pending}
-          serverUid={uid}
-          profilePromise={profilePromise}
-          unreadNotificationsPromise={unreadNotificationsPromise}
-        >
-          <TermsRevisionNotice effectiveOn={pendingTermsRevision()} />
-          <MaintenanceNotice message={maintenanceNotice} />
-          <ShellProvider>
-            <Shell>{children}</Shell>
-          </ShellProvider>
+        <Providers lang={lang} dictionary={dict}>
+          <SessionProviders lang={lang}>
+            <ShellProvider>
+              <Shell>{children}</Shell>
+            </ShellProvider>
+          </SessionProviders>
+          <MaintenanceStatus lang={lang} />
         </Providers>
       </body>
     </html>

@@ -11,19 +11,12 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import type { Serwist } from '@serwist/window';
 import { closeSnackbar, enqueueSnackbar, SnackbarProvider } from 'notistack';
 import { type ReactNode, useEffect, useEffectEvent, useState } from 'react';
-import type {
-  CursorPage,
-  Notification,
-  Profile
-} from '../../../types/index.ts';
-import AuthProvider from '../../components/auth/AuthProvider.tsx';
 import ClientErrorReporter from '../../components/common/ClientErrorReporter.tsx';
 import DictionaryContext from '../../context/DictionaryContext.ts';
 import ServiceWorkerContext from '../../context/ServiceWorkerContext.ts';
 import { usePushManager } from '../../hooks/usePushManager.ts';
 import type { Dictionary } from '../../utils/getDictionary.ts';
 import { createAppTheme } from '../../utils/theme.ts';
-import AccountProviders from './AccountProviders.tsx';
 
 const globalStyles = css`
   .pac-container {
@@ -50,23 +43,9 @@ type Props = {
   children: ReactNode;
   lang: string;
   dictionary: Dictionary;
-  serverAuthenticated: boolean;
-  serverPending: boolean;
-  serverUid?: string;
-  profilePromise: Promise<Profile | null>;
-  unreadNotificationsPromise: Promise<CursorPage<Notification>>;
 };
 
-export default function Providers({
-  children,
-  lang,
-  dictionary,
-  serverAuthenticated,
-  serverPending,
-  serverUid,
-  profilePromise,
-  unreadNotificationsPromise
-}: Props) {
+export default function Providers({ children, lang, dictionary }: Props) {
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
 
@@ -144,20 +123,9 @@ export default function Providers({
             )}
           >
             <ClientErrorReporter />
-            <AuthProvider
-              serverAuthenticated={serverAuthenticated}
-              serverPending={serverPending}
-              serverUid={serverUid ?? null}
-            >
-              <AccountProviders
-                profilePromise={profilePromise}
-                unreadNotificationsPromise={unreadNotificationsPromise}
-              >
-                <ServiceWorkerContext.Provider value={serviceWorkerValue}>
-                  {children}
-                </ServiceWorkerContext.Provider>
-              </AccountProviders>
-            </AuthProvider>
+            <ServiceWorkerContext.Provider value={serviceWorkerValue}>
+              {children}
+            </ServiceWorkerContext.Provider>
           </SnackbarProvider>
         </DictionaryContext.Provider>
       </ThemeProvider>
