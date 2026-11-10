@@ -1,5 +1,7 @@
 import type { PinProperty } from '../../types/index.ts';
 
+export type PinPropertyAppearance = Pick<PinProperty, 'icon' | 'color'>;
+
 export function chooseOptions(
   selectedIds: number[],
   property: PinProperty,

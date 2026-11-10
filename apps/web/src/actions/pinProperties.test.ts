@@ -21,6 +21,8 @@ describe('createPinProperty', () => {
     const result = await createPinProperty(2, {
       name: 'Payment',
       multiple: true,
+      icon: '💴',
+      color: '#43a047',
       options: ['Cash only', 'PayPay']
     });
 
@@ -29,7 +31,12 @@ describe('createPinProperty', () => {
       {
         path: '/maps/2/pin_properties',
         method: 'POST',
-        body: { name: 'Payment', multiple: true }
+        body: {
+          name: 'Payment',
+          multiple: true,
+          icon: '💴',
+          color: '#43a047'
+        }
       },
       {
         path: '/maps/2/pin_properties/5/options',
@@ -53,6 +60,8 @@ describe('createPinProperty', () => {
       await createPinProperty(2, {
         name: '',
         multiple: false,
+        icon: null,
+        color: null,
         options: ['Cash only']
       }),
       {
@@ -75,6 +84,8 @@ describe('createPinProperty', () => {
     const result = await createPinProperty(2, {
       name: 'Payment',
       multiple: true,
+      icon: null,
+      color: null,
       options: ['Cash only', 'PayPay']
     });
 
@@ -99,6 +110,20 @@ describe('updatePinProperty', () => {
       }
     ]);
     assert.deepEqual(revalidatedTags(), ['map:2']);
+  });
+
+  it('sends only the appearance field that changed', async () => {
+    const { updatePinProperty } = await actions();
+
+    await updatePinProperty(2, 5, { color: null });
+
+    assert.deepEqual(apiRequests(), [
+      {
+        path: '/maps/2/pin_properties/5',
+        method: 'PUT',
+        body: { color: null }
+      }
+    ]);
   });
 });
 

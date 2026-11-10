@@ -112,6 +112,9 @@ export default function PinPropertiesDialog({
               onRename={async (name) =>
                 finish(await updatePinProperty(map.id, property.id, { name }))
               }
+              onChangeAppearance={async (appearance) =>
+                finish(await updatePinProperty(map.id, property.id, appearance))
+              }
               onDelete={() => openDelete({ kind: 'property', property })}
               onCreateOption={async (name) =>
                 finish(

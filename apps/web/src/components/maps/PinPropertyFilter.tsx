@@ -10,6 +10,7 @@ import {
 import { useId, useState } from 'react';
 import type { PinProperty } from '../../../types/index.ts';
 import { chooseOptions } from '../../utils/pinPropertyOptions.ts';
+import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 
 type ChipProps = {
   property: PinProperty;
@@ -43,6 +44,7 @@ function PropertyFilterChip({ property, value, onChange }: ChipProps) {
   return (
     <>
       <Chip
+        icon={<PinPropertyIcon icon={property.icon} />}
         label={
           <Stack direction="row" alignItems="center">
             {active ? `${property.name} (${chosenIds.length})` : property.name}

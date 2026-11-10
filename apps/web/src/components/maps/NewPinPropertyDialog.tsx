@@ -2,8 +2,8 @@
 
 import {
   Autocomplete,
-  FormControl,
-  FormLabel,
+  Box,
+  InputAdornment,
   Stack,
   TextField,
   ToggleButton,
@@ -14,10 +14,15 @@ import { enqueueSnackbar } from 'notistack';
 import { type FormEvent, useState, useTransition } from 'react';
 import { createPinProperty } from '../../actions/pinProperties.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
+import type { PinPropertyAppearance } from '../../utils/pinPropertyOptions.ts';
 import AppDialog from '../common/AppDialog.tsx';
+import PinPropertyColorPicker from './PinPropertyColorPicker.tsx';
+import PinPropertyIconPicker from './PinPropertyIconPicker.tsx';
 import PinPropertyTypeIcon from './PinPropertyTypeIcon.tsx';
 
 const MAX_LENGTH = 30;
+
+const NO_APPEARANCE: PinPropertyAppearance = { icon: null, color: null };
 
 type Props = {
   open: boolean;
@@ -37,6 +42,8 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
 
   const [name, setName] = useState('');
   const [multiple, setMultiple] = useState(false);
+  const [appearance, setAppearance] =
+    useState<PinPropertyAppearance>(NO_APPEARANCE);
   const [options, setOptions] = useState<string[]>([]);
   const [optionInput, setOptionInput] = useState('');
   const [isPending, startTransition] = useTransition();
@@ -48,6 +55,10 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
     (option) => option.length > MAX_LENGTH
   );
 
+  const typeLabel = multiple
+    ? dictionary['multi select']
+    : dictionary['single select'];
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -55,6 +66,7 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
       const result = await createPinProperty(mapId, {
         name: trimmed,
         multiple,
+        ...appearance,
         options: submittedOptions
       });
 
@@ -74,6 +86,7 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
   const handleExited = () => {
     setName('');
     setMultiple(false);
+    setAppearance(NO_APPEARANCE);
     setOptions([]);
     setOptionInput('');
   };
@@ -96,26 +109,56 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
         loading: isPending
       }}
     >
-      <TextField
-        label={dictionary['pin property name']}
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        error={tooLong}
-        helperText={tooLong && dictionary['max characters 30']}
-        disabled={isPending}
-        fullWidth
-        margin="normal"
-        autoFocus
-      />
-      <FormControl component="fieldset" fullWidth margin="normal">
-        <FormLabel component="legend" sx={{ mb: 1 }}>
-          {dictionary['pin property type']}
-        </FormLabel>
+      <Stack direction="row" alignItems="center" sx={{ mt: 1 }}>
+        <Box sx={{ minWidth: 56 }}>
+          <PinPropertyIconPicker
+            icon={appearance.icon}
+            disabled={isPending}
+            onChange={(icon) => setAppearance({ ...appearance, icon })}
+          />
+        </Box>
+        <TextField
+          label={dictionary['pin property name']}
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          error={tooLong}
+          helperText={tooLong && dictionary['max characters 30']}
+          disabled={isPending}
+          size="small"
+          fullWidth
+          autoFocus
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Box
+                    component="span"
+                    role="img"
+                    aria-label={typeLabel}
+                    sx={{ display: 'flex' }}
+                  >
+                    <PinPropertyTypeIcon multiple={multiple} fontSize="small" />
+                  </Box>
+                </InputAdornment>
+              )
+            }
+          }}
+        />
+        <Box sx={{ ml: 1 }}>
+          <PinPropertyColorPicker
+            color={appearance.color}
+            disabled={isPending}
+            onChange={(color) => setAppearance({ ...appearance, color })}
+          />
+        </Box>
+      </Stack>
+      <Box sx={{ pl: 7 }}>
         <ToggleButtonGroup
           exclusive
           fullWidth
           size="small"
           color="secondary"
+          aria-label={dictionary['pin property type']}
           value={multiple}
           onChange={(_event, value: boolean | null) => {
             if (value !== null) {
@@ -123,44 +166,46 @@ export default function NewPinPropertyDialog({ open, onClose, mapId }: Props) {
             }
           }}
           disabled={isPending}
+          sx={{ mt: 2 }}
         >
           <ToggleButton value={false}>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <PinPropertyTypeIcon multiple={false} />
+              <PinPropertyTypeIcon multiple={false} fontSize="small" />
               <span>{dictionary['single select']}</span>
             </Stack>
           </ToggleButton>
           <ToggleButton value={true}>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <PinPropertyTypeIcon multiple />
+              <PinPropertyTypeIcon multiple fontSize="small" />
               <span>{dictionary['multi select']}</span>
             </Stack>
           </ToggleButton>
         </ToggleButtonGroup>
-      </FormControl>
-      <Autocomplete
-        multiple
-        freeSolo
-        options={[]}
-        value={options}
-        onChange={(_event, value) => setOptions(uniqueNames(value))}
-        inputValue={optionInput}
-        onInputChange={(_event, value) => setOptionInput(value)}
-        disabled={isPending}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label={dictionary['pin property options']}
-            error={optionTooLong}
-            helperText={
-              optionTooLong
-                ? dictionary['max characters 30']
-                : dictionary['add options with enter']
-            }
-            margin="normal"
-          />
-        )}
-      />
+        <Autocomplete
+          multiple
+          freeSolo
+          options={[]}
+          value={options}
+          onChange={(_event, value) => setOptions(uniqueNames(value))}
+          inputValue={optionInput}
+          onInputChange={(_event, value) => setOptionInput(value)}
+          disabled={isPending}
+          sx={{ mt: 2 }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={dictionary['pin property options']}
+              error={optionTooLong}
+              helperText={
+                optionTooLong
+                  ? dictionary['max characters 30']
+                  : dictionary['add options with enter']
+              }
+              size="small"
+            />
+          )}
+        />
+      </Box>
     </AppDialog>
   );
 }
