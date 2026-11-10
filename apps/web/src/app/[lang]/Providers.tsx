@@ -14,7 +14,6 @@ import { type ReactNode, useEffect, useEffectEvent, useState } from 'react';
 import ClientErrorReporter from '../../components/common/ClientErrorReporter.tsx';
 import DictionaryContext from '../../context/DictionaryContext.ts';
 import ServiceWorkerContext from '../../context/ServiceWorkerContext.ts';
-import { usePushManager } from '../../hooks/usePushManager.ts';
 import type { Dictionary } from '../../utils/getDictionary.ts';
 import { createAppTheme } from '../../utils/theme.ts';
 
@@ -48,8 +47,6 @@ type Props = {
 export default function Providers({ children, lang, dictionary }: Props) {
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
-
-  usePushManager(registration);
 
   const serviceWorkerValue = { registration };
 
