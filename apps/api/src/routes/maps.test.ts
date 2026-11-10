@@ -896,6 +896,53 @@ describe('pin properties', () => {
     expect(short.status).toBe(422);
   });
 
+  it('records, changes and clears the icon of an option', async () => {
+    const base = `/maps/${ids.ramen}/pin_properties`;
+    const tag = await send('POST', base, 'alice', { name: 'Place type' });
+    const propertyPath = `${base}/${tag.body.id}`;
+    const created = await send('POST', `${propertyPath}/options`, 'alice', {
+      name: 'Umami',
+      icon: ' 🍄‍🟫 '
+    });
+    const optionPath = `${propertyPath}/options/${created.body.id}`;
+    const renamed = await send('PATCH', optionPath, 'alice', {
+      name: 'Savory'
+    });
+    const changed = await send('PATCH', optionPath, 'alice', { icon: '🍖' });
+    const cleared = await send('PATCH', optionPath, 'alice', { icon: null });
+    const plain = await send('POST', `${propertyPath}/options`, 'alice', {
+      name: 'Bitter'
+    });
+    const property = await send('PUT', propertyPath, 'alice', {});
+
+    expect(created.body).toMatchObject({ name: 'Umami', icon: '🍄‍🟫' });
+    expect(renamed.body).toMatchObject({ name: 'Savory', icon: '🍄‍🟫' });
+    expect(changed.body).toMatchObject({ name: 'Savory', icon: '🍖' });
+    expect(cleared.body).toMatchObject({ name: 'Savory', icon: null });
+    expect(plain.body).toMatchObject({ icon: null });
+    expect(property.body.options).toEqual([
+      { id: created.body.id, name: 'Savory', position: 0, icon: null },
+      { id: plain.body.id, name: 'Bitter', position: 0, icon: null }
+    ]);
+  });
+
+  it('answers 422 for an option icon that is not exactly one character', async () => {
+    const options = `/maps/${ids.ramen}/pin_properties/${ids.taste}/options`;
+    const [wordy, empty] = await Promise.all([
+      send('POST', options, 'alice', { name: 'Wordy', icon: '🍜🍣' }),
+      send('PATCH', `${options}/${ids.salty}`, 'alice', { icon: '' })
+    ]);
+
+    expect(wordy).toMatchObject({
+      status: 422,
+      body: { detail: 'Option icon is invalid.' }
+    });
+    expect(empty).toMatchObject({
+      status: 422,
+      body: { detail: 'Option icon is invalid.' }
+    });
+  });
+
   it('answers 400 for a position that is not a whole number', async () => {
     const rejected = await Promise.all(
       [null, '', -1, 1.5, true].map(

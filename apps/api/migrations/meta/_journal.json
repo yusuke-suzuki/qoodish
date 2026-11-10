@@ -99,6 +99,13 @@
       "when": 1794063735803,
       "tag": "0013_pin_property_appearance",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1794328362443,
+      "tag": "0014_pin_property_option_icon",
+      "breakpoints": true
     }
   ]
 }

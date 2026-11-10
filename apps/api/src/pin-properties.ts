@@ -44,13 +44,20 @@ const optionName = tagName({
 
 const ICON_LENGTH_LIMIT = 32;
 
-const propertyIcon = z
-  .string({ error: 'pin_property_icon_invalid' })
-  .trim()
-  .refine((icon) => graphemes(icon) === 1 && icon.length <= ICON_LENGTH_LIMIT, {
-    error: 'pin_property_icon_invalid'
-  })
-  .nullable();
+function tagIcon(invalid: MessageKey) {
+  return z
+    .string({ error: invalid })
+    .trim()
+    .refine(
+      (icon) => graphemes(icon) === 1 && icon.length <= ICON_LENGTH_LIMIT,
+      { error: invalid }
+    )
+    .nullable();
+}
+
+const propertyIcon = tagIcon('pin_property_icon_invalid');
+
+const optionIcon = tagIcon('pin_property_option_icon_invalid');
 
 const propertyColor = z
   .string({ error: 'pin_property_color_invalid' })
@@ -75,12 +82,14 @@ export const pinPropertyInput = z.object({
 
 export const newPinPropertyOptionInput = z.object({
   name: optionName,
-  position: position.optional()
+  position: position.optional(),
+  icon: optionIcon.optional()
 });
 
 export const pinPropertyOptionInput = z.object({
   name: optionName.optional(),
-  position: position.optional()
+  position: position.optional(),
+  icon: optionIcon.optional()
 });
 
 type Status = 'published' | 'deleted';
@@ -109,6 +118,11 @@ type PropertyEdit = {
   status?: Status;
 };
 
+type OptionEdit = {
+  changes?: NamedChanges & Partial<Pick<Appearance, 'icon'>>;
+  status?: Status;
+};
+
 function changedContent(
   row: PropertyRow | OptionRow,
   { changes, status }: NamedEdit
@@ -134,6 +148,20 @@ function changedPropertyContent(
       icon: edit.changes?.icon === undefined ? current.icon : edit.changes.icon,
       color:
         edit.changes?.color === undefined ? current.color : edit.changes.color
+    })
+  };
+}
+
+function changedOptionContent(
+  option: OptionRow,
+  edit: OptionEdit
+): Partial<NamedContent & Pick<Appearance, 'icon'>> {
+  const current = { icon: option.icon };
+
+  return {
+    ...changedContent(option, edit),
+    ...changedColumns(current, {
+      icon: edit.changes?.icon === undefined ? current.icon : edit.changes.icon
     })
   };
 }
@@ -241,6 +269,7 @@ export async function createPinPropertyOption(
     .values({
       name: changes.name,
       position: changes.position ?? 0,
+      icon: changes.icon ?? null,
       status: 'published',
       pinPropertyId: propertyId,
       createdAt: now,
@@ -254,9 +283,9 @@ export async function createPinPropertyOption(
 export async function revisePinPropertyOption(
   db: Database,
   option: OptionRow,
-  edit: NamedEdit
+  edit: OptionEdit
 ): Promise<void> {
-  const changes = changedContent(option, edit);
+  const changes = changedOptionContent(option, edit);
 
   if (Object.keys(changes).length === 0) {
     return;
@@ -317,7 +346,12 @@ export function propertyShape(
 }
 
 export function optionShape(option: OptionRow): PinPropertyOptionShape {
-  return { id: option.id, name: option.name, position: option.position };
+  return {
+    id: option.id,
+    name: option.name,
+    position: option.position,
+    icon: option.icon
+  };
 }
 
 export async function pinPropertyOptionDetail(

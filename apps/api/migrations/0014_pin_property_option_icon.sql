@@ -1,0 +1,1 @@
+ALTER TABLE `pin_property_options` ADD `icon` text;

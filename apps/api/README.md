@@ -347,6 +347,7 @@ erDiagram
     integer pin_property_id FK
     text name
     integer position
+    text icon
     text status
     text created_at
     text updated_at
