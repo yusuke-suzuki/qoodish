@@ -10,16 +10,17 @@ import {
   Stack,
   Tooltip
 } from '@mui/material';
-import { useState } from 'react';
 import type { PinProperty, PinPropertyOption } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
-import type { PinPropertyAppearance } from '../../utils/pinPropertyOptions.ts';
+import type {
+  PinPropertyAppearance,
+  PinPropertyOptionChanges
+} from '../../utils/pinPropertyOptions.ts';
 import NameEditField from './NameEditField.tsx';
 import PinPropertyColorPicker from './PinPropertyColorPicker.tsx';
 import PinPropertyIconPicker from './PinPropertyIconPicker.tsx';
-import PinPropertyOptionsInput from './PinPropertyOptionsInput.tsx';
+import PinPropertyOptionList from './PinPropertyOptionList.tsx';
 import PinPropertyTypeIcon from './PinPropertyTypeIcon.tsx';
-import RenameOptionDialog from './RenameOptionDialog.tsx';
 
 type Props = {
   property: PinProperty;
@@ -29,7 +30,10 @@ type Props = {
   ) => Promise<boolean>;
   onDelete: () => void;
   onCreateOption: (name: string) => Promise<boolean>;
-  onRenameOption: (option: PinPropertyOption, name: string) => Promise<boolean>;
+  onUpdateOption: (
+    option: PinPropertyOption,
+    changes: PinPropertyOptionChanges
+  ) => Promise<boolean>;
   onDeleteOption: (option: PinPropertyOption) => void;
 };
 
@@ -39,13 +43,10 @@ export default function PinPropertyListItem({
   onChangeAppearance,
   onDelete,
   onCreateOption,
-  onRenameOption,
+  onUpdateOption,
   onDeleteOption
 }: Props) {
   const dictionary = useDictionary();
-
-  const [renamingOption, setRenamingOption] =
-    useState<PinPropertyOption | null>(null);
 
   const typeLabel = property.multiple
     ? dictionary['multi select']
@@ -98,20 +99,14 @@ export default function PinPropertyListItem({
         </IconButton>
       </Stack>
 
-      <Box sx={{ mt: 2, pl: 7 }}>
-        <PinPropertyOptionsInput
-          options={property.options}
+      <Box sx={{ pl: 7 }}>
+        <PinPropertyOptionList
+          property={property}
           onCreate={onCreateOption}
-          onRename={setRenamingOption}
+          onUpdate={onUpdateOption}
           onDelete={onDeleteOption}
         />
       </Box>
-
-      <RenameOptionDialog
-        option={renamingOption}
-        onClose={() => setRenamingOption(null)}
-        onRename={onRenameOption}
-      />
     </ListItem>
   );
 }

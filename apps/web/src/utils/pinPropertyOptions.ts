@@ -1,6 +1,17 @@
-import type { PinProperty } from '../../types/index.ts';
+import type { PinProperty, PinPropertyOption } from '../../types/index.ts';
 
 export type PinPropertyAppearance = Pick<PinProperty, 'icon' | 'color'>;
+
+export type PinPropertyOptionChanges = Partial<
+  Pick<PinPropertyOption, 'name' | 'icon'>
+>;
+
+export function optionIcon(
+  property: Pick<PinProperty, 'icon'>,
+  option: Pick<PinPropertyOption, 'icon'>
+): string | null {
+  return option.icon ?? property.icon;
+}
 
 export function chooseOptions(
   selectedIds: number[],

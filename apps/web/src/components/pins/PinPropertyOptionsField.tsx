@@ -6,7 +6,7 @@ import type {
   PinPropertyOption
 } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
-import { chooseOptions } from '../../utils/pinPropertyOptions.ts';
+import { chooseOptions, optionIcon } from '../../utils/pinPropertyOptions.ts';
 import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 import TagChip from '../common/TagChip.tsx';
 import PinPropertiesDialog from '../maps/PinPropertiesDialog.tsx';
@@ -56,7 +56,7 @@ function PinPropertyField({ property, value, disabled, onChange }: FieldProps) {
             key={option.id}
             label={option.name}
             title={property.name}
-            icon={<PinPropertyIcon icon={property.icon} />}
+            icon={<PinPropertyIcon icon={optionIcon(property, option)} />}
             tagColor={property.color}
             color={chosen ? 'secondary' : 'default'}
             variant={chosen ? 'filled' : 'outlined'}
