@@ -5,6 +5,7 @@ import type {
   Profile
 } from '../../../types/index.ts';
 import AuthProvider from '../../components/auth/AuthProvider.tsx';
+import PushSubscriptionSync from '../../components/auth/PushSubscriptionSync.tsx';
 import TermsRevisionNotice from '../../components/legal/TermsRevisionNotice.tsx';
 import { getServerAuthState } from '../../lib/auth.ts';
 import { getMyProfile, getNotifications } from '../../lib/users.ts';
@@ -41,6 +42,7 @@ export default async function SessionProviders({ children, lang }: Props) {
         profilePromise={profilePromise}
         unreadNotificationsPromise={unreadNotificationsPromise}
       >
+        <PushSubscriptionSync />
         <TermsRevisionNotice effectiveOn={pendingTermsRevision()} />
         {children}
       </AccountProviders>
