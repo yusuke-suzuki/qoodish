@@ -92,13 +92,13 @@ export const en = {
   duplicate_chapter_for_journey:
     'A chapter has already been created for this journey.',
 
-  pin_property_name_required: 'Tag name is required.',
-  pin_property_name_exceed: 'Tag name is too long. (Max: 30)',
-  pin_property_option_name_required: 'Option name is required.',
-  pin_property_option_name_exceed: 'Option name is too long. (Max: 30)',
-  pin_property_icon_invalid: 'Tag icon is invalid.',
-  pin_property_color_invalid: 'Tag color is invalid.',
-  pin_property_option_icon_invalid: 'Option icon is invalid.',
+  pin_property_name_required: 'Tag group name is required.',
+  pin_property_name_exceed: 'Tag group name is too long. (Max: 30)',
+  pin_property_option_name_required: 'Tag name is required.',
+  pin_property_option_name_exceed: 'Tag name is too long. (Max: 30)',
+  pin_property_icon_invalid: 'Tag group icon is invalid.',
+  pin_property_color_invalid: 'Tag group color is invalid.',
+  pin_property_option_icon_invalid: 'Tag icon is invalid.',
   pin_property_order_stale:
     'The tags were changed elsewhere, so the new order was not saved. Refresh the page and reorder them again.',
 

@@ -849,7 +849,7 @@ describe('pin properties', () => {
 
     expect(blank).toMatchObject({
       status: 422,
-      body: { detail: 'Tag name is required.' }
+      body: { detail: 'Tag group name is required.' }
     });
     expect(foreign.status).toBe(404);
   });
@@ -888,12 +888,12 @@ describe('pin properties', () => {
 
     expect(wordy).toMatchObject({
       status: 422,
-      body: { detail: 'Tag icon is invalid.' }
+      body: { detail: 'Tag group icon is invalid.' }
     });
     expect(empty.status).toBe(422);
     expect(named).toMatchObject({
       status: 422,
-      body: { detail: 'Tag color is invalid.' }
+      body: { detail: 'Tag group color is invalid.' }
     });
     expect(short.status).toBe(422);
   });
@@ -1042,11 +1042,11 @@ describe('pin properties', () => {
 
     expect(wordy).toMatchObject({
       status: 422,
-      body: { detail: 'Option icon is invalid.' }
+      body: { detail: 'Tag icon is invalid.' }
     });
     expect(empty).toMatchObject({
       status: 422,
-      body: { detail: 'Option icon is invalid.' }
+      body: { detail: 'Tag icon is invalid.' }
     });
   });
 
