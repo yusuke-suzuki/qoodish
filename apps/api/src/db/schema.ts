@@ -426,6 +426,7 @@ export const pinPropertyOptions = sqliteTable(
       .references(() => pinProperties.id),
     name: text('name').notNull(),
     position: integer('position').notNull().default(0),
+    icon: text('icon'),
     status: text('status').notNull().default('published'),
     createdAt: text('created_at').notNull(),
     updatedAt: text('updated_at').notNull()

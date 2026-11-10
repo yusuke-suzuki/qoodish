@@ -2,6 +2,7 @@ export type PinPropertyOption = {
   id: number;
   name: string;
   position: number;
+  icon: string | null;
 };
 
 export type PinProperty = {

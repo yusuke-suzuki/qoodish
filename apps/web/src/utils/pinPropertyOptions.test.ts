@@ -15,8 +15,8 @@ const payment: PinProperty = {
   icon: '💴',
   color: '#43a047',
   options: [
-    { id: 11, name: 'Cash only', position: 0 },
-    { id: 12, name: 'PayPay', position: 0 }
+    { id: 11, name: 'Cash only', position: 0, icon: null },
+    { id: 12, name: 'PayPay', position: 0, icon: null }
   ]
 };
 
@@ -28,8 +28,8 @@ const genre: PinProperty = {
   icon: null,
   color: null,
   options: [
-    { id: 21, name: 'Ramen', position: 0 },
-    { id: 22, name: 'Cafe', position: 0 }
+    { id: 21, name: 'Ramen', position: 0, icon: null },
+    { id: 22, name: 'Cafe', position: 0, icon: null }
   ]
 };
 
