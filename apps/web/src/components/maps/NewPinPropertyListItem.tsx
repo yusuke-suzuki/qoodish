@@ -196,6 +196,9 @@ export default function NewPinPropertyListItem({
             <TextField
               {...params}
               label={dictionary['pin property options']}
+              slotProps={{
+                htmlInput: { ...params.inputProps, enterKeyHint: 'enter' }
+              }}
               error={optionTooLong}
               helperText={
                 optionTooLong

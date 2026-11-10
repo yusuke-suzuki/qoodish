@@ -68,6 +68,7 @@ export default function PinPropertyOptionsInput({
     <Autocomplete<PinPropertyOption | string, true, true, true>
       multiple
       freeSolo
+      autoSelect
       disableClearable
       options={[]}
       value={[...options, ...pendingNames]}
@@ -76,14 +77,17 @@ export default function PinPropertyOptionsInput({
       }
       inputValue={input}
       onInputChange={(_event, value, reason) => {
-        if (reason !== 'reset') {
+        if (reason === 'input') {
           setInput(value);
         }
       }}
       onChange={(_event, _value, reason, details) => {
         const option = details?.option;
 
-        if (reason === 'createOption' && typeof option === 'string') {
+        if (
+          (reason === 'createOption' || reason === 'blur') &&
+          typeof option === 'string'
+        ) {
           create(option);
         }
 
@@ -117,6 +121,9 @@ export default function PinPropertyOptionsInput({
         <TextField
           {...params}
           label={dictionary['pin property options']}
+          slotProps={{
+            htmlInput: { ...params.inputProps, enterKeyHint: 'enter' }
+          }}
           error={tooLong}
           helperText={
             tooLong
