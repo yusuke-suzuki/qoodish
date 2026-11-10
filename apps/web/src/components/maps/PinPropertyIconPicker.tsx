@@ -6,14 +6,21 @@ import useDictionary from '../../hooks/useDictionary.ts';
 import EmojiPicker, { EMOJI_CELL_SIZE } from '../common/EmojiPicker.tsx';
 import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 
+type Fallback = {
+  icon: string | null;
+  label: string;
+};
+
 type Props = {
   icon: string | null;
+  fallback?: Fallback;
   disabled?: boolean;
   onChange: (icon: string | null) => void;
 };
 
 export default function PinPropertyIconPicker({
   icon,
+  fallback,
   disabled,
   onChange
 }: Props) {
@@ -23,6 +30,7 @@ export default function PinPropertyIconPicker({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const open = Boolean(anchorEl);
+  const emptyIcon = fallback?.icon ?? null;
 
   const choose = (next: string | null) => {
     setAnchorEl(null);
@@ -49,7 +57,7 @@ export default function PinPropertyIconPicker({
           borderColor: 'divider'
         }}
       >
-        <PinPropertyIcon icon={icon} />
+        <PinPropertyIcon icon={icon ?? emptyIcon} />
       </IconButton>
       <Popover
         id={popoverId}
@@ -63,7 +71,7 @@ export default function PinPropertyIconPicker({
           onSelect={choose}
           leading={
             <IconButton
-              aria-label={dictionary['no icon']}
+              aria-label={fallback?.label ?? dictionary['no icon']}
               aria-pressed={icon === null}
               onClick={() => choose(null)}
               sx={{
@@ -72,7 +80,7 @@ export default function PinPropertyIconPicker({
                 bgcolor: icon === null ? 'action.selected' : undefined
               }}
             >
-              <PinPropertyIcon icon={null} />
+              <PinPropertyIcon icon={emptyIcon} />
             </IconButton>
           }
         />

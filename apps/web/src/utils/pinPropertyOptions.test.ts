@@ -4,7 +4,8 @@ import type { PinProperty } from '../../types/index.ts';
 import {
   chooseOptions,
   matchesOptions,
-  offeredOptionIds
+  offeredOptionIds,
+  optionIcon
 } from './pinPropertyOptions.ts';
 
 const payment: PinProperty = {
@@ -28,10 +29,22 @@ const genre: PinProperty = {
   icon: null,
   color: null,
   options: [
-    { id: 21, name: 'Ramen', position: 0, icon: null },
+    { id: 21, name: 'Ramen', position: 0, icon: '🍜' },
     { id: 22, name: 'Cafe', position: 0, icon: null }
   ]
 };
+
+describe('optionIcon', () => {
+  it("takes the option's own icon over the tag's", () => {
+    assert.equal(optionIcon(genre, genre.options[0]), '🍜');
+    assert.equal(optionIcon(payment, { icon: '📱' }), '📱');
+  });
+
+  it("falls back to the tag's icon, which may be none", () => {
+    assert.equal(optionIcon(payment, payment.options[0]), '💴');
+    assert.equal(optionIcon(genre, genre.options[1]), null);
+  });
+});
 
 describe('chooseOptions', () => {
   it('replaces the options of one property and keeps the others', () => {

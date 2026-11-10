@@ -1,22 +1,25 @@
 'use client';
 
-import { Close } from '@mui/icons-material';
+import { Close, DeleteOutline } from '@mui/icons-material';
 import {
-  Autocomplete,
   Box,
-  Chip,
   IconButton,
   InputAdornment,
+  List,
   ListItem,
   ListItemIcon,
+  ListItemText,
+  ListSubheader,
   Stack,
   TextField
 } from '@mui/material';
 import { type FocusEvent, type FormEvent, useRef } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import type { PinPropertyAppearance } from '../../utils/pinPropertyOptions.ts';
+import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 import PinPropertyColorPicker from './PinPropertyColorPicker.tsx';
 import PinPropertyIconPicker from './PinPropertyIconPicker.tsx';
+import PinPropertyOptionAddField from './PinPropertyOptionAddField.tsx';
 import PinPropertyTypeIcon from './PinPropertyTypeIcon.tsx';
 
 export const NAME_LIMIT = 30;
@@ -76,9 +79,6 @@ export default function NewPinPropertyListItem({
   const itemRef = useRef<HTMLLIElement>(null);
 
   const tooLong = draft.name.trim().length > NAME_LIMIT;
-  const optionTooLong = draftOptionNames(draft).some(
-    (option) => option.length > NAME_LIMIT
-  );
   const typeLabel = draft.multiple
     ? dictionary['multi select']
     : dictionary['single select'];
@@ -167,49 +167,57 @@ export default function NewPinPropertyListItem({
         </IconButton>
       </Stack>
 
-      <Box sx={{ mt: 2, pl: 7 }}>
-        <Autocomplete<string, true, true, true>
-          multiple
-          freeSolo
-          disableClearable
-          options={[]}
-          value={draft.options}
-          onChange={(_event, options) =>
-            onChange((current) => ({
-              ...current,
-              options: uniqueNames(options)
-            }))
-          }
-          inputValue={draft.optionInput}
-          onInputChange={(_event, optionInput) =>
+      <List
+        disablePadding
+        subheader={
+          <ListSubheader disableGutters disableSticky>
+            {dictionary['pin property options']}
+          </ListSubheader>
+        }
+        sx={{ pl: 7 }}
+      >
+        {draft.options.map((option) => (
+          <ListItem
+            key={option}
+            disableGutters
+            secondaryAction={
+              <IconButton
+                edge="end"
+                aria-label={dictionary.delete}
+                title={dictionary.delete}
+                disabled={disabled}
+                onClick={() =>
+                  onChange((current) => ({
+                    ...current,
+                    options: current.options.filter((name) => name !== option)
+                  }))
+                }
+              >
+                <DeleteOutline />
+              </IconButton>
+            }
+          >
+            <ListItemIcon>
+              <PinPropertyIcon icon={draft.icon} />
+            </ListItemIcon>
+            <ListItemText primary={option} />
+          </ListItem>
+        ))}
+        <PinPropertyOptionAddField
+          value={draft.optionInput}
+          disabled={disabled}
+          onChange={(optionInput) =>
             onChange((current) => ({ ...current, optionInput }))
           }
-          disabled={disabled}
-          renderValue={(value, getItemProps) =>
-            value.map((option, index) => {
-              const { key, ...itemProps } = getItemProps({ index });
-
-              return <Chip key={key} {...itemProps} label={option} />;
-            })
+          onAdd={(name) =>
+            onChange((current) => ({
+              ...current,
+              options: uniqueNames([...current.options, name]),
+              optionInput: ''
+            }))
           }
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={dictionary['pin property options']}
-              slotProps={{
-                htmlInput: { ...params.inputProps, enterKeyHint: 'enter' }
-              }}
-              error={optionTooLong}
-              helperText={
-                optionTooLong
-                  ? dictionary['max characters 30']
-                  : dictionary['add options with enter']
-              }
-              size="small"
-            />
-          )}
         />
-      </Box>
+      </List>
     </ListItem>
   );
 }

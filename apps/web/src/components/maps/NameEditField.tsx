@@ -8,6 +8,7 @@ const MAX_LENGTH = 30;
 
 type Props = {
   label: string;
+  hideLabel?: boolean;
   defaultValue: string;
   onSave: (name: string) => Promise<boolean>;
   startAdornment?: ReactNode;
@@ -15,6 +16,7 @@ type Props = {
 
 export default function NameEditField({
   label,
+  hideLabel,
   defaultValue,
   onSave,
   startAdornment
@@ -46,7 +48,9 @@ export default function NameEditField({
     savingRef.current = true;
     setSaving(true);
 
-    await onSave(trimmed);
+    if (!(await onSave(trimmed).catch(() => false))) {
+      setName(defaultValue);
+    }
 
     savingRef.current = false;
     setSaving(false);
@@ -73,13 +77,16 @@ export default function NameEditField({
             setName(defaultValue);
           }
         }}
-        label={label}
+        label={hideLabel ? undefined : label}
         error={tooLong}
         helperText={tooLong && dictionary['max characters 30']}
         disabled={saving}
         size="small"
         fullWidth
-        slotProps={{ input: { startAdornment } }}
+        slotProps={{
+          input: { startAdornment },
+          htmlInput: { 'aria-label': hideLabel ? label : undefined }
+        }}
       />
     </form>
   );

@@ -215,13 +215,13 @@ export default function PinPropertiesDialog({
                   await createPinPropertyOption(map.id, property.id, { name })
                 )
               }
-              onRenameOption={async (option, name) =>
+              onUpdateOption={async (option, changes) =>
                 finish(
                   await updatePinPropertyOption(
                     map.id,
                     property.id,
                     option.id,
-                    { name }
+                    changes
                   )
                 )
               }

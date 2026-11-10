@@ -2,6 +2,7 @@ import { ArrowDropDown } from '@mui/icons-material';
 import {
   Checkbox,
   Chip,
+  ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
@@ -9,7 +10,7 @@ import {
 } from '@mui/material';
 import { useId, useState } from 'react';
 import type { PinProperty } from '../../../types/index.ts';
-import { chooseOptions } from '../../utils/pinPropertyOptions.ts';
+import { chooseOptions, optionIcon } from '../../utils/pinPropertyOptions.ts';
 import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 
 type ChipProps = {
@@ -75,6 +76,9 @@ function PropertyFilterChip({ property, value, onChange }: ChipProps) {
               tabIndex={-1}
               disableRipple
             />
+            <ListItemIcon>
+              <PinPropertyIcon icon={optionIcon(property, option)} />
+            </ListItemIcon>
             <ListItemText primary={option.name} />
           </MenuItem>
         ))}

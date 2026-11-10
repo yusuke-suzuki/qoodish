@@ -151,6 +151,20 @@ describe('updatePinPropertyOption', () => {
     ]);
     assert.deepEqual(revalidatedTags(), ['map:2']);
   });
+
+  it('sends only the fields that changed', async () => {
+    const { updatePinPropertyOption } = await actions();
+
+    await updatePinPropertyOption(2, 5, 8, { icon: null });
+
+    assert.deepEqual(apiRequests(), [
+      {
+        path: '/maps/2/pin_properties/5/options/8',
+        method: 'PUT',
+        body: { icon: null }
+      }
+    ]);
+  });
 });
 
 describe('deletePinPropertyOption', () => {
