@@ -1,26 +1,25 @@
-type RateLimiter = {
+interface RateLimit {
   limit(options: { key: string }): Promise<{ success: boolean }>;
-};
+}
 
-type AnalyticsEngineDataset = {
+interface AnalyticsEngineDataset {
   writeDataPoint(event: {
     indexes?: string[];
     blobs?: string[];
     doubles?: number[];
   }): void;
-};
-
-type KvNamespace = {
-  get(key: string, type: 'json'): Promise<unknown>;
-};
-
-declare global {
-  interface CloudflareEnv {
-    IMAGE_UPLOAD_BURST_LIMIT?: RateLimiter;
-    IMAGE_UPLOAD_LIMIT?: RateLimiter;
-    ANALYTICS_EVENTS?: AnalyticsEngineDataset;
-    MAINTENANCE?: KvNamespace;
-  }
 }
 
-export {};
+interface KVNamespace<Key extends string = string> {
+  get(key: Key, type: 'json'): Promise<unknown>;
+}
+
+type WebWorkerConfig = import('cf/config').UnwrapConfig<
+  import('cf/config').UnwrapConfig<
+    typeof import('../cloudflare.config.ts').default
+  >['worker']
+>;
+
+declare module 'cloudflare:workers' {
+  export const env: import('cf/config').InferEnv<WebWorkerConfig>;
+}

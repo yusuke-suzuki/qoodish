@@ -1,7 +1,4 @@
-import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
 import type { NextConfig } from 'next';
-
-initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   // Workers Builds exposes the commit only while building, so the health
@@ -46,16 +43,8 @@ const nextConfig: NextConfig = {
       permanent: true
     }
   ],
-  reactCompiler: true,
   experimental: {
     globalNotFound: true
-  },
-  turbopack: {
-    rules: {
-      '*.md': {
-        type: 'raw'
-      }
-    }
   }
 };
 

@@ -5,7 +5,7 @@ https://qoodish.com
 This repository is a pnpm workspace of four Cloudflare Workers under `apps/` and one shared package under `packages/`:
 
 - [`api`](apps/api/README.md): the API, a Hono app that keeps its records in D1 through Drizzle ORM
-- [`web`](apps/web/README.md): the web app, a Next.js app deployed through [OpenNext](https://opennext.js.org/cloudflare)
+- [`web`](apps/web/README.md): the web app, a Next.js app built with [vinext](https://github.com/cloudflare/vinext)
 - [`admin`](apps/admin/README.md): the moderation dashboard
 - [`synthetics`](apps/synthetics/README.md): scheduled checks against production
 - [`api-contract`](packages/api-contract): the JSON shapes of the API's responses, shared by the API and the apps that call it

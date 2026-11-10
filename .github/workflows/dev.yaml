@@ -22,6 +22,10 @@ jobs:
       - name: Install dependencies
         run: |
           pnpm install
+      # pnpm install only warns about an unmet peer.
+      - name: Check peer dependencies
+        run: |
+          pnpm peers check
       - name: Lint
         run: |
           pnpm lint

@@ -76,11 +76,11 @@ firebase-debug.log
 
 .next
 
-.open-next
 .wrangler
 .dev.vars
-cloudflare-env.d.ts
 .cloudflare/
+.vinext/
+/apps/web/dist/
 
 .env
 .env.*
