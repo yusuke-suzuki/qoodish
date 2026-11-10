@@ -4,18 +4,10 @@ import { getDictionary } from '../utils/getDictionary.ts';
 
 type Env = { MAINTENANCE?: { get: ReturnType<typeof mock.fn> } };
 
-let env: Env = {};
-let contextAvailable = true;
+const env: Env = {};
 
-mock.module('@opennextjs/cloudflare', {
-  namedExports: {
-    getCloudflareContext: () => {
-      if (!contextAvailable) {
-        throw new Error('no request scope');
-      }
-      return { env };
-    }
-  }
+mock.module(new URL('./workerEnv.ts', import.meta.url).href, {
+  namedExports: { env }
 });
 
 const maintenance = () => import('./maintenance.ts');
@@ -24,15 +16,22 @@ const flag = {};
 
 function bindStore(value: unknown): ReturnType<typeof mock.fn> {
   const get = mock.fn(async () => value);
-  env = { MAINTENANCE: { get } };
+  env.MAINTENANCE = { get };
   return get;
+}
+
+function bindFailingStore(): void {
+  env.MAINTENANCE = {
+    get: mock.fn(async () => {
+      throw new Error('namespace unreachable');
+    })
+  };
 }
 
 let now = 1_700_000_000_000;
 
 beforeEach(() => {
-  env = {};
-  contextAvailable = true;
+  delete env.MAINTENANCE;
   now += 60_000;
 });
 
@@ -44,10 +43,10 @@ describe('getMaintenance', () => {
     assert.equal(await getMaintenance(), null);
   });
 
-  it('reads nothing outside a request scope', async (t) => {
+  it('reads nothing when the namespace cannot be reached', async (t) => {
     t.mock.timers.enable({ apis: ['Date'], now });
     t.mock.method(console, 'error', () => {});
-    contextAvailable = false;
+    bindFailingStore();
     const { getMaintenance } = await maintenance();
 
     assert.equal(await getMaintenance(), null);
@@ -104,12 +103,11 @@ describe('getMaintenance', () => {
   it('retries right after a failed read instead of caching it', async (t) => {
     t.mock.timers.enable({ apis: ['Date'], now });
     t.mock.method(console, 'error', () => {});
-    contextAvailable = false;
+    bindFailingStore();
     const { getMaintenance } = await maintenance();
 
     assert.equal(await getMaintenance(), null);
 
-    contextAvailable = true;
     const get = bindStore(flag);
     t.mock.timers.tick(1);
 

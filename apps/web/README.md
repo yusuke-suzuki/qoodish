@@ -1,12 +1,12 @@
 # qoodish-web
 
-The Next.js app behind https://qoodish.com, deployed to Cloudflare Workers through [OpenNext](https://opennext.js.org/cloudflare). It reaches the API Worker in [`apps/api`](../api/README.md). Run the commands below from `apps/web`.
+The Next.js app behind https://qoodish.com, built with [vinext](https://github.com/cloudflare/vinext) and deployed to Cloudflare Workers. It reaches the API Worker in [`apps/api`](../api/README.md). Run the commands below from `apps/web`.
 
 ## Environment variables
 
-`.env.example` lists every variable the app reads. Copy it to `.env.local` and fill in the values. `.env` files are ignored by git, so never commit one.
+`.env.example` lists every variable the build reads. Copy it to `.env.local` and fill in the values. `.env` files are ignored by git, so never commit one.
 
-A deployed worker takes `APP_ENV` and `API_ENDPOINT` from the `vars` of its environment in `wrangler.jsonc` instead.
+`APP_ENV`, `API_ENDPOINT` and the bindings of each environment are declared in `cloudflare.config.ts`.
 
 ## Develop
 
@@ -14,7 +14,9 @@ A deployed worker takes `APP_ENV` and `API_ENDPOINT` from the `vars` of its envi
 pnpm dev
 ```
 
-To run the worker as it is deployed, build it for the dev environment and serve it with the Workers runtime on http://localhost:8787:
+The dev server runs the app in the Workers runtime on http://localhost:5000 with the bindings of the dev environment, simulated locally.
+
+To run the worker as it is deployed, build it for the dev environment and serve it on http://localhost:8787:
 
 ```bash
 pnpm cf:build:dev
@@ -32,33 +34,39 @@ pnpm e2e         # Playwright smoke tests
 
 ## Deploy
 
-Workers Builds deploys the worker from `master`, so a merge is the release, and deploys every other branch of the dev worker as a Worker Preview. To deploy the checked-out revision from a machine that is logged in to Cloudflare:
+Workers Builds deploys the worker from `master`, so a merge is the release, and deploys every other branch of the dev worker as a Worker Preview. It runs the `cf:*` scripts, so they keep their names. To deploy the checked-out revision from a machine that is logged in to Cloudflare:
 
 ```bash
-pnpm cf:deploy        # qoodish.com
-pnpm cf:deploy:dev    # the dev environment
+pnpm cf:build && pnpm cf:deploy            # qoodish.com
+pnpm cf:build:dev && pnpm cf:deploy:dev    # the dev environment
 ```
+
+`vite build` writes the service worker into the build output once the bundle is done, and fails if the worker would precache none of the bundle's chunks. `pnpm cf:preview` builds and deploys the branch as a Worker Preview of the dev worker.
+
+## Caching
+
+Rendered responses and cached fetches live in the [Workers Response Store](https://vinext.dev/docs/guides/caching): the bodies in the R2 bucket `<worker name>-response-store`, their metadata and tags in a Durable Object of the worker itself. `revalidateTag` reaches every isolate through it.
 
 ## Maintenance mode
 
-The `MAINTENANCE` KV namespace holds one key, `maintenance`. While it is set, every page shows a maintenance notice to signed-in users and guests alike, and every write the app would send to the API answers `503` without reaching it: Server Actions, the image upload allocation and the account registration that follows a sign-in. Reads keep working, and a visitor who already holds a session stays signed in. The flag is read per environment, so the dev worker and the production worker are toggled independently through `--env`.
+The `MAINTENANCE` KV namespace holds one key, `maintenance`. While it is set, every page shows a maintenance notice to signed-in users and guests alike, and every write the app would send to the API answers `503` without reaching it: Server Actions, the image upload allocation and the account registration that follows a sign-in. Reads keep working, and a visitor who already holds a session stays signed in. The flag is read per environment, so the dev worker and the production worker are toggled independently through the ID of their namespace, which `cloudflare.config.ts` lists as `maintenanceNamespaceId`.
 
 Turn it on by storing an empty object:
 
 ```bash
-pnpm exec wrangler kv key put --binding MAINTENANCE maintenance '{}' --remote
+pnpm exec cf kv keys put maintenance --namespace-id <namespace ID> --body '{}'
 ```
 
 The notice says that posting and editing are unavailable, in the viewer's language. To replace it, add a `message` with the text for either or both languages:
 
 ```bash
-pnpm exec wrangler kv key put --binding MAINTENANCE maintenance '{"message":{"en":"Qoodish is moving to a new database until 15:00 JST.","ja":"15:00 までデータベースを移行しています。"}}' --remote
+pnpm exec cf kv keys put maintenance --namespace-id <namespace ID> --body '{"message":{"en":"Qoodish is moving to a new database until 15:00 JST.","ja":"15:00 までデータベースを移行しています。"}}'
 ```
 
 Turn it off by deleting the key:
 
 ```bash
-pnpm exec wrangler kv key delete --binding MAINTENANCE maintenance --remote
+pnpm exec cf kv keys delete maintenance --namespace-id <namespace ID>
 ```
 
-Add `--env dev` to any of these to toggle the dev worker instead of production. Each isolate rereads the flag every 30 seconds, so a change takes up to that long to reach every visitor. A value the app cannot parse is treated as no maintenance.
+Each isolate rereads the flag every 30 seconds, so a change takes up to that long to reach every visitor. A value the app cannot parse is treated as no maintenance.

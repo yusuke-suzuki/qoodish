@@ -44,8 +44,8 @@ function parseMaintenance(value: unknown): Maintenance | null {
 }
 
 async function readMaintenanceFlag(): Promise<unknown> {
-  const { getCloudflareContext } = await import('@opennextjs/cloudflare');
-  const store = getCloudflareContext().env.MAINTENANCE;
+  const { env } = await import('./workerEnv.ts');
+  const store = env.MAINTENANCE;
   return store ? store.get(KV_KEY, 'json') : null;
 }
 

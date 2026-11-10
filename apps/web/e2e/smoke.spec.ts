@@ -137,6 +137,14 @@ test('answers the health check', async ({ request }) => {
   expect(body.sha).not.toHaveLength(0);
 });
 
+test('serves the service worker', async ({ request }) => {
+  const res = await request.get('/sw.js');
+
+  expect(res.status(), '/sw.js was not served').toBe(200);
+  expect(res.headers()['content-type']).toContain('javascript');
+  expect(await res.text()).toContain('/_next/static/');
+});
+
 for (const path of ['/.env', '/wp-login.php']) {
   test(`answers ${path} with 404`, async ({ request }) => {
     const res = await request.get(path, { maxRedirects: 0 });
