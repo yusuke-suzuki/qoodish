@@ -4,6 +4,7 @@ import type { PinProperty } from '../../types/index.ts';
 import { apiFetch } from '../lib/api.ts';
 import { mapTag } from '../lib/cacheTags.ts';
 import { revalidateTags } from '../lib/revalidate.ts';
+import type { PinPropertyAppearance } from '../utils/pinPropertyOptions.ts';
 
 type ActionResult = {
   success: boolean;
@@ -31,7 +32,14 @@ async function mutateMap(
 
 export async function createPinProperty(
   mapId: number,
-  { options, ...params }: { name: string; multiple: boolean; options: string[] }
+  {
+    options,
+    ...params
+  }: PinPropertyAppearance & {
+    name: string;
+    multiple: boolean;
+    options: string[];
+  }
 ): Promise<ActionResult> {
   const { data, error } = await apiFetch<PinProperty>(
     `/maps/${mapId}/pin_properties`,
@@ -61,7 +69,7 @@ export async function createPinProperty(
 export async function updatePinProperty(
   mapId: number,
   propertyId: number,
-  params: { name: string }
+  params: { name: string } | Partial<PinPropertyAppearance>
 ): Promise<ActionResult> {
   return mutateMap(mapId, `/${propertyId}`, {
     method: 'PUT',

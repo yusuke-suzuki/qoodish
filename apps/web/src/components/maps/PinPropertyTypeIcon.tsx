@@ -5,8 +5,13 @@ import {
 
 type Props = {
   multiple: boolean;
+  fontSize?: 'small' | 'medium';
 };
 
-export default function PinPropertyTypeIcon({ multiple }: Props) {
-  return multiple ? <FormatListBulleted /> : <ArrowDropDownCircleOutlined />;
+export default function PinPropertyTypeIcon({ multiple, fontSize }: Props) {
+  return multiple ? (
+    <FormatListBulleted fontSize={fontSize} />
+  ) : (
+    <ArrowDropDownCircleOutlined fontSize={fontSize} />
+  );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { TextField } from '@mui/material';
-import { type FormEvent, useRef, useState } from 'react';
+import { type FormEvent, type ReactNode, useRef, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
 const MAX_LENGTH = 30;
@@ -10,9 +10,15 @@ type Props = {
   label: string;
   defaultValue: string;
   onSave: (name: string) => Promise<boolean>;
+  startAdornment?: ReactNode;
 };
 
-export default function NameEditField({ label, defaultValue, onSave }: Props) {
+export default function NameEditField({
+  label,
+  defaultValue,
+  onSave,
+  startAdornment
+}: Props) {
   const dictionary = useDictionary();
 
   const [name, setName] = useState(defaultValue);
@@ -73,6 +79,7 @@ export default function NameEditField({ label, defaultValue, onSave }: Props) {
         disabled={saving}
         size="small"
         fullWidth
+        slotProps={{ input: { startAdornment } }}
       />
     </form>
   );
