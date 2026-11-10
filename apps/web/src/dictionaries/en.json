@@ -515,5 +515,13 @@
   "add options with enter": "Press Enter to add an option",
   "pin property option name": "Option name",
   "sure to delete pin property option": "Delete this option?",
-  "delete pin property option detail": "It will be removed from every pin it is set on."
+  "delete pin property option detail": "It will be removed from every pin it is set on.",
+  "emoji category smileys": "Smileys",
+  "emoji category people": "People and gestures",
+  "emoji category food": "Food and drink",
+  "emoji category nature": "Nature and animals",
+  "emoji category places": "Places",
+  "emoji category activities": "Activities",
+  "emoji category travel": "Travel",
+  "emoji category symbols": "Symbols"
 }

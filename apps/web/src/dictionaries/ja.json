@@ -505,5 +505,13 @@
   "add options with enter": "Enter で選択肢を追加",
   "pin property option name": "選択肢の名前",
   "sure to delete pin property option": "この選択肢を削除しますか？",
-  "delete pin property option detail": "この選択肢は、設定されているすべてのピンから外されます。"
+  "delete pin property option detail": "この選択肢は、設定されているすべてのピンから外されます。",
+  "emoji category smileys": "顔",
+  "emoji category people": "人・ジェスチャー",
+  "emoji category food": "食べ物・飲み物",
+  "emoji category nature": "自然・動物",
+  "emoji category places": "場所・施設",
+  "emoji category activities": "遊び・趣味",
+  "emoji category travel": "移動",
+  "emoji category symbols": "記号"
 }
