@@ -88,13 +88,13 @@ export const ja: Messages = {
     '指定された旅はチャプターの著者または地図に属していません。',
   duplicate_chapter_for_journey: 'この旅のチャプターは既に作成されています。',
 
-  pin_property_name_required: 'タグの名前を入力してください。',
-  pin_property_name_exceed: 'タグの名前が長すぎます。(最大: 30 文字)',
-  pin_property_option_name_required: '選択肢の名前を入力してください。',
-  pin_property_option_name_exceed: '選択肢の名前が長すぎます。(最大: 30 文字)',
-  pin_property_icon_invalid: 'タグのアイコンが正しくありません。',
-  pin_property_color_invalid: 'タグの色が正しくありません。',
-  pin_property_option_icon_invalid: '選択肢のアイコンが正しくありません。',
+  pin_property_name_required: 'タググループの名前を入力してください。',
+  pin_property_name_exceed: 'タググループの名前が長すぎます。(最大: 30 文字)',
+  pin_property_option_name_required: 'タグの名前を入力してください。',
+  pin_property_option_name_exceed: 'タグの名前が長すぎます。(最大: 30 文字)',
+  pin_property_icon_invalid: 'タググループのアイコンが正しくありません。',
+  pin_property_color_invalid: 'タググループの色が正しくありません。',
+  pin_property_option_icon_invalid: 'タグのアイコンが正しくありません。',
   pin_property_order_stale:
     'タグがほかの操作で変更されたため、並べ替えを保存できませんでした。画面を更新してから、もう一度並べ替えてください。',
 
