@@ -99,6 +99,8 @@ export const en = {
   pin_property_icon_invalid: 'Tag icon is invalid.',
   pin_property_color_invalid: 'Tag color is invalid.',
   pin_property_option_icon_invalid: 'Option icon is invalid.',
+  pin_property_order_stale:
+    'The tags were changed elsewhere, so the new order was not saved. Refresh the page and reorder them again.',
 
   journal_title_required: 'Journal title is required.',
   journal_title_exceed: 'Journal title is too long. (Max: 50)',
