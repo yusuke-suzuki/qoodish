@@ -2,20 +2,22 @@
 
 import { Add, Close } from '@mui/icons-material';
 import {
+  Button,
   IconButton,
   ListItem,
-  ListItemButton,
   ListItemIcon,
-  ListItemText,
   TextField
 } from '@mui/material';
-import { type FormEvent, useState } from 'react';
+import { type FocusEvent, type FormEvent, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import useDictionary from '../../hooks/useDictionary.ts';
+import PinPropertyIconCell from './PinPropertyIconCell.tsx';
 
 const MAX_LENGTH = 30;
 
 type Props = {
   value: string;
+  icon: string | null;
   disabled?: boolean;
   onChange: (value: string) => void;
   onAdd: (name: string) => void;
@@ -23,14 +25,20 @@ type Props = {
 
 export default function PinPropertyOptionAddField({
   value,
+  icon,
   disabled,
   onChange,
   onAdd
 }: Props) {
   const dictionary = useDictionary();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const discardingRef = useRef(false);
 
   const [open, setOpen] = useState(false);
 
+  const shown = open || value !== '';
   const trimmed = value.trim();
   const tooLong = trimmed.length > MAX_LENGTH;
 
@@ -41,8 +49,11 @@ export default function PinPropertyOptionAddField({
   };
 
   const discard = () => {
+    discardingRef.current = true;
     onChange('');
     setOpen(false);
+    addButtonRef.current?.focus();
+    discardingRef.current = false;
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -50,8 +61,13 @@ export default function PinPropertyOptionAddField({
     add();
   };
 
-  const handleBlur = () => {
-    if (tooLong) {
+  const handleBlur = (event: FocusEvent<HTMLElement>) => {
+    if (
+      discardingRef.current ||
+      event.relatedTarget === inputRef.current ||
+      event.relatedTarget === cancelRef.current ||
+      tooLong
+    ) {
       return;
     }
 
@@ -59,63 +75,71 @@ export default function PinPropertyOptionAddField({
     setOpen(false);
   };
 
-  if (!open) {
-    return (
-      <ListItemButton
-        disabled={disabled}
-        onClick={() => setOpen(true)}
-        sx={{ px: 0 }}
-      >
-        <ListItemIcon sx={{ pl: 1 }}>
-          <Add />
-        </ListItemIcon>
-        <ListItemText primary={dictionary['add pin property option']} />
-      </ListItemButton>
-    );
-  }
+  const handleOpen = () => {
+    flushSync(() => setOpen(true));
+    inputRef.current?.focus();
+  };
 
   return (
-    <ListItem
-      disableGutters
-      secondaryAction={
-        <IconButton
-          edge="end"
-          aria-label={dictionary.cancel}
-          title={dictionary.cancel}
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={discard}
+    <>
+      {shown && (
+        <ListItem
+          disableGutters
+          secondaryAction={
+            <IconButton
+              ref={cancelRef}
+              edge="end"
+              aria-label={dictionary.cancel}
+              title={dictionary.cancel}
+              onMouseDown={(event) => event.preventDefault()}
+              onBlur={handleBlur}
+              onClick={discard}
+            >
+              <Close />
+            </IconButton>
+          }
         >
-          <Close />
-        </IconButton>
-      }
-      sx={{ pl: 7 }}
-    >
-      <form onSubmit={handleSubmit} style={{ flex: 1, minWidth: 0 }}>
-        <TextField
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          onBlur={handleBlur}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') {
-              event.stopPropagation();
-              discard();
-            }
-          }}
-          placeholder={dictionary['pin property option name']}
-          error={tooLong}
-          helperText={tooLong && dictionary['max characters 30']}
+          <ListItemIcon>
+            <PinPropertyIconCell icon={icon} />
+          </ListItemIcon>
+          <form onSubmit={handleSubmit} style={{ flex: 1, minWidth: 0 }}>
+            <TextField
+              inputRef={inputRef}
+              value={value}
+              onChange={(event) => onChange(event.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape' && !event.nativeEvent.isComposing) {
+                  event.stopPropagation();
+                  discard();
+                }
+              }}
+              placeholder={dictionary['pin property option name']}
+              error={tooLong}
+              helperText={tooLong && dictionary['max characters 30']}
+              disabled={disabled}
+              size="small"
+              fullWidth
+              slotProps={{
+                htmlInput: {
+                  'aria-label': dictionary['pin property option name'],
+                  enterKeyHint: 'enter'
+                }
+              }}
+            />
+          </form>
+        </ListItem>
+      )}
+      <ListItem disableGutters>
+        <Button
+          ref={addButtonRef}
+          startIcon={<Add />}
           disabled={disabled}
-          size="small"
-          fullWidth
-          autoFocus
-          slotProps={{
-            htmlInput: {
-              'aria-label': dictionary['pin property option name'],
-              enterKeyHint: 'enter'
-            }
-          }}
-        />
-      </form>
-    </ListItem>
+          onClick={handleOpen}
+        >
+          {dictionary['add pin property option']}
+        </Button>
+      </ListItem>
+    </>
   );
 }

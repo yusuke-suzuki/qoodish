@@ -99,7 +99,7 @@ export default function PinPropertyListItem({
         </IconButton>
       </Stack>
 
-      <Box sx={{ pl: 7 }}>
+      <Box sx={{ pl: 7, mt: 1 }}>
         <PinPropertyOptionList
           property={property}
           onCreate={onCreateOption}
