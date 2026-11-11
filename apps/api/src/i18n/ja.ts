@@ -95,6 +95,8 @@ export const ja: Messages = {
   pin_property_icon_invalid: 'タグのアイコンが正しくありません。',
   pin_property_color_invalid: 'タグの色が正しくありません。',
   pin_property_option_icon_invalid: '選択肢のアイコンが正しくありません。',
+  pin_property_order_stale:
+    'タグがほかの操作で変更されたため、並べ替えを保存できませんでした。画面を更新してから、もう一度並べ替えてください。',
 
   journal_title_required: '手帳のタイトルを入力してください。',
   journal_title_exceed: '手帳のタイトルが長すぎます。(最大: 50 文字)',

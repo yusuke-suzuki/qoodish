@@ -2,19 +2,28 @@ import type {
   PinProperty,
   PinPropertyOption as PinPropertyOptionShape
 } from '@qoodish/api-contract';
-import { and, asc, eq, inArray, type SQL, type SQLWrapper } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  type SQL,
+  type SQLWrapper,
+  sql
+} from 'drizzle-orm';
 import { z } from 'zod';
 import {
   changedColumns,
   currentTimestamp,
-  type Database
+  type Database,
+  scalar
 } from './db/client.ts';
 import { pinProperties, pinPropertyOptions } from './db/schema.ts';
 import { ApiError } from './errors.ts';
 import type { MessageKey } from './i18n/index.ts';
 import { first } from './routing.ts';
 import { characters, graphemes } from './text.ts';
-import { position } from './validation.ts';
+import { id, position } from './validation.ts';
 
 const NAME_LIMIT = 30;
 
@@ -92,6 +101,8 @@ export const pinPropertyOptionInput = z.object({
   icon: optionIcon.optional()
 });
 
+export const orderInput = z.object({ ids: z.array(id) });
+
 type Status = 'published' | 'deleted';
 
 type NamedContent = { name: string; position: number; status: Status };
@@ -166,6 +177,85 @@ function changedOptionContent(
   };
 }
 
+type Positioned = typeof pinProperties | typeof pinPropertyOptions;
+
+function nextPosition(
+  db: Database,
+  table: Positioned,
+  siblings: SQL | undefined
+): SQL<number> {
+  return scalar(
+    db
+      .select({
+        position: sql<number>`coalesce(max(${table.position}), -1) + 1`.as(
+          'position'
+        )
+      })
+      .from(table)
+      .where(siblings)
+  );
+}
+
+async function reorder(
+  db: Database,
+  table: Positioned,
+  siblings: SQL | undefined,
+  ids: readonly number[]
+): Promise<void> {
+  const current = new Set(
+    (await db.select({ id: table.id }).from(table).where(siblings)).map(
+      (row) => row.id
+    )
+  );
+
+  if (
+    new Set(ids).size !== ids.length ||
+    ids.length !== current.size ||
+    ids.some((id) => !current.has(id))
+  ) {
+    throw new ApiError('Conflict', undefined, ['pin_property_order_stale']);
+  }
+
+  const now = currentTimestamp();
+  const [head, ...rest] = ids.map((id, position) =>
+    db
+      .update(table)
+      .set({ position, updatedAt: now })
+      .where(and(eq(table.id, id), siblings))
+  );
+
+  if (head) {
+    await db.batch([head, ...rest]);
+  }
+}
+
+export function reorderPinProperties(
+  db: Database,
+  { mapId, ids }: { mapId: number; ids: readonly number[] }
+): Promise<void> {
+  return reorder(
+    db,
+    pinProperties,
+    and(eq(pinProperties.mapId, mapId), eq(pinProperties.status, 'published')),
+    ids
+  );
+}
+
+export function reorderPinPropertyOptions(
+  db: Database,
+  { propertyId, ids }: { propertyId: number; ids: readonly number[] }
+): Promise<void> {
+  return reorder(
+    db,
+    pinPropertyOptions,
+    and(
+      eq(pinPropertyOptions.pinPropertyId, propertyId),
+      eq(pinPropertyOptions.status, 'published')
+    ),
+    ids
+  );
+}
+
 export async function editablePinProperty(
   db: Database,
   { id, mapId }: { id: number; mapId: SQL }
@@ -214,7 +304,16 @@ export async function createPinProperty(
     .insert(pinProperties)
     .values({
       name: changes.name,
-      position: changes.position ?? 0,
+      position:
+        changes.position ??
+        nextPosition(
+          db,
+          pinProperties,
+          and(
+            eq(pinProperties.mapId, mapId),
+            eq(pinProperties.status, 'published')
+          )
+        ),
       multiple: changes.multiple ?? false,
       icon: changes.icon ?? null,
       color: changes.color ?? null,
@@ -268,7 +367,16 @@ export async function createPinPropertyOption(
     .insert(pinPropertyOptions)
     .values({
       name: changes.name,
-      position: changes.position ?? 0,
+      position:
+        changes.position ??
+        nextPosition(
+          db,
+          pinPropertyOptions,
+          and(
+            eq(pinPropertyOptions.pinPropertyId, propertyId),
+            eq(pinPropertyOptions.status, 'published')
+          )
+        ),
       icon: changes.icon ?? null,
       status: 'published',
       pinPropertyId: propertyId,

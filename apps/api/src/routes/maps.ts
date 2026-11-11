@@ -51,11 +51,14 @@ import {
   editablePinProperty,
   newPinPropertyInput,
   newPinPropertyOptionInput,
+  orderInput,
   pinPropertyDetail,
   pinPropertyInput,
   pinPropertyOptionDetail,
   pinPropertyOptionInput,
   publishedOption,
+  reorderPinProperties,
+  reorderPinPropertyOptions,
   revisePinProperty,
   revisePinPropertyOption
 } from '../pin-properties.ts';
@@ -431,6 +434,24 @@ app.post(
   }
 );
 
+app.put(
+  '/:mapId/pin_properties/order',
+  mapParams,
+  jsonBody(orderInput),
+  async (c) => {
+    const db = c.get('db');
+    const viewer = c.get('viewer');
+    const map = await editableMapRow(db, viewer, c.req.valid('param').mapId);
+
+    await reorderPinProperties(db, {
+      mapId: map.id,
+      ids: c.req.valid('json').ids
+    });
+
+    return c.json<PinProperty[]>(await pinPropertiesOf(db, map.id));
+  }
+);
+
 app.on(
   ['PUT', 'PATCH'],
   '/:mapId/pin_properties/:id',
@@ -508,6 +529,24 @@ app.post(
     return c.json<PinPropertyOption>(
       await pinPropertyOptionDetail(db, optionId)
     );
+  }
+);
+
+app.put(
+  '/:mapId/pin_properties/:propertyId/options/order',
+  optionsParams,
+  jsonBody(orderInput),
+  async (c) => {
+    const db = c.get('db');
+    const viewer = c.get('viewer');
+    const property = await optionsProperty(db, viewer, c.req.valid('param'));
+
+    await reorderPinPropertyOptions(db, {
+      propertyId: property.id,
+      ids: c.req.valid('json').ids
+    });
+
+    return c.json<PinProperty>(await pinPropertyDetail(db, property.id));
   }
 );
 
