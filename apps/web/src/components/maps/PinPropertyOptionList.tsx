@@ -14,6 +14,7 @@ import { useState } from 'react';
 import type { PinProperty, PinPropertyOption } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import type { PinPropertyOptionChanges } from '../../utils/pinPropertyOptions.ts';
+import { EMOJI_CELL_SIZE } from '../common/EmojiPicker.tsx';
 import NameEditField from './NameEditField.tsx';
 import PinPropertyIconPicker from './PinPropertyIconPicker.tsx';
 import PinPropertyOptionAddField from './PinPropertyOptionAddField.tsx';
@@ -113,7 +114,7 @@ export default function PinPropertyOptionList({
       {pendingNames.map((name) => (
         <ListItem key={name} disableGutters>
           <ListItemIcon>
-            <CircularProgress size={24} />
+            <CircularProgress size={EMOJI_CELL_SIZE} thickness={2} />
           </ListItemIcon>
           <ListItemText primary={name} />
         </ListItem>
