@@ -247,7 +247,7 @@ export default function PinPropertiesDialog({
               onClick={(event) => setTypeMenuAnchor(event.currentTarget)}
               sx={{ px: 0 }}
             >
-              <ListItemIcon>
+              <ListItemIcon sx={{ pl: 1 }}>
                 <Add />
               </ListItemIcon>
               <ListItemText primary={dictionary['add pin property']} />
