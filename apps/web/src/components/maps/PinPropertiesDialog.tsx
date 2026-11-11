@@ -2,8 +2,9 @@
 
 import { Add } from '@mui/icons-material';
 import {
+  Button,
   List,
-  ListItemButton,
+  ListItem,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -230,7 +231,7 @@ export default function PinPropertiesDialog({
               }
             />
           ))}
-          {draftShown ? (
+          {draftShown && (
             <NewPinPropertyListItem
               draft={draft}
               disabled={isCreating || createdId !== null}
@@ -240,19 +241,18 @@ export default function PinPropertiesDialog({
               onCommit={commitDraft}
               onCancel={() => setDraft(null)}
             />
-          ) : (
-            <ListItemButton
+          )}
+          <ListItem disableGutters>
+            <Button
+              startIcon={<Add />}
               aria-haspopup="true"
               aria-expanded={Boolean(typeMenuAnchor)}
+              disabled={draftShown}
               onClick={(event) => setTypeMenuAnchor(event.currentTarget)}
-              sx={{ px: 0 }}
             >
-              <ListItemIcon sx={{ pl: 1 }}>
-                <Add />
-              </ListItemIcon>
-              <ListItemText primary={dictionary['add pin property']} />
-            </ListItemButton>
-          )}
+              {dictionary['add pin property']}
+            </Button>
+          </ListItem>
         </List>
         <Menu
           anchorEl={typeMenuAnchor}

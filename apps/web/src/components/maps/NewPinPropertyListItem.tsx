@@ -9,15 +9,14 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  ListSubheader,
   Stack,
   TextField
 } from '@mui/material';
 import { type FocusEvent, type FormEvent, useRef } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import type { PinPropertyAppearance } from '../../utils/pinPropertyOptions.ts';
-import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 import PinPropertyColorPicker from './PinPropertyColorPicker.tsx';
+import PinPropertyIconCell from './PinPropertyIconCell.tsx';
 import PinPropertyIconPicker from './PinPropertyIconPicker.tsx';
 import PinPropertyOptionAddField from './PinPropertyOptionAddField.tsx';
 import PinPropertyTypeIcon from './PinPropertyTypeIcon.tsx';
@@ -169,12 +168,8 @@ export default function NewPinPropertyListItem({
 
       <List
         disablePadding
-        subheader={
-          <ListSubheader disableGutters disableSticky>
-            {dictionary['pin property options']}
-          </ListSubheader>
-        }
-        sx={{ pl: 7 }}
+        aria-label={dictionary['pin property options']}
+        sx={{ pl: 7, mt: 1 }}
       >
         {draft.options.map((option) => (
           <ListItem
@@ -198,13 +193,14 @@ export default function NewPinPropertyListItem({
             }
           >
             <ListItemIcon>
-              <PinPropertyIcon icon={draft.icon} />
+              <PinPropertyIconCell icon={draft.icon} />
             </ListItemIcon>
             <ListItemText primary={option} />
           </ListItem>
         ))}
         <PinPropertyOptionAddField
           value={draft.optionInput}
+          icon={draft.icon}
           disabled={disabled}
           onChange={(optionInput) =>
             onChange((current) => ({ ...current, optionInput }))

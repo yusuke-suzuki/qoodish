@@ -7,8 +7,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
-  ListSubheader
+  ListItemText
 } from '@mui/material';
 import { useState } from 'react';
 import type { PinProperty, PinPropertyOption } from '../../../types/index.ts';
@@ -73,14 +72,7 @@ export default function PinPropertyOptionList({
   };
 
   return (
-    <List
-      disablePadding
-      subheader={
-        <ListSubheader disableGutters disableSticky>
-          {dictionary['pin property options']}
-        </ListSubheader>
-      }
-    >
+    <List disablePadding aria-label={dictionary['pin property options']}>
       {options.map((option) => (
         <ListItem
           key={option.id}
@@ -121,6 +113,7 @@ export default function PinPropertyOptionList({
       ))}
       <PinPropertyOptionAddField
         value={input}
+        icon={property.icon}
         onChange={setInput}
         onAdd={create}
       />
