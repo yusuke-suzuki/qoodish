@@ -61,6 +61,8 @@ export const EMOJI_CATEGORIES = [
     id: 'food',
     emoji: [
       '🍜',
+      '🍽️',
+      '🍴',
       '🍣',
       '🍛',
       '🍔',
@@ -83,7 +85,13 @@ export const EMOJI_CATEGORIES = [
       '🥗',
       '🌮',
       '🥟',
-      '🍳'
+      '🍳',
+      '🥩',
+      '🍤',
+      '🍲',
+      '🍢',
+      '🥡',
+      '🧋'
     ]
   },
   {
@@ -112,7 +120,10 @@ export const EMOJI_CATEGORIES = [
       '🐟',
       '🦌',
       '🐾',
-      '🌙'
+      '🌙',
+      '🌃',
+      '🌱',
+      '🦁'
     ]
   },
   {
@@ -126,6 +137,7 @@ export const EMOJI_CATEGORIES = [
       '⛪',
       '🕌',
       '🏟️',
+      '⛲',
       '🎡',
       '🎢',
       '🏨',
@@ -141,7 +153,9 @@ export const EMOJI_CATEGORIES = [
       '🚻',
       '💈',
       '🏦',
-      '📮'
+      '📮',
+      '🛒',
+      '💊'
     ]
   },
   {
@@ -170,7 +184,9 @@ export const EMOJI_CATEGORIES = [
       '🎭',
       '🧘',
       '💆',
-      '🛁'
+      '🛁',
+      '🏋️',
+      '🥾'
     ]
   },
   {
@@ -228,7 +244,12 @@ export const EMOJI_CATEGORIES = [
       '🎁',
       '♿',
       '🕒',
-      '☀️'
+      '☀️',
+      '🚭',
+      '🚬',
+      '💳',
+      '📶',
+      '🔌'
     ]
   }
 ] as const;
