@@ -11,6 +11,8 @@ import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 import TagChip from '../common/TagChip.tsx';
 import PinPropertiesDialog from '../maps/PinPropertiesDialog.tsx';
 
+const CHIP_HEIGHT = 32;
+
 type FieldProps = {
   property: PinProperty;
   value: number[];
@@ -65,7 +67,9 @@ function PinPropertyField({ property, value, disabled, onChange }: FieldProps) {
             onClick={() => handleToggle(option)}
             sx={{
               height: 'auto',
+              minHeight: CHIP_HEIGHT,
               '& .MuiChip-label': {
+                py: 0.5,
                 display: 'block',
                 whiteSpace: 'normal',
                 overflowWrap: 'anywhere'
