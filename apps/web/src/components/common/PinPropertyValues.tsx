@@ -9,12 +9,16 @@ type Props = {
   optionIds: number[];
   pinProperties: PinProperty[];
   action?: ReactNode;
+  disabled?: boolean;
+  onDelete?: (property: PinProperty, optionId: number) => void;
 };
 
 export default function PinPropertyValues({
   optionIds,
   pinProperties,
-  action
+  action,
+  disabled,
+  onDelete
 }: Props) {
   const values = pinProperties.flatMap((property) =>
     property.options
@@ -41,6 +45,8 @@ export default function PinPropertyValues({
           label={option.name}
           title={property.name}
           tagColor={property.color}
+          disabled={disabled}
+          onDelete={onDelete && (() => onDelete(property, option.id))}
         />
       ))}
       {action}

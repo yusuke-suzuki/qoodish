@@ -1,4 +1,10 @@
-import { Chip, type ChipProps, type SxProps, type Theme } from '@mui/material';
+import {
+  alpha,
+  Chip,
+  type ChipProps,
+  type SxProps,
+  type Theme
+} from '@mui/material';
 
 type Props = ChipProps & {
   tagColor: string | null;
@@ -26,6 +32,10 @@ function tagColorSx(tagColor: string | null, outlined: boolean): SxEntry {
       bgcolor: palette.main,
       color: palette.contrastText,
       '& .MuiChip-icon': { color: 'inherit' },
+      '& .MuiChip-deleteIcon': {
+        color: alpha(palette.contrastText, 0.7),
+        '&:hover': { color: palette.contrastText }
+      },
       '&.MuiChip-clickable:hover, &.Mui-focusVisible': { bgcolor: palette.dark }
     };
   };
