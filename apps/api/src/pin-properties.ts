@@ -23,7 +23,7 @@ import { ApiError } from './errors.ts';
 import type { MessageKey } from './i18n/index.ts';
 import { first } from './routing.ts';
 import { characters, graphemes } from './text.ts';
-import { id, position } from './validation.ts';
+import { position } from './validation.ts';
 
 const NAME_LIMIT = 30;
 
@@ -100,8 +100,6 @@ export const pinPropertyOptionInput = z.object({
   position: position.optional(),
   icon: optionIcon.optional()
 });
-
-export const orderInput = z.object({ ids: z.array(id) });
 
 type Status = 'published' | 'deleted';
 
@@ -193,66 +191,6 @@ function nextPosition(
       })
       .from(table)
       .where(siblings)
-  );
-}
-
-async function reorder(
-  db: Database,
-  table: Positioned,
-  siblings: SQL | undefined,
-  ids: readonly number[]
-): Promise<void> {
-  const current = new Set(
-    (await db.select({ id: table.id }).from(table).where(siblings)).map(
-      (row) => row.id
-    )
-  );
-
-  if (
-    new Set(ids).size !== ids.length ||
-    ids.length !== current.size ||
-    ids.some((id) => !current.has(id))
-  ) {
-    throw new ApiError('Conflict', undefined, ['pin_property_order_stale']);
-  }
-
-  const now = currentTimestamp();
-  const [head, ...rest] = ids.map((id, position) =>
-    db
-      .update(table)
-      .set({ position, updatedAt: now })
-      .where(and(eq(table.id, id), siblings))
-  );
-
-  if (head) {
-    await db.batch([head, ...rest]);
-  }
-}
-
-export function reorderPinProperties(
-  db: Database,
-  { mapId, ids }: { mapId: number; ids: readonly number[] }
-): Promise<void> {
-  return reorder(
-    db,
-    pinProperties,
-    and(eq(pinProperties.mapId, mapId), eq(pinProperties.status, 'published')),
-    ids
-  );
-}
-
-export function reorderPinPropertyOptions(
-  db: Database,
-  { propertyId, ids }: { propertyId: number; ids: readonly number[] }
-): Promise<void> {
-  return reorder(
-    db,
-    pinPropertyOptions,
-    and(
-      eq(pinPropertyOptions.pinPropertyId, propertyId),
-      eq(pinPropertyOptions.status, 'published')
-    ),
-    ids
   );
 }
 

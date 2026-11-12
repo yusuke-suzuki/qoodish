@@ -785,8 +785,6 @@ describe('DELETE /maps/:mapId/coauthors/:userId', () => {
 });
 
 describe('pin properties', () => {
-  const rowIds = (rows: readonly { id: number }[]) => rows.map(({ id }) => id);
-
   it('records, edits and discards a property and its options', async () => {
     const base = `/maps/${ids.ramen}/pin_properties`;
     const created = await send('POST', base, 'alice', {
@@ -947,90 +945,6 @@ describe('pin properties', () => {
         .find(({ id }: { id: number }) => id === ids.taste)
         .options.map(({ name }: { name: string }) => name)
     ).toEqual(['Salty', 'Sour']);
-  });
-
-  it('reorders the properties of a map', async () => {
-    const base = `/maps/${ids.ramen}/pin_properties`;
-    const listed = await send('GET', base, 'alice');
-    const reversed = rowIds(listed.body).reverse();
-    const reordered = await send('PUT', `${base}/order`, 'alice', {
-      ids: reversed
-    });
-    const again = await send('GET', base, 'alice');
-
-    expect(reordered.status).toBe(200);
-    expect(rowIds(reordered.body)).toEqual(reversed);
-    expect(
-      reordered.body.map(({ position }: { position: number }) => position)
-    ).toEqual(reversed.map((_, index) => index));
-    expect(rowIds(again.body)).toEqual(reversed);
-  });
-
-  it('reorders the options of a property', async () => {
-    const base = `/maps/${ids.ramen}/pin_properties`;
-    const property = await send('POST', base, 'alice', { name: 'Budget' });
-    const optionsPath = `${base}/${property.body.id}/options`;
-    const low = await send('POST', optionsPath, 'alice', { name: 'Low' });
-    const high = await send('POST', optionsPath, 'alice', { name: 'High' });
-    const middle = await send('POST', optionsPath, 'alice', { name: 'Middle' });
-    const reordered = await send('PUT', `${optionsPath}/order`, 'alice', {
-      ids: [low.body.id, middle.body.id, high.body.id]
-    });
-
-    expect(reordered.status).toBe(200);
-    expect(reordered.body.options).toEqual([
-      { id: low.body.id, name: 'Low', position: 0, icon: null },
-      { id: middle.body.id, name: 'Middle', position: 1, icon: null },
-      { id: high.body.id, name: 'High', position: 2, icon: null }
-    ]);
-  });
-
-  it('answers 409 for an order that is not the current list', async () => {
-    const base = `/maps/${ids.ramen}/pin_properties`;
-    const listed = rowIds((await send('GET', base, 'alice')).body);
-    const optionsOrder = `${base}/${ids.taste}/options/order`;
-    const [missing, extra, deleted, repeated, deletedOption] =
-      await Promise.all([
-        send('PUT', `${base}/order`, 'alice', { ids: listed.slice(1) }),
-        send('PUT', `${base}/order`, 'alice', { ids: [...listed, 999_999] }),
-        send('PUT', `${base}/order`, 'alice', {
-          ids: [...listed.slice(1), ids.retiredProperty]
-        }),
-        send('PUT', `${base}/order`, 'alice', {
-          ids: [...listed, listed[0]]
-        }),
-        send('PUT', optionsOrder, 'alice', { ids: [ids.salty, ids.sweet] })
-      ]);
-
-    expect(missing).toMatchObject({
-      status: 409,
-      body: {
-        detail:
-          'The tags were changed elsewhere, so the new order was not saved. Refresh the page and reorder them again.'
-      }
-    });
-    expect(extra.status).toBe(409);
-    expect(deleted.status).toBe(409);
-    expect(repeated.status).toBe(409);
-    expect(deletedOption.status).toBe(409);
-    expect(rowIds((await send('GET', base, 'alice')).body)).toEqual(listed);
-  });
-
-  it('answers 404 for reordering on a map the user cannot edit', async () => {
-    const [properties, options] = await Promise.all([
-      send('PUT', `/maps/${ids.cafe}/pin_properties/order`, 'alice', {
-        ids: []
-      }),
-      send(
-        'PUT',
-        `/maps/${ids.cafe}/pin_properties/${ids.taste}/options/order`,
-        'alice',
-        { ids: [ids.salty] }
-      )
-    ]);
-
-    expect(properties.status).toBe(404);
-    expect(options.status).toBe(404);
   });
 
   it('answers 422 for an option icon that is not exactly one character', async () => {
