@@ -35,7 +35,6 @@ export default function PinPropertyValues({ pin, pinProperties }: Props) {
           label={option.name}
           title={property.name}
           tagColor={property.color}
-          size="small"
         />
       ))}
     </Stack>

@@ -63,14 +63,6 @@ function PinPropertyField({ property, value, disabled, onChange }: FieldProps) {
             aria-pressed={chosen}
             disabled={disabled}
             onClick={() => handleToggle(option)}
-            sx={{
-              height: 'auto',
-              '& .MuiChip-label': {
-                display: 'block',
-                whiteSpace: 'normal',
-                overflowWrap: 'anywhere'
-              }
-            }}
           />
         );
       })}
