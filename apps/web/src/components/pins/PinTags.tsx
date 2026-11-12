@@ -1,28 +1,16 @@
 'use client';
 
-import { Add, Check, Sell } from '@mui/icons-material';
-import {
-  Chip,
-  Divider,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  Menu,
-  MenuItem
-} from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import type { AppMap, Pin, PinProperty } from '../../../types/index.ts';
 import { updatePinPropertyOptions } from '../../actions/pins.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import {
   offeredOptionIds,
-  optionIcon,
   toggleOption
 } from '../../utils/pinPropertyOptions.ts';
-import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 import PinPropertyValues from '../common/PinPropertyValues.tsx';
-import PinPropertiesDialog from '../maps/PinPropertiesDialog.tsx';
+import PinTagEditor from './PinTagEditor.tsx';
 
 type StoredTags = { ids: number[]; updatedAt: string };
 
@@ -45,13 +33,10 @@ type Props = {
 
 export default function PinTags({ pin, map, pinProperties, onSaved }: Props) {
   const dictionary = useDictionary();
-  const menuId = useId();
 
   const [stored, setStored] = useState(storedTags(pin));
   const [shownPin, setShownPin] = useState(pin);
   const [pendingIds, setPendingIds] = useState<number[] | null>(null);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [managing, setManaging] = useState(false);
 
   if (pin !== shownPin) {
     setShownPin(pin);
@@ -60,10 +45,6 @@ export default function PinTags({ pin, map, pinProperties, onSaved }: Props) {
 
   const optionIds = pendingIds ?? stored.ids;
   const saving = pendingIds !== null;
-
-  const offeredProperties = pinProperties.filter(
-    (property) => property.options.length > 0
-  );
 
   const toggle = async (property: PinProperty, optionId: number) => {
     const next = toggleOption(optionIds, property, optionId);
@@ -90,11 +71,6 @@ export default function PinTags({ pin, map, pinProperties, onSaved }: Props) {
     });
   };
 
-  const openManagement = () => {
-    setAnchorEl(null);
-    setManaging(true);
-  };
-
   if (!map?.editable) {
     return (
       <PinPropertyValues optionIds={optionIds} pinProperties={pinProperties} />
@@ -102,67 +78,12 @@ export default function PinTags({ pin, map, pinProperties, onSaved }: Props) {
   }
 
   return (
-    <>
-      <PinPropertyValues
-        optionIds={optionIds}
-        pinProperties={pinProperties}
-        action={
-          <Chip
-            variant="outlined"
-            icon={<Add />}
-            label={dictionary['add pin property option']}
-            aria-haspopup="menu"
-            aria-expanded={Boolean(anchorEl)}
-            aria-controls={anchorEl ? menuId : undefined}
-            onClick={(event) => setAnchorEl(event.currentTarget)}
-          />
-        }
-      />
-      <Menu
-        id={menuId}
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-      >
-        {offeredProperties.flatMap((property) => [
-          <ListSubheader key={`property-${property.id}`}>
-            {property.name}
-          </ListSubheader>,
-          ...property.options.map((option) => {
-            const chosen = optionIds.includes(option.id);
-
-            return (
-              <MenuItem
-                key={option.id}
-                role="menuitemcheckbox"
-                aria-checked={chosen}
-                selected={chosen}
-                disabled={saving}
-                onClick={() => toggle(property, option.id)}
-              >
-                <ListItemIcon>
-                  <PinPropertyIcon icon={optionIcon(property, option)} />
-                </ListItemIcon>
-                <ListItemText primary={option.name} />
-                {chosen && <Check fontSize="small" />}
-              </MenuItem>
-            );
-          })
-        ])}
-        {offeredProperties.length > 0 && <Divider />}
-        <MenuItem onClick={openManagement}>
-          <ListItemIcon>
-            <Sell fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={dictionary['pin properties']} />
-        </MenuItem>
-      </Menu>
-      <PinPropertiesDialog
-        open={managing}
-        onClose={() => setManaging(false)}
-        map={map}
-        pinProperties={pinProperties}
-      />
-    </>
+    <PinTagEditor
+      map={map}
+      pinProperties={pinProperties}
+      value={optionIds}
+      disabled={saving}
+      onToggle={toggle}
+    />
   );
 }
