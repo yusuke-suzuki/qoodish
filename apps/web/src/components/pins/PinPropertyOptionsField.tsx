@@ -6,7 +6,7 @@ import type {
   PinPropertyOption
 } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
-import { chooseOptions, optionIcon } from '../../utils/pinPropertyOptions.ts';
+import { optionIcon, toggleOption } from '../../utils/pinPropertyOptions.ts';
 import PinPropertyIcon from '../common/PinPropertyIcon.tsx';
 import TagChip from '../common/TagChip.tsx';
 import PinPropertiesDialog from '../maps/PinPropertiesDialog.tsx';
@@ -24,19 +24,7 @@ function PinPropertyField({ property, value, disabled, onChange }: FieldProps) {
     .filter((id) => value.includes(id));
 
   const handleToggle = (option: PinPropertyOption) => {
-    if (chosenIds.includes(option.id)) {
-      onChange(
-        chooseOptions(
-          value,
-          property,
-          chosenIds.filter((id) => id !== option.id)
-        )
-      );
-    } else if (property.multiple) {
-      onChange(chooseOptions(value, property, [...chosenIds, option.id]));
-    } else {
-      onChange(chooseOptions(value, property, [option.id]));
-    }
+    onChange(toggleOption(value, property, option.id));
   };
 
   return (

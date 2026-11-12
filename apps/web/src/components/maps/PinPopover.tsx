@@ -11,16 +11,15 @@ import { useState } from 'react';
 import type { AppMap, Pin, PinProperty } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
-import PinPropertyValues from '../common/PinPropertyValues.tsx';
 import ProfileBoundary from '../common/ProfileBoundary.tsx';
 import ReportDialog from '../common/ReportDialog.tsx';
 import DeletePinDialog from '../pins/DeletePinDialog.tsx';
 import EditPinDialog from '../pins/EditPinDialog.tsx';
-import EditPinTagsDialog from '../pins/EditPinTagsDialog.tsx';
 import LikePinButton from '../pins/LikePinButton.tsx';
 import PinCardHeader from '../pins/PinCardHeader.tsx';
 import PinImageCarousel from '../pins/PinImageCarousel.tsx';
 import PinMenuButton from '../pins/PinMenuButton.tsx';
+import PinTags from '../pins/PinTags.tsx';
 
 type Props = {
   currentPin: Pin | null;
@@ -49,7 +48,6 @@ function PinPopover({
   const localePath = useLocalePath();
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [tagsDialogOpen, setTagsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
@@ -86,9 +84,6 @@ function PinPopover({
                   currentProfile={profile}
                   onReportClick={() => setReportDialogOpen(true)}
                   onEditClick={() => setEditDialogOpen(true)}
-                  onEditTagsClick={
-                    map?.editable ? () => setTagsDialogOpen(true) : undefined
-                  }
                   onDeleteClick={() => setDeleteDialogOpen(true)}
                 />
               )}
@@ -107,7 +102,15 @@ function PinPopover({
           >
             {pin?.comment}
           </Typography>
-          {pin && <PinPropertyValues pin={pin} pinProperties={pinProperties} />}
+          {pin && (
+            <PinTags
+              key={pin.id}
+              pin={pin}
+              map={map}
+              pinProperties={pinProperties}
+              onSaved={onSaved}
+            />
+          )}
         </CardContent>
         <CardActions>
           {pin && <LikePinButton pin={pin} onSaved={onSaved} />}
@@ -127,15 +130,6 @@ function PinPopover({
       <EditPinDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        currentPin={pin}
-        map={map}
-        pinProperties={pinProperties}
-        onSaved={onSaved}
-      />
-
-      <EditPinTagsDialog
-        open={tagsDialogOpen}
-        onClose={() => setTagsDialogOpen(false)}
         currentPin={pin}
         map={map}
         pinProperties={pinProperties}

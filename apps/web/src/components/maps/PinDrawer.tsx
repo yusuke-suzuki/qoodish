@@ -15,15 +15,14 @@ import type { AppMap, Pin, PinProperty } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import BottomSheet from '../common/BottomSheet.tsx';
-import PinPropertyValues from '../common/PinPropertyValues.tsx';
 import ProfileBoundary from '../common/ProfileBoundary.tsx';
 import ReportDialog from '../common/ReportDialog.tsx';
 import DeletePinDialog from '../pins/DeletePinDialog.tsx';
 import EditPinDialog from '../pins/EditPinDialog.tsx';
-import EditPinTagsDialog from '../pins/EditPinTagsDialog.tsx';
 import LikePinButton from '../pins/LikePinButton.tsx';
 import PinCardHeader from '../pins/PinCardHeader.tsx';
 import PinMenuButton from '../pins/PinMenuButton.tsx';
+import PinTags from '../pins/PinTags.tsx';
 
 type MilestoneAction = {
   selected: boolean;
@@ -60,7 +59,6 @@ function PinDrawer({
 
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [tagsDialogOpen, setTagsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [milestoneLoading, setMilestoneLoading] = useState(false);
 
@@ -115,9 +113,6 @@ function PinDrawer({
                     currentProfile={profile}
                     onReportClick={() => setReportDialogOpen(true)}
                     onEditClick={() => setEditDialogOpen(true)}
-                    onEditTagsClick={
-                      map?.editable ? () => setTagsDialogOpen(true) : undefined
-                    }
                     onDeleteClick={() => setDeleteDialogOpen(true)}
                   />
                 )}
@@ -134,7 +129,13 @@ function PinDrawer({
               {pin?.comment}
             </Typography>
             {pin && (
-              <PinPropertyValues pin={pin} pinProperties={pinProperties} />
+              <PinTags
+                key={pin.id}
+                pin={pin}
+                map={map}
+                pinProperties={pinProperties}
+                onSaved={onSaved}
+              />
             )}
           </CardContent>
 
@@ -220,14 +221,6 @@ function PinDrawer({
       <EditPinDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        currentPin={pin}
-        map={map}
-        pinProperties={pinProperties}
-        onSaved={onSaved}
-      />
-      <EditPinTagsDialog
-        open={tagsDialogOpen}
-        onClose={() => setTagsDialogOpen(false)}
         currentPin={pin}
         map={map}
         pinProperties={pinProperties}

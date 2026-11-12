@@ -4,8 +4,7 @@ import {
   Edit,
   Link as LinkIcon,
   MoreVert,
-  ReportProblem,
-  Sell
+  ReportProblem
 } from '@mui/icons-material';
 import {
   Divider,
@@ -32,7 +31,6 @@ type Props = {
   pin: Pin | null;
   currentProfile?: Profile | null;
   onEditClick?: (pin: Pin) => void;
-  onEditTagsClick?: (pin: Pin) => void;
   onDeleteClick?: (pin: Pin) => void;
   onReportClick: (pin: Pin) => void;
   onMuted?: (authorId: number) => void;
@@ -44,7 +42,6 @@ export default function PinMenuButton({
   pin,
   currentProfile,
   onEditClick,
-  onEditTagsClick,
   onDeleteClick,
   onReportClick,
   onMuted,
@@ -92,14 +89,6 @@ export default function PinMenuButton({
 
     if (pin) {
       onEditClick?.(pin);
-    }
-  };
-
-  const handleEditTagsClick = () => {
-    setAnchorEl(null);
-
-    if (pin) {
-      onEditTagsClick?.(pin);
     }
   };
 
@@ -215,14 +204,6 @@ export default function PinMenuButton({
               <ReportProblem fontSize="small" />
             </ListItemIcon>
             <ListItemText primary={dictionary['report content']} />
-          </MenuItem>
-        )}
-        {onEditTagsClick && currentProfile && pin && !isAuthor && (
-          <MenuItem onClick={handleEditTagsClick}>
-            <ListItemIcon>
-              <Sell fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary={dictionary['edit pin tags']} />
           </MenuItem>
         )}
         {isAuthor && <Divider />}
