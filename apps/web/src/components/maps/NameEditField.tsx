@@ -2,14 +2,13 @@
 
 import { TextField } from '@mui/material';
 import { type FormEvent, type ReactNode, useRef, useState } from 'react';
-import useDictionary from '../../hooks/useDictionary.ts';
-
-const MAX_LENGTH = 30;
 
 type Props = {
   label: string;
   hideLabel?: boolean;
   defaultValue: string;
+  maxLength: number;
+  tooLongText: string;
   onSave: (name: string) => Promise<boolean>;
   startAdornment?: ReactNode;
 };
@@ -18,18 +17,18 @@ export default function NameEditField({
   label,
   hideLabel,
   defaultValue,
+  maxLength,
+  tooLongText,
   onSave,
   startAdornment
 }: Props) {
-  const dictionary = useDictionary();
-
   const [name, setName] = useState(defaultValue);
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
   const cancelledRef = useRef(false);
 
   const trimmed = name.trim();
-  const tooLong = trimmed.length > MAX_LENGTH;
+  const tooLong = trimmed.length > maxLength;
 
   const commit = async () => {
     if (savingRef.current || cancelledRef.current) {
@@ -79,7 +78,7 @@ export default function NameEditField({
         }}
         label={hideLabel ? undefined : label}
         error={tooLong}
-        helperText={tooLong && dictionary['max characters 30']}
+        helperText={tooLong && tooLongText}
         disabled={saving}
         size="small"
         fullWidth

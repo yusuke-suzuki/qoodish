@@ -1,5 +1,9 @@
 import type { PinProperty, PinPropertyOption } from '../../types/index.ts';
 
+export const PIN_PROPERTY_NAME_LIMIT = 30;
+
+export const PIN_PROPERTY_OPTION_NAME_LIMIT = 16;
+
 export type PinPropertyAppearance = Pick<PinProperty, 'icon' | 'color'>;
 
 export type PinPropertyOptionChanges = Partial<
