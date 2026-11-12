@@ -852,6 +852,29 @@ describe('pin properties', () => {
     expect(foreign.status).toBe(404);
   });
 
+  it('accepts a tag name of 16 characters and answers 422 for a longer one', async () => {
+    const base = `/maps/${ids.ramen}/pin_properties`;
+    const group = await send('POST', base, 'alice', { name: '店'.repeat(30) });
+    const options = `${base}/${group.body.id}/options`;
+    const fits = await send('POST', options, 'alice', {
+      name: '駐'.repeat(16)
+    });
+    const [tooLong, renamed] = await Promise.all([
+      send('POST', options, 'alice', { name: '車'.repeat(17) }),
+      send('PATCH', `${options}/${fits.body.id}`, 'alice', {
+        name: '塩'.repeat(17)
+      })
+    ]);
+
+    expect(group.status).toBe(200);
+    expect(fits.status).toBe(200);
+    expect(tooLong).toMatchObject({
+      status: 422,
+      body: { detail: 'Tag name is too long. (Max: 16)' }
+    });
+    expect(renamed.status).toBe(422);
+  });
+
   it('records, changes and clears the icon and color of a property', async () => {
     const base = `/maps/${ids.ramen}/pin_properties`;
     const created = await send('POST', base, 'alice', {
