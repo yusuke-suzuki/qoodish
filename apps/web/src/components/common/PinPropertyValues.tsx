@@ -1,22 +1,28 @@
 import { Stack } from '@mui/material';
-import type { Pin, PinProperty } from '../../../types/index.ts';
+import type { ReactNode } from 'react';
+import type { PinProperty } from '../../../types/index.ts';
 import { optionIcon } from '../../utils/pinPropertyOptions.ts';
 import PinPropertyIcon from './PinPropertyIcon.tsx';
 import TagChip from './TagChip.tsx';
 
 type Props = {
-  pin: Pin;
+  optionIds: number[];
   pinProperties: PinProperty[];
+  action?: ReactNode;
 };
 
-export default function PinPropertyValues({ pin, pinProperties }: Props) {
+export default function PinPropertyValues({
+  optionIds,
+  pinProperties,
+  action
+}: Props) {
   const values = pinProperties.flatMap((property) =>
     property.options
-      .filter((option) => pin.property_option_ids.includes(option.id))
+      .filter((option) => optionIds.includes(option.id))
       .map((option) => ({ property, option }))
   );
 
-  if (values.length < 1) {
+  if (values.length < 1 && !action) {
     return null;
   }
 
@@ -37,6 +43,7 @@ export default function PinPropertyValues({ pin, pinProperties }: Props) {
           tagColor={property.color}
         />
       ))}
+      {action}
     </Stack>
   );
 }

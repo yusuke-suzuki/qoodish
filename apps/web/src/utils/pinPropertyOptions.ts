@@ -32,6 +32,30 @@ export function chooseOptions(
   ];
 }
 
+export function toggleOption(
+  selectedIds: number[],
+  property: PinProperty,
+  optionId: number
+): number[] {
+  const chosenIds = property.options
+    .map((option) => option.id)
+    .filter((id) => selectedIds.includes(id));
+
+  if (chosenIds.includes(optionId)) {
+    return chooseOptions(
+      selectedIds,
+      property,
+      chosenIds.filter((id) => id !== optionId)
+    );
+  }
+
+  return chooseOptions(
+    selectedIds,
+    property,
+    property.multiple ? [...chosenIds, optionId] : [optionId]
+  );
+}
+
 export function matchesOptions(
   pinOptionIds: number[],
   pinProperties: PinProperty[],
