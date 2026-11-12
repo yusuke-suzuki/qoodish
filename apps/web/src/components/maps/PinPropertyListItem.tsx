@@ -12,9 +12,10 @@ import {
 } from '@mui/material';
 import type { PinProperty, PinPropertyOption } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
-import type {
-  PinPropertyAppearance,
-  PinPropertyOptionChanges
+import {
+  PIN_PROPERTY_NAME_LIMIT,
+  type PinPropertyAppearance,
+  type PinPropertyOptionChanges
 } from '../../utils/pinPropertyOptions.ts';
 import NameEditField from './NameEditField.tsx';
 import PinPropertyColorPicker from './PinPropertyColorPicker.tsx';
@@ -64,6 +65,8 @@ export default function PinPropertyListItem({
         <NameEditField
           label={dictionary['pin property name']}
           defaultValue={property.name}
+          maxLength={PIN_PROPERTY_NAME_LIMIT}
+          tooLongText={dictionary['max characters 30']}
           onSave={onRename}
           startAdornment={
             <InputAdornment position="start">

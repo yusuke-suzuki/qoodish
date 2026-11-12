@@ -14,14 +14,16 @@ import {
 } from '@mui/material';
 import { type FocusEvent, type FormEvent, useRef } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
-import type { PinPropertyAppearance } from '../../utils/pinPropertyOptions.ts';
+import {
+  PIN_PROPERTY_NAME_LIMIT,
+  PIN_PROPERTY_OPTION_NAME_LIMIT,
+  type PinPropertyAppearance
+} from '../../utils/pinPropertyOptions.ts';
 import PinPropertyColorPicker from './PinPropertyColorPicker.tsx';
 import PinPropertyIconCell from './PinPropertyIconCell.tsx';
 import PinPropertyIconPicker from './PinPropertyIconPicker.tsx';
 import PinPropertyOptionAddField from './PinPropertyOptionAddField.tsx';
 import PinPropertyTypeIcon from './PinPropertyTypeIcon.tsx';
-
-export const NAME_LIMIT = 30;
 
 export type PinPropertyDraft = PinPropertyAppearance & {
   name: string;
@@ -54,8 +56,10 @@ export function draftCommittable(draft: PinPropertyDraft): boolean {
 
   return (
     name !== '' &&
-    name.length <= NAME_LIMIT &&
-    draftOptionNames(draft).every((option) => option.length <= NAME_LIMIT)
+    name.length <= PIN_PROPERTY_NAME_LIMIT &&
+    draftOptionNames(draft).every(
+      (option) => option.length <= PIN_PROPERTY_OPTION_NAME_LIMIT
+    )
   );
 }
 
@@ -77,7 +81,7 @@ export default function NewPinPropertyListItem({
   const dictionary = useDictionary();
   const itemRef = useRef<HTMLLIElement>(null);
 
-  const tooLong = draft.name.trim().length > NAME_LIMIT;
+  const tooLong = draft.name.trim().length > PIN_PROPERTY_NAME_LIMIT;
   const typeLabel = draft.multiple
     ? dictionary['multi select']
     : dictionary['single select'];

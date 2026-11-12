@@ -11,9 +11,8 @@ import {
 import { type FocusEvent, type FormEvent, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import useDictionary from '../../hooks/useDictionary.ts';
+import { PIN_PROPERTY_OPTION_NAME_LIMIT } from '../../utils/pinPropertyOptions.ts';
 import PinPropertyIconCell from './PinPropertyIconCell.tsx';
-
-const MAX_LENGTH = 30;
 
 type Props = {
   value: string;
@@ -40,7 +39,7 @@ export default function PinPropertyOptionAddField({
 
   const shown = open || value !== '';
   const trimmed = value.trim();
-  const tooLong = trimmed.length > MAX_LENGTH;
+  const tooLong = trimmed.length > PIN_PROPERTY_OPTION_NAME_LIMIT;
 
   const add = () => {
     if (trimmed && !tooLong) {
@@ -116,7 +115,7 @@ export default function PinPropertyOptionAddField({
               }}
               placeholder={dictionary['pin property option name']}
               error={tooLong}
-              helperText={tooLong && dictionary['max characters 30']}
+              helperText={tooLong && dictionary['max characters 16']}
               disabled={disabled}
               size="small"
               fullWidth

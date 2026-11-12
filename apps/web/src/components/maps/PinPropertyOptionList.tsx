@@ -12,7 +12,10 @@ import {
 import { useState } from 'react';
 import type { PinProperty, PinPropertyOption } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
-import type { PinPropertyOptionChanges } from '../../utils/pinPropertyOptions.ts';
+import {
+  PIN_PROPERTY_OPTION_NAME_LIMIT,
+  type PinPropertyOptionChanges
+} from '../../utils/pinPropertyOptions.ts';
 import { EMOJI_CELL_SIZE } from '../common/EmojiPicker.tsx';
 import NameEditField from './NameEditField.tsx';
 import PinPropertyIconPicker from './PinPropertyIconPicker.tsx';
@@ -99,6 +102,8 @@ export default function PinPropertyOptionList({
             label={dictionary['pin property option name']}
             hideLabel
             defaultValue={option.name}
+            maxLength={PIN_PROPERTY_OPTION_NAME_LIMIT}
+            tooLongText={dictionary['max characters 16']}
             onSave={(name) => onUpdate(option, { name })}
           />
         </ListItem>
