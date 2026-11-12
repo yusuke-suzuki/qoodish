@@ -95,7 +95,7 @@ export const en = {
   pin_property_name_required: 'Tag group name is required.',
   pin_property_name_exceed: 'Tag group name is too long. (Max: 30)',
   pin_property_option_name_required: 'Tag name is required.',
-  pin_property_option_name_exceed: 'Tag name is too long. (Max: 30)',
+  pin_property_option_name_exceed: 'Tag name is too long. (Max: 16)',
   pin_property_icon_invalid: 'Tag group icon is invalid.',
   pin_property_color_invalid: 'Tag group color is invalid.',
   pin_property_option_icon_invalid: 'Tag icon is invalid.',

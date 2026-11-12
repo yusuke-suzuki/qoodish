@@ -25,12 +25,12 @@ import { first } from './routing.ts';
 import { characters, graphemes } from './text.ts';
 import { position } from './validation.ts';
 
-const NAME_LIMIT = 30;
-
 function tagName({
+  limit,
   required,
   exceed
 }: {
+  limit: number;
   required: MessageKey;
   exceed: MessageKey;
 }) {
@@ -38,15 +38,17 @@ function tagName({
     .string({ error: required })
     .trim()
     .refine((name) => name !== '', { error: required })
-    .refine((name) => characters(name) <= NAME_LIMIT, { error: exceed });
+    .refine((name) => characters(name) <= limit, { error: exceed });
 }
 
 const propertyName = tagName({
+  limit: 30,
   required: 'pin_property_name_required',
   exceed: 'pin_property_name_exceed'
 });
 
 const optionName = tagName({
+  limit: 16,
   required: 'pin_property_option_name_required',
   exceed: 'pin_property_option_name_exceed'
 });

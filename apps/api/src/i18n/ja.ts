@@ -91,7 +91,7 @@ export const ja: Messages = {
   pin_property_name_required: 'タググループの名前を入力してください。',
   pin_property_name_exceed: 'タググループの名前が長すぎます。(最大: 30 文字)',
   pin_property_option_name_required: 'タグの名前を入力してください。',
-  pin_property_option_name_exceed: 'タグの名前が長すぎます。(最大: 30 文字)',
+  pin_property_option_name_exceed: 'タグの名前が長すぎます。(最大: 16 文字)',
   pin_property_icon_invalid: 'タググループのアイコンが正しくありません。',
   pin_property_color_invalid: 'タググループの色が正しくありません。',
   pin_property_option_icon_invalid: 'タグのアイコンが正しくありません。',
