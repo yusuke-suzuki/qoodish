@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import JsonLd from '../../../../../components/common/JsonLd.tsx';
 import MapDetailView from '../../../../../components/maps/MapDetailView.tsx';
+import PublicMapDetailView from '../../../../../components/maps/PublicMapDetailView.tsx';
 import { getServerAuthState } from '../../../../../lib/auth.ts';
 import { getMyJourney, getMyJourneys } from '../../../../../lib/journeys.ts';
 import {
@@ -63,6 +64,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function MapPage({ params }: Props) {
   const { lang, mapId } = await params;
   const { token } = await getServerAuthState();
+
+  if (!token) {
+    if (!(await getMap(mapId, lang))) {
+      notFound();
+    }
+
+    return (
+      <Suspense>
+        <PublicMapDetailView mapId={mapId} lang={lang} />
+      </Suspense>
+    );
+  }
+
   const [map, pins, pinProperties, coauthors, chapters, profile, journeys] =
     await Promise.all([
       getMap(mapId, lang, token),
