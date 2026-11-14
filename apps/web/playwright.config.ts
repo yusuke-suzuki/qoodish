@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { LOCAL_API_URL } from './e2e/localApi.ts';
 
 // A deployment is shared by every branch, so a run driving one can answer for
 // a commit nobody put up for review. Serving the build here is what ties the
@@ -25,12 +26,20 @@ export default defineConfig({
   },
   webServer: process.env.E2E_BASE_URL
     ? undefined
-    : {
-        command: 'pnpm preview',
-        url: baseURL,
-        timeout: 180000,
-        reuseExistingServer: !process.env.CI
-      },
+    : [
+        {
+          command: 'pnpm --filter qoodish-api dev',
+          url: `${LOCAL_API_URL}/healthcheck`,
+          timeout: 180000,
+          reuseExistingServer: !process.env.CI
+        },
+        {
+          command: 'pnpm preview',
+          url: baseURL,
+          timeout: 180000,
+          reuseExistingServer: !process.env.CI
+        }
+      ],
   projects: [
     {
       name: 'chromium',

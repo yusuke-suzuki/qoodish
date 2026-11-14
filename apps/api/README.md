@@ -5,8 +5,9 @@ The Qoodish API: a Cloudflare Worker written with Hono that keeps its records in
 ## Develop
 
 ```bash
-pnpm db:migrate:local   # apply migrations to the local D1 that cf dev uses
-pnpm dev                # run the dev worker locally
+pnpm db:reset:local    # rebuild the local D1 that cf dev uses: migrations, then the test fixtures
+pnpm db:migrate:local  # apply new migrations to the local D1 and keep its rows
+pnpm dev               # run the dev worker locally on http://localhost:5173
 pnpm test
 pnpm typecheck
 ```

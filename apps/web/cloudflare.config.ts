@@ -5,7 +5,7 @@ const ACCOUNT_ID = '9671c836ad132f87d892b12ccd1809e0';
 
 type Environment = {
   appEnv: string;
-  apiEndpoint: string;
+  apiWorker: string;
   maintenanceNamespaceId: string;
   analyticsDataset: string;
   imageUploadBurstNamespace: string;
@@ -14,7 +14,7 @@ type Environment = {
 
 const PRODUCTION: Environment = {
   appEnv: 'production',
-  apiEndpoint: 'https://api.qoodish.com',
+  apiWorker: 'prod-qoodish-api',
   maintenanceNamespaceId: '6c78b3e0223e45889bce5d43c6a96844',
   analyticsDataset: 'prod_qoodish_web_events',
   imageUploadBurstNamespace: '1001',
@@ -23,7 +23,7 @@ const PRODUCTION: Environment = {
 
 const DEVELOPMENT: Environment = {
   appEnv: 'development',
-  apiEndpoint: 'https://api-dev.qoodish.com',
+  apiWorker: 'dev-qoodish-api',
   maintenanceNamespaceId: '8a56a701dfff4c26842908926149f651',
   analyticsDataset: 'dev_qoodish_web_events',
   imageUploadBurstNamespace: '2001',
@@ -72,7 +72,7 @@ async function defineWebWorker(name: string, environment: Environment) {
       ...responseStore.env,
       ASSETS: bindings.assets(),
       APP_ENV: bindings.text(environment.appEnv),
-      API_ENDPOINT: bindings.text(environment.apiEndpoint),
+      API: bindings.worker({ worker: environment.apiWorker }),
       MAINTENANCE: bindings.kv({ id: environment.maintenanceNamespaceId }),
       ANALYTICS_EVENTS: bindings.analyticsEngineDataset({
         name: environment.analyticsDataset

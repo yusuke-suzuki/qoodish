@@ -1,11 +1,12 @@
 import type { APIRequestContext, Page } from '@playwright/test';
 import { expect, test } from './fixtures.ts';
+import { LOCAL_API_URL } from './localApi.ts';
 
 const LOCALES = ['ja', 'en'] as const;
 
 // The in-app proxy only exposes what the browser needs, so the rest of the
 // guest API is read at its own origin.
-const API_BASE_URL = process.env.E2E_API_URL ?? 'https://api-dev.qoodish.com';
+const API_BASE_URL = process.env.E2E_API_URL ?? LOCAL_API_URL;
 
 const PUBLIC_PATHS = [
   '',

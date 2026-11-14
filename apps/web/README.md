@@ -6,15 +6,24 @@ The Next.js app behind https://qoodish.com, built with [vinext](https://github.c
 
 `.env.example` lists every variable the build reads. Copy it to `.env.local` and fill in the values. `.env` files are ignored by git, so never commit one.
 
-`APP_ENV`, `API_ENDPOINT` and the bindings of each environment are declared in `cloudflare.config.ts`.
+`APP_ENV` and the bindings of each environment are declared in `cloudflare.config.ts`.
 
 ## Develop
+
+The app reaches the API through the `API` service binding, so run the API Worker locally first, from `apps/api` (see its [README](../api/README.md)):
+
+```bash
+pnpm db:reset:local   # once: schema and sample content
+pnpm dev
+```
+
+Then, from `apps/web`:
 
 ```bash
 pnpm dev
 ```
 
-The dev server runs the app in the Workers runtime on http://localhost:5000 with the bindings of the dev environment, simulated locally.
+The dev server runs the app in the Workers runtime on http://localhost:5000 with the bindings of the dev environment, simulated locally. The `API` binding finds the local API Worker through the dev registry.
 
 To run the worker as it is deployed, build it for the dev environment and serve it on http://localhost:8787:
 
@@ -30,7 +39,7 @@ pnpm test        # unit tests (node:test)
 pnpm e2e         # Playwright smoke tests
 ```
 
-`pnpm e2e` serves the worker with `pnpm preview` unless `E2E_BASE_URL` points at a running app, so build it with `pnpm cf:build:dev` first. The tests find content through the API at `E2E_API_URL`, which defaults to the dev API. Pull requests run the smoke tests in CI, and every push to `master` runs them against production once it serves that commit.
+`pnpm e2e` serves the worker with `pnpm preview`, and the local API Worker beside it, unless `E2E_BASE_URL` points at a running app, so build it with `pnpm cf:build:dev` and seed the local API first. The tests find content through the API at `E2E_API_URL`, which defaults to the local API. Pull requests run the smoke tests in CI, and every push to `master` runs them against production once it serves that commit.
 
 ## Deploy
 

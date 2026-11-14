@@ -2,9 +2,9 @@ import type { ApiCursorPage, CursorPage } from '../../types/index.ts';
 import describeError from '../utils/describeError.ts';
 import { getDictionary } from '../utils/getDictionary.ts';
 import {
-  apiUrl,
   buildApiHeaders,
   DEFAULT_TIMEOUT_MS,
+  fetchApi,
   getAcceptLanguage,
   getAuthToken,
   isTimeoutError
@@ -63,7 +63,7 @@ export async function performApiFetch<T>(
   }
 
   try {
-    const res = await fetch(apiUrl(apiPath), {
+    const res = await fetchApi(apiPath, {
       ...fetchOptions,
       signal:
         fetchOptions.signal ??

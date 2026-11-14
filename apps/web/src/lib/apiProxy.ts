@@ -2,9 +2,9 @@ import { type NextRequest, NextResponse } from 'next/server';
 import describeError from '../utils/describeError.ts';
 import { LOCALE_COOKIE } from '../utils/locales.ts';
 import {
-  apiUrl,
   buildApiHeaders,
   DEFAULT_TIMEOUT_MS,
+  fetchApi,
   getAuthToken,
   isTimeoutError,
   resolveApiLanguage
@@ -60,7 +60,7 @@ export async function proxyToApi(
   }
 
   try {
-    const res = await fetch(apiUrl(`${path}${request.nextUrl.search}`), init);
+    const res = await fetchApi(`${path}${request.nextUrl.search}`, init);
     const body = await res.text();
 
     return new NextResponse(body, {

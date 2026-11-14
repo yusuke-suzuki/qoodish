@@ -9,6 +9,8 @@
     "db:generate": "drizzle-kit generate",
     "db:erd": "node scripts/erd.ts",
     "db:migrate:local": "cf d1 migrations apply 80c87870-73f2-4f5e-b057-d9296600418a --local --persist-to .cloudflare/state",
+    "db:seed:local": "node src/test/seed-local.ts",
+    "db:reset:local": "rm -rf .cloudflare/state && pnpm db:migrate:local && pnpm db:seed:local",
     "db:migrate:dev": "cf d1 migrations apply 80c87870-73f2-4f5e-b057-d9296600418a",
     "db:migrate:prod": "cf d1 migrations apply 7d615fd7-7907-407b-b5fc-de93a6cb1d55",
     "db:script:local": "cf d1 raw 80c87870-73f2-4f5e-b057-d9296600418a --local --persist-to .cloudflare/state --sql",
@@ -29,6 +31,7 @@
     "@cloudflare/workers-types": "^5.20261110.1",
     "cf": "1.0.0-beta.29",
     "drizzle-kit": "^0.31.11",
+    "miniflare": "5.20261110.0-beta",
     "typescript": "^7.0.2",
     "vite": "8.3.0",
     "vitest": "^4.1.11"

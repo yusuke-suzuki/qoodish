@@ -25,7 +25,13 @@
       "groupName": "MUI"
     },
     {
-      "matchPackageNames": ["vinext", "@vinext/**", "cf", "@cloudflare/**"],
+      "matchPackageNames": [
+        "vinext",
+        "@vinext/**",
+        "cf",
+        "@cloudflare/**",
+        "miniflare"
+      ],
       "groupName": "Cloudflare tooling"
     },
     {

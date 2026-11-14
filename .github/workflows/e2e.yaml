@@ -36,6 +36,11 @@ jobs:
         run: |
           pnpm exec playwright install --with-deps chromium
 
+      - name: Prepare the local API database
+        working-directory: apps/api
+        run: |
+          pnpm db:reset:local
+
       # The build resolves every NEXT_PUBLIC_ name, so a page cannot be given
       # its configuration after the bundle is written.
       - name: Build the worker
