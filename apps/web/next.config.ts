@@ -43,6 +43,7 @@ const nextConfig: NextConfig = {
       permanent: true
     }
   ],
+  cacheComponents: true,
   experimental: {
     globalNotFound: true
   }

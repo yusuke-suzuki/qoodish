@@ -6,57 +6,56 @@ import {
   assertApiAvailable
 } from './api.ts';
 import { CONTENT_TAG, PINS_TAG, pinTag } from './cacheTags.ts';
+import { cachePublic } from './publicCache.ts';
 
-export async function getPin(
+async function fetchPin(
   pinId: string,
   lang: string,
-  token?: string
+  guest: boolean
 ): Promise<Pin | null> {
-  const guest = !token;
   const path = `/pins/${pinId}`;
-  const { data, status } = await apiFetch<Pin>(path, {
-    lang,
-    guest,
-    next: {
-      revalidate: guest ? 300 : 0,
-      tags: [pinTag(pinId), CONTENT_TAG]
-    }
-  });
+  const { data, status } = await apiFetch<Pin>(path, { lang, guest });
   assertApiAvailable(status, path);
   return data;
 }
 
-export function getPopularPins(lang: string): Promise<Pin[]> {
-  return apiFetchList<Pin>('/pins?popular=true', {
-    lang,
-    guest: true,
-    next: { revalidate: 900, tags: [PINS_TAG] }
-  });
+async function getPublicPin(pinId: string, lang: string): Promise<Pin | null> {
+  'use cache';
+  await cachePublic(300, [pinTag(pinId), CONTENT_TAG]);
+  return fetchPin(pinId, lang, true);
 }
 
-export function getRecentPins(lang: string): Promise<Pin[]> {
-  return apiFetchList<Pin>('/pins?recent=true', {
-    lang,
-    guest: true,
-    next: { revalidate: 900, tags: [PINS_TAG] }
-  });
+export function getPin(
+  pinId: string,
+  lang: string,
+  token?: string
+): Promise<Pin | null> {
+  return token ? fetchPin(pinId, lang, false) : getPublicPin(pinId, lang);
 }
 
-export function getPinFeed(
+export async function getPopularPins(lang: string): Promise<Pin[]> {
+  'use cache';
+  await cachePublic(900, [PINS_TAG]);
+  return apiFetchList<Pin>('/pins?popular=true', { lang, guest: true });
+}
+
+export async function getRecentPins(lang: string): Promise<Pin[]> {
+  'use cache';
+  await cachePublic(900, [PINS_TAG]);
+  return apiFetchList<Pin>('/pins?recent=true', { lang, guest: true });
+}
+
+export async function getPinFeed(
   lang: string,
   cursor?: string
 ): Promise<CursorPage<Pin>> {
-  return apiFetchPage<Pin>('/v2/pins', {
-    lang,
-    guest: true,
-    cursor,
-    next: { revalidate: cursor ? 300 : 900, tags: [PINS_TAG] }
-  });
+  'use cache';
+  await cachePublic(cursor ? 300 : 900, [PINS_TAG]);
+  return apiFetchPage<Pin>('/v2/pins', { lang, guest: true, cursor });
 }
 
 export function getTimelinePins(cursor?: string): Promise<CursorPage<Pin>> {
   return apiFetchPage<Pin>('/v2/pins', {
-    cursor,
-    next: { revalidate: 0 }
+    cursor
   });
 }

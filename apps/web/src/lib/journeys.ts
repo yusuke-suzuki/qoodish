@@ -10,8 +10,7 @@ export function getMyJourneys(
   }
 
   return apiFetchList<JourneySummary>('/me/journeys', {
-    lang,
-    next: { revalidate: 0 }
+    lang
   });
 }
 
@@ -26,8 +25,7 @@ export async function getMyJourney(
 
   const path = `/me/journeys/${journeyId}`;
   const { data, status } = await apiFetch<Journey>(path, {
-    lang,
-    next: { revalidate: 0 }
+    lang
   });
   assertApiAvailable(status, path);
   return data;

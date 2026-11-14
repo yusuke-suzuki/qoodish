@@ -11,8 +11,7 @@ export async function getCoauthorshipInvitations(
   const invitations = await apiFetchList<CoauthorshipInvitation>(
     `/me/coauthorship_invitations?status=${status}`,
     {
-      lang,
-      next: { revalidate: 0 }
+      lang
     }
   );
 

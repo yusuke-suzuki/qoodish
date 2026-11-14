@@ -18,14 +18,12 @@ type ApiFetchOptions = RequestInit & {
   guest?: boolean;
   lang?: string;
   timeoutMs?: number;
-  next?: { revalidate?: number | false; tags?: string[] };
 };
 
 type PerformApiFetchOptions = RequestInit & {
   token: string | null;
   acceptLanguage: string;
   timeoutMs?: number;
-  next?: { revalidate?: number | false; tags?: string[] };
 };
 
 export type ApiResult<T> = {
@@ -52,7 +50,7 @@ export async function performApiFetch<T>(
   path: string,
   options: PerformApiFetchOptions
 ): Promise<ApiResult<T>> {
-  const { token, acceptLanguage, timeoutMs, next, ...fetchOptions } = options;
+  const { token, acceptLanguage, timeoutMs, ...fetchOptions } = options;
 
   const apiPath = token ? path : `/guest${path}`;
 
@@ -74,8 +72,7 @@ export async function performApiFetch<T>(
         token,
         acceptLanguage,
         headers: fetchOptions.headers
-      }),
-      next
+      })
     });
 
     if (!res.ok) {

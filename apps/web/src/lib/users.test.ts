@@ -32,8 +32,7 @@ describe('getNotifications', () => {
       {
         lang: 'ja',
         cursor: 'c1',
-        query: { read: 'false' },
-        next: { revalidate: 0 }
+        query: { read: 'false' }
       }
     ]);
   });
@@ -48,8 +47,7 @@ describe('getNotifications', () => {
       {
         lang: 'ja',
         cursor: undefined,
-        query: undefined,
-        next: { revalidate: 0 }
+        query: undefined
       }
     ]);
   });
