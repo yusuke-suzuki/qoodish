@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import JsonLd from '../../../../../components/common/JsonLd.tsx';
 import PinDetail from '../../../../../components/pins/PinDetail.tsx';
 import PinGridSkeleton from '../../../../../components/pins/PinGridSkeleton.tsx';
+import PublicPinDetail from '../../../../../components/pins/PublicPinDetail.tsx';
 import RecommendedPins from '../../../../../components/pins/RecommendedPins.tsx';
 import { getServerAuthState } from '../../../../../lib/auth.ts';
 import { getMap, getMapPinProperties } from '../../../../../lib/maps.ts';
@@ -69,17 +70,23 @@ export default async function PinPage({ params }: Props) {
   }
 
   const mapId = String(pin.map.id);
-  const [map, pinProperties] = await Promise.all([
-    getMap(mapId, lang, token),
-    getMapPinProperties(mapId, lang, token)
-  ]);
+  const [map, pinProperties] = token
+    ? await Promise.all([
+        getMap(mapId, lang, token),
+        getMapPinProperties(mapId, lang, token)
+      ])
+    : [null, []];
 
   return (
     <>
       <JsonLd data={pinStructuredData(pin, lang)} />
 
       <Suspense>
-        <PinDetail pin={pin} map={map} pinProperties={pinProperties} />
+        {token ? (
+          <PinDetail pin={pin} map={map} pinProperties={pinProperties} />
+        ) : (
+          <PublicPinDetail pinId={pinId} lang={lang} />
+        )}
       </Suspense>
 
       <Suspense

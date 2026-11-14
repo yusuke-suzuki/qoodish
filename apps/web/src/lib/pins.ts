@@ -5,7 +5,7 @@ import {
   apiFetchPage,
   assertApiAvailable
 } from './api.ts';
-import { CONTENT_TAG, PINS_TAG, pinTag } from './cacheTags.ts';
+import { CONTENT_TAG, mapTag, PINS_TAG, pinTag } from './cacheTags.ts';
 import { cachePublic } from './publicCache.ts';
 
 async function fetchPin(
@@ -22,7 +22,13 @@ async function fetchPin(
 async function getPublicPin(pinId: string, lang: string): Promise<Pin | null> {
   'use cache';
   await cachePublic(300, [pinTag(pinId), CONTENT_TAG]);
-  return fetchPin(pinId, lang, true);
+  const pin = await fetchPin(pinId, lang, true);
+
+  if (pin) {
+    await cachePublic(300, [mapTag(pin.map.id)]);
+  }
+
+  return pin;
 }
 
 export function getPin(
