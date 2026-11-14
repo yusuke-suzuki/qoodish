@@ -1,7 +1,7 @@
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { type ReactNode, Suspense } from 'react';
 import JsonLd from '../../components/common/JsonLd.tsx';
 import MaintenanceStatus from '../../components/common/MaintenanceStatus.tsx';
 import Shell from '../../components/layouts/Shell.tsx';
@@ -113,12 +113,16 @@ export default async function RootLayout({ children, params }: Props) {
       <body>
         <InitColorSchemeScript attribute="class" />
         <Providers lang={lang} dictionary={dict}>
-          <SessionProviders lang={lang}>
-            <ShellProvider>
-              <Shell>{children}</Shell>
-            </ShellProvider>
-          </SessionProviders>
-          <MaintenanceStatus lang={lang} />
+          <Suspense>
+            <SessionProviders lang={lang}>
+              <ShellProvider>
+                <Shell>{children}</Shell>
+              </ShellProvider>
+            </SessionProviders>
+          </Suspense>
+          <Suspense>
+            <MaintenanceStatus lang={lang} />
+          </Suspense>
         </Providers>
       </body>
     </html>

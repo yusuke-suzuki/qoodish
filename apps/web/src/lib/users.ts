@@ -16,20 +16,38 @@ import {
   assertApiAvailable
 } from './api.ts';
 import { MAPS_TAG, userTag } from './cacheTags.ts';
+import { cachePublic } from './publicCache.ts';
 
-export async function getProfile(
+async function fetchProfile(
+  userId: string,
+  lang: string,
+  guest: boolean
+): Promise<UserProfile | null> {
+  const { data, status } = await apiFetch<UserProfile>(`/users/${userId}`, {
+    lang,
+    guest
+  });
+  assertApiAvailable(status, `/users/${userId}`);
+  return data;
+}
+
+async function getPublicProfile(
+  userId: string,
+  lang: string
+): Promise<UserProfile | null> {
+  'use cache';
+  await cachePublic(300, [userTag(userId)]);
+  return fetchProfile(userId, lang, true);
+}
+
+export function getProfile(
   userId: string,
   lang: string,
   token?: string
 ): Promise<UserProfile | null> {
-  const guest = !token;
-  const { data, status } = await apiFetch<UserProfile>(`/users/${userId}`, {
-    lang,
-    guest,
-    next: { revalidate: guest ? 300 : 0, tags: [userTag(userId)] }
-  });
-  assertApiAvailable(status, `/users/${userId}`);
-  return data;
+  return token
+    ? fetchProfile(userId, lang, false)
+    : getPublicProfile(userId, lang);
 }
 
 export async function getMyProfile(
@@ -41,10 +59,26 @@ export async function getMyProfile(
   }
 
   const { data } = await apiFetch<Profile>('/me/profile', {
-    lang,
-    next: { revalidate: 0 }
+    lang
   });
   return data;
+}
+
+function fetchUserMaps(
+  userId: string,
+  lang: string,
+  guest: boolean
+): Promise<AppMap[]> {
+  return apiFetchList<AppMap>(`/users/${userId}/maps`, { lang, guest });
+}
+
+async function getPublicUserMaps(
+  userId: string,
+  lang: string
+): Promise<AppMap[]> {
+  'use cache';
+  await cachePublic(300, [userTag(userId), MAPS_TAG]);
+  return fetchUserMaps(userId, lang, true);
 }
 
 export function getUserMaps(
@@ -52,12 +86,9 @@ export function getUserMaps(
   lang: string,
   token?: string
 ): Promise<AppMap[]> {
-  const guest = !token;
-  return apiFetchList<AppMap>(`/users/${userId}/maps`, {
-    lang,
-    guest,
-    next: { revalidate: guest ? 300 : 0, tags: [userTag(userId), MAPS_TAG] }
-  });
+  return token
+    ? fetchUserMaps(userId, lang, false)
+    : getPublicUserMaps(userId, lang);
 }
 
 export function getMyMaps(lang: string, token?: string): Promise<AppMap[]> {
@@ -66,8 +97,7 @@ export function getMyMaps(lang: string, token?: string): Promise<AppMap[]> {
   }
 
   return apiFetchList<AppMap>('/me/maps', {
-    lang,
-    next: { revalidate: 0 }
+    lang
   });
 }
 
@@ -82,8 +112,7 @@ export async function getUserJournal(
 
   const path = `/users/${userId}/journal`;
   const { data, status } = await apiFetch<Journal>(path, {
-    lang,
-    next: { revalidate: 0 }
+    lang
   });
   assertApiAvailable(status, path);
   return data;
@@ -98,8 +127,7 @@ export async function getMyJournal(
   }
 
   const { data, status } = await apiFetch<Journal>('/me/journal', {
-    lang,
-    next: { revalidate: 0 }
+    lang
   });
   assertApiAvailable(status, '/me/journal');
   return data;
@@ -114,8 +142,7 @@ export function getBookmarkedMaps(
   }
 
   return apiFetchList<AppMap>('/me/bookmarks/maps', {
-    lang,
-    next: { revalidate: 0 }
+    lang
   });
 }
 
@@ -128,8 +155,7 @@ export function getBookmarkedJournals(
   }
 
   return apiFetchList<Journal>('/me/bookmarks/journals', {
-    lang,
-    next: { revalidate: 0 }
+    lang
   });
 }
 
@@ -140,8 +166,7 @@ export function getUserPins(
 ): Promise<CursorPage<Pin>> {
   return apiFetchPage<Pin>(`/v2/users/${userId}/pins`, {
     lang,
-    cursor,
-    next: { revalidate: 0 }
+    cursor
   });
 }
 
@@ -151,8 +176,7 @@ export function getMyPins(
 ): Promise<CursorPage<Pin>> {
   return apiFetchPage<Pin>('/v2/me/pins', {
     lang,
-    cursor,
-    next: { revalidate: 0 }
+    cursor
   });
 }
 
@@ -162,8 +186,7 @@ export function getBlockedAccounts(
 ): Promise<CursorPage<BlockedAccount>> {
   return apiFetchPage<BlockedAccount>('/v2/me/blocks', {
     lang,
-    cursor,
-    next: { revalidate: 0 }
+    cursor
   });
 }
 
@@ -173,8 +196,7 @@ export function getMutedAccounts(
 ): Promise<CursorPage<MutedAccount>> {
   return apiFetchPage<MutedAccount>('/v2/me/mutes', {
     lang,
-    cursor,
-    next: { revalidate: 0 }
+    cursor
   });
 }
 
@@ -185,7 +207,6 @@ export function getNotifications(
   return apiFetchPage<Notification>('/v2/me/notifications', {
     lang,
     cursor,
-    query: read === undefined ? undefined : { read: String(read) },
-    next: { revalidate: 0 }
+    query: read === undefined ? undefined : { read: String(read) }
   });
 }

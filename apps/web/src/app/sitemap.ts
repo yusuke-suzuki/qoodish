@@ -1,12 +1,11 @@
 import type { MetadataRoute } from 'next';
+import { cacheLife } from 'next/cache';
 import { getChapterFeed } from '../lib/chapters.ts';
 import { getActiveMaps, getPopularMaps, getRecentMaps } from '../lib/maps.ts';
 import { getPinFeed, getPopularPins } from '../lib/pins.ts';
 import { DEFAULT_LOCALE, LOCALES, localePath } from '../utils/locales.ts';
 import { SITE_ORIGIN } from '../utils/metadata.ts';
 import pageAll from '../utils/pageAll.ts';
-
-export const revalidate = 3600;
 
 type Entry = {
   path: string;
@@ -57,6 +56,9 @@ function expand({
 const PAGING = { maxRequests: 25 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  'use cache';
+  cacheLife({ revalidate: 3600 });
+
   const [activeMaps, popularMaps, recentMaps, popularPins, pins, chapters] =
     await Promise.all([
       getActiveMaps(DEFAULT_LOCALE),
