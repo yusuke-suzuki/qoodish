@@ -11,6 +11,14 @@ export function pinTag(pinId: number | string): string {
   return `pin:${pinId}`;
 }
 
+export function pinListTags(
+  pins: { id: number; map: { id: number } }[]
+): string[] {
+  return [
+    ...new Set(pins.flatMap((pin) => [pinTag(pin.id), mapTag(pin.map.id)]))
+  ];
+}
+
 export function chapterTag(chapterId: number | string): string {
   return `chapter:${chapterId}`;
 }

@@ -15,7 +15,7 @@ import {
   apiFetchPage,
   assertApiAvailable
 } from './api.ts';
-import { MAPS_TAG, userTag } from './cacheTags.ts';
+import { MAPS_TAG, pinListTags, userTag } from './cacheTags.ts';
 import { cachePublic } from './publicCache.ts';
 
 async function fetchProfile(
@@ -159,15 +159,30 @@ export function getBookmarkedJournals(
   });
 }
 
+function fetchUserPins(
+  userId: string,
+  options: { lang?: string; cursor?: string; guest?: boolean }
+): Promise<CursorPage<Pin>> {
+  return apiFetchPage<Pin>(`/v2/users/${userId}/pins`, options);
+}
+
 export function getUserPins(
   userId: string,
   lang?: string,
   cursor?: string
 ): Promise<CursorPage<Pin>> {
-  return apiFetchPage<Pin>(`/v2/users/${userId}/pins`, {
-    lang,
-    cursor
-  });
+  return fetchUserPins(userId, { lang, cursor });
+}
+
+export async function getPublicUserPins(
+  userId: string,
+  lang: string
+): Promise<CursorPage<Pin>> {
+  'use cache';
+  await cachePublic(300, [userTag(userId)]);
+  const page = await fetchUserPins(userId, { lang, guest: true });
+  await cachePublic(300, pinListTags(page.items));
+  return page;
 }
 
 export function getMyPins(

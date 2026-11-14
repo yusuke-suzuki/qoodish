@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+import PublicUserProfile from '../../../../../components/profiles/PublicUserProfile.tsx';
 import UserProfile from '../../../../../components/profiles/UserProfile.tsx';
 import { getServerAuthState } from '../../../../../lib/auth.ts';
 import { getMyChapters, getUserChapters } from '../../../../../lib/chapters.ts';
@@ -66,6 +68,14 @@ export default async function UserPage({ params }: Props) {
 
   if (!profile) {
     notFound();
+  }
+
+  if (!token) {
+    return (
+      <Suspense>
+        <PublicUserProfile userId={userId} lang={lang} />
+      </Suspense>
+    );
   }
 
   const isOwnProfile = Boolean(uid && profile.uid === uid);
