@@ -5,7 +5,13 @@ import {
   apiFetchPage,
   assertApiAvailable
 } from './api.ts';
-import { CHAPTERS_TAG, CONTENT_TAG, chapterTag, userTag } from './cacheTags.ts';
+import {
+  CHAPTERS_TAG,
+  CONTENT_TAG,
+  chapterTag,
+  mapTag,
+  userTag
+} from './cacheTags.ts';
 import { cachePublic } from './publicCache.ts';
 
 async function fetchChapter(
@@ -27,7 +33,13 @@ async function getPublicChapter(
 ): Promise<Chapter | null> {
   'use cache';
   await cachePublic(300, [chapterTag(chapterId), CONTENT_TAG]);
-  return fetchChapter(chapterId, lang, true);
+  const chapter = await fetchChapter(chapterId, lang, true);
+
+  if (chapter?.map_id) {
+    await cachePublic(300, [mapTag(chapter.map_id)]);
+  }
+
+  return chapter;
 }
 
 export function getChapter(
