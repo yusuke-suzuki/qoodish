@@ -6,6 +6,12 @@ import { LOCAL_API_URL } from './e2e/localApi.ts';
 // answer to the commit under test.
 const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:8787';
 
+if (process.env.E2E_BASE_URL && !process.env.E2E_API_URL) {
+  throw new Error(
+    'E2E_BASE_URL needs E2E_API_URL: the local API is only started for the local app.'
+  );
+}
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
