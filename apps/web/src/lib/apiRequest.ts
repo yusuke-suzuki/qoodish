@@ -79,8 +79,14 @@ export function buildApiHeaders({
   return requestHeaders;
 }
 
-export function apiUrl(path: string): string {
-  return `${process.env.API_ENDPOINT}${path}`;
+const API_ORIGIN = 'https://api.internal';
+
+export async function fetchApi(
+  path: string,
+  init?: RequestInit
+): Promise<Response> {
+  const { env } = await import('./workerEnv.ts');
+  return env.API.fetch(`${API_ORIGIN}${path}`, init);
 }
 
 export function isTimeoutError(error: unknown): boolean {

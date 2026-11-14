@@ -1,9 +1,9 @@
 import { connection, NextResponse } from 'next/server';
+import { fetchApi } from '../../../lib/apiRequest.ts';
 
 async function checkApi(): Promise<'ok' | 'failed'> {
   try {
-    const res = await fetch(`${process.env.API_ENDPOINT}/healthcheck`, {
-      cache: 'no-store',
+    const res = await fetchApi('/healthcheck', {
       signal: AbortSignal.timeout(5000)
     });
 

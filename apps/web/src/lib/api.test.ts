@@ -14,6 +14,15 @@ const getMaintenance = mock.fn<() => Promise<Maintenance | null>>(
 mock.module(new URL('./maintenance.ts', import.meta.url).href, {
   namedExports: { getMaintenance, maintenanceWriteBlockedMessage }
 });
+mock.module(new URL('./workerEnv.ts', import.meta.url).href, {
+  namedExports: {
+    env: {
+      API: {
+        fetch: (input: string, init?: RequestInit) => fetch(input, init)
+      }
+    }
+  }
+});
 
 let apiFetch: Api['apiFetch'];
 let apiFetchList: Api['apiFetchList'];
@@ -32,8 +41,6 @@ before(async () => {
     performApiFetch
   } = await import('./api.ts'));
 });
-
-process.env.API_ENDPOINT = 'https://api.example.com';
 
 beforeEach(() => {
   getMaintenance.mock.resetCalls();
@@ -64,7 +71,7 @@ describe('performApiFetch', () => {
     const [url, init] = fetchMock.mock.calls[0].arguments as FetchArgs;
     const requestHeaders = init?.headers as Headers;
 
-    assert.equal(url, 'https://api.example.com/maps');
+    assert.equal(url, 'https://api.internal/maps');
     assert.equal(requestHeaders.get('Authorization'), 'Bearer token-1');
     assert.equal(requestHeaders.get('Accept-Language'), 'ja');
     assert.deepEqual(result, { data: { id: 1 }, error: null, status: 200 });
@@ -80,7 +87,7 @@ describe('performApiFetch', () => {
     const [url, init] = fetchMock.mock.calls[0].arguments as FetchArgs;
     const requestHeaders = init?.headers as Headers;
 
-    assert.equal(url, 'https://api.example.com/guest/maps');
+    assert.equal(url, 'https://api.internal/guest/maps');
     assert.equal(requestHeaders.has('Authorization'), false);
   });
 
@@ -324,7 +331,7 @@ describe('apiFetch', () => {
     const [url, init] = fetchMock.mock.calls[0].arguments as FetchArgs;
     const requestHeaders = init?.headers as Headers;
 
-    assert.equal(url, 'https://api.example.com/guest/maps');
+    assert.equal(url, 'https://api.internal/guest/maps');
     assert.equal(requestHeaders.get('Accept-Language'), 'ja');
     assert.deepEqual(result, { data: [], error: null, status: 200 });
   });
@@ -405,7 +412,7 @@ describe('apiFetchPage', () => {
 
     const [url] = fetchMock.mock.calls[0].arguments as FetchArgs;
 
-    assert.equal(url, 'https://api.example.com/guest/v2/pins');
+    assert.equal(url, 'https://api.internal/guest/v2/pins');
   });
 
   it('asks for the page after the cursor it was given', async (t) => {
@@ -421,10 +428,7 @@ describe('apiFetchPage', () => {
 
     const [url] = fetchMock.mock.calls[0].arguments as FetchArgs;
 
-    assert.equal(
-      url,
-      'https://api.example.com/guest/v2/pins?cursor=a%2Bb%2Fc%3D'
-    );
+    assert.equal(url, 'https://api.internal/guest/v2/pins?cursor=a%2Bb%2Fc%3D');
   });
 
   it('sends the cursor alongside the query it was given', async (t) => {
@@ -443,7 +447,7 @@ describe('apiFetchPage', () => {
 
     assert.equal(
       url,
-      'https://api.example.com/guest/v2/me/notifications?read=false&cursor=c1'
+      'https://api.internal/guest/v2/me/notifications?read=false&cursor=c1'
     );
   });
 
