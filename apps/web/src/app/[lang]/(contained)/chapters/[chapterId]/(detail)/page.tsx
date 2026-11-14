@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import ChapterContent from '../../../../../../components/chapters/ChapterContent.tsx';
 import ChapterReadView from '../../../../../../components/chapters/ChapterReadView.tsx';
+import PublicChapterReadView from '../../../../../../components/chapters/PublicChapterReadView.tsx';
 import JsonLd from '../../../../../../components/common/JsonLd.tsx';
 import { getServerAuthState } from '../../../../../../lib/auth.ts';
 import {
@@ -75,24 +77,32 @@ export default async function ChapterPage({ params }: Props) {
   }
 
   // Deleting a map nullifies the chapters on it, so the chapter outlives it.
-  const [map, authorChapters, authorJournal, comments] = await Promise.all([
-    chapter.map_id ? getMap(String(chapter.map_id), lang, token) : null,
-    getUserChapters(chapter.author.id, lang, token),
-    getUserJournal(String(chapter.author.id), lang, token),
-    getChapterComments(chapterId, lang, token)
-  ]);
+  const [map, authorChapters, authorJournal, comments] = token
+    ? await Promise.all([
+        chapter.map_id ? getMap(String(chapter.map_id), lang, token) : null,
+        getUserChapters(chapter.author.id, lang, token),
+        getUserJournal(String(chapter.author.id), lang, token),
+        getChapterComments(chapterId, lang, token)
+      ])
+    : [null, [], null, []];
 
   return (
     <>
       <JsonLd data={chapterStructuredData(chapter, lang)} />
-      <ChapterReadView
-        chapter={chapter}
-        body={<ChapterContent content={chapter.content} />}
-        map={map}
-        authorJournal={authorJournal}
-        authorPageCount={authorChapters.length}
-        comments={comments}
-      />
+      <Suspense>
+        {token ? (
+          <ChapterReadView
+            chapter={chapter}
+            body={<ChapterContent content={chapter.content} />}
+            map={map}
+            authorJournal={authorJournal}
+            authorPageCount={authorChapters.length}
+            comments={comments}
+          />
+        ) : (
+          <PublicChapterReadView chapterId={chapterId} lang={lang} />
+        )}
+      </Suspense>
     </>
   );
 }
