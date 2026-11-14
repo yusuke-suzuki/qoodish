@@ -39,7 +39,7 @@ pnpm test        # unit tests (node:test)
 pnpm e2e         # Playwright smoke tests
 ```
 
-`pnpm e2e` serves the worker with `pnpm preview`, and the local API Worker beside it, unless `E2E_BASE_URL` points at a running app, so build it with `pnpm cf:build:dev` and seed the local API first. The tests find content through the API at `E2E_API_URL`, which defaults to the local API. Pull requests run the smoke tests in CI, and every push to `master` runs them against production once it serves that commit.
+`pnpm e2e` serves the worker with `pnpm preview`, and the local API Worker beside it, unless `E2E_BASE_URL` points at a running app, so build it with `pnpm cf:build:dev` and seed the local API first. The tests find content through the API at `E2E_API_URL`, which defaults to the local API and must be set alongside `E2E_BASE_URL`. Pull requests run the smoke tests in CI, and every push to `master` runs them against production once it serves that commit.
 
 ## Deploy
 
