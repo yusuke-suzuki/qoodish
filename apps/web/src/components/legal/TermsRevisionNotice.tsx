@@ -1,12 +1,12 @@
 'use client';
 
 import { Button } from '@mui/material';
-import Link from 'next/link';
 import { closeSnackbar, enqueueSnackbar, type SnackbarKey } from 'notistack';
 import { useContext, useEffect, useEffectEvent } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 
 const STORAGE_KEY = 'qoodish.termsRevisionAcknowledged.v1';
 

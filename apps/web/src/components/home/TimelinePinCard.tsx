@@ -8,10 +8,10 @@ import {
   IconButton,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import type { Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 import ProfileBoundary from '../common/ProfileBoundary.tsx';
 import LikePinButton from '../pins/LikePinButton.tsx';
 import PinCardHeader from '../pins/PinCardHeader.tsx';

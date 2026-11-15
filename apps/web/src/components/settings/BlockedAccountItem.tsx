@@ -7,12 +7,12 @@ import {
   ListItemText,
   Link as MuiLink
 } from '@mui/material';
-import Link from 'next/link';
 import type { BlockedAccount } from '../../../types/index.ts';
 import useBlock from '../../hooks/useBlock.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import AuthorAvatar from '../common/AuthorAvatar.tsx';
+import Link from '../common/Link.tsx';
 
 type Props = {
   account: BlockedAccount;

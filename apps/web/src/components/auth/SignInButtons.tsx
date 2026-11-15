@@ -1,7 +1,7 @@
 import { Divider, Link as MuiLink, Stack, Typography } from '@mui/material';
-import Link from 'next/link';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 import SignInWithEmailLinkButton from './SignInWithEmailLinkButton.tsx';
 import SignInWithGoogleButton from './SignInWithGoogleButton.tsx';
 

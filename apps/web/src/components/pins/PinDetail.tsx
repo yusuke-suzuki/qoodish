@@ -2,7 +2,6 @@
 
 import { KeyboardArrowLeft } from '@mui/icons-material';
 import { Box, Button, Card, CardContent, Typography } from '@mui/material';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type {
@@ -13,6 +12,7 @@ import type {
 } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import CommentList from '../common/CommentList.tsx';
+import Link from '../common/Link.tsx';
 import ProfileBoundary from '../common/ProfileBoundary.tsx';
 import ReportDialog from '../common/ReportDialog.tsx';
 import DeletePinDialog from './DeletePinDialog.tsx';

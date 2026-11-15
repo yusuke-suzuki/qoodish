@@ -9,12 +9,12 @@ import {
   IconButton,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import { useState } from 'react';
 import type { AppMap, Pin, PinProperty } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import BottomSheet from '../common/BottomSheet.tsx';
+import Link from '../common/Link.tsx';
 import ProfileBoundary from '../common/ProfileBoundary.tsx';
 import ReportDialog from '../common/ReportDialog.tsx';
 import DeletePinDialog from '../pins/DeletePinDialog.tsx';

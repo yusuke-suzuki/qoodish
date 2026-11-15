@@ -26,7 +26,6 @@ import {
   Typography
 } from '@mui/material';
 import type { LexicalEditor } from 'lexical';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
 import { useRef, useState } from 'react';
@@ -48,6 +47,7 @@ import {
 } from '../../utils/mapFeatures.ts';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
 import ConfirmDialog from '../common/ConfirmDialog.tsx';
+import Link from '../common/Link.tsx';
 import PinPickerDialog from '../journeys/PinPickerDialog.tsx';
 import ChapterAuthorCard from './ChapterAuthorCard.tsx';
 import ChapterAuthorHeader from './ChapterAuthorHeader.tsx';

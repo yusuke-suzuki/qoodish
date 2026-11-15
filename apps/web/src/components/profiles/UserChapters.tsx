@@ -15,7 +15,6 @@ import {
   Paper,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
 import { type MouseEvent, useState } from 'react';
@@ -24,6 +23,7 @@ import { deleteChapter } from '../../actions/chapters.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalDateTime from '../../hooks/useLocalDateTime.ts';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
+import Link from '../common/Link.tsx';
 import NoContents from '../common/NoContents.tsx';
 
 const THUMBNAIL_SIZE = { xs: 80, sm: 100 };

@@ -11,13 +11,13 @@ import {
   useMediaQuery,
   useScrollTrigger
 } from '@mui/material';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useContext, useState } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import ShellContext from '../../context/ShellContext.tsx';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 import AccountMenuButton from './AccountMenuButton.tsx';
 import LocaleMenuButton from './LocaleMenuButton.tsx';
 import Logo from './Logo.tsx';

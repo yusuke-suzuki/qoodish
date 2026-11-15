@@ -9,8 +9,8 @@ import {
   Grid,
   Stack
 } from '@mui/material';
-import Link from 'next/link';
 import { useContext } from 'react';
+import Link from '../../components/common/Link.tsx';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';

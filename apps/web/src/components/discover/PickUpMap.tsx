@@ -8,9 +8,9 @@ import {
   CardMedia,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import type { AppMap } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 import MediaPlaceholder from '../common/MediaPlaceholder.tsx';
 
 type Props = {

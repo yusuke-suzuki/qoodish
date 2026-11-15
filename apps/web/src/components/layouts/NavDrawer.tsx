@@ -14,7 +14,6 @@ import {
   Typography
 } from '@mui/material';
 import { getAuth } from 'firebase/auth';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Suspense, useContext } from 'react';
 import type { Profile } from '../../../types/index.ts';
@@ -24,6 +23,7 @@ import useLocalePath from '../../hooks/useLocalePath.ts';
 import useNavDestinations from '../../hooks/useNavDestinations.ts';
 import useProfile from '../../hooks/useProfile.ts';
 import { SUPPORT_EMAIL } from '../../utils/brand.ts';
+import Link from '../common/Link.tsx';
 import ProfileAvatar from '../common/ProfileAvatar.tsx';
 import LocaleMenuButton from './LocaleMenuButton.tsx';
 import Logo from './Logo.tsx';

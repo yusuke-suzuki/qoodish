@@ -4,12 +4,12 @@ import {
   Skeleton,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import useRelativeTime from '../../hooks/useRelativeTime.ts';
 import AuthorAvatar from '../common/AuthorAvatar.tsx';
+import Link from '../common/Link.tsx';
 
 type Props = {
   map: AppMap | null;

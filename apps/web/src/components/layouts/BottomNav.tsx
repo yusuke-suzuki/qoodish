@@ -7,7 +7,6 @@ import {
   Box,
   Paper
 } from '@mui/material';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Suspense, useContext } from 'react';
 import type { Profile } from '../../../types/index.ts';
@@ -16,6 +15,7 @@ import ShellContext from '../../context/ShellContext.tsx';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import useProfile from '../../hooks/useProfile.ts';
+import Link from '../common/Link.tsx';
 import ProfileAvatar from '../common/ProfileAvatar.tsx';
 
 export const BOTTOM_NAV_HEIGHT = 56;

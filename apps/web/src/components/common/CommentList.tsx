@@ -8,7 +8,6 @@ import {
   Link as MuiLink,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import { useState } from 'react';
 import type { CommentItem, ContentRef } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
@@ -17,6 +16,7 @@ import AuthorAvatar from './AuthorAvatar.tsx';
 import CommentMenuButton from './CommentMenuButton.tsx';
 import DeleteCommentDialog from './DeleteCommentDialog.tsx';
 import LikeCommentButton from './LikeCommentButton.tsx';
+import Link from './Link.tsx';
 import ProfileBoundary from './ProfileBoundary.tsx';
 import ReportDialog from './ReportDialog.tsx';
 

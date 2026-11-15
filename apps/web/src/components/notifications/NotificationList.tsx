@@ -10,7 +10,6 @@ import {
   ListItemText,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import { useContext, useEffect, useEffectEvent, useRef } from 'react';
 import type { Notification } from '../../../types/index.ts';
 import { markNotificationAsRead } from '../../actions/notifications.ts';
@@ -21,6 +20,7 @@ import useRelativeTime from '../../hooks/useRelativeTime.ts';
 import { notificationMessageKey } from '../../utils/notificationMessage.ts';
 import sleep from '../../utils/sleep.ts';
 import AuthorAvatar from '../common/AuthorAvatar.tsx';
+import Link from '../common/Link.tsx';
 import NoContents from '../common/NoContents.tsx';
 
 type Props = {

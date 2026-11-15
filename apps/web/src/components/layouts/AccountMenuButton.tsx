@@ -9,7 +9,6 @@ import {
   Menu
 } from '@mui/material';
 import { getAuth } from 'firebase/auth';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Suspense, useContext, useRef, useState } from 'react';
 import type { Profile } from '../../../types/index.ts';
@@ -17,6 +16,7 @@ import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import useProfile from '../../hooks/useProfile.ts';
+import Link from '../common/Link.tsx';
 import ProfileAvatar from '../common/ProfileAvatar.tsx';
 
 type ContentProps = {

@@ -7,12 +7,12 @@ import {
   ListItemButton,
   ListItemText
 } from '@mui/material';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import type { Chapter } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalDateTime from '../../hooks/useLocalDateTime.ts';
 import AuthorAvatar from '../common/AuthorAvatar.tsx';
+import Link from '../common/Link.tsx';
 import NoContents from '../common/NoContents.tsx';
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = {

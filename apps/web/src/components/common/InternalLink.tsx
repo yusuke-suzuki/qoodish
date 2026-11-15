@@ -1,8 +1,8 @@
 'use client';
 
 import { Link } from '@mui/material';
-import NextLink from 'next/link';
 import type { ReactNode } from 'react';
+import RouterLink from './Link.tsx';
 
 type Props = {
   href: string;
@@ -11,7 +11,7 @@ type Props = {
 
 export default function InternalLink({ href, children }: Props) {
   return (
-    <Link component={NextLink} href={href}>
+    <Link component={RouterLink} href={href}>
       {children}
     </Link>
   );
