@@ -1,13 +1,13 @@
 'use client';
 
 import { Box, Drawer, ListItemButton, Typography } from '@mui/material';
-import Link from 'next/link';
 import { Suspense } from 'react';
 import type { Profile } from '../../../types/index.ts';
 import useNavDestinations, {
   type NavDestination
 } from '../../hooks/useNavDestinations.ts';
 import useProfile from '../../hooks/useProfile.ts';
+import Link from '../common/Link.tsx';
 
 const TOOLBAR_GUTTER = 24;
 const ICON_BUTTON_EDGE_INSET = 12;

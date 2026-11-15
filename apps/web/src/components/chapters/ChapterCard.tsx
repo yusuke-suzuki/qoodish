@@ -2,10 +2,10 @@
 
 import { HistoryEdu } from '@mui/icons-material';
 import { Box, CardActionArea, CardMedia, Typography } from '@mui/material';
-import Link from 'next/link';
 import type { Chapter } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 
 type Props = {
   chapter: Chapter;

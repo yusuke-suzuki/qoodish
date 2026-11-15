@@ -9,10 +9,10 @@ import {
   Menu,
   MenuItem
 } from '@mui/material';
-import Link from 'next/link';
 import { useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocaleLinks from '../../hooks/useLocaleLinks.ts';
+import Link from '../common/Link.tsx';
 
 type Props = {
   // The bar shows an icon alone, so the label has to live in a tooltip there.

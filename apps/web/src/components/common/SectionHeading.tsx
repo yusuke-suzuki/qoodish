@@ -1,8 +1,8 @@
 'use client';
 
 import { Box, Button, Typography } from '@mui/material';
-import Link from 'next/link';
 import type { ReactNode } from 'react';
+import Link from './Link.tsx';
 
 type Props = {
   icon: ReactNode;

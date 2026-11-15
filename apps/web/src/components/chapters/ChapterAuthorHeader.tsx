@@ -1,8 +1,8 @@
 'use client';
 
 import { Box, Link as MuiLink, Typography } from '@mui/material';
-import Link from 'next/link';
 import type { ChapterAuthor } from '../../../types/index.ts';
+import Link from '../common/Link.tsx';
 import ProfileAvatar from '../common/ProfileAvatar.tsx';
 
 type Props = {

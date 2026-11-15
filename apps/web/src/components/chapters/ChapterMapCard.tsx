@@ -8,10 +8,10 @@ import {
   Link as MuiLink,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { AppMap, JourneyPathPoint, Spot } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
+import Link from '../common/Link.tsx';
 import JourneyMap from '../journeys/JourneyMap.tsx';
 
 type Props = {

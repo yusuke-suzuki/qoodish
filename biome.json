@@ -41,10 +41,30 @@
       },
       "nursery": {
         "useReactCompiler": "error"
+      },
+      "style": {
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "next/link": "Import Link from apps/web/src/components/common/Link.tsx, which turns off prefetch."
+            }
+          }
+        }
       }
     }
   },
   "overrides": [
+    {
+      "includes": ["apps/web/src/components/common/Link.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["apps/admin/**", "apps/api/**", "packages/**"],
       "linter": {

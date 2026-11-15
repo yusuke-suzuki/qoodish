@@ -9,12 +9,12 @@ import {
   ListItemText,
   Paper
 } from '@mui/material';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import type { Journal } from '../../../types/index.ts';
 import useCountLabel from '../../hooks/useCountLabel.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import DiscoverButton from '../common/DiscoverButton.tsx';
+import Link from '../common/Link.tsx';
 import NoContents from '../common/NoContents.tsx';
 
 type Props = {

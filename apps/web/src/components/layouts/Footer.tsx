@@ -7,10 +7,10 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import { SUPPORT_EMAIL } from '../../utils/brand.ts';
+import Link from '../common/Link.tsx';
 import Logo from './Logo.tsx';
 
 export default function Footer() {

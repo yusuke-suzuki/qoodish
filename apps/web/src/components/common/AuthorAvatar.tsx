@@ -1,7 +1,7 @@
 import { Avatar, Link as MuiLink, type SxProps } from '@mui/material';
-import Link from 'next/link';
 import type { UserSummary } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from './Link.tsx';
 
 type Props = {
   author: UserSummary;

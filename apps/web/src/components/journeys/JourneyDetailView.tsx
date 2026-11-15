@@ -45,7 +45,6 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
 import { useContext, useRef, useState } from 'react';
@@ -80,6 +79,7 @@ import { createMapFeatures, visitedSpots } from '../../utils/mapFeatures.ts';
 import { decodePath, encodePath } from '../../utils/polyline.ts';
 import MapLinkChip from '../chapters/MapLinkChip.tsx';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
+import Link from '../common/Link.tsx';
 import NoContents from '../common/NoContents.tsx';
 import CheckinImageStrip from './CheckinImageStrip.tsx';
 import CheckinNoteField from './CheckinNoteField.tsx';

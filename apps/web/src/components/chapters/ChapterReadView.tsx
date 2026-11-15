@@ -12,7 +12,6 @@ import {
   Paper,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
 import { type ReactNode, useContext, useState } from 'react';
@@ -36,6 +35,7 @@ import BlockUserDialog from '../common/BlockUserDialog.tsx';
 import CommentForm from '../common/CommentForm.tsx';
 import CommentList from '../common/CommentList.tsx';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
+import Link from '../common/Link.tsx';
 import MuteMenuItem from '../common/MuteMenuItem.tsx';
 import ReportDialog from '../common/ReportDialog.tsx';
 import ChapterActions from './ChapterActions.tsx';

@@ -11,7 +11,6 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import { enqueueSnackbar } from 'notistack';
 import {
   type ChangeEvent,
@@ -31,6 +30,7 @@ import {
   type ReportCategory
 } from '../../utils/reports.ts';
 import AppDialog from './AppDialog.tsx';
+import Link from './Link.tsx';
 
 const MAX_DETAILS_LENGTH = 2000;
 const DETAILS_REQUIRED_CATEGORIES = new Set<ReportCategory>([

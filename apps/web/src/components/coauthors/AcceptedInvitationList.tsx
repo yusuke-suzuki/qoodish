@@ -9,10 +9,10 @@ import {
   ListItemText,
   Paper
 } from '@mui/material';
-import Link from 'next/link';
 import type { CoauthorshipInvitation } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 import NoContents from '../common/NoContents.tsx';
 
 type Props = {

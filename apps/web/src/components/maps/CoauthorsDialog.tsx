@@ -11,7 +11,6 @@ import {
   ListItemButton,
   ListItemText
 } from '@mui/material';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
 import { useState } from 'react';
@@ -20,6 +19,7 @@ import { removeCoauthor } from '../../actions/coauthors.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import AppDialog from '../common/AppDialog.tsx';
 import ConfirmDialog from '../common/ConfirmDialog.tsx';
+import Link from '../common/Link.tsx';
 
 type Props = {
   open: boolean;

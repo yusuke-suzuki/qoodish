@@ -9,10 +9,10 @@ import {
   Chip,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import type { AppMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 
 type Props = {
   map: AppMap;

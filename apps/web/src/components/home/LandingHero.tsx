@@ -10,12 +10,12 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-import Link from 'next/link';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import { PHOTOS } from '../../utils/photos.ts';
 import SignInButtons from '../auth/SignInButtons.tsx';
 import HeroBackground from '../common/HeroBackground.tsx';
+import Link from '../common/Link.tsx';
 
 export default function LandingHero() {
   const dictionary = useDictionary();

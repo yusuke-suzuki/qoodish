@@ -21,7 +21,6 @@ import {
   MenuItem,
   Paper
 } from '@mui/material';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
 import { type MouseEvent, useState } from 'react';
@@ -31,6 +30,7 @@ import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalDateTime from '../../hooks/useLocalDateTime.ts';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
 import DiscoverButton from '../common/DiscoverButton.tsx';
+import Link from '../common/Link.tsx';
 import NoContents from '../common/NoContents.tsx';
 import RecordPastJourneyDialog from '../journeys/RecordPastJourneyDialog.tsx';
 import { BOTTOM_NAV_HEIGHT } from '../layouts/BottomNav.tsx';

@@ -2,9 +2,9 @@
 
 import { PhotoLibrary, Place } from '@mui/icons-material';
 import { Box, ButtonBase, Typography } from '@mui/material';
-import Link from 'next/link';
 import type { Pin } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 import MediaPlaceholder from '../common/MediaPlaceholder.tsx';
 
 type Props = {

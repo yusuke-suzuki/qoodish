@@ -1,11 +1,11 @@
 'use client';
 
 import { Button, Container, Divider, Stack } from '@mui/material';
-import Link from 'next/link';
 import { useContext } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from '../common/Link.tsx';
 import LandingSection from './LandingSection.tsx';
 
 export default function LandingClosing() {

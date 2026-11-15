@@ -1,8 +1,8 @@
 import { Explore } from '@mui/icons-material';
 import { Button } from '@mui/material';
-import Link from 'next/link';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import Link from './Link.tsx';
 
 // The way out of an empty list: somewhere with maps to carry.
 export default function DiscoverButton() {
