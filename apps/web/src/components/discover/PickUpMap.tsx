@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import type { AppMap } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import { responsiveImage } from '../../utils/responsiveImage.ts';
 import Link from '../common/Link.tsx';
 import MediaPlaceholder from '../common/MediaPlaceholder.tsx';
 
@@ -42,7 +43,7 @@ function PickUpMap({ map }: Props) {
         {map.image ? (
           <CardMedia
             component="img"
-            image={map.image.hero}
+            {...responsiveImage(map.image, '100vw')}
             alt={map.name}
             loading="lazy"
             sx={{ ...COVER, objectFit: 'cover' }}

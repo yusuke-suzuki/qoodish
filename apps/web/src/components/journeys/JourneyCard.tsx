@@ -20,6 +20,10 @@ import type { JourneySummary } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalDateTime from '../../hooks/useLocalDateTime.ts';
 import { journeyHeadline } from '../../utils/journeyHeadline.ts';
+import {
+  CARD_GRID_SIZES,
+  responsiveImage
+} from '../../utils/responsiveImage.ts';
 import Link from '../common/Link.tsx';
 import { JOURNEY_COVER_HEIGHT } from './journeyCardLayout.ts';
 
@@ -42,7 +46,7 @@ function JourneyCover({ journey }: { journey: JourneySummary }) {
     return (
       <CardMedia
         component="img"
-        image={journey.cover_image.card}
+        {...responsiveImage(journey.cover_image, CARD_GRID_SIZES)}
         alt=""
         loading="lazy"
         sx={{ height: JOURNEY_COVER_HEIGHT, objectFit: 'cover' }}

@@ -13,6 +13,7 @@ import { useState } from 'react';
 import type { AppMap, Pin, PinProperty } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import { responsiveImage } from '../../utils/responsiveImage.ts';
 import BottomSheet from '../common/BottomSheet.tsx';
 import Link from '../common/Link.tsx';
 import ProfileBoundary from '../common/ProfileBoundary.tsx';
@@ -162,7 +163,7 @@ function PinDrawer({
                 <CardMedia
                   component="img"
                   alt={pin.name}
-                  image={image.card}
+                  {...responsiveImage(image, '200px')}
                   sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </Box>

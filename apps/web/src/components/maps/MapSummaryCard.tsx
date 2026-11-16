@@ -17,6 +17,7 @@ import type {
   Profile
 } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
+import { responsiveImage } from '../../utils/responsiveImage.ts';
 import MediaPlaceholder from '../common/MediaPlaceholder.tsx';
 import BookmarkButton from './BookmarkButton.tsx';
 import Coauthors from './Coauthors.tsx';
@@ -68,7 +69,7 @@ export default function MapSummaryCard({
         <CardMedia
           component="img"
           alt={map.name}
-          image={map.image.card}
+          {...responsiveImage(map.image, '360px')}
           width={1200}
           height={630}
           sx={{

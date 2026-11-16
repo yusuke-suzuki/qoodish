@@ -1,5 +1,6 @@
 import { Box, ButtonBase, ImageList, ImageListItem } from '@mui/material';
 import type { Pin } from '../../../types/index.ts';
+import { responsiveImage } from '../../utils/responsiveImage.ts';
 
 type Props = {
   pin: Pin;
@@ -27,7 +28,7 @@ function PinImageList({ pin }: Props) {
           >
             <Box
               component="img"
-              src={image.card}
+              {...responsiveImage(image, '(min-width: 1200px) 576px, 50vw')}
               // The link takes its name from this text, so one report's
               // photographs have to be told apart by it.
               alt={
