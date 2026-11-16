@@ -56,7 +56,6 @@ import type {
   JourneyCheckin,
   Pin
 } from '../../../types/index.ts';
-import { writeJourneyChapter } from '../../actions/chapters.ts';
 import {
   addCheckin,
   type CheckinParams,
@@ -70,6 +69,7 @@ import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalDateTime, {
   LOCAL_DATE_TIME_PLACEHOLDER
 } from '../../hooks/useLocalDateTime.ts';
+import useWriteJourneyChapter from '../../hooks/useWriteJourneyChapter.ts';
 import { toDatetimeLocal } from '../../utils/datetimeLocal.ts';
 import { trailDistanceMeters } from '../../utils/geo.ts';
 import { deletePaused } from '../../utils/journeyPauseStorage.ts';
@@ -130,7 +130,7 @@ export default function JourneyDetailView({
   // router.refresh() cannot be awaited, so the journey prop still reads as
   // unfinished for a moment after the request succeeds.
   const [ended, setEnded] = useState(false);
-  const [recording, setRecording] = useState(false);
+  const { writingId, write } = useWriteJourneyChapter();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [repinning, setRepinning] = useState<JourneyCheckin | null>(null);
   const [savingCheckinIds, setSavingCheckinIds] = useState<ReadonlySet<number>>(
@@ -381,29 +381,6 @@ export default function JourneyDetailView({
     setEnded(true);
     setEndOpen(false);
     router.refresh();
-  };
-
-  const handleRecord = async () => {
-    if (!map) {
-      return;
-    }
-
-    setRecording(true);
-
-    const { success, data, error } = await writeJourneyChapter(
-      journey.id,
-      dictionary['untitled chapter']
-    );
-
-    if (!success || !data) {
-      enqueueSnackbar(error ?? dictionary['an error occurred'], {
-        variant: 'error'
-      });
-      setRecording(false);
-      return;
-    }
-
-    router.push(`/${lang}/chapters/${data.id}/edit`);
   };
 
   const handleDeleteConfirm = async () => {
@@ -744,9 +721,9 @@ export default function JourneyDetailView({
                 variant="contained"
                 color="secondary"
                 startIcon={<HistoryEdu />}
-                loading={recording}
+                loading={writingId !== null}
                 disabled={savingCheckinIds.size > 0}
-                onClick={handleRecord}
+                onClick={() => write(journey.id)}
               >
                 {dictionary['record as chapter']}
               </Button>

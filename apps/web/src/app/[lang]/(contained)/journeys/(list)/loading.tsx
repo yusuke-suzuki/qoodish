@@ -1,31 +1,39 @@
-import { List, ListItem, Paper, Skeleton, Stack } from '@mui/material';
+import { Card, CardActions, CardContent, Grid, Skeleton } from '@mui/material';
+import {
+  JOURNEY_CARD_SIZE,
+  JOURNEY_COVER_HEIGHT
+} from '../../../../../components/journeys/journeyCardLayout.ts';
 
-const ROW_COUNT = 5;
+const CARD_COUNT = 4;
 
 export default function Loading() {
   return (
-    <Paper variant="outlined">
-      <List disablePadding>
-        {Array.from({ length: ROW_COUNT }).map((_, index) => (
-          <ListItem
+    <>
+      <Grid container spacing={2}>
+        {Array.from({ length: CARD_COUNT }).map((_, index) => (
+          <Grid
             // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton list
             key={`skeleton-journey-${index}`}
-            divider={index < ROW_COUNT - 1}
+            size={JOURNEY_CARD_SIZE}
           >
-            <Skeleton
-              variant="circular"
-              width={24}
-              height={24}
-              sx={{ mr: 2, flexShrink: 0 }}
-            />
-            <Stack spacing={0.5} sx={{ flex: 1 }}>
-              <Skeleton variant="text" width="55%" />
-              <Skeleton variant="text" width="40%" />
-              <Skeleton variant="text" width="30%" />
-            </Stack>
-          </ListItem>
+            <Card variant="outlined">
+              <Skeleton variant="rectangular" height={JOURNEY_COVER_HEIGHT} />
+              <CardContent>
+                <Skeleton
+                  variant="text"
+                  width="70%"
+                  sx={{ typography: 'subtitle1' }}
+                />
+                <Skeleton variant="text" width="40%" />
+                <Skeleton variant="text" width="30%" />
+              </CardContent>
+              <CardActions>
+                <Skeleton variant="rounded" width={140} height={36} />
+              </CardActions>
+            </Card>
+          </Grid>
         ))}
-      </List>
-    </Paper>
+      </Grid>
+    </>
   );
 }

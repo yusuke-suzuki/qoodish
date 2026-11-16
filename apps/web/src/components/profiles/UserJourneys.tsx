@@ -1,49 +1,31 @@
 'use client';
 
+import { Delete, DirectionsWalk, HistoryEdu } from '@mui/icons-material';
 import {
-  Delete,
-  DirectionsWalk,
-  HistoryEdu,
-  MoreVert
-} from '@mui/icons-material';
-import {
-  Box,
   Button,
-  Chip,
   Fab,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
+  Grid,
   ListItemIcon,
   ListItemText,
   Menu,
-  MenuItem,
-  Paper
+  MenuItem
 } from '@mui/material';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { enqueueSnackbar } from 'notistack';
 import { type MouseEvent, useState } from 'react';
 import type { JourneySummary } from '../../../types/index.ts';
 import { deleteJourney } from '../../actions/journeys.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
-import useLocalDateTime from '../../hooks/useLocalDateTime.ts';
+import useWriteJourneyChapter from '../../hooks/useWriteJourneyChapter.ts';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
 import DiscoverButton from '../common/DiscoverButton.tsx';
-import Link from '../common/Link.tsx';
 import NoContents from '../common/NoContents.tsx';
+import JourneyCard from '../journeys/JourneyCard.tsx';
+import { JOURNEY_CARD_SIZE } from '../journeys/journeyCardLayout.ts';
 import RecordPastJourneyDialog from '../journeys/RecordPastJourneyDialog.tsx';
 import { BOTTOM_NAV_HEIGHT } from '../layouts/BottomNav.tsx';
 
 const FAB_CLEARANCE = 10;
-
-const DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit'
-};
 
 function UserJourneys({
   journeys: initialJourneys
@@ -51,8 +33,6 @@ function UserJourneys({
   journeys: JourneySummary[];
 }) {
   const dictionary = useDictionary();
-  const { lang } = useParams<{ lang: string }>();
-  const formatLocal = useLocalDateTime();
   const router = useRouter();
 
   const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
@@ -60,6 +40,7 @@ function UserJourneys({
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [menuJourney, setMenuJourney] = useState<JourneySummary | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<JourneySummary | null>(null);
+  const { writingId, write } = useWriteJourneyChapter();
 
   const openMenu = (
     event: MouseEvent<HTMLElement>,
@@ -138,91 +119,19 @@ function UserJourneys({
             {dictionary['record past journey']}
           </Fab>
 
-          <Paper variant="outlined" sx={{ mb: FAB_CLEARANCE }}>
-            <List disablePadding>
-              {journeys.map((journey, index) => {
-                const started = Boolean(journey.started_at);
-                const active = started && !journey.finished_at;
-                const dateSource =
-                  journey.finished_at ??
-                  journey.started_at ??
-                  journey.created_at;
-
-                return (
-                  <ListItem
-                    key={journey.id}
-                    disablePadding
-                    divider={index < journeys.length - 1}
-                  >
-                    <ListItemButton
-                      component={Link}
-                      href={`/${lang}/journeys/${journey.id}`}
-                      sx={{ flex: 1, minWidth: 0 }}
-                    >
-                      <ListItemIcon sx={{ minWidth: 40 }}>
-                        <DirectionsWalk fontSize="small" color="action" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={formatLocal(dateSource, DATE_TIME_OPTIONS)}
-                        secondary={
-                          <>
-                            {journey.map?.name && (
-                              <Box
-                                component="span"
-                                sx={{
-                                  display: 'block',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap'
-                                }}
-                              >
-                                {journey.map.name}
-                              </Box>
-                            )}
-                            <Box component="span" sx={{ display: 'block' }}>
-                              {started
-                                ? dictionary['checkins count'].replace(
-                                    '{count}',
-                                    String(journey.checkins_count)
-                                  )
-                                : dictionary['milestones count'].replace(
-                                    '{count}',
-                                    String(journey.milestones_count)
-                                  )}
-                            </Box>
-                          </>
-                        }
-                        slotProps={{ primary: { noWrap: true } }}
-                      />
-                      {active && (
-                        <Chip
-                          label={dictionary['in progress']}
-                          size="small"
-                          color="primary"
-                          sx={{ ml: 1, flexShrink: 0 }}
-                        />
-                      )}
-                      {!started && (
-                        <Chip
-                          label={dictionary.planned}
-                          size="small"
-                          sx={{ ml: 1, flexShrink: 0 }}
-                        />
-                      )}
-                    </ListItemButton>
-
-                    <IconButton
-                      aria-label={dictionary.more}
-                      onClick={(event) => openMenu(event, journey)}
-                      sx={{ mr: 0.5 }}
-                    >
-                      <MoreVert />
-                    </IconButton>
-                  </ListItem>
-                );
-              })}
-            </List>
-          </Paper>
+          <Grid container spacing={2} sx={{ mb: FAB_CLEARANCE }}>
+            {journeys.map((journey) => (
+              <Grid key={journey.id} size={JOURNEY_CARD_SIZE}>
+                <JourneyCard
+                  journey={journey}
+                  writing={writingId === journey.id}
+                  writeDisabled={writingId !== null}
+                  onWrite={(journey) => write(journey.id)}
+                  onMore={openMenu}
+                />
+              </Grid>
+            ))}
+          </Grid>
         </>
       )}
 
