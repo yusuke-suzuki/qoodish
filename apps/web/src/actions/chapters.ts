@@ -4,6 +4,7 @@ import type { SerializedEditorState } from 'lexical';
 import type {
   Chapter,
   CursorPage,
+  Journey,
   MapFeatureCollection
 } from '../../types/index.ts';
 import { apiFetch } from '../lib/api.ts';
@@ -11,6 +12,8 @@ import { CHAPTERS_TAG, chapterTag, mapTag, userTag } from '../lib/cacheTags.ts';
 import { getChapterFeed } from '../lib/chapters.ts';
 import { recordEvent } from '../lib/events.ts';
 import { revalidateTags } from '../lib/revalidate.ts';
+import { createChapterContent } from '../utils/chapterContent.ts';
+import { createMapFeatures } from '../utils/mapFeatures.ts';
 
 type ActionResult<T = null> = {
   success: boolean;
@@ -61,6 +64,26 @@ export async function createChapter(
   recordEvent({ name: 'create_chapter', params: { map_id: mapId } });
 
   return { success: true, data };
+}
+
+export async function writeJourneyChapter(
+  journeyId: number,
+  title: string
+): Promise<ActionResult<Chapter>> {
+  const { data: journey, error } = await apiFetch<Journey>(
+    `/me/journeys/${journeyId}`
+  );
+
+  if (!journey || journey.map_id === null) {
+    return { success: false, error: error ?? undefined };
+  }
+
+  return createChapter(journey.map_id, {
+    title,
+    content: createChapterContent(journey),
+    map_features: createMapFeatures(journey),
+    journey_id: journey.id
+  });
 }
 
 export async function updateChapter(

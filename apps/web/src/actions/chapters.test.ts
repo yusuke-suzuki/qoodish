@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, it, mock } from 'node:test';
 import type { SerializedEditorState } from 'lexical';
 import type { Chapter, CursorPage } from '../../types/index.ts';
+import { buildCheckin, buildJourney } from '../test/journeys.ts';
 import {
+  apiFetch,
   apiRequests,
   failWith,
   recordedEvents,
@@ -10,6 +12,8 @@ import {
   respondWith,
   revalidatedTags
 } from '../test/serverActionMocks.ts';
+import { createChapterContent } from '../utils/chapterContent.ts';
+import { createMapFeatures } from '../utils/mapFeatures.ts';
 
 const getChapterFeed =
   mock.fn<(lang: string, cursor: string) => Promise<CursorPage<Chapter>>>();
@@ -84,6 +88,65 @@ describe('createChapter', () => {
     assert.deepEqual(result, { success: false, error: 'Title is required' });
     assert.deepEqual(revalidatedTags(), []);
     assert.deepEqual(recordedEvents(), []);
+  });
+});
+
+describe('writeJourneyChapter', () => {
+  const journey = buildJourney([
+    buildCheckin(1, '2026-08-01T01:00:00Z', { note: 'Slurped' })
+  ]);
+
+  function respondByPath(responses: Record<string, unknown>): void {
+    apiFetch.mock.mockImplementation(async (path) => ({
+      data: responses[path] ?? null,
+      error: null,
+      status: 200
+    }));
+  }
+
+  it('creates a chapter on the journey map from its check-ins', async () => {
+    const { writeJourneyChapter } = await actions();
+    const created = chapter({ map_id: 10 });
+    respondByPath({ '/me/journeys/1': journey, '/maps/10/chapters': created });
+
+    const result = await writeJourneyChapter(1, 'Untitled');
+
+    assert.deepEqual(result, { success: true, data: created });
+    assert.deepEqual(apiRequests(), [
+      { path: '/me/journeys/1', method: undefined, body: undefined },
+      {
+        path: '/maps/10/chapters',
+        method: 'POST',
+        body: JSON.parse(
+          JSON.stringify({
+            title: 'Untitled',
+            content: createChapterContent(journey),
+            map_features: createMapFeatures(journey),
+            journey_id: 1
+          })
+        )
+      }
+    ]);
+  });
+
+  it('writes nothing for a journey whose map was deleted', async () => {
+    const { writeJourneyChapter } = await actions();
+    respondByPath({ '/me/journeys/1': { ...journey, map_id: null } });
+
+    const result = await writeJourneyChapter(1, 'Untitled');
+
+    assert.deepEqual(result, { success: false, error: undefined });
+    assert.equal(apiRequests().length, 1);
+  });
+
+  it('reports a journey it cannot read', async () => {
+    const { writeJourneyChapter } = await actions();
+    failWith('Not Found', 404);
+
+    const result = await writeJourneyChapter(1, 'Untitled');
+
+    assert.deepEqual(result, { success: false, error: 'Not Found' });
+    assert.equal(apiRequests().length, 1);
   });
 });
 
