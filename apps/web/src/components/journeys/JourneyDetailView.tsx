@@ -56,7 +56,7 @@ import type {
   JourneyCheckin,
   Pin
 } from '../../../types/index.ts';
-import { createChapter } from '../../actions/chapters.ts';
+import { writeJourneyChapter } from '../../actions/chapters.ts';
 import {
   addCheckin,
   type CheckinParams,
@@ -70,12 +70,11 @@ import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalDateTime, {
   LOCAL_DATE_TIME_PLACEHOLDER
 } from '../../hooks/useLocalDateTime.ts';
-import { createChapterContent } from '../../utils/chapterContent.ts';
 import { toDatetimeLocal } from '../../utils/datetimeLocal.ts';
 import { trailDistanceMeters } from '../../utils/geo.ts';
 import { deletePaused } from '../../utils/journeyPauseStorage.ts';
 import { deleteTrail, loadTrail } from '../../utils/journeyTrailStorage.ts';
-import { createMapFeatures, visitedSpots } from '../../utils/mapFeatures.ts';
+import { visitedSpots } from '../../utils/mapFeatures.ts';
 import { decodePath, encodePath } from '../../utils/polyline.ts';
 import MapLinkChip from '../chapters/MapLinkChip.tsx';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog.tsx';
@@ -391,12 +390,10 @@ export default function JourneyDetailView({
 
     setRecording(true);
 
-    const { success, data, error } = await createChapter(map.id, {
-      title: dictionary['untitled chapter'],
-      content: createChapterContent({ ...journey, checkins }),
-      map_features: createMapFeatures({ ...journey, checkins }),
-      journey_id: journey.id
-    });
+    const { success, data, error } = await writeJourneyChapter(
+      journey.id,
+      dictionary['untitled chapter']
+    );
 
     if (!success || !data) {
       enqueueSnackbar(error ?? dictionary['an error occurred'], {
