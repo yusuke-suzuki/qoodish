@@ -2,6 +2,7 @@ import { Box, ButtonBase, CardMedia, Stack } from '@mui/material';
 import { useRef, useState } from 'react';
 import type { Pin } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
+import { responsiveImage } from '../../utils/responsiveImage.ts';
 
 type Props = {
   pin: Pin;
@@ -66,7 +67,7 @@ function PinImageCarousel({ pin }: Props) {
             <CardMedia
               component="img"
               alt={pin.name}
-              image={image.card}
+              {...responsiveImage(image, '320px')}
               width={1200}
               height={630}
               loading={index > 0 ? 'lazy' : undefined}

@@ -12,6 +12,10 @@ import {
 import type { AppMap } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import {
+  CARD_GRID_SIZES,
+  responsiveImage
+} from '../../utils/responsiveImage.ts';
 import Link from '../common/Link.tsx';
 
 type Props = {
@@ -32,7 +36,7 @@ export default function MapCard({ map }: Props) {
         {map.image ? (
           <CardMedia
             component="img"
-            image={map.image.hero}
+            {...responsiveImage(map.image, CARD_GRID_SIZES)}
             alt=""
             loading="lazy"
             sx={{ aspectRatio: '16 / 9', objectFit: 'cover' }}

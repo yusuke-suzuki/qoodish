@@ -4,6 +4,10 @@ import { PhotoLibrary, Place } from '@mui/icons-material';
 import { Box, ButtonBase, Typography } from '@mui/material';
 import type { Pin } from '../../../types/index.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
+import {
+  PIN_GRID_SIZES,
+  responsiveImage
+} from '../../utils/responsiveImage.ts';
 import Link from '../common/Link.tsx';
 import MediaPlaceholder from '../common/MediaPlaceholder.tsx';
 
@@ -31,7 +35,7 @@ export default function PinCard({ pin }: Props) {
         {image ? (
           <Box
             component="img"
-            src={image.card}
+            {...responsiveImage(image, PIN_GRID_SIZES)}
             alt=""
             loading="lazy"
             sx={{
