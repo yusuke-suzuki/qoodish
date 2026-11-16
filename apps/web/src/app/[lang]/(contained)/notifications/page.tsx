@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import SignInRequired from '../../../../components/auth/SignInRequired.tsx';
+import PageHeader from '../../../../components/common/PageHeader.tsx';
 import NotificationsFeed from '../../../../components/notifications/NotificationsFeed.tsx';
 import { getServerAuthState } from '../../../../lib/auth.ts';
 import { getNotifications } from '../../../../lib/users.ts';
@@ -29,5 +30,10 @@ export default async function NotificationsPage({ params }: Props) {
 
   const { items, nextCursor } = await getNotifications(lang);
 
-  return <NotificationsFeed notifications={items} nextCursor={nextCursor} />;
+  return (
+    <>
+      <PageHeader title={getDictionary(lang).notifications} />
+      <NotificationsFeed notifications={items} nextCursor={nextCursor} />
+    </>
+  );
 }

@@ -2,6 +2,7 @@ import { Explore, FiberNew, HistoryEdu, Whatshot } from '@mui/icons-material';
 import { Box, Stack, Typography } from '@mui/material';
 import type { Metadata } from 'next';
 import ChapterList from '../../../../components/chapters/ChapterList.tsx';
+import PageHeader from '../../../../components/common/PageHeader.tsx';
 import SectionHeading from '../../../../components/common/SectionHeading.tsx';
 import PickUpMap from '../../../../components/discover/PickUpMap.tsx';
 import MapGridList from '../../../../components/maps/MapGridList.tsx';
@@ -67,9 +68,7 @@ export default async function DiscoverPage({ params }: Props) {
 
   return (
     <>
-      <Typography variant="h4" component="h1" sx={{ mb: { xs: 4, sm: 6 } }}>
-        {dict.discover}
-      </Typography>
+      <PageHeader title={dict.discover} />
 
       <Stack spacing={{ xs: 4, sm: 6 }}>
         {pickUpMap && (

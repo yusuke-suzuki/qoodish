@@ -6,6 +6,7 @@ import {
   Skeleton,
   Stack
 } from '@mui/material';
+import { PageHeaderSkeleton } from '../../../../components/common/PageHeader.tsx';
 
 const PLACEHOLDER_COUNT = 5;
 const TAB_COUNT = 2;
@@ -14,6 +15,7 @@ const tabBarHeight = 48;
 export default function Loading() {
   return (
     <>
+      <PageHeaderSkeleton />
       {/* Plain boxes rather than Tabs: a skeleton must not expose focusable
           tab roles that carry no accessible name. */}
       <Card>

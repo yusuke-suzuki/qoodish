@@ -1,5 +1,6 @@
 import { Stack } from '@mui/material';
 import type { Metadata } from 'next';
+import PageHeader from '../../../../components/common/PageHeader.tsx';
 import AccountEmailCard from '../../../../components/settings/AccountEmailCard.tsx';
 import BlockedAccountsCard from '../../../../components/settings/BlockedAccountsCard.tsx';
 import DeleteAccountCard from '../../../../components/settings/DeleteAccountCard.tsx';
@@ -33,23 +34,26 @@ export default async function SettingsPage({ params }: Props) {
     : [noAccounts, noAccounts];
 
   return (
-    <Stack spacing={3}>
-      <AccountEmailCard />
-      <PushNotificationsCard />
-      {token && (
-        <>
-          <MutedAccountsCard
-            accounts={mutedAccounts.items}
-            nextCursor={mutedAccounts.nextCursor}
-          />
-          <BlockedAccountsCard
-            accounts={blockedAccounts.items}
-            nextCursor={blockedAccounts.nextCursor}
-          />
-        </>
-      )}
-      <ProvidersCard />
-      <DeleteAccountCard />
-    </Stack>
+    <>
+      <PageHeader title={getDictionary(lang).settings} />
+      <Stack spacing={3}>
+        <AccountEmailCard />
+        <PushNotificationsCard />
+        {token && (
+          <>
+            <MutedAccountsCard
+              accounts={mutedAccounts.items}
+              nextCursor={mutedAccounts.nextCursor}
+            />
+            <BlockedAccountsCard
+              accounts={blockedAccounts.items}
+              nextCursor={blockedAccounts.nextCursor}
+            />
+          </>
+        )}
+        <ProvidersCard />
+        <DeleteAccountCard />
+      </Stack>
+    </>
   );
 }
