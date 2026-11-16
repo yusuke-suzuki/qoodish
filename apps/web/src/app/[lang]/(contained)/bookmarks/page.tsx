@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SignInRequired from '../../../../components/auth/SignInRequired.tsx';
 import BookmarksView from '../../../../components/bookmarks/BookmarksView.tsx';
+import PageHeader from '../../../../components/common/PageHeader.tsx';
 import { getServerAuthState } from '../../../../lib/auth.ts';
 import {
   getBookmarkedJournals,
@@ -35,5 +36,10 @@ export default async function BookmarksPage({ params }: Props) {
     getBookmarkedJournals(lang, token)
   ]);
 
-  return <BookmarksView maps={maps} journals={journals} />;
+  return (
+    <>
+      <PageHeader title={getDictionary(lang).bookmarks} />
+      <BookmarksView maps={maps} journals={journals} />
+    </>
+  );
 }

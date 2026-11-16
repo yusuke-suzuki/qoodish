@@ -1,4 +1,5 @@
-import { Box, Grid, Skeleton } from '@mui/material';
+import { Grid, Skeleton } from '@mui/material';
+import { PageHeaderSkeleton } from '../../../../../components/common/PageHeader.tsx';
 
 const TILE_COUNT = 12;
 const SIZE = { xs: 6, sm: 4, md: 3 };
@@ -6,10 +7,7 @@ const SIZE = { xs: 6, sm: 4, md: 3 };
 export default function Loading() {
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-        <Skeleton variant="circular" width={24} height={24} />
-        <Skeleton variant="text" width={160} sx={{ typography: 'h5' }} />
-      </Box>
+      <PageHeaderSkeleton />
 
       <Grid container spacing={2}>
         {Array.from({ length: TILE_COUNT }).map((_, index) => (

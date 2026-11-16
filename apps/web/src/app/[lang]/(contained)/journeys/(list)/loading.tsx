@@ -1,4 +1,5 @@
 import { Card, CardActions, CardContent, Grid, Skeleton } from '@mui/material';
+import { PageHeaderSkeleton } from '../../../../../components/common/PageHeader.tsx';
 import {
   JOURNEY_CARD_SIZE,
   JOURNEY_COVER_HEIGHT
@@ -9,6 +10,8 @@ const CARD_COUNT = 4;
 export default function Loading() {
   return (
     <>
+      <PageHeaderSkeleton />
+
       <Grid container spacing={2}>
         {Array.from({ length: CARD_COUNT }).map((_, index) => (
           <Grid

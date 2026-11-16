@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SignInRequired from '../../../../components/auth/SignInRequired.tsx';
 import CoauthorshipInvitationsView from '../../../../components/coauthors/CoauthorshipInvitationsView.tsx';
+import PageHeader from '../../../../components/common/PageHeader.tsx';
 import { getServerAuthState } from '../../../../lib/auth.ts';
 import { getCoauthorshipInvitations } from '../../../../lib/coauthorshipInvitations.ts';
 import { getDictionary } from '../../../../utils/getDictionary.ts';
@@ -37,5 +38,10 @@ export default async function InvitationsPage({ params }: Props) {
     getCoauthorshipInvitations(lang, 'accepted')
   ]);
 
-  return <CoauthorshipInvitationsView pending={pending} accepted={accepted} />;
+  return (
+    <>
+      <PageHeader title={getDictionary(lang).invites} />
+      <CoauthorshipInvitationsView pending={pending} accepted={accepted} />
+    </>
+  );
 }

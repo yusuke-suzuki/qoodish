@@ -1,4 +1,5 @@
 import { Box, Divider, Grid, Paper, Skeleton, Stack } from '@mui/material';
+import { PageHeaderSkeleton } from '../../../../components/common/PageHeader.tsx';
 
 const PIN_TILE_COUNT = 8;
 const MAP_TILE_COUNT = 6;
@@ -116,11 +117,7 @@ function ChapterRow() {
 export default function Loading() {
   return (
     <>
-      <Skeleton
-        variant="text"
-        width={160}
-        sx={{ typography: 'h4', mb: { xs: 4, sm: 6 } }}
-      />
+      <PageHeaderSkeleton />
 
       <Stack spacing={{ xs: 4, sm: 6 }}>
         <Box component="section">

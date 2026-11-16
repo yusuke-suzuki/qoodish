@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import SignInRequired from '../../../../../components/auth/SignInRequired.tsx';
+import PageHeader from '../../../../../components/common/PageHeader.tsx';
 import UserJourneys from '../../../../../components/profiles/UserJourneys.tsx';
 import { getServerAuthState } from '../../../../../lib/auth.ts';
 import { getMyJourneys } from '../../../../../lib/journeys.ts';
@@ -29,5 +30,10 @@ export default async function JourneysPage({ params }: Props) {
 
   const journeys = await getMyJourneys(lang, token);
 
-  return <UserJourneys journeys={journeys} />;
+  return (
+    <>
+      <PageHeader title={getDictionary(lang)['journey log']} />
+      <UserJourneys journeys={journeys} />
+    </>
+  );
 }

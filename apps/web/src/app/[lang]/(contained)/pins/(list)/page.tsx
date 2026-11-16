@@ -1,6 +1,5 @@
-import { FiberNew } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
 import type { Metadata } from 'next';
+import PageHeader from '../../../../../components/common/PageHeader.tsx';
 import PinFeed from '../../../../../components/pins/PinFeed.tsx';
 import { getPinFeed } from '../../../../../lib/pins.ts';
 import { getDictionary } from '../../../../../utils/getDictionary.ts';
@@ -47,12 +46,7 @@ export default async function PinsPage({ params }: Props) {
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-        <FiberNew color="secondary" />
-        <Typography variant="h5" component="h1">
-          {dict['recent pins']}
-        </Typography>
-      </Box>
+      <PageHeader title={dict['recent pins']} />
 
       <PinFeed initialPins={items} nextCursor={nextCursor} />
     </>

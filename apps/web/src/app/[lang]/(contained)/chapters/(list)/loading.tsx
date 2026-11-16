@@ -1,4 +1,5 @@
 import { Box, Divider, Paper, Skeleton, Stack } from '@mui/material';
+import { PageHeaderSkeleton } from '../../../../../components/common/PageHeader.tsx';
 
 const ROW_COUNT = 6;
 const THUMBNAIL_SIZE = { xs: 80, sm: 100 };
@@ -31,10 +32,7 @@ function ChapterRow() {
 export default function Loading() {
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-        <Skeleton variant="circular" width={24} height={24} />
-        <Skeleton variant="text" width={160} sx={{ typography: 'h5' }} />
-      </Box>
+      <PageHeaderSkeleton />
 
       <Paper variant="outlined">
         <Stack divider={<Divider />}>
