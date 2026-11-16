@@ -1,3 +1,4 @@
+import type { ChapterStatus } from './chapters.ts';
 import type { Image } from './images.ts';
 import type { MapRef } from './maps.ts';
 import type { IsoTimestamp } from './scalars.ts';
@@ -40,7 +41,16 @@ export type Journey = JourneyAttributes & {
   encoded_path: string | null;
 };
 
+export type JourneyChapterRef = {
+  id: number;
+  title: string;
+  status: ChapterStatus;
+};
+
 export type JourneySummary = JourneyAttributes & {
   milestones_count: number;
   checkins_count: number;
+  checkin_spot_names: string[];
+  cover_image: Image | null;
+  chapter: JourneyChapterRef | null;
 };
