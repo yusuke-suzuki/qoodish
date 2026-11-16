@@ -1,5 +1,8 @@
 import type {
+  ChapterStatus,
+  Image,
   Journey,
+  JourneyChapterRef,
   JourneyCheckin,
   JourneySummary,
   MapRef,
@@ -179,43 +182,112 @@ function checkinOf(
   };
 }
 
+function chapterRef(row: {
+  chapterId: number | null;
+  chapterTitle: string | null;
+  chapterStatus: string | null;
+}): JourneyChapterRef | null {
+  return row.chapterId === null ||
+    row.chapterTitle === null ||
+    row.chapterStatus === null
+    ? null
+    : {
+        id: row.chapterId,
+        title: row.chapterTitle,
+        status: row.chapterStatus as ChapterStatus
+      };
+}
+
+function coverImage(
+  checkinIds: readonly number[],
+  imagesByCheckin: Map<number, CheckinImage[]>
+): Image | null {
+  for (const checkinId of checkinIds) {
+    const [cover] = imagesByCheckin.get(checkinId) ?? [];
+
+    if (cover) {
+      return image(cover.id, cover.url);
+    }
+  }
+
+  return null;
+}
+
 export async function journeySummaries(
   db: Database,
   userId: number
 ): Promise<JourneySummary[]> {
-  const rows = await db
-    .select({
-      ...journeyColumns,
-      milestonesCount: db
-        .$count(milestones, eq(milestones.journeyId, journeys.id))
-        .as('milestones_count'),
-      checkinsCount: db
-        .$count(
-          journeyCheckins,
-          and(eq(journeyCheckins.journeyId, journeys.id), recorded)
-        )
-        .as('checkins_count')
-    })
-    .from(journeys)
-    .leftJoin(maps, eq(maps.id, journeys.mapId))
-    .where(eq(journeys.userId, userId))
-    .orderBy(
-      desc(sql`coalesce(${journeys.startedAt}, ${journeys.createdAt})`),
-      asc(journeys.id)
-    );
+  const ownJourneys = eq(journeys.userId, userId);
+  const ownCheckins = and(
+    inArray(
+      journeyCheckins.journeyId,
+      db.select({ id: journeys.id }).from(journeys).where(ownJourneys)
+    ),
+    recorded
+  );
+  const [rows, checkinRows, checkinImages] = await db.batch([
+    db
+      .select({
+        ...journeyColumns,
+        chapterTitle: chapters.title,
+        chapterStatus: chapters.status,
+        milestonesCount: db
+          .$count(milestones, eq(milestones.journeyId, journeys.id))
+          .as('milestones_count'),
+        checkinsCount: db
+          .$count(
+            journeyCheckins,
+            and(eq(journeyCheckins.journeyId, journeys.id), recorded)
+          )
+          .as('checkins_count')
+      })
+      .from(journeys)
+      .leftJoin(maps, eq(maps.id, journeys.mapId))
+      .leftJoin(chapters, eq(chapters.journeyId, journeys.id))
+      .where(ownJourneys)
+      .orderBy(
+        desc(sql`coalesce(${journeys.startedAt}, ${journeys.createdAt})`),
+        asc(journeys.id)
+      ),
+    db
+      .select({
+        id: journeyCheckins.id,
+        journeyId: journeyCheckins.journeyId,
+        name: journeyCheckins.name
+      })
+      .from(journeyCheckins)
+      .where(ownCheckins)
+      .orderBy(asc(journeyCheckins.checkedInAt), asc(journeyCheckins.id)),
+    checkinImagesQuery(db, ownCheckins)
+  ]);
+  const checkinsByJourney = Map.groupBy(
+    checkinRows,
+    (checkin) => checkin.journeyId
+  );
+  const imagesByCheckin = Map.groupBy(checkinImages, (item) => item.checkinId);
 
-  return rows.map((row) => ({
-    id: row.id,
-    map_id: row.mapId,
-    started_at: row.startedAt,
-    finished_at: row.finishedAt,
-    milestones_count: row.milestonesCount,
-    checkins_count: row.checkinsCount,
-    chapter_id: row.chapterId,
-    map: mapRef(row),
-    created_at: row.createdAt,
-    updated_at: row.updatedAt
-  }));
+  return rows.map((row) => {
+    const checkins = checkinsByJourney.get(row.id) ?? [];
+
+    return {
+      id: row.id,
+      map_id: row.mapId,
+      started_at: row.startedAt,
+      finished_at: row.finishedAt,
+      milestones_count: row.milestonesCount,
+      checkins_count: row.checkinsCount,
+      checkin_spot_names: checkins.map((checkin) => checkin.name),
+      cover_image: coverImage(
+        checkins.map((checkin) => checkin.id),
+        imagesByCheckin
+      ),
+      chapter_id: row.chapterId,
+      chapter: chapterRef(row),
+      map: mapRef(row),
+      created_at: row.createdAt,
+      updated_at: row.updatedAt
+    };
+  });
 }
 
 export async function journeyDetail(

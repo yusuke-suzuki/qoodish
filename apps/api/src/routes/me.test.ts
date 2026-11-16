@@ -191,7 +191,10 @@ describe('journeys', () => {
           finished_at: null,
           milestones_count: 0,
           checkins_count: 0,
+          checkin_spot_names: [],
+          cover_image: null,
           chapter_id: null,
+          chapter: null,
           map: null,
           created_at: at(7),
           updated_at: at(7)
@@ -203,7 +206,14 @@ describe('journeys', () => {
           finished_at: at(6),
           milestones_count: 2,
           checkins_count: 2,
+          checkin_spot_names: ['Spot 3', 'Spot 1'],
+          cover_image: { id: checkinImage, ...variants('spot') },
           chapter_id: ids.noodleStory,
+          chapter: {
+            id: ids.noodleStory,
+            title: 'Noodle Story',
+            status: 'published'
+          },
           map: { id: ids.ramen, name: 'Tokyo Ramen', private: false },
           created_at: at(4),
           updated_at: at(6)
