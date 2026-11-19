@@ -43,6 +43,11 @@ export default function PinTagEditor({
     (property) => property.options.length > 0
   );
 
+  const chooseOption = (property: PinProperty, optionId: number) => {
+    setAnchorEl(null);
+    onToggle(property, optionId);
+  };
+
   const openManagement = () => {
     setAnchorEl(null);
     setManaging(true);
@@ -89,7 +94,7 @@ export default function PinTagEditor({
                 aria-checked={chosen}
                 selected={chosen}
                 disabled={disabled}
-                onClick={() => onToggle(property, option.id)}
+                onClick={() => chooseOption(property, option.id)}
               >
                 <ListItemIcon>
                   <PinPropertyIcon icon={optionIcon(property, option)} />
