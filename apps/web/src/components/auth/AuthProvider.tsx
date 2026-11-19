@@ -48,6 +48,7 @@ function AuthProvider({
   const [signInRequired, setSignInRequired] = useState(false);
   const authStateRef = useRef(serverAuthenticated);
   const pendingRegistrationRef = useRef(false);
+  const signingOutRef = useRef(false);
   // The server withheld both the signed-in and the signed-out page, so this
   // render has to be replaced whichever way the token resolves. Without it a
   // reader whose session has actually ended keeps the placeholder for good.
@@ -131,6 +132,7 @@ function AuthProvider({
 
             if (firstAuth || pendingRegistrationRef.current) {
               authStateRef.current = true;
+              signingOutRef.current = false;
               pendingRegistrationRef.current = !(await registerBackendUser());
 
               if (firstAuth || !pendingRegistrationRef.current) {
@@ -151,7 +153,10 @@ function AuthProvider({
           if (authStateRef.current || provisionalRenderRef.current) {
             authStateRef.current = false;
             provisionalRenderRef.current = false;
-            router.refresh();
+
+            if (!signingOutRef.current) {
+              router.refresh();
+            }
           }
         }
       } catch (error) {
@@ -189,7 +194,18 @@ function AuthProvider({
       )
     );
 
-    await signOutOfFirebase(getAuth());
+    signingOutRef.current = true;
+
+    try {
+      await signOutOfFirebase(getAuth());
+    } catch (error) {
+      signingOutRef.current = false;
+      throw error;
+    }
+
+    await syncSessionCookie(null).catch((error) => {
+      console.error('Failed to clear session cookie:', error);
+    });
   };
 
   return (

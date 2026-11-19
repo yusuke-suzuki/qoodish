@@ -7,7 +7,7 @@ import ProfileBoundary from '../common/ProfileBoundary.tsx';
 type Props = {
   open: boolean;
   onClose: () => void;
-  onDeleted: () => void;
+  onDeleted: () => Promise<void>;
 };
 
 type ContentProps = Props & {
@@ -32,7 +32,7 @@ function DeleteAccountDialogContent({
         });
 
         onClose();
-        onDeleted();
+        await onDeleted();
         return;
       }
 

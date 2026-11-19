@@ -7,7 +7,6 @@ import {
   CardContent,
   Typography
 } from '@mui/material';
-import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
 import AuthContext from '../../context/AuthContext.ts';
@@ -20,15 +19,16 @@ function DeleteAccountCard() {
   const localePath = useLocalePath();
   const { push } = useRouter();
 
-  const { authenticated } = useContext(AuthContext);
+  const { authenticated, signOut } = useContext(AuthContext);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleDeleted = async () => {
-    const auth = getAuth();
-    await signOut(auth);
-
-    push(localePath('/'));
+    try {
+      await signOut();
+    } finally {
+      push(localePath('/'));
+    }
   };
 
   return (
