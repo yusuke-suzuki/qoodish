@@ -84,7 +84,7 @@ function TopBarContent() {
                 sx={{
                   display: { xs: 'none', md: 'block' },
                   width: '100%',
-                  maxWidth: { md: 400, xl: 560 }
+                  maxWidth: { md: 400, lg: 480, xl: 560 }
                 }}
               >
                 <TopBarSearch />
