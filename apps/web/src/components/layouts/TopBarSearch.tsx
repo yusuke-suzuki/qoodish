@@ -24,7 +24,7 @@ function TopBarSearch() {
   const [inputValue, setInputValue] = useState('');
   const deferredInputValue = useDeferredValue(inputValue);
 
-  const { results, includesUsers, active, isLoading, failed } =
+  const { results, active, isLoading, failed } =
     useSiteSearch(deferredInputValue);
 
   const groupLabel = (option: SearchResult) => {
@@ -39,6 +39,7 @@ function TopBarSearch() {
       size="small"
       autoComplete
       includeInputInList
+      forcePopupIcon={false}
       open={open && active}
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}
@@ -89,11 +90,7 @@ function TopBarSearch() {
         <TextField
           {...params}
           type="search"
-          placeholder={
-            includesUsers
-              ? dictionary['search keyword']
-              : dictionary['search keyword as guest']
-          }
+          placeholder={dictionary.search}
           aria-label={dictionary.search}
           slotProps={{
             input: {
