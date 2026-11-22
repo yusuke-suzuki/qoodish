@@ -1,12 +1,7 @@
 import type { APIRequestContext, Page } from '@playwright/test';
 import { expect, test } from './fixtures.ts';
-import { LOCAL_API_URL } from './localApi.ts';
 
 const LOCALES = ['ja', 'en'] as const;
-
-// The in-app proxy only exposes what the browser needs, so the rest of the
-// guest API is read at its own origin.
-const API_BASE_URL = process.env.E2E_API_URL ?? LOCAL_API_URL;
 
 const PUBLIC_PATHS = [
   '',
@@ -73,7 +68,7 @@ async function firstMapId(request: APIRequestContext): Promise<string> {
 async function firstPublicPin(request: APIRequestContext): Promise<GuestPin> {
   const pins = await fetchGuestList<GuestPin>(
     request,
-    `${API_BASE_URL}/guest/pins?recent=true`,
+    '/api/v1/guest/pins?recent=true',
     'guest recent pins'
   );
 
@@ -107,7 +102,7 @@ async function firstChapterId(
 ): Promise<string | null> {
   const chapters = await fetchGuestList<GuestChapter>(
     request,
-    `${API_BASE_URL}/guest/chapters`,
+    '/api/v1/guest/chapters',
     'guest chapters'
   );
 
