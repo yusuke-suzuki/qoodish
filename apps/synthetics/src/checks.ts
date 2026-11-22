@@ -61,15 +61,32 @@ function newPage(browser: Browser): Promise<Page> {
   return browser.newPage({ serviceWorkers: 'block' });
 }
 
+const STREAMED_CONTENT_REVEAL_TIMEOUT_MS = 15000;
+
 async function checkTopPage(browser: Browser, env: Env): Promise<void> {
   const page = await newPage(browser);
 
   try {
     await openPage(page, `${env.TARGET_ORIGIN}/ja`, async (openedPage) => {
-      const text = await openedPage.locator('body').innerText();
+      const rendered = await openedPage
+        .waitForFunction(
+          'document.body.innerText.trim().length > 0',
+          undefined,
+          {
+            timeout: STREAMED_CONTENT_REVEAL_TIMEOUT_MS
+          }
+        )
+        .then(
+          () => true,
+          () => false
+        );
 
-      if (text.trim().length === 0) {
-        throw new Error('the page rendered an empty body');
+      if (!rendered) {
+        const state = await openedPage.evaluate<string>(
+          'JSON.stringify({ visibility: document.visibilityState, unrevealedBoundaries: document.querySelectorAll("div[hidden][id^=\'S:\']").length, textContentLength: document.body.textContent.length })'
+        );
+
+        throw new Error(`the page rendered an empty body: ${state}`);
       }
     });
   } finally {
