@@ -21,6 +21,8 @@ function defineApiWorker(name: string, environment: Environment) {
     compatibilityDate: '2026-07-01',
     compatibilityFlags: ['nodejs_compat'],
     placement: { mode: 'smart' as const },
+    workersDev: false,
+    previewUrls: false,
     observability: {
       enabled: true,
       traces: { enabled: true },
@@ -78,19 +80,13 @@ function selectWorker(mode: string | undefined, isPreview: boolean) {
   if (mode === 'production') {
     return {
       ...defineApiWorker('prod-qoodish-api', PRODUCTION),
-      triggers: queueConsumers(PRODUCTION),
-      workersDev: false,
-      previewUrls: false,
-      domains: ['api.qoodish.com']
+      triggers: queueConsumers(PRODUCTION)
     };
   }
 
   return {
     ...defineApiWorker('dev-qoodish-api', DEVELOPMENT),
-    triggers: queueConsumers(DEVELOPMENT),
-    workersDev: false,
-    previewUrls: true,
-    domains: ['api-dev.qoodish.com']
+    triggers: queueConsumers(DEVELOPMENT)
   };
 }
 

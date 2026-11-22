@@ -479,7 +479,7 @@ erDiagram
 Workers Builds applies pending migrations and deploys the worker from `master`, so a merge is the release, and deploys every other branch of the dev worker as a Worker Preview. To deploy the checked-out revision from a machine that is logged in to Cloudflare:
 
 ```bash
-pnpm db:migrate:dev && pnpm exec cf deploy --mode dev   # api-dev.qoodish.com
+pnpm db:migrate:dev && pnpm exec cf deploy --mode dev
 ```
 
 A change to existing data ships as a SQL script under `scripts/`, which leaves the data as it found it when run again. Run it from this directory on both databases with an account that may write to D1. Its statements are sent as one batch:
