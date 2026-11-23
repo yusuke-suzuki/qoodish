@@ -1,13 +1,14 @@
 'use client';
 
-import { Favorite, FavoriteBorder, Link } from '@mui/icons-material';
-import { Box, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Favorite, FavoriteBorder } from '@mui/icons-material';
+import { Box, Checkbox, Tooltip } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import { type ChangeEvent, useContext, useState, useTransition } from 'react';
 import type { Chapter } from '../../../types/index.ts';
 import { likeChapter, unlikeChapter } from '../../actions/chapterLikes.ts';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
+import ShareButton from '../common/ShareButton.tsx';
 
 type Props = {
   chapter: Chapter;
@@ -52,15 +53,6 @@ function ChapterActions({ chapter }: Props) {
     });
   };
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      enqueueSnackbar(dictionary['link copied'], { variant: 'info' });
-    } catch (_error) {
-      enqueueSnackbar(dictionary['an error occurred'], { variant: 'error' });
-    }
-  };
-
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
       <Tooltip
@@ -82,14 +74,7 @@ function ChapterActions({ chapter }: Props) {
         />
       </Tooltip>
 
-      <Tooltip title={dictionary['copy link']}>
-        <IconButton
-          onClick={handleCopyLink}
-          aria-label={dictionary['copy link']}
-        >
-          <Link />
-        </IconButton>
-      </Tooltip>
+      <ShareButton title={chapter.title} path={`/chapters/${chapter.id}`} />
     </Box>
   );
 }

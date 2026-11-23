@@ -1,11 +1,11 @@
 import { Bookmark } from '@mui/icons-material';
-import { Button } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import { useContext, useState, useTransition } from 'react';
 import type { AppMap, Profile } from '../../../types/index.ts';
 import { removeBookmark } from '../../actions/mapBookmarks.ts';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
+import ActionButton from '../common/ActionButton.tsx';
 
 type Props = {
   map: AppMap | null;
@@ -56,18 +56,14 @@ function RemoveBookmarkButton({ map, currentProfile, onSaved }: Props) {
   };
 
   return (
-    <Button
-      variant="outlined"
-      color="inherit"
-      size="medium"
-      fullWidth
-      startIcon={<Bookmark />}
+    <ActionButton
+      icon={<Bookmark />}
+      label={dictionary.bookmarked}
+      active
+      loading={isPending}
       disabled={!map || !bookmarking || isAuthor}
       onClick={handleClick}
-      loading={isPending}
-    >
-      {dictionary.unfollow}
-    </Button>
+    />
   );
 }
 

@@ -13,6 +13,7 @@ import useDictionary from '../../hooks/useDictionary.ts';
 import useLocalePath from '../../hooks/useLocalePath.ts';
 import Link from '../common/Link.tsx';
 import ProfileBoundary from '../common/ProfileBoundary.tsx';
+import ShareButton from '../common/ShareButton.tsx';
 import LikePinButton from '../pins/LikePinButton.tsx';
 import PinCardHeader from '../pins/PinCardHeader.tsx';
 import PinImageList from '../pins/PinImageList.tsx';
@@ -74,6 +75,8 @@ export default function TimelinePinCard({
         >
           <Comment />
         </IconButton>
+
+        <ShareButton title={pin.name} path={`/pins/${pin.id}`} />
       </CardActions>
     </Card>
   );

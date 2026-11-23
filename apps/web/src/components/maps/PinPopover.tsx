@@ -13,6 +13,7 @@ import useLocalePath from '../../hooks/useLocalePath.ts';
 import Link from '../common/Link.tsx';
 import ProfileBoundary from '../common/ProfileBoundary.tsx';
 import ReportDialog from '../common/ReportDialog.tsx';
+import ShareButton from '../common/ShareButton.tsx';
 import DeletePinDialog from '../pins/DeletePinDialog.tsx';
 import EditPinDialog from '../pins/EditPinDialog.tsx';
 import LikePinButton from '../pins/LikePinButton.tsx';
@@ -124,6 +125,8 @@ function PinPopover({
           >
             <Comment />
           </IconButton>
+
+          {pin && <ShareButton title={pin.name} path={`/pins/${pin.id}`} />}
         </CardActions>
       </Popover>
 

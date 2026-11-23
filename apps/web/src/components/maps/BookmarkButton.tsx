@@ -1,11 +1,11 @@
 import { BookmarkBorder } from '@mui/icons-material';
-import { Button } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import { useContext, useState, useTransition } from 'react';
 import type { AppMap } from '../../../types/index.ts';
 import { bookmarkMap } from '../../actions/mapBookmarks.ts';
 import AuthContext from '../../context/AuthContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
+import ActionButton from '../common/ActionButton.tsx';
 
 type Props = {
   map: AppMap | null;
@@ -53,18 +53,14 @@ function BookmarkButton({ map, onSaved }: Props) {
   };
 
   return (
-    <Button
+    <ActionButton
+      icon={<BookmarkBorder />}
+      label={dictionary.follow}
+      active={false}
       loading={isPending}
-      variant="contained"
-      color="secondary"
-      size="medium"
-      fullWidth
-      startIcon={<BookmarkBorder />}
       disabled={!map || bookmarking}
       onClick={handleClick}
-    >
-      {dictionary.follow}
-    </Button>
+    />
   );
 }
 

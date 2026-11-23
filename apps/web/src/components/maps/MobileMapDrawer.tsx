@@ -4,6 +4,7 @@ import {
   CardContent,
   Divider,
   Skeleton,
+  Stack,
   SwipeableDrawer,
   type Theme,
   Typography
@@ -16,6 +17,7 @@ import type {
   Profile
 } from '../../../types/index.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
+import ShareButton from '../common/ShareButton.tsx';
 import BookmarkButton from './BookmarkButton.tsx';
 import Coauthors from './Coauthors.tsx';
 import { drawerBleeding } from './constants.ts';
@@ -139,7 +141,7 @@ function MobileMapDrawer({
           }
         />
 
-        <CardContent sx={{ pt: 0, pb: map?.editable ? 2 : 0 }}>
+        <CardContent sx={{ pt: 0, pb: 0 }}>
           {map ? (
             <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
               {map.description}
@@ -151,9 +153,9 @@ function MobileMapDrawer({
             </>
           )}
         </CardContent>
-        {map?.editable ? null : (
-          <CardActions sx={{ p: 2 }}>
-            {map?.bookmarking ? (
+        <CardActions sx={{ p: 2 }}>
+          <Stack direction="row" spacing={2}>
+            {map?.editable ? null : map?.bookmarking ? (
               <RemoveBookmarkButton
                 map={map}
                 currentProfile={currentProfile}
@@ -162,8 +164,11 @@ function MobileMapDrawer({
             ) : (
               <BookmarkButton map={map} onSaved={onSaved} />
             )}
-          </CardActions>
-        )}
+            {map && (
+              <ShareButton title={map.name} path={`/maps/${map.id}`} labeled />
+            )}
+          </Stack>
+        </CardActions>
         <Divider />
         <CardContent>
           <Typography variant="subtitle2" component="h2" gutterBottom>
