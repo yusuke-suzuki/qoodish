@@ -12,7 +12,7 @@ const CACHE_TTL_MS = 30_000;
 
 type CacheEntry = {
   readAt: number;
-  result: Promise<Maintenance | null>;
+  maintenance: Maintenance | null;
 };
 
 let cache: CacheEntry | undefined;
@@ -49,24 +49,19 @@ async function readMaintenanceFlag(): Promise<unknown> {
   return store ? store.get(KV_KEY, 'json') : null;
 }
 
-async function loadMaintenance(): Promise<Maintenance | null> {
+export async function getMaintenance(): Promise<Maintenance | null> {
+  if (cache && Date.now() - cache.readAt < CACHE_TTL_MS) {
+    return cache.maintenance;
+  }
+
   try {
-    return parseMaintenance(await readMaintenanceFlag());
+    const maintenance = parseMaintenance(await readMaintenanceFlag());
+    cache = { readAt: Date.now(), maintenance };
+    return maintenance;
   } catch (error) {
     console.error(`Maintenance flag unavailable: ${describeError(error)}`);
-    cache = undefined;
     return null;
   }
-}
-
-export function getMaintenance(): Promise<Maintenance | null> {
-  const now = Date.now();
-
-  if (!cache || now - cache.readAt >= CACHE_TTL_MS) {
-    cache = { readAt: now, result: loadMaintenance() };
-  }
-
-  return cache.result;
 }
 
 function toMaintenanceLocale(locale: string): MaintenanceLocale {

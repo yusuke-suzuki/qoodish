@@ -100,6 +100,25 @@ describe('getMaintenance', () => {
     assert.equal(get.mock.callCount(), 2);
   });
 
+  it('makes its own read while another caller’s read is pending', {
+    timeout: 1000
+  }, async (t) => {
+    t.mock.timers.enable({ apis: ['Date'], now });
+    const { promise: stalled, resolve } = Promise.withResolvers<unknown>();
+    const reads = [stalled, Promise.resolve(flag)];
+    const get = mock.fn(() => reads.shift());
+    env.MAINTENANCE = { get };
+    const { getMaintenance } = await maintenance();
+
+    const first = getMaintenance();
+
+    assert.deepEqual(await getMaintenance(), flag);
+    assert.equal(get.mock.callCount(), 2);
+
+    resolve(flag);
+    assert.deepEqual(await first, flag);
+  });
+
   it('retries right after a failed read instead of caching it', async (t) => {
     t.mock.timers.enable({ apis: ['Date'], now });
     t.mock.method(console, 'error', () => {});
