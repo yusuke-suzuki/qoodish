@@ -1,7 +1,10 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import {
   Box,
+  Button,
+  Stack,
   type SxProps,
+  Typography,
   useColorScheme,
   useMediaQuery,
   useTheme
@@ -15,6 +18,7 @@ import {
   useState
 } from 'react';
 import GoogleMapsContext from '../../context/GoogleMapsContext.ts';
+import useDictionary from '../../hooks/useDictionary.ts';
 import { toLocale } from '../../utils/locales.ts';
 
 // The Maps script carries its language in the URL it is loaded from, so the
@@ -58,6 +62,7 @@ function GoogleMaps({
 }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const { lang } = useParams<{ lang: string }>();
+  const dictionary = useDictionary();
 
   const [googleMap, setGoogleMap] = useState<google.maps.Map | null>(null);
   const [currentPosition, setCurrentPosition] =
@@ -141,11 +146,35 @@ function GoogleMaps({
     setGoogleMap(map);
   }, [mapId, mapOptions, mdUp, loader, carriedCamera, colorScheme]);
 
+  const [loadFailed, setLoadFailed] = useState(false);
+
   useEffect(() => {
-    if (!googleMap && mapRef.current && loader) {
-      initGoogleMaps();
+    if (googleMap || loadFailed || !mapRef.current) {
+      return;
     }
-  }, [googleMap, loader, initGoogleMaps]);
+
+    initGoogleMaps().catch(() => setLoadFailed(true));
+  }, [googleMap, loadFailed, initGoogleMaps]);
+
+  useEffect(() => {
+    if (!loadFailed) {
+      return;
+    }
+
+    const retryWhenVisible = () => {
+      if (document.visibilityState === 'visible' && navigator.onLine) {
+        setLoadFailed(false);
+      }
+    };
+
+    window.addEventListener('online', retryWhenVisible);
+    document.addEventListener('visibilitychange', retryWhenVisible);
+
+    return () => {
+      window.removeEventListener('online', retryWhenVisible);
+      document.removeEventListener('visibilitychange', retryWhenVisible);
+    };
+  }, [loadFailed]);
 
   useEffect(() => {
     if (!('geolocation' in navigator) || !('permissions' in navigator)) {
@@ -228,7 +257,27 @@ function GoogleMaps({
 
   return (
     <Box>
-      <Box key={generation} ref={mapRef} sx={sx} />
+      <Box key={generation} ref={mapRef} sx={sx}>
+        {loadFailed && (
+          <Stack
+            spacing={2}
+            sx={{
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              p: 2,
+              textAlign: 'center'
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              {dictionary['map could not load']}
+            </Typography>
+            <Button variant="outlined" onClick={() => setLoadFailed(false)}>
+              {dictionary.retry}
+            </Button>
+          </Stack>
+        )}
+      </Box>
 
       <GoogleMapsContext.Provider value={contextValue}>
         {children}

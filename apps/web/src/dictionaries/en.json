@@ -297,6 +297,7 @@
   "retry": "Try again",
   "offline": "You're offline",
   "offline description": "This page can't be shown without an internet connection. Check your connection and try again.",
+  "map could not load": "The map could not be loaded. Check your connection and try again.",
   "new version available": "A new version of Qoodish is available.",
   "reload": "Reload",
   "back to map": "Back to the map",
