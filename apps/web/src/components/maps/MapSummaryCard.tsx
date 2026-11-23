@@ -7,6 +7,7 @@ import {
   CardMedia,
   Divider,
   Skeleton,
+  Stack,
   Typography
 } from '@mui/material';
 import type {
@@ -19,6 +20,7 @@ import type {
 import useDictionary from '../../hooks/useDictionary.ts';
 import { responsiveImage } from '../../utils/responsiveImage.ts';
 import MediaPlaceholder from '../common/MediaPlaceholder.tsx';
+import ShareButton from '../common/ShareButton.tsx';
 import BookmarkButton from './BookmarkButton.tsx';
 import Coauthors from './Coauthors.tsx';
 import MapCardHeader from './MapCardHeader.tsx';
@@ -111,7 +113,7 @@ export default function MapSummaryCard({
           />
         }
       />
-      <CardContent sx={{ pt: 0, pb: map?.editable ? 2 : 0 }}>
+      <CardContent sx={{ pt: 0, pb: 0 }}>
         {map ? (
           <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
             {map.description}
@@ -123,9 +125,9 @@ export default function MapSummaryCard({
           </>
         )}
       </CardContent>
-      {map?.editable ? null : (
-        <CardActions sx={{ p: 2 }}>
-          {map?.bookmarking ? (
+      <CardActions sx={{ p: 2 }}>
+        <Stack direction="row" spacing={2}>
+          {map?.editable ? null : map?.bookmarking ? (
             <RemoveBookmarkButton
               map={map}
               currentProfile={currentProfile}
@@ -134,8 +136,11 @@ export default function MapSummaryCard({
           ) : (
             <BookmarkButton map={map} onSaved={onSaved} />
           )}
-        </CardActions>
-      )}
+          {map && (
+            <ShareButton title={map.name} path={`/maps/${map.id}`} labeled />
+          )}
+        </Stack>
+      </CardActions>
       <Divider />
       <CardContent>
         <Typography variant="subtitle1" component="h2" gutterBottom>

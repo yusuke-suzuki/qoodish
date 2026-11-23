@@ -1,7 +1,6 @@
 import {
   Delete,
   Edit,
-  Link,
   MoreVert,
   PersonAdd,
   ReportProblem,
@@ -15,15 +14,11 @@ import {
   Menu,
   MenuItem
 } from '@mui/material';
-import { useParams } from 'next/navigation';
-import { enqueueSnackbar } from 'notistack';
 import { useRef, useState } from 'react';
 import type { AppMap, Profile } from '../../../types/index.ts';
 import useBlock from '../../hooks/useBlock.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useMute from '../../hooks/useMute.ts';
-import { localePath } from '../../utils/locales.ts';
-import { SITE_ORIGIN } from '../../utils/metadata.ts';
 import BlockMenuItem from '../common/BlockMenuItem.tsx';
 import BlockUserDialog from '../common/BlockUserDialog.tsx';
 import MuteMenuItem from '../common/MuteMenuItem.tsx';
@@ -52,26 +47,11 @@ export default function MapMenuButton({
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
 
-  const { lang } = useParams<{ lang: string }>();
   const dictionary = useDictionary();
   const { pending: blockPending, block, unblock } = useBlock();
   const { pending: mutePending, mute, unmute } = useMute();
 
   const isAuthor = currentProfile?.id === map?.author.id;
-
-  const url = `${SITE_ORIGIN}${localePath(lang, `/maps/${map?.id}`)}`;
-
-  const handleCopyClick = async () => {
-    if (!url) {
-      return;
-    }
-
-    setAnchorEl(null);
-
-    await navigator.clipboard.writeText(url);
-
-    enqueueSnackbar(dictionary.copied);
-  };
 
   const handleReportClick = () => {
     setAnchorEl(null);
@@ -161,13 +141,6 @@ export default function MapMenuButton({
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        <MenuItem onClick={handleCopyClick}>
-          <ListItemIcon>
-            <Link fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={dictionary['copy link']} />
-        </MenuItem>
-
         {currentProfile && map && !isAuthor && (
           <MuteMenuItem
             muting={Boolean(map.author.muting)}

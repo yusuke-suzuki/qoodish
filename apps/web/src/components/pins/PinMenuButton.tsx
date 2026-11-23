@@ -2,7 +2,6 @@ import {
   ArrowForward,
   Delete,
   Edit,
-  Link as LinkIcon,
   MoreVert,
   ReportProblem
 } from '@mui/icons-material';
@@ -15,14 +14,12 @@ import {
   MenuItem
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
-import { enqueueSnackbar } from 'notistack';
 import { useRef, useState } from 'react';
 import type { Pin, Profile } from '../../../types/index.ts';
 import useBlock from '../../hooks/useBlock.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import useMute from '../../hooks/useMute.ts';
 import { localePath } from '../../utils/locales.ts';
-import { SITE_ORIGIN } from '../../utils/metadata.ts';
 import BlockMenuItem from '../common/BlockMenuItem.tsx';
 import BlockUserDialog from '../common/BlockUserDialog.tsx';
 import MuteMenuItem from '../common/MuteMenuItem.tsx';
@@ -62,19 +59,6 @@ export default function PinMenuButton({
   const isAuthor = currentProfile?.id === pin?.author.id;
 
   const pinPath = `/pins/${pin?.id}`;
-  const url = `${SITE_ORIGIN}${localePath(lang, pinPath)}`;
-
-  const handleCopyClick = async () => {
-    if (!url) {
-      return;
-    }
-
-    setAnchorEl(null);
-
-    await navigator.clipboard.writeText(url);
-
-    enqueueSnackbar(dictionary.copied);
-  };
 
   const handleReportClick = () => {
     setAnchorEl(null);
@@ -172,12 +156,6 @@ export default function PinMenuButton({
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        <MenuItem onClick={handleCopyClick}>
-          <ListItemIcon>
-            <LinkIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={dictionary['copy link']} />
-        </MenuItem>
         {hideDetail ? null : (
           <MenuItem onClick={handleDetailClick}>
             <ListItemIcon>
