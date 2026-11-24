@@ -173,6 +173,9 @@ importers:
       firebase:
         specifier: ^12.4.0
         version: 12.4.0
+      jose:
+        specifier: ^6.2.12
+        version: 6.2.12
       lexical:
         specifier: ^0.46.0
         version: 0.46.0(typescript@7.0.2)
