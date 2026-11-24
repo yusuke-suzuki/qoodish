@@ -1,20 +1,7 @@
-import {
-  deleteApp,
-  type FirebaseServerApp,
-  initializeServerApp
-} from 'firebase/app';
-import { getAuth } from 'firebase/auth';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
+import { verifiedUid } from './firebaseIdToken.ts';
 import { REFRESH_TOKEN_COOKIE, SESSION_COOKIE } from './session.ts';
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
-};
 
 type ServerAuthState = {
   authenticated: boolean;
@@ -23,30 +10,8 @@ type ServerAuthState = {
   token?: string;
 };
 
-async function resolveUid(idToken: string): Promise<string | null> {
-  let serverApp: FirebaseServerApp;
-
-  try {
-    serverApp = initializeServerApp(firebaseConfig, {
-      authIdToken: idToken
-    });
-  } catch {
-    return null;
-  }
-
-  // Server apps stay registered until deleteApp drops their reference count
-  // to zero, so skipping it pins one Auth instance per token for the life of
-  // the isolate.
-  try {
-    const auth = getAuth(serverApp);
-    await auth.authStateReady();
-
-    return auth.currentUser?.uid ?? null;
-  } catch {
-    return null;
-  } finally {
-    await deleteApp(serverApp);
-  }
+function resolveUid(idToken: string): Promise<string | null> {
+  return verifiedUid(idToken, process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
 }
 
 export async function verifyIdToken(idToken: string): Promise<boolean> {
