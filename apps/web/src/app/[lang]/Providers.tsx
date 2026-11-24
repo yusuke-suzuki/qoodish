@@ -14,6 +14,7 @@ import { type ReactNode, useEffect, useEffectEvent, useState } from 'react';
 import ClientErrorReporter from '../../components/common/ClientErrorReporter.tsx';
 import DictionaryContext from '../../context/DictionaryContext.ts';
 import ServiceWorkerContext from '../../context/ServiceWorkerContext.ts';
+import useReloadOnStaleChunk from '../../hooks/useReloadOnStaleChunk.ts';
 import type { Dictionary } from '../../utils/getDictionary.ts';
 import { createAppTheme } from '../../utils/theme.ts';
 
@@ -51,6 +52,8 @@ export default function Providers({ children, lang, dictionary }: Props) {
   const serviceWorkerValue = { registration };
 
   const theme = createAppTheme(lang);
+
+  useReloadOnStaleChunk();
 
   const offerUpdate = useEffectEvent((activateUpdate: () => void) => {
     enqueueSnackbar(dictionary['new version available'], {
