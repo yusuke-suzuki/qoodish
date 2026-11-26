@@ -12,6 +12,7 @@ export const ja: Messages = {
   error_separator: '',
 
   user_name_required: '名前を入力してください。',
+  user_name_exceed: '名前が長すぎます。(最大: 50 文字)',
   user_biography_exceed: '自己紹介が長すぎます。(最大: 160 文字)',
   image_not_owned: 'ご自身でアップロードした画像ではありません。',
   web_push_invalid: '通知の設定はオンかオフで指定してください。',

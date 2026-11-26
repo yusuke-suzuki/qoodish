@@ -35,6 +35,7 @@ import { first } from './routing.ts';
 import { id, optionalText, text } from './validation.ts';
 import type { Viewer } from './visibility.ts';
 
+const USER_NAME_LIMIT = 50;
 const USER_BIOGRAPHY_LIMIT = 160;
 
 type UserContent = { name: string | null; biography: string | null };
@@ -48,7 +49,10 @@ export type SignInClaims = {
 
 export const profileInput = z
   .object({
-    name: text({ required: 'user_name_required' }).optional(),
+    name: text({
+      required: 'user_name_required',
+      max: { length: USER_NAME_LIMIT, error: 'user_name_exceed' }
+    }).optional(),
     biography: optionalText({
       length: USER_BIOGRAPHY_LIMIT,
       error: 'user_biography_exceed'
@@ -94,12 +98,16 @@ function userRevisionStatements(
 
 async function createAccount(
   db: Database,
-  { uid, name, email, locale }: SignInClaims
+  { uid, name: claimedName, email, locale }: SignInClaims
 ): Promise<number> {
-  if (name === undefined || blank(name)) {
+  if (claimedName === undefined || blank(claimedName)) {
     throw ApiError.invalid(['user_name_required']);
   }
 
+  const name = [...claimedName.trim()]
+    .slice(0, USER_NAME_LIMIT)
+    .join('')
+    .trimEnd();
   const content = { name, biography: null };
   const now = currentTimestamp();
   const userId = scalar(

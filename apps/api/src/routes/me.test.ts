@@ -426,6 +426,52 @@ describe('PUT /me/profile', () => {
     expect(body.detail).toBe('名前を入力してください。');
   });
 
+  it('refuses a name longer than 50 characters', async () => {
+    const { status, body } = await send(
+      'PUT',
+      '/me/profile',
+      { sub: 'bob' },
+      { name: 'x'.repeat(51) }
+    );
+
+    expect(status).toBe(422);
+    expect(body.detail).toBe('Name is too long. (Max: 50)');
+  });
+
+  it('words the long name refusal in Japanese', async () => {
+    const { body } = await send(
+      'PUT',
+      '/me/profile',
+      { sub: 'bob' },
+      { name: 'あ'.repeat(51) },
+      'ja'
+    );
+
+    expect(body.detail).toBe('名前が長すぎます。(最大: 50 文字)');
+  });
+
+  it('accepts a name of 50 characters', async () => {
+    const { status } = await send(
+      'PUT',
+      '/me/profile',
+      { sub: 'bob' },
+      { name: 'あ'.repeat(50) }
+    );
+
+    expect(status).toBe(200);
+  });
+
+  it('counts an emoji as one character of the name', async () => {
+    const { status } = await send(
+      'PUT',
+      '/me/profile',
+      { sub: 'bob' },
+      { name: '🍜'.repeat(50) }
+    );
+
+    expect(status).toBe(200);
+  });
+
   it('refuses an image someone else uploaded', async () => {
     const { status, body } = await send(
       'PUT',
