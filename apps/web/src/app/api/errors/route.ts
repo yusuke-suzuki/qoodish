@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server';
-
 const MAX_BODY_BYTES = 8 * 1024;
 
 type ClientErrorReport = {
@@ -53,13 +51,13 @@ export async function POST(request: Request) {
   // The Origin check only stops cross-site browsers; a scripted caller is
   // bounded by the WAF rate limiting rule on this path.
   if (origin && origin !== new URL(request.url).origin) {
-    return new NextResponse(null, { status: 403 });
+    return new Response(null, { status: 403 });
   }
 
   const body = await readBodyWithinLimit(request);
 
   if (body === null) {
-    return new NextResponse(null, { status: 413 });
+    return new Response(null, { status: 413 });
   }
 
   let report: ClientErrorReport;
@@ -67,11 +65,11 @@ export async function POST(request: Request) {
   try {
     report = JSON.parse(body);
   } catch {
-    return new NextResponse(null, { status: 400 });
+    return new Response(null, { status: 400 });
   }
 
   if (typeof report?.message !== 'string') {
-    return new NextResponse(null, { status: 400 });
+    return new Response(null, { status: 400 });
   }
 
   // Same shape as the server-side error line, so one query covers both.
@@ -87,5 +85,5 @@ export async function POST(request: Request) {
     })
   );
 
-  return new NextResponse(null, { status: 204 });
+  return new Response(null, { status: 204 });
 }
