@@ -111,7 +111,11 @@ function UserProfile({
             <Stack spacing={1.5}>
               <ProfileAvatar size={96} profile={profile} />
 
-              <Typography variant="h5" fontWeight={600}>
+              <Typography
+                variant="h5"
+                fontWeight={600}
+                sx={{ overflowWrap: 'anywhere' }}
+              >
                 {profile.name}
                 {journal && ` / ${journal.title}`}
               </Typography>

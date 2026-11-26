@@ -42,6 +42,7 @@ function PinCardHeader({ pin, action, hideMapLink, sx }: Props) {
             component={Link}
             href={localePath(`/users/${pin?.author.id}`)}
             title={pin?.author.name}
+            sx={{ minWidth: 0, overflowWrap: 'anywhere' }}
           >
             {pin?.author.name}
           </MuiLink>
