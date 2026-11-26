@@ -472,6 +472,58 @@ describe('PUT /me/profile', () => {
     expect(status).toBe(200);
   });
 
+  it('refuses a name hiding a right-to-left override', async () => {
+    const { status, body } = await send(
+      'PUT',
+      '/me/profile',
+      { sub: 'bob' },
+      { name: 'Bob\u202Enimda' }
+    );
+
+    expect(status).toBe(422);
+    expect(body.detail).toBe(
+      'The text contains characters that cannot be used.'
+    );
+  });
+
+  it('refuses a name made only of zero width spaces', async () => {
+    const { status } = await send(
+      'PUT',
+      '/me/profile',
+      { sub: 'bob' },
+      { name: '\u200B\u200B' }
+    );
+
+    expect(status).toBe(422);
+  });
+
+  it.each([
+    ['zero width joiners', '\u200D\u200D'],
+    ['a Hangul filler', '\u3164'],
+    ['a braille blank', '\u2800']
+  ])('refuses a name made only of %s as blank', async (_, name) => {
+    const { status, body } = await send(
+      'PUT',
+      '/me/profile',
+      { sub: 'bob' },
+      { name }
+    );
+
+    expect(status).toBe(422);
+    expect(body.detail).toBe('Name is required.');
+  });
+
+  it('stores the name as entered', async () => {
+    const { body } = await send(
+      'PUT',
+      '/me/profile',
+      { sub: 'bob' },
+      { name: ' Bob \uFA19 ' }
+    );
+
+    expect(body.name).toBe(' Bob \uFA19 ');
+  });
+
   it('refuses an image someone else uploaded', async () => {
     const { status, body } = await send(
       'PUT',

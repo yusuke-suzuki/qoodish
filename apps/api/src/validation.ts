@@ -5,7 +5,12 @@ import { uniqueIds } from './db/client.ts';
 import { ApiError, type ErrorTitle } from './errors.ts';
 import { isMessageKey, type MessageKey } from './i18n/index.ts';
 import { present } from './routing.ts';
-import { characters, withoutCarriageReturns } from './text.ts';
+import {
+  characters,
+  containsInvisibleCharacters,
+  looksBlank,
+  withoutCarriageReturns
+} from './text.ts';
 
 function rejection(issues: readonly z.core.$ZodIssue[]): ApiError {
   const keys = issues.map((issue) => issue.message);
@@ -138,10 +143,9 @@ export function text({
   required: MessageKey;
   max?: { length: number; error: MessageKey };
 }) {
-  const present = z
-    .string({ error: required })
-    .overwrite(withoutCarriageReturns)
-    .refine((value) => value.trim() !== '', { error: required, abort: true });
+  const present = visible(
+    z.string({ error: required }).overwrite(withoutCarriageReturns)
+  ).refine((value) => !looksBlank(value), { error: required, abort: true });
 
   return max
     ? present.refine((value) => characters(value) <= max.length, {
@@ -151,8 +155,14 @@ export function text({
 }
 
 export function optionalText(max: { length: number; error: MessageKey }) {
-  return z
-    .string()
+  return visible(z.string())
     .refine((value) => characters(value) <= max.length, { error: max.error })
     .nullable();
+}
+
+function visible(input: z.ZodString) {
+  return input.refine((value) => !containsInvisibleCharacters(value), {
+    error: 'text_invisible_characters',
+    abort: true
+  });
 }

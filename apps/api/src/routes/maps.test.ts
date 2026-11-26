@@ -528,6 +528,18 @@ describe('POST /maps', () => {
     expect(map?.currentRevisionId).toBe(revision?.id);
   });
 
+  it('answers 422 for a description hiding a right-to-left override', async () => {
+    const { status, body } = await send('POST', '/maps', 'bob', {
+      name: 'Hidden direction',
+      description: 'Menu\u202Etxt.exe'
+    });
+
+    expect(status).toBe(422);
+    expect(body.detail).toBe(
+      'The text contains characters that cannot be used.'
+    );
+  });
+
   it('answers 422 for a duplicated name, an image of someone else and too many images', async () => {
     const duplicate = await send('POST', '/maps', 'alice', {
       name: 'Tokyo Ramen',
