@@ -115,14 +115,28 @@ describe('POST /users', () => {
     expect(after?.maps).toHaveLength(1);
   });
 
-  it('truncates the default map name to fit a long display name', async () => {
+  it('keeps a display name of up to 50 characters whole', async () => {
     const name = 'Bartholomew Montgomery-Fitzgerald';
     const { status } = await send('POST', '/users', { sub: 'long', name });
     const account = await accountOf('long');
 
     expect(status).toBe(200);
+    expect(account?.user.name).toBe(name);
     expect(account?.maps[0]?.name).toBe('Bartholomew Montgomery-Fitz...');
     expect(account?.journals[0]?.title).toBe(`${name}'s journal`);
+  });
+
+  it('cuts a longer display name to the 50 characters a profile name holds', async () => {
+    const { status } = await send('POST', '/users', {
+      sub: 'longer',
+      name: 'Bartholomew Montgomery-Fitzgerald of Ravensworth Castle'
+    });
+    const account = await accountOf('longer');
+
+    expect(status).toBe(200);
+    expect(account?.user.name).toBe(
+      'Bartholomew Montgomery-Fitzgerald of Ravensworth C'
+    );
   });
 
   it('answers 422 and creates nothing without a name', async () => {

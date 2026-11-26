@@ -10,6 +10,7 @@ export const en = {
   error_separator: ' ',
 
   user_name_required: 'Name is required.',
+  user_name_exceed: 'Name is too long. (Max: 50)',
   user_biography_exceed: 'Biography is too long. (Max: 160)',
   image_not_owned: 'The image was not uploaded by you.',
   web_push_invalid: 'Notification settings must be on or off.',
