@@ -262,6 +262,20 @@ describe('comments on a pin', () => {
     expect(await commentRevisionsOf(commentId)).toHaveLength(before.length);
   });
 
+  it('answers 422 for a comment hiding a zero width space', async () => {
+    const { status, body } = await send(
+      'POST',
+      `/pins/${ids.shoyu}/comments`,
+      'bob',
+      { comment: 'Good\u200Bramen' }
+    );
+
+    expect(status).toBe(422);
+    expect(body.detail).toBe(
+      'The text contains characters that cannot be used.'
+    );
+  });
+
   it('answers 422 for an edit that sends no comment', async () => {
     const created = await send('POST', `/pins/${ids.shoyu}/comments`, 'bob', {
       comment: 'Again'

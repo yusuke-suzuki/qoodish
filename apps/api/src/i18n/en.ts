@@ -8,6 +8,8 @@ export const en = {
   error_429: 'Too many requests. Please try again later.',
   error_500: 'The request has failed due to some unknown error.',
   error_separator: ' ',
+  text_invisible_characters:
+    'The text contains characters that cannot be used.',
 
   user_name_required: 'Name is required.',
   user_name_exceed: 'Name is too long. (Max: 50)',

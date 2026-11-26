@@ -10,6 +10,7 @@ export const ja: Messages = {
   error_429: 'リクエストが多すぎます。しばらくしてからやり直してください。',
   error_500: 'サーバー内部エラーが発生しました。',
   error_separator: '',
+  text_invisible_characters: '使用できない文字が含まれています。',
 
   user_name_required: '名前を入力してください。',
   user_name_exceed: '名前が長すぎます。(最大: 50 文字)',
