@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useSyncExternalStore, useTransition } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import {
   BRAND_COLOR,
   BRAND_COLOR_CONTRAST,
@@ -10,7 +10,6 @@ import reportClientError from '../utils/reportClientError.ts';
 
 type Props = {
   error: Error & { digest?: string };
-  retry: () => void;
 };
 
 const subscribe = () => () => {};
@@ -38,9 +37,7 @@ const messages = {
 
 // Replaces the root layout when it crashes, so everything here has to be
 // self-contained: no theme provider, no dictionary hook, inline styles only.
-export default function GlobalError({ error, retry }: Props) {
-  const [retrying, startRetry] = useTransition();
-
+export default function GlobalError({ error }: Props) {
   useEffect(() => {
     reportClientError(error, 'global-error');
   }, [error]);
@@ -91,9 +88,7 @@ export default function GlobalError({ error, retry }: Props) {
           </p>
           <button
             type="button"
-            disabled={retrying}
-            aria-busy={retrying}
-            onClick={() => startRetry(retry)}
+            onClick={() => window.location.reload()}
             style={{
               display: 'inline-block',
               padding: '0.75rem 1.5rem',
@@ -103,8 +98,7 @@ export default function GlobalError({ error, retry }: Props) {
               borderRadius: '4px',
               fontWeight: 500,
               fontSize: '1rem',
-              cursor: retrying ? 'progress' : 'pointer',
-              opacity: retrying ? 0.6 : 1
+              cursor: 'pointer'
             }}
           >
             {m.retry}
