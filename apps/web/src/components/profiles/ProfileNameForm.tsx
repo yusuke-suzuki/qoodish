@@ -2,7 +2,7 @@ import { TextField } from '@mui/material';
 import { type ChangeEvent, useEffect, useEffectEvent, useState } from 'react';
 import useDictionary from '../../hooks/useDictionary.ts';
 
-const MAX_LENGTH = 30;
+export const PROFILE_NAME_MAX_LENGTH = 50;
 
 type Props = {
   onChange: (description: string | undefined) => void;
@@ -21,8 +21,8 @@ function ProfileNameForm({ onChange, defaultValue }: Props) {
     const input = e.target.value;
 
     if (input) {
-      if (input.length > MAX_LENGTH) {
-        setError(dictionary['max characters 30']);
+      if ([...input].length > PROFILE_NAME_MAX_LENGTH) {
+        setError(dictionary['max characters 50']);
       } else {
         setError(undefined);
       }
