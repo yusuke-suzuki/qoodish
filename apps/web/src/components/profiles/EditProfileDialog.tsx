@@ -17,7 +17,9 @@ import AddPhotoButton from '../common/AddPhotoButton.tsx';
 import AppDialog from '../common/AppDialog.tsx';
 import BiographyForm from './BiographyForm.tsx';
 import JournalTitleForm from './JournalTitleForm.tsx';
-import ProfileNameForm from './ProfileNameForm.tsx';
+import ProfileNameForm, {
+  PROFILE_NAME_MAX_LENGTH
+} from './ProfileNameForm.tsx';
 
 type Props = {
   currentProfile: PublicUser | null;
@@ -44,7 +46,11 @@ export default function EditProfileDialog({
   const { items, isUploading, uploadedImages, upload, reset } =
     usePhotoUploads();
 
-  const disabled = !name || (Boolean(journal) && !journalTitle) || isUploading;
+  const disabled =
+    !name ||
+    [...name].length > PROFILE_NAME_MAX_LENGTH ||
+    (Boolean(journal) && !journalTitle) ||
+    isUploading;
 
   const previewItem = items[0];
   const newThumbnailUrl =
