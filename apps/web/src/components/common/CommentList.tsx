@@ -70,6 +70,7 @@ const CommentList = ({ subject, comments, onDeleted, onLiked }: Props) => {
                     component={Link}
                     href={localePath(`/users/${comment.author.id}`)}
                     title={comment.author.name}
+                    sx={{ minWidth: 0, overflowWrap: 'anywhere' }}
                   >
                     {comment.author.name}
                   </MuiLink>
