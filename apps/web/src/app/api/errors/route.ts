@@ -45,6 +45,17 @@ async function readBodyWithinLimit(request: Request): Promise<string | null> {
   return text + decoder.decode();
 }
 
+// Workers Issues signs an error with its message and top stack frame. The
+// browser's frames name chunk files that change with every deploy, so the
+// logged error carries the message alone.
+function clientError(message: string): Error {
+  const title =
+    message.trim() === '' ? 'Client error without a message' : message;
+  const error = new Error(title);
+  error.stack = `Error: ${title}`;
+  return error;
+}
+
 export async function POST(request: Request) {
   const origin = request.headers.get('origin');
 
@@ -72,8 +83,10 @@ export async function POST(request: Request) {
     return new Response(null, { status: 400 });
   }
 
+  console.error(clientError(report.message));
+
   // Same shape as the server-side error line, so one query covers both.
-  console.error(
+  console.log(
     JSON.stringify({
       kind: 'client-error',
       message: report.message,
