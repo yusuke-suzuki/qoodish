@@ -27,20 +27,20 @@ function BrowserMapPopup({ children, label, position, open, onClose }: Props) {
   use(browser());
 
   const dictionary = useDictionary();
-  const { googleMap, loader } = useGoogleMap();
+  const { googleMap, importLibrary } = useGoogleMap();
 
   const [content] = useState(() => document.createElement('div'));
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!loader) {
+    if (!importLibrary) {
       return;
     }
 
     let cancelled = false;
 
     const isolateFromMap = async () => {
-      const { OverlayView } = await loader.importLibrary('maps');
+      const { OverlayView } = await importLibrary('maps');
 
       if (cancelled) {
         return;
@@ -54,10 +54,10 @@ function BrowserMapPopup({ children, label, position, open, onClose }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [loader, content]);
+  }, [importLibrary, content]);
 
   useEffect(() => {
-    if (!googleMap || !loader || !position || !open) {
+    if (!googleMap || !importLibrary || !position || !open) {
       return;
     }
 
@@ -65,7 +65,7 @@ function BrowserMapPopup({ children, label, position, open, onClose }: Props) {
     let marker: google.maps.marker.AdvancedMarkerElement | null = null;
 
     const showPopup = async () => {
-      const { AdvancedMarkerElement } = await loader.importLibrary('marker');
+      const { AdvancedMarkerElement } = await importLibrary('marker');
 
       if (cancelled) {
         return;
@@ -106,7 +106,7 @@ function BrowserMapPopup({ children, label, position, open, onClose }: Props) {
         marker.map = null;
       }
     };
-  }, [googleMap, loader, content, position, open]);
+  }, [googleMap, importLibrary, content, position, open]);
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {

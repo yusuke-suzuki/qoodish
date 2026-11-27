@@ -10,7 +10,7 @@ export default function DraggableMarker({
   defaultPosition,
   onLatLngChanged
 }: Props) {
-  const { googleMap, loader } = useGoogleMap();
+  const { googleMap, importLibrary } = useGoogleMap();
 
   // The marker is an imperative map object that the effects below write to, so
   // it is held in a ref rather than in state; the flag is what lets them run
@@ -34,14 +34,14 @@ export default function DraggableMarker({
   );
 
   useEffect(() => {
-    if (!googleMap || !loader) {
+    if (!googleMap || !importLibrary) {
       return;
     }
 
     let cancelled = false;
 
     const initMarker = async () => {
-      const { AdvancedMarkerElement } = await loader.importLibrary('marker');
+      const { AdvancedMarkerElement } = await importLibrary('marker');
 
       if (cancelled) {
         return;
@@ -68,7 +68,7 @@ export default function DraggableMarker({
 
       setReady(false);
     };
-  }, [googleMap, loader]);
+  }, [googleMap, importLibrary]);
 
   useEffect(() => {
     const marker = markerRef.current;

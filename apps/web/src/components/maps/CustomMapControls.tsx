@@ -13,7 +13,7 @@ type Props = {
 };
 
 function CustomMapControls({ filter, onPlaceChange }: Props) {
-  const { googleMap, loader } = useGoogleMap();
+  const { googleMap, importLibrary } = useGoogleMap();
 
   const dictionary = useDictionary();
 
@@ -28,14 +28,14 @@ function CustomMapControls({ filter, onPlaceChange }: Props) {
     useState<google.maps.ControlPosition | null>(null);
 
   useEffect(() => {
-    if (!googleMap || !loader) {
+    if (!googleMap || !importLibrary) {
       return;
     }
 
     let cancelled = false;
 
     const initControlPositions = async () => {
-      const { ControlPosition } = await loader.importLibrary('core');
+      const { ControlPosition } = await importLibrary('core');
 
       if (cancelled) {
         return;
@@ -52,7 +52,7 @@ function CustomMapControls({ filter, onPlaceChange }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [googleMap, loader, mdDown]);
+  }, [googleMap, importLibrary, mdDown]);
 
   useEffect(() => {
     if (!googleMap) {

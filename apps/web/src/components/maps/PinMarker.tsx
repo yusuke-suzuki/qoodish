@@ -20,7 +20,7 @@ type Props = {
 };
 
 function PinMarker({ pin, milestone, onClick }: Props) {
-  const { loader } = useGoogleMap();
+  const { importLibrary } = useGoogleMap();
   const dictionary = useDictionary();
 
   const [position, setPosition] = useState<google.maps.LatLng | null>(null);
@@ -44,14 +44,14 @@ function PinMarker({ pin, milestone, onClick }: Props) {
   };
 
   useEffect(() => {
-    if (!loader) {
+    if (!importLibrary) {
       return;
     }
 
     let cancelled = false;
 
     const updatePosition = async () => {
-      const { LatLng } = await loader.importLibrary('core');
+      const { LatLng } = await importLibrary('core');
 
       if (cancelled) {
         return;
@@ -65,7 +65,7 @@ function PinMarker({ pin, milestone, onClick }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [loader, pin.latitude, pin.longitude]);
+  }, [importLibrary, pin.latitude, pin.longitude]);
 
   if (!position) {
     return null;
