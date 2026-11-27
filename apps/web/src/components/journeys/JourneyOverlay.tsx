@@ -9,7 +9,7 @@ type Props = {
 };
 
 function JourneyOverlay({ position, path }: Props) {
-  const { googleMap, importLibrary } = useGoogleMap();
+  const { googleMap, loadLibrary } = useGoogleMap();
 
   const pannedRef = useRef(false);
 
@@ -31,7 +31,7 @@ function JourneyOverlay({ position, path }: Props) {
   const active = path !== null;
 
   useEffect(() => {
-    if (!googleMap || !importLibrary || !active) {
+    if (!googleMap || !loadLibrary || !active) {
       return;
     }
 
@@ -39,8 +39,17 @@ function JourneyOverlay({ position, path }: Props) {
     let line: google.maps.Polyline | null = null;
 
     (async () => {
-      const { Polyline } = await importLibrary('maps');
-      const { Point } = await importLibrary('core');
+      const [mapsLibrary, coreLibrary] = await Promise.all([
+        loadLibrary('maps'),
+        loadLibrary('core')
+      ]);
+
+      if (!mapsLibrary || !coreLibrary) {
+        return;
+      }
+
+      const { Polyline } = mapsLibrary;
+      const { Point } = coreLibrary;
 
       if (disposed) {
         return;
@@ -61,7 +70,7 @@ function JourneyOverlay({ position, path }: Props) {
       line?.setMap(null);
       setPolyline(null);
     };
-  }, [googleMap, importLibrary, active]);
+  }, [googleMap, loadLibrary, active]);
 
   useEffect(() => {
     if (!polyline || !path) {

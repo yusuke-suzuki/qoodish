@@ -24,21 +24,27 @@ function JourneyFab({
   onOpenProgress
 }: Props) {
   const dictionary = useDictionary();
-  const { googleMap, importLibrary } = useGoogleMap();
+  const { googleMap, loadLibrary } = useGoogleMap();
   const { authenticated, setSignInRequired } = useContext(AuthContext);
 
   const [controlPosition, setControlPosition] =
     useState<google.maps.ControlPosition | null>(null);
 
   useEffect(() => {
-    if (!googleMap || !importLibrary) {
+    if (!googleMap || !loadLibrary) {
       return;
     }
 
     let cancelled = false;
 
     (async () => {
-      const { ControlPosition } = await importLibrary('core');
+      const coreLibrary = await loadLibrary('core');
+
+      if (!coreLibrary) {
+        return;
+      }
+
+      const { ControlPosition } = coreLibrary;
 
       if (cancelled) {
         return;
@@ -50,7 +56,7 @@ function JourneyFab({
     return () => {
       cancelled = true;
     };
-  }, [googleMap, importLibrary]);
+  }, [googleMap, loadLibrary]);
 
   const active = Boolean(journey?.started_at && !journey?.finished_at);
 

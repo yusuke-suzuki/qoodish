@@ -1,3 +1,4 @@
+import { importLibrary } from '@googlemaps/js-api-loader';
 import { useParams } from 'next/navigation';
 import { useCallback, useRef } from 'react';
 import { toLocale } from '../utils/locales.ts';
@@ -13,7 +14,7 @@ export const PLACE_FIELDS = [
 ];
 
 export function usePlaceSearch(input: string) {
-  const { importLibrary, googleMap, currentPosition } = useGoogleMap();
+  const { googleMap, currentPosition } = useGoogleMap();
   const { lang } = useParams<{ lang: string }>();
   const language = toLocale(lang);
 
@@ -25,7 +26,7 @@ export function usePlaceSearch(input: string) {
 
   const search = useCallback(
     async (query: string) => {
-      if (!importLibrary) {
+      if (!googleMap) {
         return [];
       }
 
@@ -56,7 +57,7 @@ export function usePlaceSearch(input: string) {
         .map((suggestion) => suggestion.placePrediction)
         .filter((prediction) => prediction !== null);
     },
-    [importLibrary, language, googleMap, currentPosition]
+    [language, googleMap, currentPosition]
   );
 
   const { results: predictions, isLoading } = useDebouncedSearch(input, search);

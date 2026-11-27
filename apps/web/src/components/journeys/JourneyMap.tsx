@@ -23,18 +23,24 @@ function JourneySpotMarker({
   spot: Spot;
   variant: keyof typeof markerVariants;
 }) {
-  const { importLibrary } = useGoogleMap();
+  const { loadLibrary } = useGoogleMap();
   const [position, setPosition] = useState<google.maps.LatLng | null>(null);
 
   useEffect(() => {
-    if (!importLibrary) {
+    if (!loadLibrary) {
       return;
     }
 
     let disposed = false;
 
     (async () => {
-      const { LatLng } = await importLibrary('core');
+      const coreLibrary = await loadLibrary('core');
+
+      if (!coreLibrary) {
+        return;
+      }
+
+      const { LatLng } = coreLibrary;
 
       if (!disposed) {
         setPosition(new LatLng(spot.latitude, spot.longitude));
@@ -44,7 +50,7 @@ function JourneySpotMarker({
     return () => {
       disposed = true;
     };
-  }, [importLibrary, spot]);
+  }, [loadLibrary, spot]);
 
   if (!position) {
     return null;
@@ -87,12 +93,12 @@ function JourneyMapOverlay({
   path,
   fallbackCenter
 }: OverlayProps) {
-  const { googleMap, importLibrary } = useGoogleMap();
+  const { googleMap, loadLibrary } = useGoogleMap();
 
   const [polyline, setPolyline] = useState<google.maps.Polyline | null>(null);
 
   useEffect(() => {
-    if (!googleMap || !importLibrary) {
+    if (!googleMap || !loadLibrary) {
       return;
     }
 
@@ -100,8 +106,17 @@ function JourneyMapOverlay({
     let line: google.maps.Polyline | null = null;
 
     (async () => {
-      const { Polyline } = await importLibrary('maps');
-      const { Point } = await importLibrary('core');
+      const [mapsLibrary, coreLibrary] = await Promise.all([
+        loadLibrary('maps'),
+        loadLibrary('core')
+      ]);
+
+      if (!mapsLibrary || !coreLibrary) {
+        return;
+      }
+
+      const { Polyline } = mapsLibrary;
+      const { Point } = coreLibrary;
 
       if (disposed) {
         return;
@@ -122,7 +137,7 @@ function JourneyMapOverlay({
       line?.setMap(null);
       setPolyline(null);
     };
-  }, [googleMap, importLibrary]);
+  }, [googleMap, loadLibrary]);
 
   useEffect(() => {
     if (!polyline) {
@@ -138,7 +153,7 @@ function JourneyMapOverlay({
   const centeredRef = useRef(false);
 
   useEffect(() => {
-    if (!googleMap || !importLibrary) {
+    if (!googleMap || !loadLibrary) {
       return;
     }
 
@@ -177,7 +192,13 @@ function JourneyMapOverlay({
     let cancelled = false;
 
     (async () => {
-      const { LatLngBounds } = await importLibrary('core');
+      const coreLibrary = await loadLibrary('core');
+
+      if (!coreLibrary) {
+        return;
+      }
+
+      const { LatLngBounds } = coreLibrary;
 
       if (cancelled) {
         return;
@@ -199,7 +220,7 @@ function JourneyMapOverlay({
     return () => {
       cancelled = true;
     };
-  }, [googleMap, importLibrary, path, spots, milestones, fallbackCenter]);
+  }, [googleMap, loadLibrary, path, spots, milestones, fallbackCenter]);
 
   return (
     <>

@@ -11,17 +11,26 @@ import {
 } from '@mui/material';
 import { useParams } from 'next/navigation';
 import {
+  Fragment,
   type ReactNode,
   useCallback,
   useEffect,
+  useEffectEvent,
   useRef,
   useState
 } from 'react';
 import GoogleMapsContext, {
-  type ImportMapsLibrary
+  type LoadLibrary
 } from '../../context/GoogleMapsContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { toLocale } from '../../utils/locales.ts';
+import reportClientError from '../../utils/reportClientError.ts';
+
+declare global {
+  interface Window {
+    gm_authFailure?: () => void;
+  }
+}
 
 // The Maps script carries its language in the URL it is loaded from, and
 // setOptions applies only once per document, so the first map settles the
@@ -40,6 +49,8 @@ function configureMaps(language: string): void {
   });
   optionsSet = true;
 }
+
+type Failure = 'load' | 'auth';
 
 type Props = {
   mapId: string | undefined;
@@ -79,14 +90,6 @@ function GoogleMaps({
 
   const language = toLocale(lang);
 
-  const importMapsLibrary: ImportMapsLibrary = useCallback(
-    (name) => {
-      configureMaps(language);
-      return importLibrary(name);
-    },
-    [language]
-  );
-
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -111,13 +114,52 @@ function GoogleMaps({
     setGeneration((current) => current + 1);
   }
 
+  const [failure, setFailure] = useState<Failure | null>(null);
+  const [attempt, setAttempt] = useState(0);
+
+  // Applied once per value rather than once per map, so that a map rebuilt
+  // for a new theme keeps the camera it carried over instead of jumping back.
+  const appliedCenterRef = useRef<string | null>(null);
+  const appliedZoomRef = useRef<number | null>(null);
+
+  // A failed library leaves the map without the parts drawn from it, so the
+  // map is dropped for the failure notice and built again, with the children
+  // that draw on it, on retry.
+  const loadLibrary: LoadLibrary = useCallback(
+    async (name) => {
+      configureMaps(language);
+
+      try {
+        return await importLibrary(name);
+      } catch {
+        setFailure((current) => current ?? 'load');
+        setBuiltScheme(null);
+        setGoogleMap(null);
+        setGeneration((current) => current + 1);
+        appliedCenterRef.current = null;
+        appliedZoomRef.current = null;
+        return null;
+      }
+    },
+    [language]
+  );
+
   const initGoogleMaps = useCallback(async () => {
     if (!mapRef.current) {
       return;
     }
 
-    const [{ Map: GoogleMap }, { ColorScheme, ControlPosition }] =
-      await Promise.all([importMapsLibrary('maps'), importMapsLibrary('core')]);
+    const [mapsLibrary, coreLibrary] = await Promise.all([
+      loadLibrary('maps'),
+      loadLibrary('core')
+    ]);
+
+    if (!mapsLibrary || !coreLibrary || !mapRef.current) {
+      return;
+    }
+
+    const { Map: GoogleMap } = mapsLibrary;
+    const { ColorScheme, ControlPosition } = coreLibrary;
 
     // The scheme the reader chose, which may differ from the system's, so
     // ColorScheme.FOLLOW_SYSTEM would not do. useColorScheme reports nothing
@@ -129,7 +171,7 @@ function GoogleMaps({
           ? 'dark'
           : 'light')) === 'dark';
 
-    const map = new GoogleMap(mapRef.current as HTMLElement, {
+    const map = new GoogleMap(mapRef.current, {
       colorScheme: dark ? ColorScheme.DARK : ColorScheme.LIGHT,
       zoom: 17,
       ...carriedCamera,
@@ -152,26 +194,52 @@ function GoogleMaps({
     setCarriedCamera(null);
     setBuiltScheme(dark ? 'dark' : 'light');
     setGoogleMap(map);
-  }, [mapId, mapOptions, mdUp, importMapsLibrary, carriedCamera, colorScheme]);
-
-  const [loadFailed, setLoadFailed] = useState(false);
+  }, [mapId, mapOptions, mdUp, loadLibrary, carriedCamera, colorScheme]);
 
   useEffect(() => {
-    if (googleMap || loadFailed || !mapRef.current) {
+    if (googleMap || failure || !mapRef.current) {
       return;
     }
 
-    initGoogleMaps().catch(() => setLoadFailed(true));
-  }, [googleMap, loadFailed, initGoogleMaps]);
+    initGoogleMaps().catch(() => setFailure('load'));
+  }, [googleMap, failure, initGoogleMaps]);
+
+  const retry = () => {
+    setFailure(null);
+    setAttempt((current) => current + 1);
+  };
+
+  const onAuthFailure = useEffectEvent(() => {
+    reportClientError(
+      new Error('Google Maps rejected the API key'),
+      'google-maps-auth'
+    );
+    setFailure('auth');
+    setBuiltScheme(null);
+    setGoogleMap(null);
+    setGeneration((current) => current + 1);
+  });
 
   useEffect(() => {
-    if (!loadFailed) {
+    const handleAuthFailure = () => onAuthFailure();
+    window.gm_authFailure = handleAuthFailure;
+
+    return () => {
+      if (window.gm_authFailure === handleAuthFailure) {
+        window.gm_authFailure = undefined;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (failure !== 'load') {
       return;
     }
 
     const retryWhenVisible = () => {
       if (document.visibilityState === 'visible' && navigator.onLine) {
-        setLoadFailed(false);
+        setFailure(null);
+        setAttempt((current) => current + 1);
       }
     };
 
@@ -182,7 +250,7 @@ function GoogleMaps({
       window.removeEventListener('online', retryWhenVisible);
       document.removeEventListener('visibilitychange', retryWhenVisible);
     };
-  }, [loadFailed]);
+  }, [failure]);
 
   useEffect(() => {
     if (!('geolocation' in navigator) || !('permissions' in navigator)) {
@@ -231,11 +299,6 @@ function GoogleMaps({
   const centerLat = center?.lat;
   const centerLng = center?.lng;
 
-  // Applied once per value rather than once per map, so that a map rebuilt
-  // for a new theme keeps the camera it carried over instead of jumping back.
-  const appliedCenterRef = useRef<string | null>(null);
-  const appliedZoomRef = useRef<number | null>(null);
-
   useEffect(() => {
     if (!googleMap || centerLat === undefined || centerLng === undefined) {
       return;
@@ -258,7 +321,7 @@ function GoogleMaps({
 
   const contextValue = {
     googleMap,
-    importLibrary: importMapsLibrary,
+    loadLibrary,
     currentPosition,
     setCurrentPosition
   };
@@ -266,7 +329,7 @@ function GoogleMaps({
   return (
     <Box>
       <Box key={generation} ref={mapRef} sx={sx}>
-        {loadFailed && (
+        {failure && (
           <Stack
             spacing={2}
             sx={{
@@ -278,17 +341,21 @@ function GoogleMaps({
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              {dictionary['map could not load']}
+              {failure === 'auth'
+                ? dictionary['map unavailable']
+                : dictionary['map could not load']}
             </Typography>
-            <Button variant="outlined" onClick={() => setLoadFailed(false)}>
-              {dictionary.retry}
-            </Button>
+            {failure === 'load' && (
+              <Button variant="outlined" onClick={retry}>
+                {dictionary.retry}
+              </Button>
+            )}
           </Stack>
         )}
       </Box>
 
       <GoogleMapsContext.Provider value={contextValue}>
-        {children}
+        <Fragment key={attempt}>{children}</Fragment>
       </GoogleMapsContext.Provider>
     </Box>
   );
