@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { detailOf } from './reportClientError.ts';
+import { CLIENT_ERROR_MAX_BYTES } from './clientErrorReport.ts';
+import { detailOf, reportBody } from './reportClientError.ts';
 
 describe('detailOf', () => {
   it('takes the message and stack of an error', () => {
@@ -175,5 +176,111 @@ describe('detailOf', () => {
 
   it('does not throw for an object without a prototype', () => {
     assert.equal(detailOf(Object.create(null)).message, '[object Object]');
+  });
+});
+
+describe('reportBody', () => {
+  const url = 'https://qoodish.com/ja/maps/1';
+
+  it('carries the detail, source and url', () => {
+    assert.deepEqual(
+      JSON.parse(
+        reportBody({ message: 'Load failed', stack: 'at f' }, 'window', url) ??
+          ''
+      ),
+      { message: 'Load failed', stack: 'at f', source: 'window', url }
+    );
+  });
+
+  it('cuts a long message', () => {
+    const body = reportBody({ message: 'x'.repeat(5000) }, 'window', url);
+
+    assert.equal(JSON.parse(body ?? '').message.length, 1000);
+  });
+
+  it('cuts only the excess of the stack', () => {
+    const stack = 'x'.repeat(4000);
+    const message = 'x'.repeat(1000);
+    const longest = reportBody({ message, stack }, 'window', url) ?? '';
+    const overLimit = reportBody(
+      { message, stack: stack.repeat(2) },
+      'window',
+      url
+    );
+
+    assert.equal(
+      new TextEncoder().encode(overLimit ?? '').byteLength,
+      CLIENT_ERROR_MAX_BYTES
+    );
+    assert.ok(
+      JSON.parse(overLimit ?? '').stack.length >
+        JSON.parse(longest).stack.length
+    );
+  });
+
+  it('keeps as much of a multibyte stack as fits', () => {
+    const stack = `Error: ${'あ'.repeat(4000)}`;
+    const body =
+      reportBody({ message: 'あ'.repeat(1000), stack }, 'window', url) ?? '';
+    const sent: string = JSON.parse(body).stack;
+    const longer = JSON.stringify({
+      ...JSON.parse(body),
+      stack: stack.slice(0, sent.length + 1)
+    });
+
+    assert.ok(sent.length > 0 && stack.startsWith(sent));
+    assert.ok(
+      new TextEncoder().encode(body).byteLength <= CLIENT_ERROR_MAX_BYTES
+    );
+    assert.ok(
+      new TextEncoder().encode(longer).byteLength > CLIENT_ERROR_MAX_BYTES
+    );
+  });
+
+  it('keeps the longest stack of whole characters that fits', () => {
+    const body =
+      reportBody(
+        { message: 'm'.repeat(977), stack: '😀'.repeat(2000) },
+        'error',
+        'https://example.com/'
+      ) ?? '';
+
+    assert.equal(JSON.parse(body).stack.length, 3572);
+  });
+
+  it('keeps an unpaired surrogate that fits', () => {
+    const loneSurrogate = String.fromCharCode(0xd800);
+    const stack = `${'😀'.repeat(1800)}${loneSurrogate}${'b'.repeat(399)}`;
+    const kept = stack.slice(0, 3601);
+    const source = 'error';
+    const url = 'https://example.com/';
+    const overhead = new TextEncoder().encode(
+      JSON.stringify({ message: '', stack: kept, source, url })
+    ).byteLength;
+    const message = 'm'.repeat(CLIENT_ERROR_MAX_BYTES - overhead);
+
+    const body = reportBody({ message, stack }, source, url) ?? '';
+
+    assert.equal(JSON.parse(body).stack, kept);
+  });
+
+  it('cuts a long digest', () => {
+    const body = reportBody(
+      { message: 'x', digest: 'd'.repeat(9000) },
+      'window',
+      url
+    );
+
+    assert.equal(JSON.parse(body ?? '').digest.length, 100);
+  });
+
+  it('cuts a long url', () => {
+    const body = reportBody(
+      { message: 'x' },
+      'window',
+      `${url}/${'a'.repeat(9000)}`
+    );
+
+    assert.equal(JSON.parse(body ?? '').url.length, 2000);
   });
 });
