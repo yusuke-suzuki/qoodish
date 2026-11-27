@@ -1,4 +1,4 @@
-const MAX_BODY_BYTES = 8 * 1024;
+import { CLIENT_ERROR_MAX_BYTES } from '../../../utils/clientErrorReport.ts';
 
 type ClientErrorReport = {
   message: string;
@@ -11,7 +11,7 @@ type ClientErrorReport = {
 // request.text() would buffer the whole body before any check could run, so
 // the stream is counted chunk by chunk and dropped once it passes the limit.
 async function readBodyWithinLimit(request: Request): Promise<string | null> {
-  if (Number(request.headers.get('content-length')) > MAX_BODY_BYTES) {
+  if (Number(request.headers.get('content-length')) > CLIENT_ERROR_MAX_BYTES) {
     return null;
   }
 
@@ -34,7 +34,7 @@ async function readBodyWithinLimit(request: Request): Promise<string | null> {
 
     received += value.byteLength;
 
-    if (received > MAX_BODY_BYTES) {
+    if (received > CLIENT_ERROR_MAX_BYTES) {
       await reader.cancel();
       return null;
     }
