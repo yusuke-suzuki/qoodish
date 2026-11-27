@@ -12,7 +12,7 @@ type Props = {
 };
 
 function CoodinatesConverter({ onChange, defaultValue }: Props) {
-  const { googleMap, importLibrary } = useGoogleMap();
+  const { googleMap, loadLibrary } = useGoogleMap();
 
   const dictionary = useDictionary();
 
@@ -42,14 +42,20 @@ function CoodinatesConverter({ onChange, defaultValue }: Props) {
   };
 
   useEffect(() => {
-    if (!googleMap || !importLibrary) {
+    if (!googleMap || !loadLibrary) {
       return;
     }
 
     let cancelled = false;
 
     const initControlPosition = async () => {
-      const { ControlPosition } = await importLibrary('core');
+      const coreLibrary = await loadLibrary('core');
+
+      if (!coreLibrary) {
+        return;
+      }
+
+      const { ControlPosition } = coreLibrary;
 
       if (cancelled) {
         return;
@@ -63,7 +69,7 @@ function CoodinatesConverter({ onChange, defaultValue }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [googleMap, importLibrary]);
+  }, [googleMap, loadLibrary]);
 
   const notifyChange = useEffectEvent(onChange);
 

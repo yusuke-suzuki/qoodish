@@ -27,20 +27,26 @@ function BrowserMapPopup({ children, label, position, open, onClose }: Props) {
   use(browser());
 
   const dictionary = useDictionary();
-  const { googleMap, importLibrary } = useGoogleMap();
+  const { googleMap, loadLibrary } = useGoogleMap();
 
   const [content] = useState(() => document.createElement('div'));
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!importLibrary) {
+    if (!loadLibrary) {
       return;
     }
 
     let cancelled = false;
 
     const isolateFromMap = async () => {
-      const { OverlayView } = await importLibrary('maps');
+      const mapsLibrary = await loadLibrary('maps');
+
+      if (!mapsLibrary) {
+        return;
+      }
+
+      const { OverlayView } = mapsLibrary;
 
       if (cancelled) {
         return;
@@ -54,10 +60,10 @@ function BrowserMapPopup({ children, label, position, open, onClose }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [importLibrary, content]);
+  }, [loadLibrary, content]);
 
   useEffect(() => {
-    if (!googleMap || !importLibrary || !position || !open) {
+    if (!googleMap || !loadLibrary || !position || !open) {
       return;
     }
 
@@ -65,7 +71,13 @@ function BrowserMapPopup({ children, label, position, open, onClose }: Props) {
     let marker: google.maps.marker.AdvancedMarkerElement | null = null;
 
     const showPopup = async () => {
-      const { AdvancedMarkerElement } = await importLibrary('marker');
+      const markerLibrary = await loadLibrary('marker');
+
+      if (!markerLibrary) {
+        return;
+      }
+
+      const { AdvancedMarkerElement } = markerLibrary;
 
       if (cancelled) {
         return;
@@ -106,7 +118,7 @@ function BrowserMapPopup({ children, label, position, open, onClose }: Props) {
         marker.map = null;
       }
     };
-  }, [googleMap, importLibrary, content, position, open]);
+  }, [googleMap, loadLibrary, content, position, open]);
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {

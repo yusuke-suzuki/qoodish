@@ -172,6 +172,36 @@ for (const lang of LOCALES) {
     );
   });
 
+  test(`recovers the map detail page in ${lang} after the Maps script fails`, async ({
+    page,
+    request
+  }) => {
+    const mapId = await firstMapId(request);
+    let blocked = true;
+
+    await page.route(
+      (url) =>
+        url.hostname === 'maps.googleapis.com' &&
+        url.pathname === '/maps/api/js',
+      (route) => (blocked ? route.abort() : route.continue())
+    );
+
+    await page.goto(`/${lang}/maps/${mapId}`);
+
+    const retry = page.getByRole('button', {
+      name: lang === 'ja' ? 'もう一度試す' : 'Try again'
+    });
+
+    await expect(retry).toBeVisible({ timeout: 30000 });
+
+    blocked = false;
+    await retry.click();
+
+    await expect(page.locator('.gm-style').first()).toBeVisible({
+      timeout: 30000
+    });
+  });
+
   test(`boots the pin detail page in ${lang}`, async ({ page, request }) => {
     const pin = await firstPublicPin(request);
     const route = `/${lang}/pins/${pin.id}`;
