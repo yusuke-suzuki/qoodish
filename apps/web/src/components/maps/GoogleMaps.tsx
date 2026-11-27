@@ -1,4 +1,4 @@
-import { Loader } from '@googlemaps/js-api-loader';
+import { importLibrary, setOptions } from '@googlemaps/js-api-loader';
 import {
   Box,
   Button,
@@ -17,28 +17,28 @@ import {
   useRef,
   useState
 } from 'react';
-import GoogleMapsContext from '../../context/GoogleMapsContext.ts';
+import GoogleMapsContext, {
+  type ImportMapsLibrary
+} from '../../context/GoogleMapsContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { toLocale } from '../../utils/locales.ts';
 
-// The Maps script carries its language in the URL it is loaded from, so the
-// first map on a document settles the language for every later one, and the
-// Loader enforces that by throwing when constructed again with different
-// options. Handing back the existing instance keeps a locale reached by
-// client navigation from throwing on a change the loaded script could not
-// have honoured anyway; a full load picks the new language up.
-let loader: Loader | null = null;
+// The Maps script carries its language in the URL it is loaded from, and
+// setOptions applies only once per document, so the first map settles the
+// language for every later one; a full load picks a new language up.
+let optionsSet = false;
 
-function getLoader(language: string): Loader {
-  if (!loader) {
-    loader = new Loader({
-      apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
-      version: 'beta',
-      language
-    });
+function configureMaps(language: string): void {
+  if (optionsSet) {
+    return;
   }
 
-  return loader;
+  setOptions({
+    key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
+    v: 'beta',
+    language
+  });
+  optionsSet = true;
 }
 
 type Props = {
@@ -77,7 +77,15 @@ function GoogleMaps({
     }
   }
 
-  const loader = getLoader(toLocale(lang));
+  const language = toLocale(lang);
+
+  const importMapsLibrary: ImportMapsLibrary = useCallback(
+    (name) => {
+      configureMaps(language);
+      return importLibrary(name);
+    },
+    [language]
+  );
 
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -108,8 +116,8 @@ function GoogleMaps({
       return;
     }
 
-    const { Map: GoogleMap } = await loader.importLibrary('maps');
-    const { ColorScheme, ControlPosition } = await loader.importLibrary('core');
+    const [{ Map: GoogleMap }, { ColorScheme, ControlPosition }] =
+      await Promise.all([importMapsLibrary('maps'), importMapsLibrary('core')]);
 
     // The scheme the reader chose, which may differ from the system's, so
     // ColorScheme.FOLLOW_SYSTEM would not do. useColorScheme reports nothing
@@ -144,7 +152,7 @@ function GoogleMaps({
     setCarriedCamera(null);
     setBuiltScheme(dark ? 'dark' : 'light');
     setGoogleMap(map);
-  }, [mapId, mapOptions, mdUp, loader, carriedCamera, colorScheme]);
+  }, [mapId, mapOptions, mdUp, importMapsLibrary, carriedCamera, colorScheme]);
 
   const [loadFailed, setLoadFailed] = useState(false);
 
@@ -250,7 +258,7 @@ function GoogleMaps({
 
   const contextValue = {
     googleMap,
-    loader,
+    importLibrary: importMapsLibrary,
     currentPosition,
     setCurrentPosition
   };

@@ -23,7 +23,7 @@ export default function MarkerView({
   onMouseEnter,
   onMouseLeave
 }: Props) {
-  const { loader, googleMap } = useGoogleMap();
+  const { importLibrary, googleMap } = useGoogleMap();
 
   // The marker is an imperative map object that the effects below write to, so
   // it is held in a ref rather than in state; the flag is what lets them run
@@ -47,14 +47,14 @@ export default function MarkerView({
   const handleMouseLeave = useEffectEvent(() => onMouseLeave?.());
 
   useEffect(() => {
-    if (!googleMap || !loader) {
+    if (!googleMap || !importLibrary) {
       return;
     }
 
     let cancelled = false;
 
     const initMarker = async () => {
-      const { AdvancedMarkerElement } = await loader.importLibrary('marker');
+      const { AdvancedMarkerElement } = await importLibrary('marker');
 
       if (cancelled) {
         return;
@@ -82,7 +82,7 @@ export default function MarkerView({
 
       setReady(false);
     };
-  }, [googleMap, loader, content]);
+  }, [googleMap, importLibrary, content]);
 
   useEffect(() => {
     // Turning on gmpClickable to use gmp-click makes the marker swallow taps

@@ -63,7 +63,7 @@ function CurrentPositionMarker({
   onCreatePinClick,
   disableCreatePin
 }: Props) {
-  const { loader, currentPosition } = useGoogleMap();
+  const { importLibrary, currentPosition } = useGoogleMap();
 
   const dictionary = useDictionary();
 
@@ -104,14 +104,14 @@ function CurrentPositionMarker({
   const popoverId = popoverOpen ? 'current-position' : undefined;
 
   useEffect(() => {
-    if (!loader || !currentPosition) {
+    if (!importLibrary || !currentPosition) {
       return;
     }
 
     let cancelled = false;
 
     const initPosition = async () => {
-      const { LatLng } = await loader.importLibrary('core');
+      const { LatLng } = await importLibrary('core');
 
       if (cancelled) {
         return;
@@ -130,7 +130,7 @@ function CurrentPositionMarker({
     return () => {
       cancelled = true;
     };
-  }, [loader, currentPosition]);
+  }, [importLibrary, currentPosition]);
 
   if (!position) {
     return null;

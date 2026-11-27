@@ -13,7 +13,7 @@ export const PLACE_FIELDS = [
 ];
 
 export function usePlaceSearch(input: string) {
-  const { loader, googleMap, currentPosition } = useGoogleMap();
+  const { importLibrary, googleMap, currentPosition } = useGoogleMap();
   const { lang } = useParams<{ lang: string }>();
   const language = toLocale(lang);
 
@@ -25,12 +25,12 @@ export function usePlaceSearch(input: string) {
 
   const search = useCallback(
     async (query: string) => {
-      if (!loader) {
+      if (!importLibrary) {
         return [];
       }
 
       const { AutocompleteSessionToken, AutocompleteSuggestion } =
-        await loader.importLibrary('places');
+        await importLibrary('places');
 
       if (!sessionTokenRef.current) {
         sessionTokenRef.current = new AutocompleteSessionToken();
@@ -56,7 +56,7 @@ export function usePlaceSearch(input: string) {
         .map((suggestion) => suggestion.placePrediction)
         .filter((prediction) => prediction !== null);
     },
-    [loader, language, googleMap, currentPosition]
+    [importLibrary, language, googleMap, currentPosition]
   );
 
   const { results: predictions, isLoading } = useDebouncedSearch(input, search);

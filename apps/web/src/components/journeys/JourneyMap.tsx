@@ -23,18 +23,18 @@ function JourneySpotMarker({
   spot: Spot;
   variant: keyof typeof markerVariants;
 }) {
-  const { loader } = useGoogleMap();
+  const { importLibrary } = useGoogleMap();
   const [position, setPosition] = useState<google.maps.LatLng | null>(null);
 
   useEffect(() => {
-    if (!loader) {
+    if (!importLibrary) {
       return;
     }
 
     let disposed = false;
 
     (async () => {
-      const { LatLng } = await loader.importLibrary('core');
+      const { LatLng } = await importLibrary('core');
 
       if (!disposed) {
         setPosition(new LatLng(spot.latitude, spot.longitude));
@@ -44,7 +44,7 @@ function JourneySpotMarker({
     return () => {
       disposed = true;
     };
-  }, [loader, spot]);
+  }, [importLibrary, spot]);
 
   if (!position) {
     return null;
@@ -87,12 +87,12 @@ function JourneyMapOverlay({
   path,
   fallbackCenter
 }: OverlayProps) {
-  const { googleMap, loader } = useGoogleMap();
+  const { googleMap, importLibrary } = useGoogleMap();
 
   const [polyline, setPolyline] = useState<google.maps.Polyline | null>(null);
 
   useEffect(() => {
-    if (!googleMap || !loader) {
+    if (!googleMap || !importLibrary) {
       return;
     }
 
@@ -100,8 +100,8 @@ function JourneyMapOverlay({
     let line: google.maps.Polyline | null = null;
 
     (async () => {
-      const { Polyline } = await loader.importLibrary('maps');
-      const { Point } = await loader.importLibrary('core');
+      const { Polyline } = await importLibrary('maps');
+      const { Point } = await importLibrary('core');
 
       if (disposed) {
         return;
@@ -122,7 +122,7 @@ function JourneyMapOverlay({
       line?.setMap(null);
       setPolyline(null);
     };
-  }, [googleMap, loader]);
+  }, [googleMap, importLibrary]);
 
   useEffect(() => {
     if (!polyline) {
@@ -138,7 +138,7 @@ function JourneyMapOverlay({
   const centeredRef = useRef(false);
 
   useEffect(() => {
-    if (!googleMap || !loader) {
+    if (!googleMap || !importLibrary) {
       return;
     }
 
@@ -177,7 +177,7 @@ function JourneyMapOverlay({
     let cancelled = false;
 
     (async () => {
-      const { LatLngBounds } = await loader.importLibrary('core');
+      const { LatLngBounds } = await importLibrary('core');
 
       if (cancelled) {
         return;
@@ -199,7 +199,7 @@ function JourneyMapOverlay({
     return () => {
       cancelled = true;
     };
-  }, [googleMap, loader, path, spots, milestones, fallbackCenter]);
+  }, [googleMap, importLibrary, path, spots, milestones, fallbackCenter]);
 
   return (
     <>
