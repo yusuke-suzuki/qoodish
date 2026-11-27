@@ -1,5 +1,10 @@
+import { CLIENT_ERROR_MAX_BYTES } from './clientErrorReport.ts';
+
 const MAX_REPORTS_PER_PAGE = 5;
+const MAX_MESSAGE_LENGTH = 1000;
 const MAX_STACK_LENGTH = 4000;
+const MAX_URL_LENGTH = 2000;
+const MAX_DIGEST_LENGTH = 100;
 const IDENTIFYING_FIELDS = ['code', 'status', 'type'] as const;
 const MAX_LISTED_KEYS = 10;
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
@@ -82,6 +87,67 @@ export function detailOf(value: unknown): ErrorDetail {
   };
 }
 
+function isHighSurrogate(code: number): boolean {
+  return code >= 0xd800 && code <= 0xdbff;
+}
+
+function isLowSurrogate(code: number): boolean {
+  return code >= 0xdc00 && code <= 0xdfff;
+}
+
+function prefix(text: string, length: number): string {
+  const splitsPair =
+    isHighSurrogate(text.charCodeAt(length - 1)) &&
+    isLowSurrogate(text.charCodeAt(length));
+  return text.slice(0, splitsPair ? length - 1 : length);
+}
+
+function byteLength(text: string): number {
+  return new TextEncoder().encode(text).byteLength;
+}
+
+export function reportBody(
+  detail: ErrorDetail,
+  source: string,
+  url: string
+): string | null {
+  const report = {
+    ...detail,
+    message: detail.message.slice(0, MAX_MESSAGE_LENGTH),
+    digest: detail.digest?.slice(0, MAX_DIGEST_LENGTH),
+    source,
+    url: url.slice(0, MAX_URL_LENGTH)
+  };
+  const fit = (stack: string | undefined): string | null => {
+    const body = JSON.stringify({ ...report, stack });
+    return byteLength(body) <= CLIENT_ERROR_MAX_BYTES ? body : null;
+  };
+  const stack = report.stack ?? '';
+  let best = fit(report.stack);
+
+  if (best !== null) {
+    return best;
+  }
+
+  best = fit(undefined);
+  let low = 0;
+  let high = stack.length;
+
+  while (best !== null && low < high) {
+    const length = Math.ceil((low + high) / 2);
+    const body = fit(prefix(stack, length));
+
+    if (body === null) {
+      high = length - 1;
+    } else {
+      best = body;
+      low = length;
+    }
+  }
+
+  return best;
+}
+
 export default function reportClientError(
   error: unknown,
   source: string
@@ -97,17 +163,19 @@ export default function reportClientError(
     return;
   }
 
+  // The query can carry credentials such as the email sign-in code.
+  const body = reportBody(detail, source, location.origin + location.pathname);
+
+  if (body === null) {
+    return;
+  }
+
   reported += 1;
 
   fetch('/api/errors', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     keepalive: true,
-    // The query can carry credentials such as the email sign-in code.
-    body: JSON.stringify({
-      ...detail,
-      source,
-      url: location.origin + location.pathname
-    })
+    body
   }).catch(() => {});
 }
