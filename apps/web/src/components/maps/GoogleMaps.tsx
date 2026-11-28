@@ -336,7 +336,12 @@ function GoogleMaps({
   }, [googleMap, centerLat, centerLng]);
 
   useEffect(() => {
-    if (googleMap && zoom && appliedZoomRef.current !== zoom) {
+    if (
+      googleMap &&
+      zoom !== undefined &&
+      Number.isFinite(zoom) &&
+      appliedZoomRef.current !== zoom
+    ) {
       appliedZoomRef.current = zoom;
       googleMap.setZoom(zoom);
     }
