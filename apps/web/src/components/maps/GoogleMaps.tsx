@@ -222,16 +222,17 @@ function GoogleMaps({
           buildMap(mapsLibrary, coreLibrary);
         }
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (current) {
-          dispatch({ type: 'loadFailed', attempt });
+          reportClientError(error, 'google-maps-build');
+          dispatch({ type: 'buildFailed' });
         }
       });
 
     return () => {
       current = false;
     };
-  }, [googleMap, failure, loadLibrary, attempt]);
+  }, [googleMap, failure, loadLibrary]);
 
   const retry = () => dispatch({ type: 'retry' });
 
@@ -369,9 +370,9 @@ function GoogleMaps({
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              {failure === 'auth'
-                ? dictionary['map unavailable']
-                : dictionary['map could not load']}
+              {canRetry(failure)
+                ? dictionary['map could not load']
+                : dictionary['map unavailable']}
             </Typography>
             {canRetry(failure) && (
               <Button variant="outlined" onClick={retry}>

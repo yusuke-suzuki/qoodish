@@ -34,6 +34,26 @@ describe('nextMapLoadState', () => {
     );
   });
 
+  it('records a map that failed to build', () => {
+    assert.deepEqual(
+      nextMapLoadState(initialMapLoadState, { type: 'buildFailed' }),
+      { failure: 'build', attempt: 0 }
+    );
+  });
+
+  it('keeps an auth failure when the map fails to build after it', () => {
+    assert.equal(
+      nextMapLoadState(authFailed, { type: 'buildFailed' }),
+      authFailed
+    );
+  });
+
+  it('does not retry a map that failed to build', () => {
+    const buildFailed: MapLoadState = { failure: 'build', attempt: 2 };
+
+    assert.equal(nextMapLoadState(buildFailed, { type: 'retry' }), buildFailed);
+  });
+
   it('replaces a load failure with an auth failure', () => {
     assert.deepEqual(nextMapLoadState(loadFailed, { type: 'authFailed' }), {
       failure: 'auth',
@@ -107,8 +127,8 @@ describe('nextMapLoadState', () => {
 describe('canRetry', () => {
   it('offers a retry for a load failure only', () => {
     assert.deepEqual(
-      [canRetry('load'), canRetry('auth'), canRetry(null)],
-      [true, false, false]
+      [canRetry('load'), canRetry('build'), canRetry('auth'), canRetry(null)],
+      [true, false, false, false]
     );
   });
 });

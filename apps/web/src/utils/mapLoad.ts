@@ -1,4 +1,4 @@
-export type MapFailure = 'load' | 'auth';
+export type MapFailure = 'load' | 'build' | 'auth';
 
 export type MapLoadState = {
   failure: MapFailure | null;
@@ -7,6 +7,7 @@ export type MapLoadState = {
 
 export type MapLoadEvent =
   | { type: 'loadFailed'; attempt: number }
+  | { type: 'buildFailed' }
   | { type: 'authFailed' }
   | { type: 'retry' }
   | { type: 'resumed'; visible: boolean; online: boolean };
@@ -30,6 +31,8 @@ export function nextMapLoadState(
       return state.failure || event.attempt !== state.attempt
         ? state
         : { ...state, failure: 'load' };
+    case 'buildFailed':
+      return state.failure ? state : { ...state, failure: 'build' };
     case 'authFailed':
       return { ...state, failure: 'auth' };
     case 'retry':
