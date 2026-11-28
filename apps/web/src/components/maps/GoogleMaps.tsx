@@ -151,11 +151,11 @@ function GoogleMaps({
       try {
         return await importLibrary(name);
       } catch {
-        dispatch({ type: 'loadFailed' });
+        dispatch({ type: 'loadFailed', attempt });
         return null;
       }
     },
-    [language]
+    [language, attempt]
   );
 
   const initGoogleMaps = useCallback(async () => {
@@ -229,8 +229,8 @@ function GoogleMaps({
       return;
     }
 
-    initGoogleMaps().catch(() => dispatch({ type: 'loadFailed' }));
-  }, [googleMap, failure, initGoogleMaps]);
+    initGoogleMaps().catch(() => dispatch({ type: 'loadFailed', attempt }));
+  }, [googleMap, failure, initGoogleMaps, attempt]);
 
   const retry = () => dispatch({ type: 'retry' });
 
