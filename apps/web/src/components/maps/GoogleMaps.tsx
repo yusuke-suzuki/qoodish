@@ -201,7 +201,7 @@ function GoogleMaps({
       return;
     }
 
-    initGoogleMaps().catch(() => setFailure('load'));
+    initGoogleMaps().catch(() => setFailure((current) => current ?? 'load'));
   }, [googleMap, failure, initGoogleMaps]);
 
   const retry = () => {
