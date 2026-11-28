@@ -122,15 +122,28 @@ function GoogleMaps({
     nextMapLoadState,
     initialMapLoadState
   );
-
-  // Applied once per value rather than once per map, so that a map rebuilt
-  // for a new theme keeps the camera it carried over instead of jumping back.
-  const appliedCenterRef = useRef<string | null>(null);
-  const appliedZoomRef = useRef<number | null>(null);
+  const [shownFailure, setShownFailure] = useState(failure);
 
   // A failed library leaves the map without the parts drawn from it, so the
   // map is dropped for the failure notice and built again, with the children
   // that draw on it, on retry.
+  if (failure !== shownFailure) {
+    setShownFailure(failure);
+
+    if (failure && !shownFailure) {
+      setBuiltScheme(null);
+      setGoogleMap(null);
+      setGeneration((current) => current + 1);
+    }
+  }
+
+  // Applied once per value rather than once per map, so that a map rebuilt
+  // for a new theme keeps the camera it carried over instead of jumping back.
+  // A map rebuilt by a retry applies them afresh.
+  const appliedCenterRef = useRef<string | null>(null);
+  const appliedZoomRef = useRef<number | null>(null);
+  const builtAttemptRef = useRef<number | null>(null);
+
   const loadLibrary: LoadLibrary = useCallback(
     async (name) => {
       configureMaps(language);
@@ -139,11 +152,6 @@ function GoogleMaps({
         return await importLibrary(name);
       } catch {
         dispatch({ type: 'loadFailed' });
-        setBuiltScheme(null);
-        setGoogleMap(null);
-        setGeneration((current) => current + 1);
-        appliedCenterRef.current = null;
-        appliedZoomRef.current = null;
         return null;
       }
     },
@@ -197,10 +205,24 @@ function GoogleMaps({
       ...mapOptions
     });
 
+    if (builtAttemptRef.current !== attempt) {
+      builtAttemptRef.current = attempt;
+      appliedCenterRef.current = null;
+      appliedZoomRef.current = null;
+    }
+
     setCarriedCamera(null);
     setBuiltScheme(dark ? 'dark' : 'light');
     setGoogleMap(map);
-  }, [mapId, mapOptions, mdUp, loadLibrary, carriedCamera, colorScheme]);
+  }, [
+    mapId,
+    mapOptions,
+    mdUp,
+    loadLibrary,
+    carriedCamera,
+    colorScheme,
+    attempt
+  ]);
 
   useEffect(() => {
     if (googleMap || failure || !mapRef.current) {
@@ -218,9 +240,6 @@ function GoogleMaps({
       'google-maps-auth'
     );
     dispatch({ type: 'authFailed' });
-    setBuiltScheme(null);
-    setGoogleMap(null);
-    setGeneration((current) => current + 1);
   });
 
   useEffect(() => {
