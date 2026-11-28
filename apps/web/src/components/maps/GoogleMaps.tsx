@@ -158,79 +158,80 @@ function GoogleMaps({
     [language, attempt]
   );
 
-  const initGoogleMaps = useCallback(async () => {
-    if (!mapRef.current) {
-      return;
+  const buildMap = useEffectEvent(
+    (
+      { Map: GoogleMap }: google.maps.MapsLibrary,
+      { ColorScheme, ControlPosition }: google.maps.CoreLibrary
+    ) => {
+      if (!mapRef.current) {
+        return;
+      }
+
+      // The scheme the reader chose, which may differ from the system's, so
+      // ColorScheme.FOLLOW_SYSTEM would not do. useColorScheme reports nothing
+      // until the provider has mounted, but InitColorSchemeScript has put the
+      // class on the root by then.
+      const dark =
+        (colorScheme ??
+          (document.documentElement.classList.contains('dark')
+            ? 'dark'
+            : 'light')) === 'dark';
+
+      const map = new GoogleMap(mapRef.current, {
+        colorScheme: dark ? ColorScheme.DARK : ColorScheme.LIGHT,
+        zoom: 17,
+        ...carriedCamera,
+        zoomControl: !!mdUp,
+        zoomControlOptions: {
+          position: ControlPosition.LEFT_BOTTOM
+        },
+        streetViewControl: true,
+        streetViewControlOptions: {
+          position: ControlPosition.LEFT_BOTTOM
+        },
+        scaleControl: false,
+        mapTypeControl: false,
+        fullscreenControl: false,
+        gestureHandling: 'greedy',
+        mapId: mapId,
+        ...mapOptions
+      });
+
+      if (builtAttemptRef.current !== attempt) {
+        builtAttemptRef.current = attempt;
+        appliedCenterRef.current = null;
+        appliedZoomRef.current = null;
+      }
+
+      setCarriedCamera(null);
+      setBuiltScheme(dark ? 'dark' : 'light');
+      setGoogleMap(map);
     }
-
-    const [mapsLibrary, coreLibrary] = await Promise.all([
-      loadLibrary('maps'),
-      loadLibrary('core')
-    ]);
-
-    if (!mapsLibrary || !coreLibrary || !mapRef.current) {
-      return;
-    }
-
-    const { Map: GoogleMap } = mapsLibrary;
-    const { ColorScheme, ControlPosition } = coreLibrary;
-
-    // The scheme the reader chose, which may differ from the system's, so
-    // ColorScheme.FOLLOW_SYSTEM would not do. useColorScheme reports nothing
-    // until the provider has mounted, but InitColorSchemeScript has put the
-    // class on the root by then.
-    const dark =
-      (colorScheme ??
-        (document.documentElement.classList.contains('dark')
-          ? 'dark'
-          : 'light')) === 'dark';
-
-    const map = new GoogleMap(mapRef.current, {
-      colorScheme: dark ? ColorScheme.DARK : ColorScheme.LIGHT,
-      zoom: 17,
-      ...carriedCamera,
-      zoomControl: !!mdUp,
-      zoomControlOptions: {
-        position: ControlPosition.LEFT_BOTTOM
-      },
-      streetViewControl: true,
-      streetViewControlOptions: {
-        position: ControlPosition.LEFT_BOTTOM
-      },
-      scaleControl: false,
-      mapTypeControl: false,
-      fullscreenControl: false,
-      gestureHandling: 'greedy',
-      mapId: mapId,
-      ...mapOptions
-    });
-
-    if (builtAttemptRef.current !== attempt) {
-      builtAttemptRef.current = attempt;
-      appliedCenterRef.current = null;
-      appliedZoomRef.current = null;
-    }
-
-    setCarriedCamera(null);
-    setBuiltScheme(dark ? 'dark' : 'light');
-    setGoogleMap(map);
-  }, [
-    mapId,
-    mapOptions,
-    mdUp,
-    loadLibrary,
-    carriedCamera,
-    colorScheme,
-    attempt
-  ]);
+  );
 
   useEffect(() => {
     if (googleMap || failure || !mapRef.current) {
       return;
     }
 
-    initGoogleMaps().catch(() => dispatch({ type: 'loadFailed', attempt }));
-  }, [googleMap, failure, initGoogleMaps, attempt]);
+    let current = true;
+
+    Promise.all([loadLibrary('maps'), loadLibrary('core')])
+      .then(([mapsLibrary, coreLibrary]) => {
+        if (current && mapsLibrary && coreLibrary) {
+          buildMap(mapsLibrary, coreLibrary);
+        }
+      })
+      .catch(() => {
+        if (current) {
+          dispatch({ type: 'loadFailed', attempt });
+        }
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [googleMap, failure, loadLibrary, attempt]);
 
   const retry = () => dispatch({ type: 'retry' });
 
