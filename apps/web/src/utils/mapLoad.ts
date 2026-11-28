@@ -6,7 +6,7 @@ export type MapLoadState = {
 };
 
 export type MapLoadEvent =
-  | { type: 'loadFailed' }
+  | { type: 'loadFailed'; attempt: number }
   | { type: 'authFailed' }
   | { type: 'retry' }
   | { type: 'resumed'; visible: boolean; online: boolean };
@@ -27,7 +27,9 @@ export function nextMapLoadState(
 ): MapLoadState {
   switch (event.type) {
     case 'loadFailed':
-      return state.failure ? state : { ...state, failure: 'load' };
+      return state.failure || event.attempt !== state.attempt
+        ? state
+        : { ...state, failure: 'load' };
     case 'authFailed':
       return { ...state, failure: 'auth' };
     case 'retry':

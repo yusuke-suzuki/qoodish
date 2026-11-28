@@ -13,15 +13,24 @@ const authFailed: MapLoadState = { failure: 'auth', attempt: 2 };
 describe('nextMapLoadState', () => {
   it('records a load failure', () => {
     assert.deepEqual(
-      nextMapLoadState(initialMapLoadState, { type: 'loadFailed' }),
+      nextMapLoadState(initialMapLoadState, { type: 'loadFailed', attempt: 0 }),
       { failure: 'load', attempt: 0 }
     );
   });
 
   it('keeps an auth failure when a load fails after it', () => {
     assert.equal(
-      nextMapLoadState(authFailed, { type: 'loadFailed' }),
+      nextMapLoadState(authFailed, { type: 'loadFailed', attempt: 2 }),
       authFailed
+    );
+  });
+
+  it('ignores a load that failed in an earlier attempt', () => {
+    const retrying: MapLoadState = { failure: null, attempt: 3 };
+
+    assert.equal(
+      nextMapLoadState(retrying, { type: 'loadFailed', attempt: 2 }),
+      retrying
     );
   });
 
