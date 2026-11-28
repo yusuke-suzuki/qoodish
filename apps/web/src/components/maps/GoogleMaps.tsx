@@ -16,6 +16,7 @@ import {
   useCallback,
   useEffect,
   useEffectEvent,
+  useReducer,
   useRef,
   useState
 } from 'react';
@@ -24,6 +25,11 @@ import GoogleMapsContext, {
 } from '../../context/GoogleMapsContext.ts';
 import useDictionary from '../../hooks/useDictionary.ts';
 import { toLocale } from '../../utils/locales.ts';
+import {
+  canRetry,
+  initialMapLoadState,
+  nextMapLoadState
+} from '../../utils/mapLoad.ts';
 import reportClientError from '../../utils/reportClientError.ts';
 
 declare global {
@@ -49,8 +55,6 @@ function configureMaps(language: string): void {
   });
   optionsSet = true;
 }
-
-type Failure = 'load' | 'auth';
 
 type Props = {
   mapId: string | undefined;
@@ -114,8 +118,10 @@ function GoogleMaps({
     setGeneration((current) => current + 1);
   }
 
-  const [failure, setFailure] = useState<Failure | null>(null);
-  const [attempt, setAttempt] = useState(0);
+  const [{ failure, attempt }, dispatch] = useReducer(
+    nextMapLoadState,
+    initialMapLoadState
+  );
 
   // Applied once per value rather than once per map, so that a map rebuilt
   // for a new theme keeps the camera it carried over instead of jumping back.
@@ -132,7 +138,7 @@ function GoogleMaps({
       try {
         return await importLibrary(name);
       } catch {
-        setFailure((current) => current ?? 'load');
+        dispatch({ type: 'loadFailed' });
         setBuiltScheme(null);
         setGoogleMap(null);
         setGeneration((current) => current + 1);
@@ -201,20 +207,17 @@ function GoogleMaps({
       return;
     }
 
-    initGoogleMaps().catch(() => setFailure((current) => current ?? 'load'));
+    initGoogleMaps().catch(() => dispatch({ type: 'loadFailed' }));
   }, [googleMap, failure, initGoogleMaps]);
 
-  const retry = () => {
-    setFailure(null);
-    setAttempt((current) => current + 1);
-  };
+  const retry = () => dispatch({ type: 'retry' });
 
   const onAuthFailure = useEffectEvent(() => {
     reportClientError(
       new Error('Google Maps rejected the API key'),
       'google-maps-auth'
     );
-    setFailure('auth');
+    dispatch({ type: 'authFailed' });
     setBuiltScheme(null);
     setGoogleMap(null);
     setGeneration((current) => current + 1);
@@ -232,16 +235,16 @@ function GoogleMaps({
   }, []);
 
   useEffect(() => {
-    if (failure !== 'load') {
+    if (!canRetry(failure)) {
       return;
     }
 
-    const retryWhenVisible = () => {
-      if (document.visibilityState === 'visible' && navigator.onLine) {
-        setFailure(null);
-        setAttempt((current) => current + 1);
-      }
-    };
+    const retryWhenVisible = () =>
+      dispatch({
+        type: 'resumed',
+        visible: document.visibilityState === 'visible',
+        online: navigator.onLine
+      });
 
     window.addEventListener('online', retryWhenVisible);
     document.addEventListener('visibilitychange', retryWhenVisible);
@@ -345,7 +348,7 @@ function GoogleMaps({
                 ? dictionary['map unavailable']
                 : dictionary['map could not load']}
             </Typography>
-            {failure === 'load' && (
+            {canRetry(failure) && (
               <Button variant="outlined" onClick={retry}>
                 {dictionary.retry}
               </Button>
